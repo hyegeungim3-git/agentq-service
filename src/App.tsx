@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { PortalPage } from '@pages/portal/PortalPage'
+import { SummaryPage } from '@pages/summary/SummaryPage'
+
+/* 화면이 둘이 됐지만 아직 라우터를 넣지 않는다.
+   URL로 직접 접근할 화면이 생길 때(공유·새로고침 복원이 필요할 때) 도입한다.
+   지금 넣으면 요구사항보다 큰 구조가 된다(가이드 §8). */
+type View = { name: 'portal' } | { name: 'summary'; domainId: string }
 
 export default function App() {
-  const [domainId, setDomainId] = useState<string | null>(null)
+  const [view, setView] = useState<View>({ name: 'portal' })
 
-  // 라우팅은 아직 붙이지 않았다 — 화면이 하나뿐인 시점에 라우터를 넣으면
-  // 요구사항보다 큰 구조가 된다(가이드 §8). 두 번째 화면이 생길 때 도입한다.
-  if (domainId) {
-    return (
-      <main className="min-h-dvh grid place-items-center">
-        <p className="text-sm text-slate-600">선택한 도메인: {domainId}</p>
-      </main>
-    )
+  if (view.name === 'summary') {
+    return <SummaryPage onBack={() => setView({ name: 'portal' })} />
   }
-  return <PortalPage onSelect={setDomainId} />
+  return <PortalPage onSelect={(domainId) => setView({ name: 'summary', domainId })} />
 }
