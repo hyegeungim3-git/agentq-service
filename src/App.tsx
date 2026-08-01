@@ -7,6 +7,9 @@ import { HubPage } from '@pages/hub/HubPage'
 import { SummaryPage } from '@pages/summary/SummaryPage'
 import { TranslatePage } from '@pages/translate/TranslatePage'
 import { ReviewPage } from '@pages/review/ReviewPage'
+import { ReportPage } from '@pages/report/ReportPage'
+import { MeetingPage } from '@pages/meeting/MeetingPage'
+import { RegulationPage } from '@pages/regulation/RegulationPage'
 
 /* 화면이 여럿이 됐지만 라우터는 아직 넣지 않는다.
    URL 공유·새로고침 복원이 요구사항으로 들어올 때 도입한다(가이드 §8, §12).
@@ -49,6 +52,9 @@ export default function App() {
     if (view.agentId === 'summary') return <SummaryPage onBack={back} />
     if (view.agentId === 'translate') return <TranslatePage onBack={back} />
     if (view.agentId === 'review') return <ReviewPage onBack={back} />
+    if (view.agentId === 'report') return <ReportPage onBack={back} />
+    if (view.agentId === 'meeting') return <MeetingPage onBack={back} />
+    if (view.agentId === 'internalreg') return <RegulationPage onBack={back} />
     // 허브가 준비된 에이전트만 열어 주므로 여기 오면 카탈로그와 라우팅이 어긋난 것이다
     return (
       <main className="min-h-dvh grid place-items-center p-6">
