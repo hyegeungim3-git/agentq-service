@@ -2,7 +2,7 @@ import type { GlossaryEntry, TranslationRequest, TranslationResult } from '@enti
 import { GLOSSARY, TRANSLATION_RESULTS } from '@fixtures/translation'
 import type { ApiResult } from './domains'
 
-export type TranslationApiOptions = { delayMs?: number }
+export type TranslationApiOptions = { delayMs?: number | undefined }
 
 const wait = (ms: number): Promise<void> =>
   ms <= 0 ? Promise.resolve() : new Promise((r) => setTimeout(r, ms))

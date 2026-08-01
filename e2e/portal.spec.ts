@@ -16,6 +16,8 @@ test.describe('포털 · 허브', () => {
     await page.goto('/')
     await page.getByRole('button', { name: /한빛정밀/ }).click()
     await expect(page.getByRole('button', { name: /업무 챗봇/ })).toBeDisabled()
+    // 준비된 것은 활성이어야 한다 — 전부 비활성이면 위 단언이 무의미해진다
+    await expect(page.getByRole('button', { name: /문서 사전 검토/ })).toBeEnabled()
   })
 
   test('가로 스크롤이 없다', async ({ page }) => {
