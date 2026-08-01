@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SummaryPage } from './SummaryPage'
 import * as api from '@shared/api/summary'
+import * as docApi from '@shared/api/documents'
 
 const NO_DELAY = { delayMs: 0 }
 const setup = () => render(<SummaryPage apiOptions={NO_DELAY} />)
@@ -55,13 +56,13 @@ describe('SummaryPage', () => {
   })
 
   it('문서 목록이 비면 안내를 보여준다', async () => {
-    vi.spyOn(api, 'fetchSourceDocuments').mockResolvedValue({ ok: true, data: [] })
+    vi.spyOn(docApi, 'fetchDocuments').mockResolvedValue({ ok: true, data: [] })
     setup()
     expect(await screen.findByText('요약할 문서가 없습니다.')).toBeInTheDocument()
   })
 
   it('문서가 없으면 실행 버튼이 비활성이다', async () => {
-    vi.spyOn(api, 'fetchSourceDocuments').mockResolvedValue({ ok: true, data: [] })
+    vi.spyOn(docApi, 'fetchDocuments').mockResolvedValue({ ok: true, data: [] })
     setup()
     expect(await screen.findByRole('button', { name: '요약 생성' })).toBeDisabled()
   })

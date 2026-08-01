@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { useSummarize } from './useSummarize'
 import * as api from '@shared/api/summary'
+import * as docApi from '@shared/api/documents'
 
 const NO_DELAY = { delayMs: 0 }
 
@@ -17,7 +18,7 @@ describe('useSummarize', () => {
   })
 
   it('문서 목록 실패는 오류 상태로 남는다 — 빈 화면으로 두지 않는다', async () => {
-    vi.spyOn(api, 'fetchSourceDocuments').mockResolvedValue({ ok: false, error: '연결 실패' })
+    vi.spyOn(docApi, 'fetchDocuments').mockResolvedValue({ ok: false, error: '연결 실패' })
     const { result } = renderHook(() => useSummarize(NO_DELAY))
     await waitFor(() => expect(result.current.phase.kind).toBe('docsError'))
   })

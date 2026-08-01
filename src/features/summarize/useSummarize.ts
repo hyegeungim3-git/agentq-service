@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import type {
-  FocusArea,
-  SourceDocument,
-  SummaryResult,
-  SummaryStyle,
-  TargetLength,
-} from '@entities/summary/model'
-import { createSummary, fetchSourceDocuments, type SummaryApiOptions } from '@shared/api/summary'
+import type { FocusArea, SummaryResult, SummaryStyle, TargetLength } from '@entities/summary/model'
+import type { BusinessDocument } from '@entities/document/model'
+import { createSummary, type SummaryApiOptions } from '@shared/api/summary'
+import { fetchDocuments } from '@shared/api/documents'
 
 /**
  * 요약 화면의 상태와 전이.
@@ -26,7 +22,7 @@ export type Phase =
 export type SummarizeOptions = SummaryApiOptions
 
 export function useSummarize(opts: SummarizeOptions = {}) {
-  const [docs, setDocs] = useState<SourceDocument[]>([])
+  const [docs, setDocs] = useState<BusinessDocument[]>([])
   const [phase, setPhase] = useState<Phase>({ kind: 'loadingDocs' })
 
   const [documentId, setDocumentId] = useState<string | null>(null)
@@ -36,7 +32,7 @@ export function useSummarize(opts: SummarizeOptions = {}) {
 
   useEffect(() => {
     let alive = true
-    void fetchSourceDocuments().then((res) => {
+    void fetchDocuments().then((res) => {
       if (!alive) return
       if (!res.ok) {
         setPhase({ kind: 'docsError', message: res.error })

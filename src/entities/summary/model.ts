@@ -22,15 +22,6 @@ export type FocusArea =
   | 'risk'
   | 'action'
 
-export type SourceDocument = {
-  id: string
-  name: string
-  /** 바이트. '2.1MB' 같은 표시 문자열로 굳히지 않는다 */
-  sizeBytes: number
-  /** 본문 — 실제로는 서버가 추출한 텍스트 */
-  text: string
-}
-
 export type SummaryRequest = {
   documentId: string
   style: SummaryStyle

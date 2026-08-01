@@ -8,14 +8,8 @@ import {
   styleLabel,
 } from '@entities/summary/model'
 import { useSummarize, type SummarizeOptions } from '@features/summarize/useSummarize'
+import { formatSize } from '@entities/document/model'
 import { formatCount } from '@shared/lib/format'
-
-/** 바이트를 사람이 읽는 단위로. 표시 변환은 화면 몫이다(데이터에 굳히지 않는다). */
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes}B`
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)}KB`
-  return `${(bytes / 1024 / 1024).toFixed(1)}MB`
-}
 
 export function SummaryPage({ onBack, apiOptions }: { onBack?: () => void; apiOptions?: SummarizeOptions }) {
   const s = useSummarize(apiOptions ?? {})

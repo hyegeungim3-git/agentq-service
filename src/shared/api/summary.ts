@@ -5,8 +5,8 @@
  * 화면의 로딩 상태가 '실제로 쓰이는 코드'가 된다 — 즉시 반환하면
  * 로딩 UI가 한 번도 실행되지 않은 채 배포된다.
  */
-import type { SourceDocument, SummaryRequest, SummaryResult } from '@entities/summary/model'
-import { SOURCE_DOCUMENTS, SUMMARY_RESULTS } from '@fixtures/summary'
+import type { SummaryRequest, SummaryResult } from '@entities/summary/model'
+import { SUMMARY_RESULTS } from '@fixtures/summary'
 import type { ApiResult } from './domains'
 
 /** 테스트에서 지연을 0으로 만들기 위한 주입점 — 테스트가 4초를 기다리게 두지 않는다. */
@@ -14,11 +14,6 @@ export type SummaryApiOptions = { delayMs?: number }
 
 const wait = (ms: number): Promise<void> =>
   ms <= 0 ? Promise.resolve() : new Promise((r) => setTimeout(r, ms))
-
-export function fetchSourceDocuments(): Promise<ApiResult<SourceDocument[]>> {
-  // TODO(api-미확정): GET /documents 로 교체. 제거 조건 = API 명세 확정.
-  return Promise.resolve({ ok: true, data: SOURCE_DOCUMENTS })
-}
 
 export async function createSummary(
   req: SummaryRequest,
