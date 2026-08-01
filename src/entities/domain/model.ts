@@ -1,0 +1,59 @@
+/**
+ * 도메인(발주처) 모델.
+ *
+ * 이 파일이 이 프로젝트의 계약이다. fixture도 API 응답도 이 타입을 만족해야 한다.
+ *
+ * ⚠️ 표시 속성을 넣지 말 것.
+ * 이전 데모의 mock은 이런 형태였다:
+ *   { label: '수집 항목', value: '4,380건', sub: '...', tone: 'base' }
+ * `'4,380건'`은 이미 포맷된 문자열이고 `tone`은 색이다. 서버는 둘 다 주지 않는다.
+ * 서버는 `4380`을 주고, 천 단위 구분과 색은 화면이 정한다.
+ * 그 형태를 그대로 두면 API를 붙일 때 전부 다시 써야 한다 —
+ * 그래서 여기서는 원시 값·코드·ID만 다룬다.
+ */
+
+/** 발주처를 대표하는 분야. 화면에 표시할 라벨은 이 코드로 조회한다. */
+export type SectorCode = 'public' | 'manufacturing' | 'civic' | 'medical'
+
+/** 브랜드 색 — 화면이 CSS 변수로 푼다. 여기서는 값만 보관한다. */
+export type HexColor = `#${string}`
+
+export type DomainSummary = {
+  id: string
+  /** 조직 정식 명칭 */
+  orgName: string
+  /** 약칭 — 로고·문서번호 접두 등에 쓴다 */
+  orgShort: string
+  sector: SectorCode
+  brandColor: HexColor
+  /** 포털 화면의 한 줄 소개 */
+  tagline: string
+}
+
+export type DomainUser = {
+  name: string
+  dept: string
+  title: string
+}
+
+export type Domain = DomainSummary & {
+  user: DomainUser
+  /** 문서번호 접두 (예: 'HBP') — 문서 생성 시 조합한다 */
+  docPrefix: string
+}
+
+/* ── 표시 규칙은 화면이 아니라 여기서 한 번만 정한다(가이드 §6 "한 곳에서 일관되게") ── */
+
+const SECTOR_LABEL: Record<SectorCode, string> = {
+  public: '공공',
+  manufacturing: '제조',
+  civic: '행정',
+  medical: '의료',
+}
+
+export function sectorLabel(sector: SectorCode): string {
+  return SECTOR_LABEL[sector]
+}
+
+/** 전 분야 코드 — 화면에서 순회할 때 쓴다. 타입과 목록이 어긋나지 않게 여기서 파생한다. */
+export const SECTOR_CODES = Object.keys(SECTOR_LABEL) as SectorCode[]

@@ -16,6 +16,18 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* 경로 별칭 — vite.config.ts의 resolve.alias와 반드시 같이 유지할 것.
+       한쪽만 고치면 에디터는 되는데 빌드가 깨지거나 그 반대가 된다. */
+    "paths": {
+      "@app/*": ["./src/app/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@widgets/*": ["./src/widgets/*"],
+      "@features/*": ["./src/features/*"],
+      "@entities/*": ["./src/entities/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@fixtures/*": ["./src/fixtures/*"]
+    },
+
     /* 엄격 검사 — agent-rules §7 "TypeScript의 엄격한 타입 검사를 활성화한다"
        스캐폴드 기본값에는 strict가 없어 명시적으로 켠다. 우회(any·@ts-ignore)는 금지. */
     "strict": true,
