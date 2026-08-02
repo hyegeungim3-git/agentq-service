@@ -142,3 +142,55 @@ CI는 항상 콜드 스타트라 재현 조건이 더 나쁘다.
 
 **영향** CI에서 빌드가 한 번 더 돈다(약 1초). 그 대가로 컴파일 타이밍이라는
 변수가 사라진다.
+
+---
+
+## D-008 · package-lock.json은 CI(Linux) 환경에서 만들어 커밋한다
+
+**결정일** 2026-08-02
+
+**문제** 저장소를 만들고 첫 push를 하자 CI가 8초 만에 실패했다.
+
+```text
+npm error `npm ci` can only install packages when your package.json and
+npm error package-lock.json are in sync.
+npm error Missing: @emnapi/runtime@1.11.3 from lock file
+```
+
+개발 머신이 Windows다. npm은 **현재 플랫폼에서 쓰이지 않는 패키지의 하위 의존성을
+순회하지 않는다.** `@tailwindcss/oxide-wasm32-wasi`가 그 경우라, 그 안의
+`@emnapi/runtime`이 lock에 기록되지 않는다. Linux 러너는 그 패키지를 설치 대상으로
+보기 때문에 lock과 어긋난다.
+
+**시도한 것과 결과**
+
+| 시도 | 결과 |
+|---|---|
+| `npm install --package-lock-only` | 추가되지 않음 |
+| `npm install --package-lock-only --os=linux --cpu=x64` | 추가되지 않음 |
+| Docker / WSL로 Linux에서 생성 | 이 머신에 둘 다 없음 |
+
+**택하지 않은 선택지** CI를 `npm ci` 대신 `npm install`로 바꾸면 바로 통과한다.
+하지만 그러면 lockfile 고정이 무의미해지고, 어느 날 의존성이 조용히 올라가
+"내 머신에선 되는데"가 된다. 실서비스 준비 저장소에서 포기할 수 없는 성질이다.
+
+**결정** `.github/workflows/lockfile.yml`(workflow_dispatch)에서 lockfile을 만들어
+아티팩트로 받아 커밋한다. 워크플로 안에서 `npm ci`까지 돌려 **고쳐졌는지를 스스로
+판정**하게 했다 — 통과하지 못하면 실패로 남는다.
+
+의존성을 추가·변경한 뒤 한 번 돌리면 된다.
+
+```bash
+gh workflow run lockfile.yml
+```
+
+**검증** 재생성한 lock에 `@emnapi/runtime` 1.11.x가 들어왔고 win32 바이너리 항목은
+그대로 남았다(+90/-25). Windows에서 `npm ci`와 `npm run verify` 통과,
+CI에서 E2E 62건 포함 전체 통과.
+
+**영향** 의존성을 바꿀 때 단계가 하나 늘어난다. 그 대가로 lockfile이 두 플랫폼
+모두에서 유효해진다.
+
+**부수 발견** Windows에서 `npm ci`가 `EPERM: unlink`로 실패하면 코드 문제가 아니라
+dev 서버가 네이티브 바이너리(`rolldown-binding.win32-x64-msvc.node`)를 잡고 있는
+것이다. 해당 프로세스만 종료하고 재실행한다.
