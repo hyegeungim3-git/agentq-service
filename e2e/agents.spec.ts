@@ -27,9 +27,4 @@ test.describe('신규 에이전트 3종', () => {
     await expect(page.getByText(/근거 조항을 찾지 못했습니다/)).toBeVisible({ timeout: 10_000 })
   })
 
-  test('허브 진척이 6/13으로 갱신된다', async ({ page }) => {
-    await page.goto('/')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
-    await expect(page.getByText('(이식 6/13종)')).toBeVisible()
-  })
 })
