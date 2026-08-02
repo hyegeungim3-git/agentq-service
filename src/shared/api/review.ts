@@ -12,6 +12,7 @@ export async function createReview(
   opts: ReviewApiOptions = {},
 ): Promise<ApiResult<ReviewResult>> {
   await wait(opts.delayMs ?? 2000)
+  // TODO(api-미확정): POST /reviews 로 교체. 제거 조건 = 검토 모델·응답 형식 확정.
 
   if (req.regulationSets.length === 0) {
     return { ok: false, error: '대조할 규정을 1개 이상 선택하세요.' }

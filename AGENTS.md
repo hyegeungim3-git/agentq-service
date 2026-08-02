@@ -273,7 +273,12 @@ production build: npm run build
   3. **관리자 화면** — 이전 데모의 관리자 61메뉴는 아직 손대지 않았다.
      실서비스로 몇 개가 필요한지 정해야 한다.
   4. **디자인 기준** — 원본이 없으면 이전 데모 화면이 기준이다
-- **완료된 작업**: 저장소 골격(TS strict · ESLint · Vitest · Playwright · CI 게이트),
+- **완료된 작업**: 저장소 골격(TS strict · ESLint · Vitest · Playwright · CI 게이트 · Pages 배포),
   한글 경로 함정 실측·회피, 포털·허브, **에이전트 13종 전체 이식**,
-  공통 실행 훅(useAgentRun)·화면 골격(AgentShell) 추출, Recharts 지연 로딩
+  공통 실행 훅(useAgentRun)·화면 골격(AgentShell) 추출, Recharts 지연 로딩,
+  파일 업로드 경로(D-009), **복합 업무 오케스트레이션 1종**,
+  이전 데모 대비 축소돼 있던 입력 옵션 6종 복원(OCR·지식 검색·표준 보고서·기준정보·회의록·번역)
+
+- **이전 데모 대비 아직 없는 것**: 채팅 셸(일반/보안 탭·사이드바·워크스페이스),
+  MCP 호출 로그, 관리자 화면. 전부 아래 결정이 필요한 항목이다.
 - **제외 범위**: 이전 데모(genos-app / qagent-platform) 수정

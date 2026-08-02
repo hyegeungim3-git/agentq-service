@@ -56,7 +56,3 @@ const SOURCE_LABEL: Record<DataSource, string> = {
 export const DATA_SOURCES = Object.keys(SOURCE_LABEL) as DataSource[]
 export const sourceLabel = (s: DataSource): string => SOURCE_LABEL[s]
 
-/** 차트로 그릴 수 있는 첫 숫자 컬럼 — 없으면 표만 보여 준다 */
-export function firstNumericColumn(columns: TableColumn[]): TableColumn | null {
-  return columns.find((c) => c.numeric) ?? null
-}

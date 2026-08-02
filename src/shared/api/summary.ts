@@ -20,6 +20,7 @@ export async function createSummary(
   opts: SummaryApiOptions = {},
 ): Promise<ApiResult<SummaryResult>> {
   await wait(opts.delayMs ?? 1600)
+  // TODO(api-미확정): POST /summaries 로 교체. 제거 조건 = 요약 모델·응답 형식 확정.
 
   const byDoc = SUMMARY_RESULTS[req.documentId]
   if (!byDoc) return { ok: false, error: `요약할 문서를 찾지 못했습니다: ${req.documentId}` }

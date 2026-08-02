@@ -51,6 +51,3 @@ export const AGENTS: AgentDefinition[] = [
 
 export const READY_AGENTS = AGENTS.filter((a) => a.status === 'ready')
 
-export function findAgent(id: string): AgentDefinition | undefined {
-  return AGENTS.find((a) => a.id === id)
-}

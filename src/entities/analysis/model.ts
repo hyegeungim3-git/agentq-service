@@ -79,7 +79,7 @@ export function breaches(trend: TrendPoint[]): TrendPoint[] {
 }
 
 /** 적용률이 낮으면 결론을 전체로 읽으면 안 된다 */
-export const COVERAGE_WARN = 0.9
+const COVERAGE_WARN = 0.9
 
 export function isPartial(result: AnalysisResult): boolean {
   return result.coverage < COVERAGE_WARN

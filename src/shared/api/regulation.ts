@@ -11,6 +11,7 @@ export async function askRegulation(
   opts: RegulationApiOptions = {},
 ): Promise<ApiResult<RegulationAnswer>> {
   await wait(opts.delayMs ?? 1500)
+  // TODO(api-미확정): POST /regulations:search 로 교체. 제거 조건 = 규정 검색 엔진·응답 형식 확정.
 
   const q = req.question.trim()
   if (!q) return { ok: false, error: '질문을 입력하세요.' }

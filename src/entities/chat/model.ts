@@ -61,7 +61,7 @@ export function isUngrounded(m: ChatMessage): boolean {
 }
 
 /** 사람이 확인해야 하는 답변 */
-export const CHAT_REVIEW_THRESHOLD = 0.8
+const CHAT_REVIEW_THRESHOLD = 0.8
 
 export function needsCheck(m: ChatMessage): boolean {
   return m.confidence !== null && m.confidence < CHAT_REVIEW_THRESHOLD

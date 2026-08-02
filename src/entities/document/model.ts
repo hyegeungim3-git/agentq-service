@@ -18,14 +18,6 @@ export type BusinessDocument = {
   text: string
 }
 
-const KIND_LABEL: Record<DocumentKind, string> = {
-  sop: '작업표준',
-  report: '보고서',
-  certificate: '성적서',
-  minutes: '회의록',
-}
-
-export const kindLabel = (k: DocumentKind): string => KIND_LABEL[k]
 
 /** 바이트를 사람이 읽는 단위로. 표시 변환은 한 곳에서만 한다. */
 export function formatSize(bytes: number): string {

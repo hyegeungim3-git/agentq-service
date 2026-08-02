@@ -69,5 +69,3 @@ export function sectorLabel(sector: SectorCode): string {
   return SECTOR_LABEL[sector]
 }
 
-/** 전 분야 코드 — 화면에서 순회할 때 쓴다. 타입과 목록이 어긋나지 않게 여기서 파생한다. */
-export const SECTOR_CODES = Object.keys(SECTOR_LABEL) as SectorCode[]

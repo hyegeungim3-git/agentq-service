@@ -11,6 +11,7 @@ export async function runQuery(
   opts: QueryApiOptions = {},
 ): Promise<ApiResult<QueryResult>> {
   await wait(opts.delayMs ?? 1500)
+  // TODO(api-미확정): POST /queries 로 교체. 제거 조건 = Text-to-SQL 엔진·응답 형식 확정.
   if (!req.question.trim()) return { ok: false, error: '조회할 내용을 입력하세요.' }
   const base = QUERY_RESULTS[req.source]
   if (!base) return { ok: false, error: `지원하지 않는 데이터 소스입니다: ${req.source}` }
