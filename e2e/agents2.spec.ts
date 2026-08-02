@@ -10,10 +10,24 @@ async function openAgent(page: import('@playwright/test').Page, name: RegExp) {
 test.describe('신규 에이전트 3종 (2차)', () => {
   test('지식 검색 — 유사도 근거를 속성 대조로 보여준다', async ({ page }) => {
     await openAgent(page, /지식 검색/)
-    await page.getByRole('button', { name: '유사 도면 검색' }).click()
-    const r = page.getByRole('region', { name: /유사 도면/ })
+    await page.getByRole('searchbox').fill('브래킷 굽힘 금형')
+    await page.getByRole('button', { name: /검색 시작/ }).click()
+    const r = page.getByRole('region', { name: /HBM-2211/ })
     await expect(r).toBeVisible({ timeout: 10_000 })
     await expect(r).toContainText('확인 필요 · 홀 피치')
+  })
+
+  /* 필터에 걸려 빠진 문서를 감추면 '없다'로 읽힌다 */
+  test('지식 검색 — 보안 등급으로 빠진 건수를 밝힌다', async ({ page }) => {
+    await openAgent(page, /지식 검색/)
+    await page.getByRole('searchbox').fill('브래킷 굽힘 금형')
+    // 라디오는 sr-only라 사용자와 같은 방식으로 라벨을 누른다
+    await page.locator('label').filter({ hasText: /^일반$/ }).click()
+    await expect(page.getByRole('radio', { name: '일반', exact: true })).toBeChecked()
+    await page.getByRole('button', { name: /검색 시작/ }).click()
+    const summary = page.getByRole('region', { name: /검색 결과/ })
+    await expect(summary).toContainText('보안 등급 필터로', { timeout: 10_000 })
+    await expect(page.getByRole('region', { name: /HBM-2211/ })).toHaveCount(0)
   })
 
   test('OCR — 못 읽은 줄과 마스킹 기록을 함께 보여준다', async ({ page }) => {
