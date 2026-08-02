@@ -34,17 +34,33 @@ describe('HubPage', () => {
     expect(onOpen).toHaveBeenCalledWith('summary')
   })
 
-  /* 이 두 건이 핵심이다 — 미구현을 죽은 버튼으로 두지 않는다 */
+  /* 13종이 모두 ready가 된 뒤에도 이 경로는 지켜야 한다 —
+     앞으로 에이전트를 추가하면 다시 planned가 생긴다. 목록을 주입해 검증한다. */
   it('준비 중인 에이전트는 비활성이고 상태를 표시한다', () => {
-    setup()
-    const btn = screen.getByRole('button', { name: /업무 챗봇/ })
+    render(
+      <HubPage
+        domain={domain}
+        onOpen={vi.fn()}
+        onBack={vi.fn()}
+        agents={[{ id: 'chatbot', name: '미구현 예시', desc: '설명', status: 'planned' }]}
+      />,
+    )
+    const btn = screen.getByRole('button', { name: /미구현 예시/ })
     expect(btn).toBeDisabled()
     expect(btn).toHaveTextContent('준비 중')
   })
 
   it('준비 중인 에이전트는 눌러도 열리지 않는다', async () => {
-    const onOpen = setup()
-    await userEvent.click(screen.getByRole('button', { name: /업무 챗봇/ }))
+    const onOpen = vi.fn()
+    render(
+      <HubPage
+        domain={domain}
+        onOpen={onOpen}
+        onBack={vi.fn()}
+        agents={[{ id: 'chatbot', name: '미구현 예시', desc: '설명', status: 'planned' }]}
+      />,
+    )
+    await userEvent.click(screen.getByRole('button', { name: /미구현 예시/ }))
     expect(onOpen).not.toHaveBeenCalled()
   })
 

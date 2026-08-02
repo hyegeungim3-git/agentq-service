@@ -1,4 +1,4 @@
-import { AGENTS, migrationProgress, type AgentId } from '@entities/agent/model'
+import { AGENTS, type AgentDefinition, type AgentId } from '@entities/agent/model'
 import type { Domain } from '@entities/domain/model'
 import { sectorLabel } from '@entities/domain/model'
 
@@ -6,12 +6,17 @@ export function HubPage({
   domain,
   onOpen,
   onBack,
+  /* 목록을 주입할 수 있게 둔다 — 13종이 모두 ready가 된 뒤에도
+     '준비 중' 렌더 경로를 테스트로 지킬 수 있어야 한다. */
+  agents = AGENTS,
 }: {
   domain: Domain
   onOpen: (id: AgentId) => void
   onBack: () => void
+  agents?: AgentDefinition[]
 }) {
-  const { ready, total } = migrationProgress()
+  const total = agents.length
+  const ready = agents.filter((a) => a.status === 'ready').length
 
   return (
     <main className="min-h-dvh bg-slate-50 px-4 py-8">
@@ -42,7 +47,7 @@ export function HubPage({
         </header>
 
         <ul className="grid gap-3 sm:grid-cols-2">
-          {AGENTS.map((a) => {
+          {agents.map((a) => {
             const ready = a.status === 'ready'
             return (
               <li key={a.id}>
