@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react'
-import type { ChatMessage } from '@entities/chat/model'
-import { makeUserMessage, sendMessage, type ChatApiOptions } from '@shared/api/chat'
+import { useCallback, useEffect, useState } from 'react'
+import type { ChatMessage, FaqCategory, FaqItem } from '@entities/chat/model'
+import { fetchFaq, makeUserMessage, sendMessage, type ChatApiOptions } from '@shared/api/chat'
 
 /**
  * 챗봇은 '한 번 실행하고 결과를 본다'가 아니라 대화가 쌓이는 형태라
@@ -14,30 +14,64 @@ export function useChat(opts: ChatOptions = {}) {
   const [input, setInput] = useState('')
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [faq, setFaq] = useState<FaqItem[]>([])
+  const [faqCategory, setFaqCategory] = useState<FaqCategory | 'all'>('all')
+
+  useEffect(() => {
+    let alive = true
+    void fetchFaq().then((res) => {
+      if (alive && res.ok) setFaq(res.data)
+    })
+    return () => {
+      alive = false
+    }
+  }, [])
 
   const delayMs = opts.delayMs
-  const send = useCallback(async () => {
-    const text = input.trim()
-    if (!text || pending) return
 
-    setMessages((prev) => [...prev, makeUserMessage(text)])
-    setInput('')
-    setPending(true)
-    setError(null)
+  /** 질문을 그대로 보낸다 — FAQ를 누르면 입력창을 거치지 않고 바로 묻는다 */
+  const ask = useCallback(
+    async (text: string) => {
+      const q = text.trim()
+      if (!q || pending) return
 
-    const res = await sendMessage(text, { delayMs })
-    setPending(false)
-    if (!res.ok) {
-      setError(res.error)
-      return
-    }
-    setMessages((prev) => [...prev, res.data])
-  }, [input, pending, delayMs])
+      setMessages((prev) => [...prev, makeUserMessage(q)])
+      setInput('')
+      setPending(true)
+      setError(null)
+
+      const res = await sendMessage(q, { delayMs })
+      setPending(false)
+      if (!res.ok) {
+        setError(res.error)
+        return
+      }
+      setMessages((prev) => [...prev, res.data])
+    },
+    [pending, delayMs],
+  )
+
+  const send = useCallback(() => ask(input), [ask, input])
 
   const reset = useCallback(() => {
     setMessages([])
     setError(null)
   }, [])
 
-  return { messages, input, setInput, pending, error, send, reset, canSend: input.trim().length > 0 && !pending }
+  const shownFaq = faqCategory === 'all' ? faq : faq.filter((f) => f.category === faqCategory)
+
+  return {
+    messages,
+    input,
+    setInput,
+    pending,
+    error,
+    send,
+    ask,
+    reset,
+    faq: shownFaq,
+    faqCategory,
+    setFaqCategory,
+    canSend: input.trim().length > 0 && !pending,
+  }
 }

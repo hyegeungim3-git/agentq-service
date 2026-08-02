@@ -104,3 +104,36 @@ test.describe('회의록 — 자료·참석자·안건', () => {
     await expect(r).toContainText('발언 기록 없음 · 이서준')
   })
 })
+
+test.describe('챗봇 — FAQ·출처 원문', () => {
+  test('범주로 거르고, 목록에서 바로 물어보고, 출처 원문을 펼친다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /업무 챗봇/ }).click()
+
+    const faq = page.getByRole('region', { name: '자주 묻는 질문' })
+    await expect(faq).toContainText('출장 여비 기준 알려줘')
+    // 라디오는 sr-only라 사용자와 같은 방식으로 라벨을 누른다
+    await page.locator('label').filter({ hasText: /^작업표준$/ }).click()
+    await expect(faq).not.toContainText('출장 여비 기준 알려줘')
+
+    await page.getByRole('button', { name: /초품 검사는 언제 실시하나요/ }).click()
+    await expect(page.getByText(/초품 검사는 금형 교체 직후에 실시합니다/)).toBeVisible({
+      timeout: 10_000,
+    })
+
+    await page.getByRole('button', { name: /제3장 금형 교체/ }).click()
+    await expect(page.getByText(/SMED 절차를 따르며 표준 소요 시간은 25분/)).toBeVisible()
+  })
+
+  /* 목록에 있어도 근거가 없으면 없다고 말한다 */
+  test('FAQ에 있어도 근거가 없으면 지어내지 않는다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /업무 챗봇/ }).click()
+    await page.getByRole('button', { name: /기밀 기술자료는 어떻게 처리하나요/ }).click()
+    await expect(page.getByText('근거 문서 없음 · 담당 부서 확인 필요')).toBeVisible({
+      timeout: 10_000,
+    })
+  })
+})

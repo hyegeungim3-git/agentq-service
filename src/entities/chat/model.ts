@@ -15,7 +15,33 @@ export type ChatSource = {
   title: string
   /** 인용 위치 — '제23조 제2항' 처럼 */
   locator: string
+  /**
+   * 인용 원문. 출처만 대고 원문을 못 보여 주면 사용자는 확인할 방법이 없다.
+   * 찾지 못했으면 null — 못 찾았다는 사실을 감추지 않는다.
+   */
+  passage: string | null
+  /** 규정이면 개정일. 문서면 null */
+  revisedOn: string | null
 }
+
+/** 자주 묻는 질문의 범주 */
+export type FaqCategory = 'standard' | 'labor' | 'quality' | 'security' | 'system'
+
+export type FaqItem = {
+  category: FaqCategory
+  question: string
+}
+
+const FAQ_CATEGORY_LABEL: Record<FaqCategory, string> = {
+  standard: '작업표준',
+  labor: '복무규정',
+  quality: '품질',
+  security: '보안',
+  system: '시스템',
+}
+
+export const FAQ_CATEGORIES = Object.keys(FAQ_CATEGORY_LABEL) as FaqCategory[]
+export const faqCategoryLabel = (c: FaqCategory): string => FAQ_CATEGORY_LABEL[c]
 
 export type ChatMessage = {
   id: string

@@ -1,8 +1,13 @@
-import { useEffect, useRef } from 'react'
-import { isUngrounded, needsCheck, type ChatMessage } from '@entities/chat/model'
+import { useEffect, useRef, useState } from 'react'
+import {
+  FAQ_CATEGORIES,
+  faqCategoryLabel,
+  isUngrounded,
+  needsCheck,
+  type ChatMessage,
+  type ChatSource,
+} from '@entities/chat/model'
 import { useChat, type ChatOptions } from '@features/chat/useChat'
-
-const SAMPLES = ['금형 교체 주기가 어떻게 되나요?', '진동 알람이 뜨면 어떻게 하나요?', '출장 여비 기준 알려줘']
 
 export function ChatPage({ onBack, apiOptions }: { onBack?: () => void; apiOptions?: ChatOptions }) {
   const c = useChat(apiOptions ?? {})
@@ -48,20 +53,7 @@ export function ChatPage({ onBack, apiOptions }: { onBack?: () => void; apiOptio
             <p className="text-sm text-slate-600">
               사내 규정·작업표준을 근거로 답변합니다. 근거를 찾지 못하면 지어내지 않고 모른다고 답합니다.
             </p>
-            <p className="mt-4 text-xs font-bold text-slate-600">이런 걸 물어보세요</p>
-            <ul className="mt-2 flex flex-wrap gap-2">
-              {SAMPLES.map((s) => (
-                <li key={s}>
-                  <button
-                    type="button"
-                    onClick={() => c.setInput(s)}
-                    className="min-h-11 rounded-full border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
-                  >
-                    {s}
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <p className="mt-2 text-xs text-slate-500">아래 자주 묻는 질문에서 골라 물어볼 수 있습니다.</p>
           </div>
         )}
 
@@ -91,6 +83,56 @@ export function ChatPage({ onBack, apiOptions }: { onBack?: () => void; apiOptio
         )}
 
         <div ref={endRef} />
+
+        <section aria-labelledby="faq-title" className="mt-6 rounded-xl border border-slate-200 bg-white p-5">
+          <h2 id="faq-title" className="text-sm font-black text-slate-900">
+            자주 묻는 질문
+          </h2>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {(['all', ...FAQ_CATEGORIES] as const).map((cat) => (
+              <label
+                key={cat}
+                className="flex min-h-11 cursor-pointer items-center rounded-full border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-900 has-checked:text-white"
+              >
+                <input
+                  type="radio"
+                  name="faq-category"
+                  value={cat}
+                  checked={c.faqCategory === cat}
+                  onChange={() => c.setFaqCategory(cat)}
+                  className="sr-only"
+                />
+                {cat === 'all' ? '전체' : faqCategoryLabel(cat)}
+              </label>
+            ))}
+          </div>
+
+          {c.faq.length === 0 ? (
+            <p className="mt-3 text-sm text-slate-600">이 범주에 등록된 질문이 없습니다.</p>
+          ) : (
+            <ul className="mt-3 space-y-2">
+              {c.faq.map((f) => (
+                <li key={f.question}>
+                  <button
+                    type="button"
+                    onClick={() => void c.ask(f.question)}
+                    disabled={c.pending}
+                    className="flex min-h-11 w-full items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-left hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">
+                      {faqCategoryLabel(f.category)}
+                    </span>
+                    <span className="text-sm text-slate-700">{f.question}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {/* FAQ에 있다고 다 답할 수 있는 것은 아니다 */}
+          <p className="mt-3 text-xs text-slate-400">
+            목록에 있어도 지식베이스에 근거가 없으면 답하지 않고 없다고 말합니다.
+          </p>
+        </section>
       </div>
 
       <div className="sticky bottom-0 border-t border-slate-200 bg-white px-4 py-3">
@@ -154,10 +196,10 @@ function MessageBubble({ message }: { message: ChatMessage }) {
           <>
             <div className="mt-3">
               <p className="text-[11px] font-bold text-slate-500">근거</p>
-              <ul className="mt-1 space-y-0.5">
+              <ul className="mt-1 space-y-1.5">
                 {message.sources.map((s) => (
-                  <li key={`${s.title}-${s.locator}`} className="text-xs text-slate-600">
-                    {s.title} · {s.locator}
+                  <li key={`${s.title}-${s.locator}`}>
+                    <SourceItem source={s} />
                   </li>
                 ))}
               </ul>
@@ -180,6 +222,38 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         <p className="mt-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
           <span className="font-bold text-slate-800">{message.handoff.agentLabel} 에이전트 </span>
           {message.handoff.reason}
+        </p>
+      )}
+    </div>
+  )
+}
+
+/**
+ * 출처를 눌러 원문을 펼친다.
+ *
+ * 출처 이름만 대면 사용자는 확인할 방법이 없다. 원문을 못 찾았으면
+ * 그것도 그대로 말한다 — 조용히 빈칸으로 두면 근거가 있는 것처럼 보인다.
+ *
+ * 부모 안에서 정의하지 않는다 — 매 렌더 새 타입이 되어 펼침 상태가 초기화된다.
+ */
+function SourceItem({ source }: { source: ChatSource }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="min-h-11 text-left text-xs font-bold text-slate-600 underline decoration-slate-300 underline-offset-2 hover:text-slate-900"
+      >
+        {source.title} · {source.locator}
+        {source.revisedOn && <span className="ml-1 font-normal text-slate-400">({source.revisedOn} 개정)</span>}
+      </button>
+
+      {open && (
+        <p className="mt-1 rounded-lg bg-slate-50 px-3 py-2 text-xs leading-relaxed text-slate-700">
+          {source.passage ?? '원문을 찾지 못했습니다. 원본 문서에서 직접 확인하십시오.'}
         </p>
       )}
     </div>
