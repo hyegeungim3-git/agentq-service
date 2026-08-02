@@ -9,6 +9,8 @@
  * 화면이 그 경우를 반드시 다르게 그리도록 한다.
  */
 
+import type { MapIntel } from '@entities/mapintel/model'
+
 export type ChatRole = 'user' | 'assistant'
 
 export type ChatSource = {
@@ -74,6 +76,8 @@ export type ChatMessage = {
   handoff: { agentLabel: string; reason: string } | null
   /** 판단 근거. 근거 없는 답변에는 없다 */
   xai: Xai | null
+  /** 사업장별 지표를 묻는 질문이면 지도가 붙는다. 아니면 null */
+  map: MapIntel | null
 }
 
 /** 근거 없는 답변 — 화면이 다르게 그려야 하는 경우 */

@@ -11,6 +11,7 @@ const user = (text: string): ChatMessage => ({
   confidence: null,
   handoff: null,
   xai: null,
+  map: null,
 })
 
 const WS_A = 'ws-a'

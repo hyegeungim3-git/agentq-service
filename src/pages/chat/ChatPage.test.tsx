@@ -152,4 +152,45 @@ describe('ChatPage', () => {
       expect(up).toHaveAttribute('aria-pressed', 'false')
     })
   })
+
+  describe('사업장별 지표 지도', () => {
+    it('지리 좌표가 아니라는 사실을 먼저 말한다', async () => {
+      setup()
+      await ask('사업장별 가동률 보여줘')
+      expect(await screen.findByText('배치 도식 — 실제 지리 좌표 아님')).toBeInTheDocument()
+    })
+
+    /* 값 없는 사업장을 빼면 남은 것이 전부인 줄 안다 */
+    it('값이 없는 사업장을 지우지 않고 이유를 말한다', async () => {
+      setup()
+      await ask('사업장별 가동률 보여줘')
+      expect(await screen.findByText(/2개 사업장은 값이 없어 평균에서 빠졌습니다/)).toBeInTheDocument()
+      expect(screen.getByText(/천안공장 · MES 미연동/)).toBeInTheDocument()
+      expect(screen.getByText(/광주공장 · 2026-06 인수/)).toBeInTheDocument()
+      // 빈칸도 칸으로 남는다 — 목록에서 사라지면 안 된다
+      expect(screen.getAllByText('값 없음')).toHaveLength(2)
+    })
+
+    it('사업장을 누르면 그 사업장의 추이가 나온다', async () => {
+      setup()
+      await ask('사업장별 가동률 보여줘')
+      await userEvent.click(await screen.findByRole('button', { name: /창원본사/ }))
+      expect(screen.getByText(/최근 추이 · 88.2% → 81.4%/)).toBeInTheDocument()
+    })
+
+    it('값이 없는 사업장을 누르면 없는 이유를 준다', async () => {
+      setup()
+      await ask('사업장별 가동률 보여줘')
+      await userEvent.click(await screen.findByRole('button', { name: /천안공장/ }))
+      expect(screen.getByText(/값 없음 — MES 미연동/)).toBeInTheDocument()
+    })
+
+    it('지도가 필요 없는 질문에는 지도를 붙이지 않는다', async () => {
+      setup()
+      await ask('초품 검사 언제 해')
+      expect(await screen.findByText(/초품 검사는 금형 교체 직후/)).toBeInTheDocument()
+      expect(screen.queryByText('배치 도식 — 실제 지리 좌표 아님')).not.toBeInTheDocument()
+    })
+  })
+
 })

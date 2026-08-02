@@ -19,6 +19,8 @@ import { HubPage } from '@pages/hub/HubPage'
 import { SecurityPage } from '@pages/security/SecurityPage'
 import { NoticesPage } from '@pages/notices/NoticesPage'
 import { GuidePage } from '@pages/guide/GuidePage'
+import { SettingsPage } from '@pages/settings/SettingsPage'
+import { usePrefs } from '@features/prefs/usePrefs'
 import { SummaryPage } from '@pages/summary/SummaryPage'
 import { TranslatePage } from '@pages/translate/TranslatePage'
 import { ReviewPage } from '@pages/review/ReviewPage'
@@ -103,6 +105,7 @@ export default function App() {
 
   /* 대화는 셸이 소유한다 — 탭을 옮겨도, 다른 대화를 골라도 남아야 한다 */
   const conv = useConversations(workspaceId)
+  const prefs = usePrefs()
 
   const domainId = view.name === 'portal' ? null : view.domainId
 
@@ -163,6 +166,7 @@ export default function App() {
       signals={signals}
       onOpenSignal={openSignal}
       onExit={() => setView({ name: 'portal' })}
+      uiLang={prefs.prefs.uiLang}
     >
       {view.tab === 'general' && (
         <ChatPage store={conv.store} signals={signals} onOpenSignal={openSignal} metrics={metrics} />
@@ -170,6 +174,7 @@ export default function App() {
       {view.tab === 'security' && <SecurityPage />}
       {view.tab === 'notices' && <NoticesPage onRead={markRead} />}
       {view.tab === 'guide' && <GuidePage />}
+      {view.tab === 'settings' && <SettingsPage store={prefs} />}
       {view.tab === 'agents' && view.scenario && <OrchestrationPage onBack={backToAgents} />}
       {view.tab === 'agents' && !view.scenario && view.agentId === null && (
         <HubPage

@@ -11,11 +11,16 @@ export function sidebar(page: Page) {
   return page.getByRole('navigation', { name: '작업 영역' })
 }
 
-/** 사이드바를 쓸 수 있는 상태로 만든다 — 좁은 화면이면 연다 */
-export async function openSidebar(page: Page) {
-  const nav = sidebar(page)
+/**
+ * 사이드바를 쓸 수 있는 상태로 만든다 — 좁은 화면이면 연다.
+ *
+ * 화면 틀 언어를 바꾸면 여는 버튼과 사이드바 이름도 함께 바뀐다.
+ * 그래서 이름을 받는다 — 기본값은 한국어다.
+ */
+export async function openSidebar(page: Page, names = { nav: '작업 영역', open: '사이드바 열기' }) {
+  const nav = page.getByRole('navigation', { name: names.nav })
   if (!(await nav.isVisible().catch(() => false))) {
-    await page.getByRole('button', { name: '사이드바 열기' }).click()
+    await page.getByRole('button', { name: names.open }).click()
     await expect(nav).toBeVisible()
   }
   return nav

@@ -13,6 +13,7 @@
  * 같은 조항을 두 화면이 다르게 인용하면 어느 쪽이 맞는지 알 수 없다.
  */
 import type { ChatMessage, ChatSource, FaqItem } from '@entities/chat/model'
+import { SITE_UTILIZATION } from '@fixtures/mapintel'
 import { DOCUMENTS } from '@fixtures/documents'
 import { REGULATION_ENTRIES } from '@fixtures/regulation'
 
@@ -67,6 +68,7 @@ export const CHAT_ENTRIES: ChatEntry[] = [
         fromDocument(SOP, 'doc-press-sop', '제3장 금형 교체'),
       ],
       confidence: 0.94,
+      map: null,
       handoff: null,
       xai: {
         factors: [
@@ -84,6 +86,7 @@ export const CHAT_ENTRIES: ChatEntry[] = [
       text: '진동 RMS가 관리 기준 3.5mm/s를 넘으면 예지보전 알람이 발생합니다. 알람이 뜨면 운전을 계속하지 말고 보전팀 진단을 받아야 하며, 연속 초과 시 계획정지에 편성합니다. 현재 PRS-C03이 4.2mm/s로 기준을 넘고 있습니다.',
       sources: [fromDocument(SOP, 'doc-press-sop', '제5장 이상 대응')],
       confidence: 0.91,
+      map: null,
       xai: {
         factors: [
           { label: '대응 절차 조항 일치', weight: 0.55, detail: '제5장이 알람 발생 시 행동을 규정한다' },
@@ -104,6 +107,7 @@ export const CHAT_ENTRIES: ChatEntry[] = [
       text: '국내 출장 여비는 일 60,000원 기준 실비 정산입니다. 기준액을 초과하려면 사전에 부서장 승인이 필요합니다.',
       sources: [fromRegulation('취업규칙 제23조 제2항')],
       confidence: 0.72,
+      map: null,
       xai: {
         factors: [
           { label: '조항 일치', weight: 0.48, detail: '취업규칙 제23조 제2항이 기준액을 정한다' },
@@ -124,6 +128,7 @@ export const CHAT_ENTRIES: ChatEntry[] = [
       text: '초품 검사는 금형 교체 직후에 실시합니다. 교체는 2인 1조로 수행하며 크레인 작업 구간에는 통제선을 설치합니다. 검사 결과는 설비 대장에 기록합니다.',
       sources: [fromDocument(SOP, 'doc-press-sop', '제3장 금형 교체')],
       confidence: 0.89,
+      map: null,
       handoff: null,
       xai: {
         factors: [
@@ -148,6 +153,7 @@ export const CHAT_ENTRIES: ChatEntry[] = [
         },
       ],
       confidence: 0.78,
+      map: null,
       xai: {
         factors: [
           { label: '성적서 판정란 인용', weight: 0.52, detail: '해당 로트의 판정 근거 문장을 그대로 인용했다' },
@@ -162,6 +168,37 @@ export const CHAT_ENTRIES: ChatEntry[] = [
       },
     },
   },
+  {
+    /* 사업장별 지표 질문 — 답변에 지도가 붙는다.
+       '가동률'만으로는 라이브 지표(진동) 질문과 헷갈리지 않지만,
+       사업장을 묻는 말이 함께 와야 지도를 붙인다. */
+    keywords: ['사업장별', '공장별', '사업장 가동률'],
+    reply: {
+      text: '7개 사업장 중 5곳의 설비 가동률을 수집하고 있습니다. 관리 기준 85%를 밑도는 곳은 창원본사(81.4%)와 양산공장(83.7%) 두 곳입니다. 창원본사는 PRS-C03 진동 알람으로 계획정지가 걸려 있어 가동률 하락과 같은 원인일 수 있습니다. 나머지 2개 사업장은 값이 없어 이 평균에 포함되지 않았습니다.',
+      sources: [
+        {
+          title: 'MES 가동 실적 집계',
+          locator: '2026-07-01 ~ 2026-07-12',
+          passage: null,
+          revisedOn: null,
+        },
+      ],
+      confidence: 0.83,
+      map: SITE_UTILIZATION,
+      xai: {
+        factors: [
+          { label: '집계 기간 일치', weight: 0.46, detail: '요청 시점 기준 최근 2주 실적을 집계했다' },
+          { label: '수집 범위 결손', weight: 0.34, detail: '7개 중 2개 사업장이 미연동이라 전사 평균이라고 말할 수 없다' },
+          { label: '기준값 대조', weight: 0.20, detail: '관리 기준 85%와 대조했다' },
+        ],
+        caveat: '천안·광주는 값이 없습니다. 평균 87.7%는 값이 있는 5개 사업장만의 평균입니다.',
+      },
+      handoff: {
+        agentLabel: '데이터 분석',
+        reason: '가동률 하락의 원인을 설비·공정별로 쪼개 보려면 데이터 분석 에이전트를 쓰십시오.',
+      },
+    },
+  },
 ]
 
 /** 매칭 실패 — 지어내지 않는다 */
@@ -172,6 +209,7 @@ export const CHAT_UNKNOWN: Omit<ChatMessage, 'id' | 'role'> = {
   handoff: null,
   // 근거가 없으므로 판단 근거도 없다. 없는 것을 만들어 붙이지 않는다
   xai: null,
+  map: null,
 }
 
 /**
@@ -187,4 +225,5 @@ export const FAQ_ITEMS: FaqItem[] = [
   { category: 'quality', question: '수입검사 판정 기준이 무엇인가요?' },
   { category: 'security', question: '도면 등 기밀 기술자료는 어떻게 처리하나요?' },
   { category: 'system', question: '진동 알람이 뜨면 어떻게 하나요?' },
+  { category: 'quality', question: '사업장별 가동률 보여줘' },
 ]

@@ -5,6 +5,7 @@ import type { Workspace } from '@entities/workspace/model'
 import type { Conversation } from '@features/conversations/useConversations'
 import type { SignalLink, WorkSignal } from '@entities/signal/model'
 import { INFO_TABS, SHELL_TABS, shellTabDesc, shellTabLabel, type ShellTab } from './tabs'
+import { t, type UiLang } from '@shared/i18n/strings'
 import { SignalBell } from './SignalBell'
 
 /**
@@ -36,6 +37,8 @@ export type ShellProps = {
   signals: WorkSignal[]
   onOpenSignal: (link: SignalLink) => void
   onExit: () => void
+  /** 화면 틀 언어 — 업무 콘텐츠는 이 값과 무관하게 원문 그대로다 */
+  uiLang: UiLang
   children: ReactNode
 }
 
@@ -57,6 +60,7 @@ export function AppShell({
   signals,
   onOpenSignal,
   onExit,
+  uiLang,
   children,
 }: ShellProps) {
   const [open, setOpen] = useState(false)
@@ -65,13 +69,15 @@ export function AppShell({
 
   const sidebar = (
     <nav
-      aria-label="작업 영역"
+      aria-label={t(uiLang, 'nav.workArea')}
       className="flex h-full w-72 shrink-0 flex-col border-r border-slate-200 bg-white"
     >
       <div className="border-b border-slate-200 p-4">
         <span
-          className="inline-block rounded px-2 py-0.5 text-[11px] font-bold text-white"
-          style={{ backgroundColor: domain.brandColor }}
+          className="inline-block rounded px-2 py-0.5 text-[11px] font-bold"
+          /* 브랜드 색은 인라인이라 팔레트 변수를 안 따라간다 —
+             다크에서도 글자가 읽히도록 흰색을 직접 지정한다 */
+          style={{ backgroundColor: domain.brandColor, color: '#fff' }}
         >
           {sectorLabel(domain.sector)}
         </span>
@@ -82,7 +88,7 @@ export function AppShell({
       {/* 워크스페이스를 바꾸면 아래 대화 목록이 실제로 바뀐다 */}
       <div className="border-b border-slate-200 p-3">
         <label htmlFor="ws" className="block text-[11px] font-bold text-slate-500">
-          워크스페이스
+          {t(uiLang, 'nav.workspace')}
         </label>
         <select
           id="ws"
@@ -100,24 +106,24 @@ export function AppShell({
       </div>
 
       <ul className="border-b border-slate-200 p-2">
-        {SHELL_TABS.map((t) => (
-          <li key={t}>
+        {SHELL_TABS.map((tab_) => (
+          <li key={tab_}>
             <button
               type="button"
               onClick={() => {
-                onTab(t)
+                onTab(tab_)
                 close()
               }}
-              aria-current={tab === t ? 'page' : undefined}
+              aria-current={tab === tab_ ? 'page' : undefined}
               className={`min-h-11 w-full rounded-lg px-3 text-left text-sm font-bold ${
-                tab === t ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-50'
+                tab === tab_ ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-50'
               }`}
             >
-              {shellTabLabel(t)}
+              {shellTabLabel(tab_, uiLang)}
               <span
-                className={`block text-[11px] font-normal ${tab === t ? 'text-slate-300' : 'text-slate-500'}`}
+                className={`block text-[11px] font-normal ${tab === tab_ ? 'text-slate-300' : 'text-slate-500'}`}
               >
-                {shellTabDesc(t)}
+                {shellTabDesc(tab_, uiLang)}
               </span>
             </button>
           </li>
@@ -134,24 +140,24 @@ export function AppShell({
           }}
           className="min-h-11 rounded-lg border border-slate-300 px-3 text-sm font-bold text-slate-700 hover:bg-slate-50"
         >
-          + 새 대화
+          {t(uiLang, 'nav.newChat')}
         </button>
 
         <div className="mt-4 flex items-center justify-between px-3">
-          <p className="text-[11px] font-bold text-slate-500">최근 대화</p>
+          <p className="text-[11px] font-bold text-slate-500">{t(uiLang, 'nav.recent')}</p>
           {conversations.length > 0 && (
             <button
               type="button"
               onClick={onClearConversations}
               className="min-h-11 text-[11px] font-bold text-slate-400 underline hover:text-slate-700"
             >
-              전체 지우기
+              {t(uiLang, 'nav.clearAll')}
             </button>
           )}
         </div>
 
         {conversations.length === 0 ? (
-          <p className="px-3 py-2 text-xs text-slate-400">이 워크스페이스에는 아직 없습니다.</p>
+          <p className="px-3 py-2 text-xs text-slate-400">{t(uiLang, 'nav.empty')}</p>
         ) : (
           <ul className="mt-1 min-h-0 flex-1 overflow-y-auto">
             {conversations.map((c) => (
@@ -175,7 +181,7 @@ export function AppShell({
                 <button
                   type="button"
                   onClick={() => onDeleteConversation(c.id)}
-                  aria-label={`${c.title ?? '대화'} 삭제`}
+                  aria-label={`${c.title} ${t(uiLang, 'nav.delete')}`}
                   className="min-h-11 px-2 text-xs text-slate-400 hover:text-rose-700"
                 >
                   ✕
@@ -187,28 +193,26 @@ export function AppShell({
 
         {/* 저장 사실과 막혔을 때를 모두 말한다 */}
         <p className="mt-2 px-3 text-[11px] text-slate-400">
-          {conversationsPersisted
-            ? '이 브라우저에 저장됩니다. 지우려면 위 전체 지우기를 누르세요.'
-            : '이 브라우저에 저장하지 못했습니다. 새로고침하면 사라집니다.'}
+          {t(uiLang, conversationsPersisted ? 'nav.saved' : 'nav.notSaved')}
         </p>
       </div>
 
       <ul className="border-t border-slate-200 p-2">
-        {INFO_TABS.map((t) => (
-          <li key={t}>
+        {INFO_TABS.map((tab_) => (
+          <li key={tab_}>
             <button
               type="button"
               onClick={() => {
-                onTab(t)
+                onTab(tab_)
                 close()
               }}
-              aria-current={tab === t ? 'page' : undefined}
+              aria-current={tab === tab_ ? 'page' : undefined}
               className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-sm ${
-                tab === t ? 'bg-slate-100 font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50'
+                tab === tab_ ? 'bg-slate-100 font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
-              {shellTabLabel(t)}
-              {t === 'notices' && unreadNotices > 0 && (
+              {shellTabLabel(tab_, uiLang)}
+              {tab_ === 'notices' && unreadNotices > 0 && (
                 <span className="ml-auto rounded-full bg-rose-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
                   {unreadNotices}
                 </span>
@@ -228,7 +232,7 @@ export function AppShell({
           onClick={onExit}
           className="mt-2 min-h-11 text-xs font-bold text-slate-500 underline hover:text-slate-900"
         >
-          분야 선택으로
+          {t(uiLang, 'nav.exit')}
         </button>
       </div>
     </nav>
@@ -240,7 +244,7 @@ export function AppShell({
       {open && (
         <button
           type="button"
-          aria-label="사이드바 닫기"
+          aria-label={t(uiLang, 'nav.close')}
           onClick={close}
           className="fixed inset-0 z-40 bg-slate-900/40 lg:hidden"
         />
@@ -260,13 +264,13 @@ export function AppShell({
           <button
             type="button"
             onClick={() => setOpen(true)}
-            aria-label="사이드바 열기"
+            aria-label={t(uiLang, 'nav.open')}
             className="min-h-11 rounded-lg border border-slate-200 px-3 text-sm font-bold text-slate-700 lg:hidden"
           >
             ☰
             {unreadNotices > 0 && <span className="ml-1 text-[10px] text-rose-600">●</span>}
           </button>
-          <span className="text-sm font-bold text-slate-800">{shellTabLabel(tab)}</span>
+          <span className="text-sm font-bold text-slate-800">{shellTabLabel(tab, uiLang)}</span>
           <div className="ml-auto">
             <SignalBell signals={signals} onOpen={onOpenSignal} />
           </div>

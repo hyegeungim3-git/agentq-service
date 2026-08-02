@@ -85,9 +85,9 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `POST /mapping:run` | `runMapping` | `MappingRequest` → `MappingResult` (`entities/mapping/model.ts`) |
 | `POST /analyses` | `analyzeData` | `AnalysisRequest` → `AnalysisResult` (`entities/analysis/model.ts`) |
 | `POST /safety-plans` | `createSafetyPlan` | `SafetyRequest` → `SafetyPlan` (`entities/safety/model.ts`) |
-| `POST /chat/messages` | `sendMessage` | 질문 문자열 → `ChatMessage` (`entities/chat/model.ts`) |
+| `POST /chat/messages` | `sendMessage` | 질문 문자열 → `ChatMessage` (`entities/chat/model.ts`). 사업장별 지표를 묻는 질문이면 `map`(`entities/mapintel/model.ts`)이 함께 온다 — 별도 호출을 만들지 않은 이유는 §2-5 |
 | `GET /chat/faq` | `fetchFaq` | → `FaqItem[]` |
-| `GET /metrics/live` | `fetchLiveMetrics` | → `LiveMetric[]` (`entities/metric/model.ts`) — 실제로는 스트리밍/폴링이 맞다. §2-4 참조 |
+| `GET /metrics/live` | `fetchLiveMetrics` | → `LiveMetric[]` (`entities/metric/model.ts`) — 실제로는 스트리밍/폴링이 맞다. §2-3 참조 |
 | `GET /signals` | `fetchSignals` | → `WorkSignal[]` (`entities/signal/model.ts`) — 알림 센터·오늘의 브리핑이 함께 쓴다 |
 
 `makeUserMessage`는 서버를 부르지 않는다. 사용자가 방금 친 말을 화면에 얹는 클라이언트 함수다.
@@ -106,7 +106,7 @@ OCR·번역·분석·보고서는 지금 fixture에서 4~15초 범위다.
 그 경우 바뀌는 곳은 `shared/api`의 해당 함수 하나이고 화면은 그대로다 —
 화면은 이미 '진행 중' 상태를 갖고 있다.
 
-### 2-4. 라이브 지표
+### 2-3. 라이브 지표
 
 지금은 예시 곡선을 통째로 받아 화면이 시간에 맞춰 재생한다.
 실제로는 **값이 계속 바뀌므로** 다음 중 하나가 맞다 — 백엔드가 정해 주면 맞춘다.
@@ -116,7 +116,7 @@ OCR·번역·분석·보고서는 지금 fixture에서 4~15초 범위다.
 
 어느 쪽이든 바뀌는 곳은 `shared/api/metrics.ts` 하나다. 화면은 '지금 값'만 받으면 된다.
 
-### 2-3. 업로드
+### 2-4. 업로드
 
 `entities/upload/model.ts`에 형식·용량 제약이 있다(문서 50MB / 음성 200MB / 스캔 50MB / 데이터 100MB).
 지금은 클라이언트가 먼저 거른다. **서버가 제약을 응답으로 내려 주면 그것을 쓰겠다** —
@@ -125,7 +125,20 @@ OCR·번역·분석·보고서는 지금 fixture에서 4~15초 범위다.
 업로드는 파일을 얹는 일이 아니라 **서버가 본문을 파싱해 돌려주는 일**이다.
 `BusinessDocument.text`(추출 본문)가 응답에 있어야 요약·검토·번역이 이어진다.
 
-### 2-4. 브라우저에 남기는 것
+### 2-5. 지도가 답변에 붙는 이유
+
+사업장별 지표는 **별도 호출을 만들지 않고 챗봇 응답에 실어** 제안한다.
+질문을 해석해 '지도를 붙일지'를 정하는 것은 서버이고, 화면이 그 판단을 다시 하면
+두 곳이 어긋난다. 화면은 `map`이 있으면 그리고 없으면 안 그린다.
+
+값이 없는 사업장은 **빼지 말고 `value: null` + 이유(`missingReason`)로** 달라고 요청한다.
+빼서 보내면 화면이 '전 사업장이 이렇다'로 그리게 된다. 0으로 보내는 것은 더 나쁘다 —
+가동률 0%인 공장이 있는 것으로 읽힌다.
+
+격자 위치(`col`/`row`)는 지금 프론트 fixture가 갖고 있다. 실제 좌표(위경도)를 줄 수 있으면
+지도 위에 그리겠다. 없으면 지금처럼 **배치 도식**이라고 밝히고 그린다.
+
+### 2-6. 브라우저에 남기는 것
 
 대화 기록과 공지 읽음 표시는 **브라우저에만** 저장한다(서버로 보내지 않는다).
 보관 기간 정책이 정해지기 전이라 지우는 방법을 함께 뒀다.

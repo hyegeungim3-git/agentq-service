@@ -14,6 +14,7 @@ import { BriefingCards } from '@widgets/briefing/BriefingCards'
 import type { LiveMetric } from '@entities/metric/model'
 import { LiveMetricCard } from '@widgets/live-metric/LiveMetricCard'
 import { DOWN_REASONS, useFeedback, type FeedbackEntry } from '@features/feedback/useFeedback'
+import { MapIntelCard } from '@widgets/map-intel/MapIntelCard'
 
 export function ChatPage({
   onBack,
@@ -268,6 +269,9 @@ function MessageBubble({
 
             {/* 신뢰도 숫자만으로는 무엇을 보고 그 숫자가 나왔는지 알 수 없다 */}
             {message.xai && <XaiPanel xai={message.xai} />}
+
+            {/* 사업장별 지표는 표보다 배치로 봐야 어디가 처지는지 보인다 */}
+            {message.map && <MapIntelCard map={message.map} />}
           </>
         )}
       </div>

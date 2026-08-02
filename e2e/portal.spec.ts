@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { openSidebar, openTab } from './shell'
+import { enterDomain, openSidebar, openTab } from './shell'
 
 test.describe('포털 · 셸', () => {
   /* 분야를 고르면 셸이 열리고 '일반' 탭(챗봇)이 먼저 보인다 */
@@ -175,4 +175,47 @@ test.describe('셸 — 라이브 지표·판단 근거·피드백', () => {
     await expect(page.getByRole('button', { name: '근거가 부족하다' })).toBeVisible()
     await expect(page.getByText(/서버로 보내지 않습니다/)).toBeVisible()
   })
+
+  test('사업장별 지표는 도식임을 밝히고 값 없는 곳을 지우지 않는다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /사업장별 가동률 보여줘/ }).click()
+
+    await expect(page.getByText('배치 도식 — 실제 지리 좌표 아님')).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByText(/2개 사업장은 값이 없어 평균에서 빠졌습니다/)).toBeVisible()
+
+    await page.getByRole('button', { name: /창원본사/ }).click()
+    await expect(page.getByText(/최근 추이 · 88.2% → 81.4%/)).toBeVisible()
+  })
+
+  /* 다크는 팔레트 변수만 뒤집는다 — 셸 배경이 실제로 어두워졌는지로 판정한다 */
+  test('환경설정 — 다크 스킨과 화면 틀 언어가 실제로 바뀐다', async ({ page }) => {
+    await enterDomain(page)
+    await openTab(page, /^환경설정/)
+
+    const root = page.locator('html')
+    await expect(root).toHaveAttribute('data-theme', 'light')
+    /* 카드 배경(bg-white)이 실제로 어두워졌는지로 판정한다 —
+       data-theme만 보면 CSS가 안 붙어도 통과한다 */
+    const card = page.getByRole('main').locator('section').first()
+    const lightBg = await card.evaluate((el) => getComputedStyle(el).backgroundColor)
+
+    /* 라디오는 sr-only라 라벨을 누른다 — 실제 사용자도 라벨을 누른다 */
+    await page.getByRole('main').locator('label').filter({ hasText: '어둡게' }).click()
+    await expect(root).toHaveAttribute('data-theme', 'dark')
+    const darkBg = await card.evaluate((el) => getComputedStyle(el).backgroundColor)
+    expect(lightBg).toBe('rgb(255, 255, 255)')
+    expect(darkBg).not.toBe(lightBg)
+
+    // 화면 틀만 영어로 — 사이드바 탭 이름이 바뀐다
+    await page.getByRole('main').locator('label').filter({ hasText: 'English' }).click()
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Settings')
+    const nav = await openSidebar(page, { nav: 'Work area', open: 'Open sidebar' })
+    await expect(nav.getByRole('button', { name: /^Agents/ })).toBeVisible()
+
+    // 새로고침해도 남는다
+    await page.reload()
+    await expect(root).toHaveAttribute('data-theme', 'dark')
+  })
+
 })
