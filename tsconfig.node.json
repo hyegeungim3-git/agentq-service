@@ -19,5 +19,8 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.ts"]
+  /* scripts/는 저장소 자체를 들여다보는 코드다(파일 읽기·경로).
+     앱 프로젝트에 node 타입을 열어 주면 화면 코드에서도 fs를 쓸 수 있게 되므로
+     여기로 분리한다. */
+  "include": ["vite.config.ts", "scripts/**/*.ts"]
 }

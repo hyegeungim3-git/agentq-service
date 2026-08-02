@@ -19,13 +19,14 @@ export type ApiResult<T> =
 
 /** 전체 도메인 목록. 포털 선택 화면이 쓴다. */
 export function fetchDomains(): Promise<ApiResult<Domain[]>> {
-  // TODO(api-미확정): 서버 확정 시 GET /domains 로 교체. 제거 조건 = API 명세 확정.
+  // TODO(api-미확정): GET /domains 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
   // 지금은 동기지만 반환 타입은 Promise로 고정한다 — 나중에 호출부를 바꾸지 않기 위해서다.
   return Promise.resolve({ ok: true, data: DOMAIN_FIXTURES })
 }
 
 /** 단일 도메인. 없으면 실패를 실패로 돌려준다 — 빈 객체로 얼버무리지 않는다. */
 export function fetchDomain(id: string): Promise<ApiResult<Domain>> {
+  // TODO(api-미확정): GET /domains/{id} 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
   const found = DOMAIN_FIXTURES.find((d) => d.id === id)
   return Promise.resolve(
     found ? { ok: true, data: found } : { ok: false, error: `알 수 없는 도메인: ${id}` },

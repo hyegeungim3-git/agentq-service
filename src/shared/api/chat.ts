@@ -14,6 +14,7 @@ export async function sendMessage(
   opts: ChatApiOptions = {},
 ): Promise<ApiResult<ChatMessage>> {
   await wait(opts.delayMs ?? 1300)
+  // TODO(api-미확정): POST /chat/messages 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
   const q = text.trim()
   if (!q) return { ok: false, error: '질문을 입력하세요.' }
 
