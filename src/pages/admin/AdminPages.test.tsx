@@ -122,10 +122,10 @@ describe('트레이너 현황', () => {
 describe('준비 중 화면', () => {
   /* 껍데기 화면을 복제하지 않는다. 대신 무엇이 언제 오는지 말한다 */
   it('무엇을 할 화면인지와 언제 만드는지 말한다', () => {
-    const menu = findMenu('users')
+    const menu = findMenu('hr')
     expect(menu).not.toBeNull()
     render(<PlannedPage menu={menu as NonNullable<typeof menu>} />)
-    expect(screen.getByText('계정·승인·권한 부여')).toBeInTheDocument()
+    expect(screen.getByText('인사 시스템 연동과 조직 그룹')).toBeInTheDocument()
     expect(screen.getByText(/운영·관리 단계에서 만듭니다/)).toBeInTheDocument()
   })
 })

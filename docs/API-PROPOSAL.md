@@ -94,6 +94,14 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /infra/pods?window=` | `fetchPods` | `window`=`1h`\|`6h`\|`24h`\|`7d` → `PodInfo[]`. 구간은 **서버 질의 조건**이다 — §2-7 |
 | `GET /infra/services` | `fetchServices` | → `ServiceStatus[]`. 정상이 아니면 `reason`·`action`이 있어야 한다 — §2-7 |
 | `GET /infra/gpus` | `fetchGpuNodes` | → `GpuNode[]`. 과부하 판정은 화면이 한다(원시 값만 준다) |
+| `GET /users?keyword=&role=&state=` | `fetchUsers` | → `PlatformUser[]` (`entities/user/model.ts`). **거르기는 서버가 한다** — §3-3 |
+| `PATCH /users/{id}` | `updateUserState` | 상태 변경. 인증·권한이 정해지기 전까지 화면은 실패를 그대로 알린다 |
+| `GET /approvals` | `fetchApprovals` | → `ApprovalRequest[]`. 신청 사유가 없으면 `null`(빈 문자열 금지) |
+| `POST /approvals/{id}:decide` | `decideApproval` | 승인·반려 |
+| `GET /audit/access?denied=&keyword=` | `fetchAccessLogs` | → `AccessLogEntry[]`. 거부는 `deniedReason` 필수 |
+| `GET /audit/coverage` | `fetchLogGaps` | → 로그에 **남지 않는 것** 목록. 없으면 화면이 '여기 있는 게 전부'로 그리게 된다 |
+| `GET /access-rules` | `fetchBlockRules` | → `BlockRule[]`. 만료된 규칙도 함께 준다 — 화면이 만료를 가려서 말한다 |
+| `POST /access-rules` | `createBlockRule` | 차단 규칙 추가 |
 | `GET /training/report?window=` | `fetchTrainerReport` | `window`=`day`\|`week`\|`month` → `TrainerReport`. 실패 작업에는 `note`(사유)가 있어야 한다 |
 
 `makeUserMessage`는 서버를 부르지 않는다. 사용자가 방금 친 말을 화면에 얹는 클라이언트 함수다.

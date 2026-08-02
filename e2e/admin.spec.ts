@@ -31,11 +31,11 @@ test.describe('관리자 셸', () => {
   test('아직 안 만든 메뉴를 감추지 않고 준비 중으로 표시한다', async ({ page }) => {
     await enterAdmin(page)
     const nav = await adminNav(page)
-    await expect(nav.getByText(/화면 4개 사용 가능 · 20개 준비 중/)).toBeVisible()
+    await expect(nav.getByText(/화면 9개 사용 가능 · 19개 준비 중/)).toBeVisible()
 
-    await nav.getByRole('button', { name: /사용자 관리/ }).click()
-    await expect(page.getByRole('heading', { name: '사용자 관리' })).toBeVisible()
-    await expect(page.getByText('계정·승인·권한 부여')).toBeVisible()
+    await nav.getByRole('button', { name: /HR 연계·그룹 관리/ }).click()
+    await expect(page.getByRole('heading', { name: 'HR 연계·그룹 관리' })).toBeVisible()
+    await expect(page.getByText('인사 시스템 연동과 조직 그룹')).toBeVisible()
     await expect(page.getByText(/운영·관리 단계에서 만듭니다/)).toBeVisible()
   })
 
@@ -84,4 +84,70 @@ test.describe('관리자 셸', () => {
     await pickLabel(page, '일간')
     await expect(page.getByText('실패한 작업 1건')).toBeVisible()
   })
+
+  /* 상위 항목은 묶음일 뿐 화면이 아니다 — 첫 하위 메뉴로 보낸다 */
+  test('사용자 관리는 하위 메뉴로 펼쳐지고 첫 화면으로 간다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '사용자 관리' }).click()
+    await expect(page.getByRole('heading', { name: '사용자 목록', level: 1 })).toBeVisible()
+
+    nav = await adminNav(page)
+    for (const label of ['승인 관리', '할당량', '접근 로그', '접근권한·차단']) {
+      await expect(nav.getByRole('button', { name: label })).toBeVisible()
+    }
+  })
+
+  test('사용자 검색이 서버 조건으로 목록을 좁힌다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: '사용자 관리' }).click()
+    await expect(page.getByText('10명')).toBeVisible()
+
+    await page.getByLabel(/이름 · 부서 · 메일/).fill('협력사')
+    await expect(page.getByText('1명')).toBeVisible()
+    await expect(page.getByText('박태윤')).toHaveCount(0)
+  })
+
+  /* 화면에서만 바꾸면 정지시킨 줄 알고 닫는데 그 계정은 살아 있다 */
+  test('계정 상태 변경은 성공한 척하지 않는다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: '사용자 관리' }).click()
+    await page.getByRole('button', { name: '정지' }).first().click()
+    await expect(page.getByRole('alert')).toContainText(/변경을 저장할 곳이 없습니다/)
+  })
+
+  test('오래 기다린 승인 신청이 맨 위로 온다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '사용자 관리' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '승인 관리' }).click()
+    await expect(page.getByText(/3일 이상 기다린 신청 2건/)).toBeVisible()
+    await expect(page.getByRole('main').getByRole('listitem').first()).toContainText('8일 대기')
+  })
+
+  /* 목록만 보여 주면 '여기 있는 게 전부'로 읽힌다 */
+  test('접근 로그가 남지 않는 것을 함께 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '사용자 관리' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '접근 로그' }).click()
+    await expect(page.getByText('이 목록에 남지 않는 것')).toBeVisible()
+    await expect(page.getByText(/보관 기간이 정해지지 않아/)).toBeVisible()
+  })
+
+  /* 만료된 규칙을 '차단 중'으로 그리면 막고 있다고 믿게 된다 */
+  test('만료된 차단 규칙을 가려서 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '사용자 관리' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '접근권한·차단' }).click()
+    await expect(page.getByText(/차단 중 2건/)).toBeVisible()
+    await expect(page.getByText(/만료돼 더 이상 막지 않는 규칙 1건/)).toBeVisible()
+  })
+
 })

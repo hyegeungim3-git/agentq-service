@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { ADMIN_SECTIONS, menusOf, plannedCount, readyCount } from '@entities/admin/nav'
+import { ADMIN_SECTIONS, childrenOf, landingOf, menusOf, plannedCount, readyCount } from '@entities/admin/nav'
 
 /**
  * 관리자 셸 — 좌측 메뉴와 상단 바.
@@ -49,37 +49,69 @@ export function AdminShell({
         <div key={section} className="border-b border-slate-200 p-2">
           <p className="px-3 py-1 text-[11px] font-bold tracking-wide text-slate-400">{section}</p>
           <ul>
-            {menusOf(section).map((m) => (
-              <li key={m.id}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onMenu(m.id)
-                    close()
-                  }}
-                  aria-current={menuId === m.id ? 'page' : undefined}
-                  className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-sm ${
-                    menuId === m.id
-                      ? 'bg-slate-900 font-bold text-white'
-                      : m.status === 'ready'
-                        ? 'font-bold text-slate-700 hover:bg-slate-50'
-                        : 'text-slate-500 hover:bg-slate-50'
-                  }`}
-                >
-                  <span className="min-w-0 flex-1 truncate">{m.label}</span>
-                  {/* 색만으로 구분하지 않는다 */}
-                  {m.status === 'planned' && (
-                    <span
-                      className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                        menuId === m.id ? 'bg-white text-slate-900' : 'bg-slate-100 text-slate-500'
-                      }`}
-                    >
-                      준비 중
-                    </span>
+            {menusOf(section).map((m) => {
+              const kids = childrenOf(m.id)
+              /* 상위 항목 자체에는 화면이 없다 — 첫 하위 메뉴로 보낸다 */
+              const active = menuId === m.id || kids.some((k) => k.id === menuId)
+              return (
+                <li key={m.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onMenu(landingOf(m.id))
+                      close()
+                    }}
+                    aria-current={menuId === m.id ? 'page' : undefined}
+                    className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-sm ${
+                      active && kids.length === 0
+                        ? 'bg-slate-900 font-bold text-white'
+                        : m.status === 'ready'
+                          ? 'font-bold text-slate-700 hover:bg-slate-50'
+                          : 'text-slate-500 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span className="min-w-0 flex-1 truncate">{m.label}</span>
+                    {/* 색만으로 구분하지 않는다 */}
+                    {m.status === 'planned' && (
+                      <span
+                        className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                          active && kids.length === 0
+                            ? 'bg-white text-slate-900'
+                            : 'bg-slate-100 text-slate-500'
+                        }`}
+                      >
+                        준비 중
+                      </span>
+                    )}
+                  </button>
+
+                  {/* 하위 메뉴는 그 묶음 안에 있을 때만 편다 — 늘 펴 두면 24개가 60개로 보인다 */}
+                  {kids.length > 0 && active && (
+                    <ul className="mb-1 ml-3 border-l border-slate-200 pl-2">
+                      {kids.map((k) => (
+                        <li key={k.id}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              onMenu(k.id)
+                              close()
+                            }}
+                            aria-current={menuId === k.id ? 'page' : undefined}
+                            className={`flex min-h-11 w-full items-center rounded-lg px-3 text-left text-xs ${
+                              menuId === k.id
+                                ? 'bg-slate-900 font-bold text-white'
+                                : 'text-slate-600 hover:bg-slate-50'
+                            }`}
+                          >
+                            {k.label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   )}
-                </button>
-              </li>
-            ))}
+                </li>
+              )
+            })}
           </ul>
         </div>
       ))}

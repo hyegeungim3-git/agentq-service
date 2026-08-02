@@ -42,6 +42,11 @@ import { ServiceStatusPage } from '@pages/admin/service/ServiceStatusPage'
 import { GpuStatusPage } from '@pages/admin/gpu/GpuStatusPage'
 import { TrainerStatusPage } from '@pages/admin/trainer/TrainerStatusPage'
 import { PlannedPage } from '@pages/admin/planned/PlannedPage'
+import { UserListPage } from '@pages/admin/users/UserListPage'
+import { ApprovalPage } from '@pages/admin/users/ApprovalPage'
+import { QuotaPage } from '@pages/admin/users/QuotaPage'
+import { AccessLogPage } from '@pages/admin/users/AccessLogPage'
+import { BlockRulePage } from '@pages/admin/users/BlockRulePage'
 
 /* 화면이 여럿이 됐지만 라우터는 아직 넣지 않는다.
    URL 공유·새로고침 복원이 요구사항으로 들어올 때 도입한다(가이드 §8, §12).
@@ -158,6 +163,11 @@ export default function App() {
         {view.menuId === 'service' && <ServiceStatusPage />}
         {view.menuId === 'gpu' && <GpuStatusPage />}
         {view.menuId === 'trainer' && <TrainerStatusPage />}
+        {view.menuId === 'users.list' && <UserListPage />}
+        {view.menuId === 'users.approval' && <ApprovalPage />}
+        {view.menuId === 'users.quota' && <QuotaPage />}
+        {view.menuId === 'users.log' && <AccessLogPage />}
+        {view.menuId === 'users.block' && <BlockRulePage />}
         {menu !== null && menu.status === 'planned' && <PlannedPage menu={menu} />}
       </AdminShell>
     )
