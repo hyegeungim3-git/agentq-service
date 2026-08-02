@@ -7,10 +7,19 @@ import {
   type ChatMessage,
   type ChatSource,
 } from '@entities/chat/model'
-import { useChat, type ChatOptions } from '@features/chat/useChat'
+import { useChat, type ChatOptions, type ChatStore } from '@features/chat/useChat'
 
-export function ChatPage({ onBack, apiOptions }: { onBack?: () => void; apiOptions?: ChatOptions }) {
-  const c = useChat(apiOptions ?? {})
+export function ChatPage({
+  onBack,
+  apiOptions,
+  /** 셸이 대화를 소유할 때 넘긴다. 없으면 이 화면이 스스로 들고 있는다 */
+  store,
+}: {
+  onBack?: () => void
+  apiOptions?: ChatOptions
+  store?: ChatStore
+}) {
+  const c = useChat(apiOptions ?? {}, store)
   const endRef = useRef<HTMLDivElement>(null)
 
   // 새 메시지가 오면 아래로 스크롤 — 대화가 길어지면 직접 내려야 하는 건 불편하다

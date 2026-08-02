@@ -1,15 +1,31 @@
 import { test, expect } from '@playwright/test'
+import { openSidebar, openTab } from './shell'
 
-test.describe('포털 · 허브', () => {
-  test('분야를 고르면 허브가 열리고 돌아올 수 있다', async ({ page }) => {
+test.describe('포털 · 셸', () => {
+  /* 분야를 고르면 셸이 열리고 '일반' 탭(챗봇)이 먼저 보인다 */
+  test('분야를 고르면 셸이 열리고 돌아올 수 있다', async ({ page }) => {
     await page.goto('./')
     await expect(page.getByRole('heading', { name: 'AgentQ' })).toBeVisible()
 
     await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await expect(page.getByRole('heading', { name: '업무 챗봇' })).toBeVisible()
+
+    const nav = await openSidebar(page)
+    await expect(nav).toContainText('한빛정밀')
+    await nav.getByRole('button', { name: '분야 선택으로' }).click()
+    await expect(page.getByRole('heading', { name: 'AgentQ' })).toBeVisible()
+  })
+
+  /* 탭이 실제로 화면을 바꾼다 */
+  test('탭을 옮기면 본문이 바뀐다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+
+    await openTab(page, /^에이전트/)
     await expect(page.getByRole('heading', { name: '한빛정밀' })).toBeVisible()
 
-    await page.getByRole('button', { name: '← 분야 선택' }).click()
-    await expect(page.getByRole('heading', { name: 'AgentQ' })).toBeVisible()
+    await openTab(page, /^보안/)
+    await expect(page.getByRole('heading', { name: '데이터 취급 현황' })).toBeVisible()
   })
 
   /* 고를 수 있는 발주처는 업무 데이터가 있는 곳뿐이다.
@@ -25,7 +41,7 @@ test.describe('포털 · 허브', () => {
   test('가로 스크롤이 없다', async ({ page }) => {
     await page.goto('./')
     await page.getByRole('button', { name: /한빛정밀/ }).click()
-    await expect(page.getByRole('heading', { name: '한빛정밀' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: '업무 챗봇' })).toBeVisible()
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     )
@@ -36,5 +52,26 @@ test.describe('포털 · 허브', () => {
     await page.goto('./')
     const box = await page.getByRole('button', { name: /한빛정밀/ }).boundingBox()
     expect(box!.height).toBeGreaterThanOrEqual(44)
+  })
+})
+
+test.describe('셸 — 최근 대화', () => {
+  /* 목록이 실제로 대화를 오갈 수 있어야 한다 */
+  test('질문하면 목록에 남고, 새 대화로 갈랐다가 되돌아올 수 있다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+
+    await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
+    await expect(page.getByText(/타수 50만 타/)).toBeVisible({ timeout: 10_000 })
+
+    let nav = await openSidebar(page)
+    await expect(nav).toContainText('금형 교체 주기가 어떻게 되나요')
+
+    await nav.getByRole('button', { name: '+ 새 대화' }).click()
+    await expect(page.getByText(/타수 50만 타/)).toHaveCount(0)
+
+    nav = await openSidebar(page)
+    await nav.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
+    await expect(page.getByText(/타수 50만 타/)).toBeVisible()
   })
 })

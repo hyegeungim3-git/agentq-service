@@ -15,7 +15,8 @@ export function HubPage({
   onOpen: (id: AgentId) => void
   /** 복합 업무 시나리오 — 없으면 카드를 그리지 않는다 */
   onOpenScenario?: (() => void) | undefined
-  onBack: () => void
+  /** 셸 밖에서 단독으로 쓸 때만 필요하다. 셸 안에서는 사이드바가 그 역할을 한다 */
+  onBack?: (() => void) | undefined
   agents?: AgentDefinition[]
 }) {
   const total = agents.length
@@ -25,13 +26,15 @@ export function HubPage({
     <main className="min-h-dvh bg-slate-50 px-4 py-8">
       <div className="mx-auto w-full max-w-3xl">
         <header className="mb-6">
-          <button
-            type="button"
-            onClick={onBack}
-            className="mb-3 min-h-11 text-sm font-bold text-slate-500 hover:text-slate-900"
-          >
-            ← 분야 선택
-          </button>
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="mb-3 min-h-11 text-sm font-bold text-slate-500 hover:text-slate-900"
+            >
+              ← 분야 선택
+            </button>
+          )}
           <div className="flex flex-wrap items-center gap-2">
             <span
               className="rounded px-2 py-0.5 text-[11px] font-bold text-white"

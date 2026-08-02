@@ -9,8 +9,21 @@ import { fetchFaq, makeUserMessage, sendMessage, type ChatApiOptions } from '@sh
 
 export type ChatOptions = ChatApiOptions
 
-export function useChat(opts: ChatOptions = {}) {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+/**
+ * 대화를 밖에서 보관할 수 있게 하는 자리.
+ *
+ * 셸의 '최근 대화'는 대화 여러 개를 오가야 하므로 메시지 소유자가 화면보다 위에 있어야 한다.
+ * 주지 않으면 훅이 스스로 들고 있는다 — 챗봇 화면만 따로 띄우는 경우가 그렇다.
+ */
+export type ChatStore = {
+  messages: ChatMessage[]
+  setMessages: (update: (prev: ChatMessage[]) => ChatMessage[]) => void
+}
+
+export function useChat(opts: ChatOptions = {}, store?: ChatStore) {
+  const [ownMessages, setOwnMessages] = useState<ChatMessage[]>([])
+  const messages = store ? store.messages : ownMessages
+  const setMessages = store ? store.setMessages : setOwnMessages
   const [input, setInput] = useState('')
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -48,15 +61,15 @@ export function useChat(opts: ChatOptions = {}) {
       }
       setMessages((prev) => [...prev, res.data])
     },
-    [pending, delayMs],
+    [pending, delayMs, setMessages],
   )
 
   const send = useCallback(() => ask(input), [ask, input])
 
   const reset = useCallback(() => {
-    setMessages([])
+    setMessages(() => [])
     setError(null)
-  }, [])
+  }, [setMessages])
 
   const shownFaq = faqCategory === 'all' ? faq : faq.filter((f) => f.category === faqCategory)
 

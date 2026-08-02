@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test'
+import { openTab } from './shell'
 
 async function openAgent(page: import('@playwright/test').Page, name: RegExp) {
   await page.goto('./')
   await page.getByRole('button', { name: /한빛정밀/ }).click()
+  await openTab(page, /^에이전트/)
   await page.getByRole('button', { name }).click()
 }
 

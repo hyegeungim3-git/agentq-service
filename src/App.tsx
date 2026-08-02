@@ -2,8 +2,12 @@ import { useEffect, useState } from 'react'
 import type { AgentId } from '@entities/agent/model'
 import type { Domain } from '@entities/domain/model'
 import { fetchDomain } from '@shared/api/domains'
+import { useConversations } from '@features/conversations/useConversations'
+import { AppShell } from '@widgets/app-shell/AppShell'
+import type { ShellTab } from '@widgets/app-shell/tabs'
 import { PortalPage } from '@pages/portal/PortalPage'
 import { HubPage } from '@pages/hub/HubPage'
+import { SecurityPage } from '@pages/security/SecurityPage'
 import { SummaryPage } from '@pages/summary/SummaryPage'
 import { TranslatePage } from '@pages/translate/TranslatePage'
 import { ReviewPage } from '@pages/review/ReviewPage'
@@ -24,9 +28,16 @@ import { OrchestrationPage } from '@pages/orchestration/OrchestrationPage'
    그때 이 View 타입이 그대로 라우트 정의가 된다. */
 type View =
   | { name: 'portal' }
-  | { name: 'hub'; domainId: string }
-  | { name: 'agent'; domainId: string; agentId: AgentId }
-  | { name: 'scenario'; domainId: string }
+  /** 셸 안. tab이 무엇을 보여 줄지, agentId·scenario가 에이전트 탭의 안쪽을 정한다 */
+  | { name: 'shell'; domainId: string; tab: ShellTab; agentId: AgentId | null; scenario: boolean }
+
+const shell = (domainId: string, tab: ShellTab): View => ({
+  name: 'shell',
+  domainId,
+  tab,
+  agentId: null,
+  scenario: false,
+})
 
 export default function App() {
   const [view, setView] = useState<View>({ name: 'portal' })
@@ -36,6 +47,9 @@ export default function App() {
      ② 도메인을 바꿀 때 이전 도메인이 잠깐 보이는 문제도 같이 사라진다 —
         id가 다르면 아직 안 불러온 것으로 취급한다. */
   const [loaded, setLoaded] = useState<{ id: string; domain: Domain } | null>(null)
+
+  /* 대화는 셸이 소유한다 — 탭을 옮겨도, 다른 대화를 골라도 남아야 한다 */
+  const conv = useConversations()
 
   const domainId = view.name === 'portal' ? null : view.domainId
 
@@ -53,39 +67,7 @@ export default function App() {
   const domain = loaded && loaded.id === domainId ? loaded.domain : null
 
   if (view.name === 'portal') {
-    return <PortalPage onSelect={(id) => setView({ name: 'hub', domainId: id })} />
-  }
-
-  if (view.name === 'scenario') {
-    return <OrchestrationPage onBack={() => setView({ name: 'hub', domainId: view.domainId })} />
-  }
-
-  if (view.name === 'agent') {
-    const back = () => setView({ name: 'hub', domainId: view.domainId })
-    if (view.agentId === 'summary') return <SummaryPage onBack={back} />
-    if (view.agentId === 'translate') return <TranslatePage onBack={back} />
-    if (view.agentId === 'review') return <ReviewPage onBack={back} />
-    if (view.agentId === 'report') return <ReportPage onBack={back} />
-    if (view.agentId === 'meeting') return <MeetingPage onBack={back} />
-    if (view.agentId === 'internalreg') return <RegulationPage onBack={back} />
-    if (view.agentId === 'knowledge') return <KnowledgePage onBack={back} />
-    if (view.agentId === 'ocr') return <OcrPage onBack={back} />
-    if (view.agentId === 'safety') return <SafetyPage onBack={back} />
-    if (view.agentId === 'dbquery') return <DataQueryPage onBack={back} />
-    if (view.agentId === 'dataanalysis') return <AnalysisPage onBack={back} />
-    if (view.agentId === 'address') return <MappingPage onBack={back} />
-    if (view.agentId === 'chatbot') return <ChatPage onBack={back} />
-    // 허브가 준비된 에이전트만 열어 주므로 여기 오면 카탈로그와 라우팅이 어긋난 것이다
-    return (
-      <main className="min-h-dvh grid place-items-center p-6">
-        <div role="alert" className="max-w-sm text-center">
-          <p className="font-bold text-slate-900">아직 준비되지 않은 에이전트입니다</p>
-          <button type="button" onClick={back} className="mt-3 min-h-11 text-sm font-bold text-slate-600 underline">
-            허브로 돌아가기
-          </button>
-        </div>
-      </main>
-    )
+    return <PortalPage onSelect={(id) => setView(shell(id, 'general'))} />
   }
 
   if (!domain) {
@@ -97,12 +79,63 @@ export default function App() {
     )
   }
 
+  const backToAgents = () => setView(shell(domain.id, 'agents'))
+
   return (
-    <HubPage
+    <AppShell
       domain={domain}
-      onBack={() => setView({ name: 'portal' })}
-      onOpen={(agentId) => setView({ name: 'agent', domainId: domain.id, agentId })}
-      onOpenScenario={() => setView({ name: 'scenario', domainId: domain.id })}
-    />
+      tab={view.tab}
+      onTab={(tab) => setView(shell(domain.id, tab))}
+      conversations={conv.listed}
+      activeConversationId={conv.activeId}
+      onSelectConversation={conv.select}
+      onNewConversation={conv.startNew}
+      onExit={() => setView({ name: 'portal' })}
+    >
+      {view.tab === 'general' && <ChatPage store={conv.store} />}
+      {view.tab === 'security' && <SecurityPage />}
+      {view.tab === 'agents' && view.scenario && <OrchestrationPage onBack={backToAgents} />}
+      {view.tab === 'agents' && !view.scenario && view.agentId === null && (
+        <HubPage
+          domain={domain}
+          onOpen={(agentId) => setView({ ...view, agentId })}
+          onOpenScenario={() => setView({ ...view, scenario: true })}
+        />
+      )}
+      {view.tab === 'agents' && !view.scenario && view.agentId !== null && (
+        <AgentView agentId={view.agentId} onBack={backToAgents} />
+      )}
+    </AppShell>
+  )
+}
+
+/** 에이전트 화면 선택 — 허브가 준비된 것만 열어 주므로 여기 오면 카탈로그와 어긋난 것이다 */
+function AgentView({ agentId, onBack }: { agentId: AgentId; onBack: () => void }) {
+  if (agentId === 'summary') return <SummaryPage onBack={onBack} />
+  if (agentId === 'translate') return <TranslatePage onBack={onBack} />
+  if (agentId === 'review') return <ReviewPage onBack={onBack} />
+  if (agentId === 'report') return <ReportPage onBack={onBack} />
+  if (agentId === 'meeting') return <MeetingPage onBack={onBack} />
+  if (agentId === 'internalreg') return <RegulationPage onBack={onBack} />
+  if (agentId === 'knowledge') return <KnowledgePage onBack={onBack} />
+  if (agentId === 'ocr') return <OcrPage onBack={onBack} />
+  if (agentId === 'safety') return <SafetyPage onBack={onBack} />
+  if (agentId === 'dbquery') return <DataQueryPage onBack={onBack} />
+  if (agentId === 'dataanalysis') return <AnalysisPage onBack={onBack} />
+  if (agentId === 'address') return <MappingPage onBack={onBack} />
+  if (agentId === 'chatbot') return <ChatPage onBack={onBack} />
+  return (
+    <main className="min-h-dvh grid place-items-center p-6">
+      <div role="alert" className="max-w-sm text-center">
+        <p className="font-bold text-slate-900">아직 준비되지 않은 에이전트입니다</p>
+        <button
+          type="button"
+          onClick={onBack}
+          className="mt-3 min-h-11 text-sm font-bold text-slate-600 underline"
+        >
+          허브로 돌아가기
+        </button>
+      </div>
+    </main>
   )
 }
