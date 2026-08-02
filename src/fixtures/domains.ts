@@ -10,6 +10,12 @@
  */
 import type { Domain } from '@entities/domain/model'
 
+/*
+ * status가 'ready'인 발주처는 지금 한 곳뿐이다.
+ * 에이전트 13종이 쓰는 문서·용어·수치 fixture가 전부 한빛정밀(제조) 기준이기 때문이다.
+ * 나머지 세 곳을 'ready'로 바꾸려면 각 발주처의 업무 데이터를 먼저 만들어야 한다 —
+ * 플래그만 바꾸면 제조 데이터가 그대로 노출된다.
+ */
 export const DOMAIN_FIXTURES: Domain[] = [
   {
     id: 'manufacturing',
@@ -18,6 +24,7 @@ export const DOMAIN_FIXTURES: Domain[] = [
     sector: 'manufacturing',
     brandColor: '#0F766E',
     tagline: '스마트팩토리 생성형 AI 플랫폼',
+    status: 'ready',
     docPrefix: 'HBP',
     user: { name: '박태윤', dept: '생산기술팀', title: '책임' },
   },
@@ -28,6 +35,7 @@ export const DOMAIN_FIXTURES: Domain[] = [
     sector: 'public',
     brandColor: '#003087',
     tagline: '부동산 공시 업무 생성형 AI 플랫폼',
+    status: 'planned',
     docPrefix: 'KREA',
     user: { name: '김민준', dept: '부동산공시처', title: '과장' },
   },
@@ -38,6 +46,7 @@ export const DOMAIN_FIXTURES: Domain[] = [
     sector: 'civic',
     brandColor: '#166534',
     tagline: '스마트행정 생성형 AI 플랫폼',
+    status: 'planned',
     docPrefix: 'HSC',
     user: { name: '이서연', dept: '민원여권과', title: '주무관' },
   },
@@ -48,6 +57,7 @@ export const DOMAIN_FIXTURES: Domain[] = [
     sector: 'medical',
     brandColor: '#7C3AED',
     tagline: '의료 업무 생성형 AI 플랫폼',
+    status: 'planned',
     docPrefix: 'SUH',
     user: { name: '서지은', dept: '적정진료관리실', title: '대리' },
   },

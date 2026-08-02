@@ -18,6 +18,19 @@ export type SectorCode = 'public' | 'manufacturing' | 'civic' | 'medical'
 /** 브랜드 색 — 화면이 CSS 변수로 푼다. 여기서는 값만 보관한다. */
 export type HexColor = `#${string}`
 
+/**
+ * 이 발주처 전용 업무 데이터(문서 목록·용어·수치)가 준비됐는지.
+ *
+ * 왜 타입에 있나: 준비되지 않은 발주처를 선택하게 두면 다른 발주처의 데이터가
+ * 그대로 보인다. 실제로 그랬다 — 공공(한국부동산원)을 골라도 요약할 문서 목록에
+ * `프레스_작업표준서_SOP-PR-011.pdf`가 떴다. 고르는 행위에 의미가 없는데
+ * 의미가 있는 것처럼 보이는 화면이었다.
+ *
+ * 목록에서 감추지 않고 상태를 표시한다 — 안 만든 것을 없는 것처럼 보이게 하지 않는다.
+ * 에이전트 카탈로그(`AgentDefinition.status`)와 같은 어법이다.
+ */
+export type DomainStatus = 'ready' | 'planned'
+
 export type DomainSummary = {
   id: string
   /** 조직 정식 명칭 */
@@ -28,6 +41,7 @@ export type DomainSummary = {
   brandColor: HexColor
   /** 포털 화면의 한 줄 소개 */
   tagline: string
+  status: DomainStatus
 }
 
 export type DomainUser = {

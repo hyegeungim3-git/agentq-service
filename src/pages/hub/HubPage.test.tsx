@@ -12,6 +12,7 @@ const domain: Domain = {
   sector: 'manufacturing',
   brandColor: '#0F766E',
   tagline: '스마트팩토리 생성형 AI 플랫폼',
+  status: 'ready',
   docPrefix: 'HBP',
   user: { name: '박태윤', dept: '생산기술팀', title: '책임' },
 }

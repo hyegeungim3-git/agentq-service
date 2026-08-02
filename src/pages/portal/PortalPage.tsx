@@ -66,26 +66,49 @@ export function PortalPage({ onSelect }: { onSelect: (id: string) => void }) {
 
         {state.kind === 'ready' && state.domains.length > 0 && (
           <ul className="grid gap-3 sm:grid-cols-2">
-            {state.domains.map((d) => (
-              <li key={d.id}>
-                <button
-                  type="button"
-                  onClick={() => onSelect(d.id)}
-                  className="min-h-28 w-full rounded-xl border border-slate-200 bg-white p-5 text-left transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2"
-                  style={{ outlineColor: d.brandColor }}
-                >
-                  <span
-                    className="inline-block rounded px-2 py-0.5 text-[11px] font-bold text-white"
-                    style={{ backgroundColor: d.brandColor }}
+            {state.domains.map((d) => {
+              const ready = d.status === 'ready'
+              return (
+                <li key={d.id}>
+                  <button
+                    type="button"
+                    onClick={() => onSelect(d.id)}
+                    disabled={!ready}
+                    aria-describedby={ready ? undefined : `${d.id}-status`}
+                    className="min-h-28 w-full rounded-xl border border-slate-200 bg-white p-5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 enabled:hover:border-slate-300 enabled:hover:bg-slate-50 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-60"
+                    style={{ outlineColor: d.brandColor }}
                   >
-                    {sectorLabel(d.sector)}
-                  </span>
-                  <span className="mt-2 block font-bold text-slate-900">{d.orgName}</span>
-                  <span className="mt-0.5 block text-sm text-slate-600">{d.tagline}</span>
-                </button>
-              </li>
-            ))}
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span
+                        className="inline-block rounded px-2 py-0.5 text-[11px] font-bold text-white"
+                        style={{ backgroundColor: d.brandColor }}
+                      >
+                        {sectorLabel(d.sector)}
+                      </span>
+                      {!ready && (
+                        <span
+                          id={`${d.id}-status`}
+                          className="rounded bg-slate-200 px-1.5 py-0.5 text-[10px] font-bold text-slate-600"
+                        >
+                          업무 데이터 준비 중
+                        </span>
+                      )}
+                    </span>
+                    <span className="mt-2 block font-bold text-slate-900">{d.orgName}</span>
+                    <span className="mt-0.5 block text-sm text-slate-600">{d.tagline}</span>
+                  </button>
+                </li>
+              )
+            })}
           </ul>
+        )}
+
+        {/* 왜 못 고르는지 화면이 말한다 — 눌리지 않는 이유를 사용자가 추측하게 두지 않는다 */}
+        {state.kind === 'ready' && state.domains.some((d) => d.status !== 'ready') && (
+          <p className="mt-4 text-xs text-slate-500">
+            업무 데이터가 준비된 발주처만 선택할 수 있습니다. 준비 중인 곳을 열면 다른 발주처의 문서와
+            수치가 그대로 보이므로 막아 두었습니다.
+          </p>
         )}
       </div>
     </main>
