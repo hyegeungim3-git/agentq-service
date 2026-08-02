@@ -8,16 +8,23 @@ import {
   type ChatSource,
 } from '@entities/chat/model'
 import { useChat, type ChatOptions, type ChatStore } from '@features/chat/useChat'
+import type { SignalLink, WorkSignal } from '@entities/signal/model'
+import { BriefingCards } from '@widgets/briefing/BriefingCards'
 
 export function ChatPage({
   onBack,
   apiOptions,
   /** 셸이 대화를 소유할 때 넘긴다. 없으면 이 화면이 스스로 들고 있는다 */
   store,
+  /** 빈 화면에 오늘의 브리핑을 띄운다. 셸 밖에서 단독으로 쓰면 없다 */
+  signals = [],
+  onOpenSignal,
 }: {
   onBack?: () => void
   apiOptions?: ChatOptions
   store?: ChatStore
+  signals?: WorkSignal[]
+  onOpenSignal?: ((link: SignalLink) => void) | undefined
 }) {
   const c = useChat(apiOptions ?? {}, store)
   const endRef = useRef<HTMLDivElement>(null)
@@ -57,6 +64,13 @@ export function ChatPage({
       </header>
 
       <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
+        {/* 빈 화면에서 가장 먼저 봐야 하는 것은 오늘 처리할 일이다 */}
+        {c.messages.length === 0 && !c.pending && onOpenSignal && (
+          <div className="mb-4">
+            <BriefingCards signals={signals} onOpen={onOpenSignal} />
+          </div>
+        )}
+
         {c.messages.length === 0 && !c.pending && (
           <div className="rounded-xl border border-slate-200 bg-white p-5">
             <p className="text-sm text-slate-600">

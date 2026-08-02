@@ -7,6 +7,8 @@ import { unreadNotices, type Notice } from '@entities/notice/model'
 import type { Workspace } from '@entities/workspace/model'
 import { fetchWorkspaces } from '@shared/api/workspaces'
 import { fetchNotices } from '@shared/api/notices'
+import { fetchSignals } from '@shared/api/signals'
+import type { SignalLink, WorkSignal } from '@entities/signal/model'
 import { readJson, writeJson } from '@shared/lib/storage'
 import { AppShell } from '@widgets/app-shell/AppShell'
 import type { ShellTab } from '@widgets/app-shell/tabs'
@@ -61,6 +63,7 @@ export default function App() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([])
   const [workspaceId, setWorkspaceId] = useState('')
   const [notices, setNotices] = useState<Notice[]>([])
+  const [signals, setSignals] = useState<WorkSignal[]>([])
   const [readIds, setReadIds] = useState<string[]>(
     () => readJson<string[]>(READ_KEY, (v): v is string[] => Array.isArray(v)) ?? [],
   )
@@ -74,6 +77,9 @@ export default function App() {
     })
     void fetchNotices().then((res) => {
       if (alive && res.ok) setNotices(res.data)
+    })
+    void fetchSignals().then((res) => {
+      if (alive && res.ok) setSignals(res.data)
     })
     return () => {
       alive = false
@@ -122,6 +128,16 @@ export default function App() {
 
   const backToAgents = () => setView(shell(domain.id, 'agents'))
 
+  /* 알림·브리핑에서 처리할 화면으로 잇는다 — 이을 곳이 없으면 아무 것도 하지 않는다 */
+  const openSignal = (link: SignalLink) => {
+    if (!link) return
+    if (link.kind === 'scenario') {
+      setView({ name: 'shell', domainId: domain.id, tab: 'agents', agentId: null, scenario: true })
+      return
+    }
+    setView({ name: 'shell', domainId: domain.id, tab: 'agents', agentId: link.agentId, scenario: false })
+  }
+
   return (
     <AppShell
       domain={domain}
@@ -138,9 +154,13 @@ export default function App() {
       onClearConversations={conv.clearAll}
       conversationsPersisted={conv.persisted}
       unreadNotices={unreadNotices(notices, readIds).length}
+      signals={signals}
+      onOpenSignal={openSignal}
       onExit={() => setView({ name: 'portal' })}
     >
-      {view.tab === 'general' && <ChatPage store={conv.store} />}
+      {view.tab === 'general' && (
+        <ChatPage store={conv.store} signals={signals} onOpenSignal={openSignal} />
+      )}
       {view.tab === 'security' && <SecurityPage />}
       {view.tab === 'notices' && <NoticesPage onRead={markRead} />}
       {view.tab === 'guide' && <GuidePage />}

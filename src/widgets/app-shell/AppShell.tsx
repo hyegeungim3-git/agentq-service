@@ -3,7 +3,9 @@ import type { Domain } from '@entities/domain/model'
 import { sectorLabel } from '@entities/domain/model'
 import type { Workspace } from '@entities/workspace/model'
 import type { Conversation } from '@features/conversations/useConversations'
+import type { SignalLink, WorkSignal } from '@entities/signal/model'
 import { INFO_TABS, SHELL_TABS, shellTabDesc, shellTabLabel, type ShellTab } from './tabs'
+import { SignalBell } from './SignalBell'
 
 /**
  * 사용자 포털의 셸 — 사이드바와 탭.
@@ -31,6 +33,8 @@ export type ShellProps = {
   conversationsPersisted: boolean
 
   unreadNotices: number
+  signals: WorkSignal[]
+  onOpenSignal: (link: SignalLink) => void
   onExit: () => void
   children: ReactNode
 }
@@ -50,6 +54,8 @@ export function AppShell({
   onClearConversations,
   conversationsPersisted,
   unreadNotices,
+  signals,
+  onOpenSignal,
   onExit,
   children,
 }: ShellProps) {
@@ -249,17 +255,21 @@ export function AppShell({
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-4 py-2 lg:hidden">
+        {/* 상단 바는 모든 폭에서 보인다 — 알림은 좁은 화면에서만 필요한 것이 아니다 */}
+        <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-4 py-2">
           <button
             type="button"
             onClick={() => setOpen(true)}
             aria-label="사이드바 열기"
-            className="min-h-11 rounded-lg border border-slate-200 px-3 text-sm font-bold text-slate-700"
+            className="min-h-11 rounded-lg border border-slate-200 px-3 text-sm font-bold text-slate-700 lg:hidden"
           >
             ☰
             {unreadNotices > 0 && <span className="ml-1 text-[10px] text-rose-600">●</span>}
           </button>
           <span className="text-sm font-bold text-slate-800">{shellTabLabel(tab)}</span>
+          <div className="ml-auto">
+            <SignalBell signals={signals} onOpen={onOpenSignal} />
+          </div>
         </div>
         {children}
       </div>

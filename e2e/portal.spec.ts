@@ -122,3 +122,25 @@ test.describe('셸 — 워크스페이스·공지·가이드', () => {
     await expect(page.getByRole('heading', { name: '사용 가이드' })).toBeVisible()
   })
 })
+
+test.describe('셸 — 알림·브리핑', () => {
+  /* 눌러도 아무 데도 못 가면 읽음 처리 버튼일 뿐이다 */
+  test('브리핑에서 릴레이로, 알림에서 에이전트로 이어진다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+
+    // 빈 화면 브리핑
+    await expect(page.getByRole('region', { name: '오늘의 업무 브리핑' })).toContainText(
+      '지금 처리해야 하는 일이 2건 있습니다',
+    )
+    await page.getByRole('button', { name: /접수 처리 릴레이 열기/ }).click()
+    await expect(page.getByRole('heading', { name: '수입검사 성적서 접수 처리' })).toBeVisible()
+
+    // 알림 센터
+    await page.getByRole('button', { name: /업무 알림/ }).click()
+    const box = page.getByRole('region', { name: '업무 알림' })
+    await expect(box).toContainText('출처 · PdM 센서 알람')
+    await box.getByRole('button', { name: /설비 이력 조회 →/ }).click()
+    await expect(page.getByRole('heading', { name: '데이터 조회 에이전트' })).toBeVisible()
+  })
+})

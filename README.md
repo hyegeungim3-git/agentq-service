@@ -65,4 +65,5 @@ src/
 ## 작업 규칙
 
 AI로 개발할 때는 `AGENTS.md`와 `docs/ai-development-handoff-guidelines.md`를 먼저 읽을 것.
+이전 데모와 무엇이 왜 달라졌는지는 `docs/REBUILD-NOTES.md`.
 기술 결정 기록은 `docs/DECISIONS.md`, 남은 결정 사항은 `AGENTS.md` §20.
