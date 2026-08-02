@@ -14,10 +14,19 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
   /* 포트를 5180으로 고정한다 — 5173은 흔한 기본값이라 다른 프로젝트의 dev 서버가
-     떠 있으면 reuseExistingServer가 '남의 앱'을 테스트한다(실제로 겪었다). */
+     떠 있으면 reuseExistingServer가 '남의 앱'을 테스트한다(실제로 겪었다).
+
+     CI에서는 dev가 아니라 production preview를 띄운다.
+     dev 서버는 모듈을 요청 시점에 컴파일해서, 지연 로딩 청크(차트)를 여러 워커가
+     동시에 처음 요청하면 5초 안에 안 온다 — 실제로 차트를 넣은 직후 7건이
+     타임아웃으로 실패하고 재실행하니 통과했다. 그런 '두 번째에 되는' 테스트는
+     CI에서 무작위로 깨진다. preview는 이미 빌드된 파일을 주므로 그 변수가 사라진다. */
   webServer: {
-    command: 'npm run dev -- --port 5180 --strictPort',
+    command: process.env.CI
+      ? 'npm run build && npm run preview -- --port 5180 --strictPort'
+      : 'npm run dev -- --port 5180 --strictPort',
     url: 'http://localhost:5180',
     reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
   },
 })

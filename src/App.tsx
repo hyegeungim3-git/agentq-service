@@ -13,6 +13,8 @@ import { RegulationPage } from '@pages/regulation/RegulationPage'
 import { KnowledgePage } from '@pages/knowledge/KnowledgePage'
 import { OcrPage } from '@pages/ocr/OcrPage'
 import { SafetyPage } from '@pages/safety/SafetyPage'
+import { DataQueryPage } from '@pages/dataquery/DataQueryPage'
+import { AnalysisPage } from '@pages/analysis/AnalysisPage'
 
 /* 화면이 여럿이 됐지만 라우터는 아직 넣지 않는다.
    URL 공유·새로고침 복원이 요구사항으로 들어올 때 도입한다(가이드 §8, §12).
@@ -61,6 +63,8 @@ export default function App() {
     if (view.agentId === 'knowledge') return <KnowledgePage onBack={back} />
     if (view.agentId === 'ocr') return <OcrPage onBack={back} />
     if (view.agentId === 'safety') return <SafetyPage onBack={back} />
+    if (view.agentId === 'dbquery') return <DataQueryPage onBack={back} />
+    if (view.agentId === 'dataanalysis') return <AnalysisPage onBack={back} />
     // 허브가 준비된 에이전트만 열어 주므로 여기 오면 카탈로그와 라우팅이 어긋난 것이다
     return (
       <main className="min-h-dvh grid place-items-center p-6">

@@ -21,3 +21,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run test
       - run: npm run build
+      # E2E는 preview 빌드를 띄워 돌린다(playwright.config.ts 참조).
+      # 브라우저 설치는 CI에서만 필요하다.
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
