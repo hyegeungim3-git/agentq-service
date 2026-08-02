@@ -54,6 +54,9 @@ import { UsageHistoryPage } from '@pages/admin/analytics/UsageHistoryPage'
 import { SatisfactionPage } from '@pages/admin/analytics/SatisfactionPage'
 import { UsageStatsPage } from '@pages/admin/analytics/UsageStatsPage'
 import { ReportPage as AnalyticsReportPage } from '@pages/admin/analytics/ReportPage'
+import { IntegratedLogPage } from '@pages/admin/oplog/IntegratedLogPage'
+import { UsageMonitorPage } from '@pages/admin/oplog/UsageMonitorPage'
+import { ContentPage } from '@pages/admin/content/ContentPage'
 
 /* 화면이 여럿이 됐지만 라우터는 아직 넣지 않는다.
    URL 공유·새로고침 복원이 요구사항으로 들어올 때 도입한다(가이드 §8, §12).
@@ -182,6 +185,9 @@ export default function App() {
         {view.menuId === 'analytics.satisfaction' && <SatisfactionPage />}
         {view.menuId === 'analytics.stats' && <UsageStatsPage />}
         {view.menuId === 'analytics.report' && <AnalyticsReportPage />}
+        {view.menuId === 'logs.integrated' && <IntegratedLogPage />}
+        {view.menuId === 'logs.usage' && <UsageMonitorPage />}
+        {view.menuId === 'content' && <ContentPage />}
         {menu !== null && menu.status === 'planned' && <PlannedPage menu={menu} />}
       </AdminShell>
     )

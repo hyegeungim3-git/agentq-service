@@ -108,8 +108,10 @@ export const ADMIN_MENUS: AdminMenu[] = [
   { id: 'analytics.satisfaction', label: '이용만족도', section: '운영 · 관리', parentId: 'analytics', status: 'ready', phase: 'P2', summary: '만족도 조사 결과와 표본' },
   { id: 'analytics.stats', label: '이용 통계', section: '운영 · 관리', parentId: 'analytics', status: 'ready', phase: 'P2', summary: '기간별 질의량과 응답 시간' },
   { id: 'analytics.report', label: '서비스 통계 리포트', section: '운영 · 관리', parentId: 'analytics', status: 'ready', phase: 'P2', summary: '기간·항목을 골라 리포트 생성' },
-  { id: 'logs', label: '로그·모니터링', section: '운영 · 관리', parentId: null, status: 'planned', phase: 'P2', summary: '접근 로그·감사 추적·알림' },
-  { id: 'content', label: '콘텐츠 관리', section: '운영 · 관리', parentId: null, status: 'planned', phase: 'P2', summary: '공지·가이드·FAQ 편집' },
+  { id: 'logs', label: '로그·모니터링', section: '운영 · 관리', parentId: null, status: 'ready', phase: 'P2', summary: '통합 로그와 사용량' },
+  { id: 'logs.integrated', label: '통합 로그 관리', section: '운영 · 관리', parentId: 'logs', status: 'ready', phase: 'P2', summary: '추출·접속·작업·질의 기록' },
+  { id: 'logs.usage', label: '사용량 모니터링', section: '운영 · 관리', parentId: 'logs', status: 'ready', phase: 'P2', summary: '업무별 토큰 소비와 한도' },
+  { id: 'content', label: '콘텐츠 관리', section: '운영 · 관리', parentId: null, status: 'ready', phase: 'P2', summary: '공지·Q&A·설문 — 포털에 그대로 나온다' },
   { id: 'prompts', label: 'API·프롬프트', section: '운영 · 관리', parentId: null, status: 'planned', phase: 'P2', summary: '시스템 프롬프트와 외부 연동 키' },
   { id: 'settings', label: '시스템 설정', section: '운영 · 관리', parentId: null, status: 'planned', phase: 'P2', summary: '전역 설정과 보관 정책' },
 ]

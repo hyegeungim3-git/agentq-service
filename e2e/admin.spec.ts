@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
+import { openTab } from './shell'
 
 /** 관리자 메뉴는 좁은 화면에서 오버레이라 먼저 연다 */
 async function adminNav(page: Page) {
@@ -31,7 +32,7 @@ test.describe('관리자 셸', () => {
   test('아직 안 만든 메뉴를 감추지 않고 준비 중으로 표시한다', async ({ page }) => {
     await enterAdmin(page)
     const nav = await adminNav(page)
-    await expect(nav.getByText(/화면 16개 사용 가능 · 17개 준비 중/)).toBeVisible()
+    await expect(nav.getByText(/화면 19개 사용 가능 · 15개 준비 중/)).toBeVisible()
 
     await nav.getByRole('button', { name: /HR 연계·그룹 관리/ }).click()
     await expect(page.getByRole('heading', { name: 'HR 연계·그룹 관리' })).toBeVisible()
@@ -262,6 +263,51 @@ test.describe('관리자 셸', () => {
     await page.getByRole('checkbox').first().check()
     await page.getByRole('button', { name: '리포트 만들기' }).click()
     await expect(page.getByRole('alert')).toContainText(/지금은 내려받을 것이 없습니다/)
+  })
+
+
+  test('통합 로그는 반출 기록을 먼저 보여 주고 접근 로그와의 관계를 밝힌다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: '로그·모니터링' }).click()
+    await expect(page.getByRole('heading', { name: '통합 로그 관리', level: 1 })).toBeVisible()
+    await expect(page.getByText(/수입검사성적서 SPCC-2211/)).toBeVisible()
+
+    await page.getByRole('tab', { name: '접속 로그' }).click()
+    await expect(page.getByText(/사용자 관리 > 접근 로그와 같은 데이터입니다/)).toBeVisible()
+  })
+
+  /* '80% 소비'만 보여 주면 남은 날짜를 머리로 계산해야 한다 */
+  test('사용량은 한도 초과분과 금액이 없는 이유를 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '로그·모니터링' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '사용량 모니터링' }).click()
+    await expect(page.getByText(/한도를 40,000토큰 넘겼습니다/)).toBeVisible()
+    await expect(page.getByText(/과금 단가가 정해지지 않아/)).toBeVisible()
+  })
+
+  /* 관리자가 따로 목록을 갖고 있으면 '여기서 고쳤는데 포털에 안 나오는' 상태가 생긴다 */
+  test('콘텐츠 관리가 사용자 포털과 같은 공지를 보여 준다', async ({ page }) => {
+    // 먼저 포털에서 공지 제목을 확인한다
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await openTab(page, /^공지사항/)
+    const portalTitle = await page
+      .getByRole('main')
+      .getByRole('heading', { level: 2 })
+      .first()
+      .innerText()
+
+    await page.goto('./')
+    await page.getByRole('button', { name: /관리자 시스템/ }).click()
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: '콘텐츠 관리' }).click()
+    await expect(page.getByText(/사용자 포털에 그대로 보입니다/)).toBeVisible()
+    await expect(page.getByRole('main').getByText(portalTitle)).toBeVisible()
+
+    await page.getByRole('button', { name: '등록' }).isDisabled()
   })
 
 })

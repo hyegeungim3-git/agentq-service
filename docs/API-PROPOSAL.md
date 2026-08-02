@@ -115,6 +115,12 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /analytics/stats?window=` | `fetchUsageStats` | `window`=`7d`\|`30d`\|`quarter` → `UsageStats`. `avgSeconds`는 성공한 요청 기준, 제외된 `failedQueries`를 함께 |
 | `GET /analytics/report-sections` | `fetchReportSections` | → `ReportSection[]`. 만들 수 없는 항목도 이유와 함께 준다 |
 | `POST /analytics/reports` | `buildReport` | 리포트 파일 생성 |
+| `GET /audit/logs?kind=` | `fetchOpLogs` | `kind`=`export`\|`access`\|`operation`\|`query` → `OpLogEntry[]`. **접속 로그는 `/audit/access`와 같은 자원**이어야 한다 |
+| `GET /audit/logs.csv?kind=` | `exportLogsCsv` | 서버가 파일을 만든다 — 화면에 보이는 것만 모으면 조회 조건 밖 기록이 빠진다 |
+| `GET /usage/buckets` | `fetchUsageBuckets` | → `UsageBucket[]`. 금액이 아니라 **토큰 수**로 준다(단가 미정) |
+| `GET /notices` | `fetchManagedNotices` | 관리자와 포털이 **같은 엔드포인트**를 쓴다 — 따로 두면 고쳐도 포털에 안 나온다 |
+| `GET /chat/faq` | `fetchManagedFaq` | 위와 같은 이유로 포털과 같은 자원 |
+| `POST /notices` | `saveNotice` | 공지 등록 |
 | `GET /training/report?window=` | `fetchTrainerReport` | `window`=`day`\|`week`\|`month` → `TrainerReport`. 실패 작업에는 `note`(사유)가 있어야 한다 |
 
 `makeUserMessage`는 서버를 부르지 않는다. 사용자가 방금 친 말을 화면에 얹는 클라이언트 함수다.
