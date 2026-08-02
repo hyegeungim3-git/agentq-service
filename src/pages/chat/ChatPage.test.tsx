@@ -109,4 +109,47 @@ describe('ChatPage', () => {
       expect(await screen.findByText('근거 문서 없음 · 담당 부서 확인 필요')).toBeInTheDocument()
     })
   })
+
+  /* 신뢰도 숫자만으로는 무엇을 보고 그 숫자가 나왔는지 알 수 없다 */
+  describe('판단 근거', () => {
+    it('왜 이 답변인지 펼치면 기여도와 확인할 것을 함께 보여준다', async () => {
+      setup()
+      await ask('금형 교체 주기 알려줘')
+      await screen.findByText(/타수 50만 타/)
+      await userEvent.click(screen.getByRole('button', { name: '왜 이 답변인가' }))
+      expect(screen.getByText('작업표준 조항 직접 일치')).toBeInTheDocument()
+      // 기여도만 보여 주면 근거가 탄탄하다는 인상만 남는다
+      expect(screen.getByText(/확인할 것 · 타수 기준은 설비별 예외/)).toBeInTheDocument()
+    })
+
+    it('근거 없는 답변에는 판단 근거를 만들어 붙이지 않는다', async () => {
+      setup()
+      await ask('사내 동호회 지원금 얼마야')
+      await screen.findByText(/지어내지 않기 위해/)
+      expect(screen.queryByRole('button', { name: '왜 이 답변인가' })).not.toBeInTheDocument()
+    })
+  })
+
+  /* 보낸 척하면 개선 요청이 접수된 줄 안다 */
+  describe('피드백', () => {
+    it('아쉬움을 고르면 사유를 물어보고 어디에 남는지 말한다', async () => {
+      setup()
+      await ask('금형 교체 주기 알려줘')
+      await screen.findByText(/타수 50만 타/)
+      await userEvent.click(screen.getByRole('button', { name: '도움이 안 됐어요' }))
+      expect(screen.getByRole('button', { name: '근거가 부족하다' })).toBeInTheDocument()
+      expect(screen.getByText(/서버로 보내지 않습니다/)).toBeInTheDocument()
+    })
+
+    it('같은 것을 다시 누르면 취소된다 — 잘못 누른 것을 되돌릴 수 있어야 한다', async () => {
+      setup()
+      await ask('금형 교체 주기 알려줘')
+      await screen.findByText(/타수 50만 타/)
+      const up = screen.getByRole('button', { name: '도움이 됐어요' })
+      await userEvent.click(up)
+      expect(up).toHaveAttribute('aria-pressed', 'true')
+      await userEvent.click(up)
+      expect(up).toHaveAttribute('aria-pressed', 'false')
+    })
+  })
 })

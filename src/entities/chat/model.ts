@@ -43,6 +43,25 @@ const FAQ_CATEGORY_LABEL: Record<FaqCategory, string> = {
 export const FAQ_CATEGORIES = Object.keys(FAQ_CATEGORY_LABEL) as FaqCategory[]
 export const faqCategoryLabel = (c: FaqCategory): string => FAQ_CATEGORY_LABEL[c]
 
+/**
+ * 판단 근거 — '왜 이 답변인가'.
+ *
+ * 신뢰도 94%만 보여 주면 무엇을 보고 94%인지 알 수 없다. 무엇이 얼마나 기여했는지
+ * 나누고, **이 답변으로 결정하기 전에 사람이 확인할 것**을 함께 적는다.
+ */
+export type XaiFactor = {
+  label: string
+  /** 0~1. 합이 1이 되게 쓴다 */
+  weight: number
+  detail: string
+}
+
+export type Xai = {
+  factors: XaiFactor[]
+  /** 이 답변만으로 결정하면 안 되는 이유 */
+  caveat: string
+}
+
 export type ChatMessage = {
   id: string
   role: ChatRole
@@ -53,6 +72,8 @@ export type ChatMessage = {
   confidence: number | null
   /** 이 질문을 더 잘 다루는 에이전트가 있으면 안내한다 */
   handoff: { agentLabel: string; reason: string } | null
+  /** 판단 근거. 근거 없는 답변에는 없다 */
+  xai: Xai | null
 }
 
 /** 근거 없는 답변 — 화면이 다르게 그려야 하는 경우 */

@@ -68,6 +68,14 @@ export const CHAT_ENTRIES: ChatEntry[] = [
       ],
       confidence: 0.94,
       handoff: null,
+      xai: {
+        factors: [
+          { label: '작업표준 조항 직접 일치', weight: 0.62, detail: '제4장·제3장이 질문의 두 요소(주기·절차)를 모두 다룬다' },
+          { label: '문서 최신성', weight: 0.23, detail: '현행 개정본이며 상위 규정과 충돌이 없다' },
+          { label: '용어 일치', weight: 0.15, detail: "'금형 교체'가 사내 표준 용어와 같다" },
+        ],
+        caveat: '타수 기준은 설비별 예외가 있을 수 있습니다. 해당 프레스의 설비 대장을 함께 확인하십시오.',
+      },
     },
   },
   {
@@ -76,6 +84,14 @@ export const CHAT_ENTRIES: ChatEntry[] = [
       text: '진동 RMS가 관리 기준 3.5mm/s를 넘으면 예지보전 알람이 발생합니다. 알람이 뜨면 운전을 계속하지 말고 보전팀 진단을 받아야 하며, 연속 초과 시 계획정지에 편성합니다. 현재 PRS-C03이 4.2mm/s로 기준을 넘고 있습니다.',
       sources: [fromDocument(SOP, 'doc-press-sop', '제5장 이상 대응')],
       confidence: 0.91,
+      xai: {
+        factors: [
+          { label: '대응 절차 조항 일치', weight: 0.55, detail: '제5장이 알람 발생 시 행동을 규정한다' },
+          { label: '현재 실측값 참조', weight: 0.30, detail: 'PRS-C03 4.2mm/s를 함께 인용했다' },
+          { label: '용어 일치', weight: 0.15, detail: "'진동 RMS'가 표준 용어와 같다" },
+        ],
+        caveat: '인용한 4.2mm/s는 마지막 측정치입니다. 측정 시점이 설비마다 달라 조회로 확인하십시오.',
+      },
       handoff: {
         agentLabel: '데이터 조회',
         reason: '설비별 실측값을 표로 확인하려면 데이터 조회 에이전트가 더 정확합니다.',
@@ -88,6 +104,14 @@ export const CHAT_ENTRIES: ChatEntry[] = [
       text: '국내 출장 여비는 일 60,000원 기준 실비 정산입니다. 기준액을 초과하려면 사전에 부서장 승인이 필요합니다.',
       sources: [fromRegulation('취업규칙 제23조 제2항')],
       confidence: 0.72,
+      xai: {
+        factors: [
+          { label: '조항 일치', weight: 0.48, detail: '취업규칙 제23조 제2항이 기준액을 정한다' },
+          { label: '질문 범위 불확실', weight: 0.34, detail: '국내/해외, 숙박 포함 여부가 질문에 없어 국내 기준으로 답했다' },
+          { label: '개정일 확인', weight: 0.18, detail: '2025-07-01 개정본이며 이후 변경 이력은 확인하지 못했다' },
+        ],
+        caveat: '해외 출장이나 숙박 포함이면 기준이 다릅니다. 조항 원문을 확인하십시오.',
+      },
       handoff: {
         agentLabel: '내규·규정 조회',
         reason: '조항 원문과 개정일까지 확인하려면 규정 조회 에이전트를 쓰십시오.',
@@ -101,6 +125,13 @@ export const CHAT_ENTRIES: ChatEntry[] = [
       sources: [fromDocument(SOP, 'doc-press-sop', '제3장 금형 교체')],
       confidence: 0.89,
       handoff: null,
+      xai: {
+        factors: [
+          { label: '절차 조항 일치', weight: 0.70, detail: '제3장이 금형 교체 절차 안에서 초품 검사를 규정한다' },
+          { label: '용어 일치', weight: 0.30, detail: "'초품 검사'가 표준 용어와 같다" },
+        ],
+        caveat: '기록 양식과 보관 기간은 이 조항에 없습니다. 품질경영매뉴얼을 함께 보십시오.',
+      },
     },
   },
   {
@@ -117,6 +148,14 @@ export const CHAT_ENTRIES: ChatEntry[] = [
         },
       ],
       confidence: 0.78,
+      xai: {
+        factors: [
+          { label: '성적서 판정란 인용', weight: 0.52, detail: '해당 로트의 판정 근거 문장을 그대로 인용했다' },
+          { label: '수치 신뢰도', weight: 0.28, detail: '인용한 경도 수치는 OCR 신뢰도가 낮은 줄에서 나왔다' },
+          { label: '기준값 대조', weight: 0.20, detail: '규격 하한 58.0 HRC와 대조했다' },
+        ],
+        caveat: '경도 수치는 스캔본 인식 결과입니다. 원본과 대조하기 전에 인용하지 마십시오.',
+      },
       handoff: {
         agentLabel: '문서 인식(OCR)',
         reason: '성적서 원본의 수치를 줄 단위로 확인하려면 OCR 에이전트를 쓰십시오.',
@@ -131,6 +170,8 @@ export const CHAT_UNKNOWN: Omit<ChatMessage, 'id' | 'role'> = {
   sources: [],
   confidence: null,
   handoff: null,
+  // 근거가 없으므로 판단 근거도 없다. 없는 것을 만들어 붙이지 않는다
+  xai: null,
 }
 
 /**

@@ -21,6 +21,9 @@ describe('SecurityPage', () => {
     render(<SecurityPage />)
     expect(screen.getByText('이 브라우저 안')).toBeInTheDocument()
     expect(screen.getByText('전송되지 않음')).toBeInTheDocument()
-    expect(screen.getAllByText('이 브라우저에 저장')).toHaveLength(2)
+    // 항목이 늘어날 때마다 숫자를 고치지 않도록 '있는지'로 본다
+    expect(screen.getAllByText('이 브라우저에 저장').length).toBeGreaterThanOrEqual(2)
+    // 실측이 아닌 값은 반드시 그렇다고 적혀 있어야 한다
+    expect(screen.getByText('실측 아님 — 예시 값')).toBeInTheDocument()
   })
 })

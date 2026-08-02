@@ -6,10 +6,14 @@ import {
   needsCheck,
   type ChatMessage,
   type ChatSource,
+  type Xai,
 } from '@entities/chat/model'
 import { useChat, type ChatOptions, type ChatStore } from '@features/chat/useChat'
 import type { SignalLink, WorkSignal } from '@entities/signal/model'
 import { BriefingCards } from '@widgets/briefing/BriefingCards'
+import type { LiveMetric } from '@entities/metric/model'
+import { LiveMetricCard } from '@widgets/live-metric/LiveMetricCard'
+import { DOWN_REASONS, useFeedback, type FeedbackEntry } from '@features/feedback/useFeedback'
 
 export function ChatPage({
   onBack,
@@ -19,14 +23,17 @@ export function ChatPage({
   /** 빈 화면에 오늘의 브리핑을 띄운다. 셸 밖에서 단독으로 쓰면 없다 */
   signals = [],
   onOpenSignal,
+  metrics = [],
 }: {
   onBack?: () => void
   apiOptions?: ChatOptions
   store?: ChatStore
   signals?: WorkSignal[]
   onOpenSignal?: ((link: SignalLink) => void) | undefined
+  metrics?: LiveMetric[]
 }) {
   const c = useChat(apiOptions ?? {}, store)
+  const fb = useFeedback()
   const endRef = useRef<HTMLDivElement>(null)
 
   // 새 메시지가 오면 아래로 스크롤 — 대화가 길어지면 직접 내려야 하는 건 불편하다
@@ -66,8 +73,11 @@ export function ChatPage({
       <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
         {/* 빈 화면에서 가장 먼저 봐야 하는 것은 오늘 처리할 일이다 */}
         {c.messages.length === 0 && !c.pending && onOpenSignal && (
-          <div className="mb-4">
+          <div className="mb-4 space-y-4">
             <BriefingCards signals={signals} onOpen={onOpenSignal} />
+            {metrics.map((m) => (
+              <LiveMetricCard key={m.id} metric={m} />
+            ))}
           </div>
         )}
 
@@ -83,7 +93,13 @@ export function ChatPage({
         <ol className="space-y-4">
           {c.messages.map((m) => (
             <li key={m.id}>
-              <MessageBubble message={m} />
+              <MessageBubble
+                message={m}
+                feedback={fb.entries[m.id] ?? null}
+                onRate={fb.rate}
+                onReason={fb.setReason}
+                feedbackPersisted={fb.persisted}
+              />
             </li>
           ))}
         </ol>
@@ -192,7 +208,19 @@ export function ChatPage({
   )
 }
 
-function MessageBubble({ message }: { message: ChatMessage }) {
+function MessageBubble({
+  message,
+  feedback,
+  onRate,
+  onReason,
+  feedbackPersisted,
+}: {
+  message: ChatMessage
+  feedback: FeedbackEntry | null
+  onRate: (id: string, v: 'up' | 'down') => void
+  onReason: (id: string, reason: string) => void
+  feedbackPersisted: boolean
+}) {
   if (message.role === 'user') {
     return (
       <div className="flex justify-end">
@@ -237,9 +265,20 @@ function MessageBubble({ message }: { message: ChatMessage }) {
                 {needsCheck(message) ? ' · 원문 확인 권장' : ''}
               </p>
             )}
+
+            {/* 신뢰도 숫자만으로는 무엇을 보고 그 숫자가 나왔는지 알 수 없다 */}
+            {message.xai && <XaiPanel xai={message.xai} />}
           </>
         )}
       </div>
+
+      <FeedbackBar
+        messageId={message.id}
+        entry={feedback}
+        onRate={onRate}
+        onReason={onReason}
+        persisted={feedbackPersisted}
+      />
 
       {message.handoff && (
         <p className="mt-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
@@ -278,6 +317,123 @@ function SourceItem({ source }: { source: ChatSource }) {
         <p className="mt-1 rounded-lg bg-slate-50 px-3 py-2 text-xs leading-relaxed text-slate-700">
           {source.passage ?? '원문을 찾지 못했습니다. 원본 문서에서 직접 확인하십시오.'}
         </p>
+      )}
+    </div>
+  )
+}
+
+/**
+ * 왜 이 답변인가.
+ *
+ * 무엇이 얼마나 기여했는지 나누고, **이 답변만으로 결정하면 안 되는 이유**를 함께 적는다.
+ * 기여도만 보여 주면 근거가 탄탄하다는 인상만 남는다.
+ */
+function XaiPanel({ xai }: { xai: Xai }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div className="mt-3">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="min-h-11 text-[11px] font-bold text-slate-600 underline decoration-slate-300 underline-offset-2 hover:text-slate-900"
+      >
+        왜 이 답변인가
+      </button>
+
+      {open && (
+        <div className="mt-1 rounded-lg bg-slate-50 p-3">
+          <ul className="space-y-2">
+            {xai.factors.map((f) => (
+              <li key={f.label}>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-700">{f.label}</span>
+                  <span className="ml-auto text-[11px] tabular-nums text-slate-500">
+                    {Math.round(f.weight * 100)}%
+                  </span>
+                </div>
+                <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                  <div className="h-full bg-slate-700" style={{ width: `${f.weight * 100}%` }} />
+                </div>
+                <p className="mt-1 text-xs text-slate-600">{f.detail}</p>
+              </li>
+            ))}
+          </ul>
+          {/* 기여도만 보여 주면 근거가 탄탄하다는 인상만 남는다 */}
+          <p className="mt-3 rounded border border-amber-200 bg-amber-50 px-2.5 py-2 text-xs font-bold text-amber-900">
+            확인할 것 · {xai.caveat}
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/**
+ * 답변 피드백.
+ *
+ * 서버가 없어 보낼 곳이 없다. 보낸 척하면 개선 요청이 접수된 줄 안다 —
+ * 어디에 남는지 그대로 말한다.
+ */
+function FeedbackBar({
+  messageId,
+  entry,
+  onRate,
+  onReason,
+  persisted,
+}: {
+  messageId: string
+  entry: FeedbackEntry | null
+  onRate: (id: string, v: 'up' | 'down') => void
+  onReason: (id: string, reason: string) => void
+  persisted: boolean
+}) {
+  return (
+    <div className="mt-1.5 flex flex-wrap items-center gap-2">
+      {(['up', 'down'] as const).map((v) => (
+        <button
+          key={v}
+          type="button"
+          onClick={() => onRate(messageId, v)}
+          aria-pressed={entry?.verdict === v}
+          aria-label={v === 'up' ? '도움이 됐어요' : '도움이 안 됐어요'}
+          className={`min-h-11 rounded-lg border px-3 text-xs font-bold ${
+            entry?.verdict === v
+              ? 'border-slate-900 bg-slate-900 text-white'
+              : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+          }`}
+        >
+          {v === 'up' ? '👍 도움됨' : '👎 아쉬움'}
+        </button>
+      ))}
+
+      {entry?.verdict === 'down' && (
+        <span className="flex flex-wrap items-center gap-1.5">
+          {DOWN_REASONS.map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => onReason(messageId, r)}
+              aria-pressed={entry.reason === r}
+              className={`min-h-11 rounded-full border px-2.5 text-[11px] font-bold ${
+                entry.reason === r
+                  ? 'border-slate-900 bg-slate-100 text-slate-900'
+                  : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              {r}
+            </button>
+          ))}
+        </span>
+      )}
+
+      {entry && (
+        <span className="text-[11px] text-slate-400">
+          {persisted
+            ? '이 브라우저에만 남습니다 — 서버로 보내지 않습니다'
+            : '저장하지 못했습니다 — 이 화면을 벗어나면 사라집니다'}
+        </span>
       )}
     </div>
   )

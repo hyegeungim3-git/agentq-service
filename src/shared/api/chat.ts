@@ -30,5 +30,5 @@ export function fetchFaq(): Promise<ApiResult<FaqItem[]>> {
 }
 
 export function makeUserMessage(text: string): ChatMessage {
-  return { id: nextId(), role: 'user', text, sources: [], confidence: null, handoff: null }
+  return { id: nextId(), role: 'user', text, sources: [], confidence: null, handoff: null, xai: null }
 }

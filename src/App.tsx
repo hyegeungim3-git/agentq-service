@@ -8,6 +8,8 @@ import type { Workspace } from '@entities/workspace/model'
 import { fetchWorkspaces } from '@shared/api/workspaces'
 import { fetchNotices } from '@shared/api/notices'
 import { fetchSignals } from '@shared/api/signals'
+import { fetchLiveMetrics } from '@shared/api/metrics'
+import type { LiveMetric } from '@entities/metric/model'
 import type { SignalLink, WorkSignal } from '@entities/signal/model'
 import { readJson, writeJson } from '@shared/lib/storage'
 import { AppShell } from '@widgets/app-shell/AppShell'
@@ -64,6 +66,7 @@ export default function App() {
   const [workspaceId, setWorkspaceId] = useState('')
   const [notices, setNotices] = useState<Notice[]>([])
   const [signals, setSignals] = useState<WorkSignal[]>([])
+  const [metrics, setMetrics] = useState<LiveMetric[]>([])
   const [readIds, setReadIds] = useState<string[]>(
     () => readJson<string[]>(READ_KEY, (v): v is string[] => Array.isArray(v)) ?? [],
   )
@@ -80,6 +83,9 @@ export default function App() {
     })
     void fetchSignals().then((res) => {
       if (alive && res.ok) setSignals(res.data)
+    })
+    void fetchLiveMetrics().then((res) => {
+      if (alive && res.ok) setMetrics(res.data)
     })
     return () => {
       alive = false
@@ -159,7 +165,7 @@ export default function App() {
       onExit={() => setView({ name: 'portal' })}
     >
       {view.tab === 'general' && (
-        <ChatPage store={conv.store} signals={signals} onOpenSignal={openSignal} />
+        <ChatPage store={conv.store} signals={signals} onOpenSignal={openSignal} metrics={metrics} />
       )}
       {view.tab === 'security' && <SecurityPage />}
       {view.tab === 'notices' && <NoticesPage onRead={markRead} />}

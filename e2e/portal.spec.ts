@@ -144,3 +144,35 @@ test.describe('셸 — 알림·브리핑', () => {
     await expect(page.getByRole('heading', { name: '데이터 조회 에이전트' })).toBeVisible()
   })
 })
+
+test.describe('셸 — 라이브 지표·판단 근거·피드백', () => {
+  /* 계기판처럼 보이는데 지어낸 숫자면 그게 제일 위험하다 */
+  test('라이브 지표는 예시 값임을 먼저 말하고 배속이 동작한다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+
+    const card = page.getByRole('region', { name: 'PRS-C03 진동 RMS' })
+    await expect(card).toContainText('서버 미연결 — 예시 값')
+    await expect(card).toContainText('관리 기준 3.5mm/s')
+
+    // 60배속으로 돌리면 곡선 끝(4.2)까지 간다
+    await card.locator('label').filter({ hasText: '60×' }).click()
+    await expect(card).toContainText('4.20', { timeout: 20_000 })
+    await expect(card).toContainText('관리 기준 3.5mm/s를 넘었습니다')
+  })
+
+  test('판단 근거와 피드백이 답변에 붙는다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
+    await expect(page.getByText(/타수 50만 타/)).toBeVisible({ timeout: 10_000 })
+
+    await page.getByRole('button', { name: '왜 이 답변인가' }).click()
+    await expect(page.getByText('작업표준 조항 직접 일치')).toBeVisible()
+    await expect(page.getByText(/확인할 것 · 타수 기준은 설비별 예외/)).toBeVisible()
+
+    await page.getByRole('button', { name: '도움이 안 됐어요' }).click()
+    await expect(page.getByRole('button', { name: '근거가 부족하다' })).toBeVisible()
+    await expect(page.getByText(/서버로 보내지 않습니다/)).toBeVisible()
+  })
+})

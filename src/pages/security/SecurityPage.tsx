@@ -52,6 +52,20 @@ const FACTS: Fact[] = [
     settled: true,
   },
   {
+    label: '답변 피드백',
+    value: '이 브라우저에 저장',
+    detail:
+      '👍/👎와 사유는 이 브라우저에만 남고 서버로 보내지 않습니다. 서버가 연결되면 관리자 품질 화면으로 모입니다.',
+    settled: true,
+  },
+  {
+    label: '라이브 지표',
+    value: '실측 아님 — 예시 값',
+    detail:
+      '서버가 없어 예시 곡선을 시간에 맞춰 재생합니다. 화면에도 같은 표시를 답니다. 서버가 붙으면 그 표시가 사라집니다.',
+    settled: true,
+  },
+  {
     label: '문서 접근 권한',
     value: '아직 정해지지 않음',
     detail:

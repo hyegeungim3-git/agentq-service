@@ -10,6 +10,7 @@ const user = (text: string): ChatMessage => ({
   sources: [],
   confidence: null,
   handoff: null,
+  xai: null,
 })
 
 const WS_A = 'ws-a'

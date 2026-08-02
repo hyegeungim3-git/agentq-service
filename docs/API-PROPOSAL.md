@@ -87,6 +87,7 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `POST /safety-plans` | `createSafetyPlan` | `SafetyRequest` → `SafetyPlan` (`entities/safety/model.ts`) |
 | `POST /chat/messages` | `sendMessage` | 질문 문자열 → `ChatMessage` (`entities/chat/model.ts`) |
 | `GET /chat/faq` | `fetchFaq` | → `FaqItem[]` |
+| `GET /metrics/live` | `fetchLiveMetrics` | → `LiveMetric[]` (`entities/metric/model.ts`) — 실제로는 스트리밍/폴링이 맞다. §2-4 참조 |
 | `GET /signals` | `fetchSignals` | → `WorkSignal[]` (`entities/signal/model.ts`) — 알림 센터·오늘의 브리핑이 함께 쓴다 |
 
 `makeUserMessage`는 서버를 부르지 않는다. 사용자가 방금 친 말을 화면에 얹는 클라이언트 함수다.
@@ -104,6 +105,16 @@ OCR·번역·분석·보고서는 지금 fixture에서 4~15초 범위다.
 **동기 응답으로 제안**하되, 실제 처리가 30초를 넘으면 `202 Accepted` + 작업 id + 폴링으로 바꾸자.
 그 경우 바뀌는 곳은 `shared/api`의 해당 함수 하나이고 화면은 그대로다 —
 화면은 이미 '진행 중' 상태를 갖고 있다.
+
+### 2-4. 라이브 지표
+
+지금은 예시 곡선을 통째로 받아 화면이 시간에 맞춰 재생한다.
+실제로는 **값이 계속 바뀌므로** 다음 중 하나가 맞다 — 백엔드가 정해 주면 맞춘다.
+
+- 짧은 주기 폴링 (`GET /metrics/live?since=…`) — 구현이 단순하다
+- 서버 전송 이벤트(SSE) 또는 WebSocket — 지연이 짧다
+
+어느 쪽이든 바뀌는 곳은 `shared/api/metrics.ts` 하나다. 화면은 '지금 값'만 받으면 된다.
 
 ### 2-3. 업로드
 
