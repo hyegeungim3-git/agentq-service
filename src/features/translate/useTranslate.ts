@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import type { LanguageCode, TranslationResult, TranslationTone } from '@entities/translation/model'
 import { createTranslation, type TranslationApiOptions } from '@shared/api/translation'
+import { DOCUMENT_UPLOAD } from '@entities/upload/model'
 import { useAgentRun } from '@features/agent-run/useAgentRun'
 
 /** 번역 화면의 옵션과 실행. 공통 흐름은 useAgentRun이 맡는다. */
@@ -22,7 +23,7 @@ export function useTranslate(opts: TranslateOptions = {}) {
     [to, tone, useGlossary, delayMs],
   )
 
-  const agent = useAgentRun<TranslationResult>({ kinds: [...TARGET_KINDS], run })
+  const agent = useAgentRun<TranslationResult>({ kinds: [...TARGET_KINDS], run, upload: DOCUMENT_UPLOAD })
 
   return {
     ...agent,

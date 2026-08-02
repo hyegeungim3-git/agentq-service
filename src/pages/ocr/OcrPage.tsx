@@ -22,6 +22,7 @@ export function OcrPage({ onBack, apiOptions }: { onBack?: () => void; apiOption
       onSelectDocument={o.setDocumentId}
       docSectionLabel="인식할 스캔 문서"
       emptyDocsLabel="인식할 문서가 없습니다."
+      upload={o.upload}
       optionsLabel="처리 설정"
       runLabel="문서 인식"
       runningLabel="인식 중…"

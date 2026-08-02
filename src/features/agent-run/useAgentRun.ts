@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { BusinessDocument, DocumentKind } from '@entities/document/model'
-import { fetchDocuments } from '@shared/api/documents'
+import { validateUpload, type UploadConstraint } from '@entities/upload/model'
+import { fetchDocuments, uploadDocument } from '@shared/api/documents'
 import type { ApiResult } from '@shared/api/domains'
 
 /**
@@ -51,6 +52,19 @@ export type UseAgentRunArgs<R, I extends AgentInput> = {
   loadInputs?: (() => Promise<ApiResult<I[]>>) | undefined
   /** 실제 호출. 호출부가 자기 옵션을 묶어 useCallback으로 넘긴다. */
   run: (documentId: string) => Promise<ApiResult<R>>
+  /** 업로드를 받을 때의 형식·용량 제약. 없으면 업로드 자리를 그리지 않는다. */
+  upload?: UploadConstraint | undefined
+  /** 올린 파일을 보낼 곳. 생략하면 업무 문서 업로드다(분석은 데이터셋으로 갈아 끼운다). */
+  sendUpload?: ((file: File) => Promise<ApiResult<I>>) | undefined
+}
+
+/** 화면이 업로드 자리를 그리는 데 필요한 것 — 페이지는 이 묶음만 넘긴다. */
+export type UploadSlot = {
+  constraint: UploadConstraint
+  busy: boolean
+  error: string | null
+  select: (file: File) => void
+  clearError: () => void
 }
 
 /**
@@ -62,10 +76,14 @@ export function useAgentRun<R, I extends AgentInput = BusinessDocument>({
   kinds,
   loadInputs,
   run,
+  upload: constraint,
+  sendUpload,
 }: UseAgentRunArgs<R, I>) {
   const [docs, setDocs] = useState<I[]>([])
   const [documentId, setDocumentId] = useState<string | null>(null)
   const [phase, setPhase] = useState<RunPhase<R>>({ kind: 'loadingDocs' })
+  const [uploadBusy, setUploadBusy] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
   // kinds는 배열 리터럴로 넘어오기 쉬워 매 렌더 새 참조가 된다 — 키로 고정한다
   const kindsKey = kinds?.join(',') ?? ''
@@ -102,7 +120,46 @@ export function useAgentRun<R, I extends AgentInput = BusinessDocument>({
   /** 결과만 지우고 옵션은 남긴다 — 설정을 바꿔 다시 돌리는 것이 흔한 동선이다. */
   const reset = useCallback(() => setPhase({ kind: 'ready' }), [])
 
+  /**
+   * 형식·용량은 여기서 먼저 거른다. 통과한 것만 서버로 보낸다.
+   * 서버가 문서를 돌려주면 목록에 얹고 바로 선택한다 — 올린 사람은 그걸 쓰려고 올린 것이다.
+   */
+  const selectFile = useCallback(
+    async (file: File) => {
+      if (!constraint) return
+      const invalid = validateUpload(file, constraint)
+      if (invalid) {
+        setUploadError(invalid)
+        return
+      }
+      setUploadError(null)
+      setUploadBusy(true)
+      /* loadInputs와 같은 이유의 좁히기 — sendUpload가 없으면 I는 BusinessDocument다. */
+      const send = sendUpload ?? ((f: File) => uploadDocument(f) as Promise<ApiResult<I>>)
+      const res = await send(file)
+      setUploadBusy(false)
+      if (!res.ok) {
+        setUploadError(res.error)
+        return
+      }
+      const added = res.data
+      setDocs((prev) => [added, ...prev])
+      setDocumentId(added.id)
+    },
+    [constraint, sendUpload],
+  )
+
+  const uploadSlot: UploadSlot | null = constraint
+    ? {
+        constraint,
+        busy: uploadBusy,
+        error: uploadError,
+        select: (file: File) => void selectFile(file),
+        clearError: () => setUploadError(null),
+      }
+    : null
+
   const selectedDoc = docs.find((d) => d.id === documentId) ?? null
 
-  return { docs, selectedDoc, documentId, setDocumentId, phase, execute, reset }
+  return { docs, selectedDoc, documentId, setDocumentId, phase, execute, reset, upload: uploadSlot }
 }

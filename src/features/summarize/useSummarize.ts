@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import type { FocusArea, SummaryResult, SummaryStyle, TargetLength } from '@entities/summary/model'
 import { createSummary, type SummaryApiOptions } from '@shared/api/summary'
+import { DOCUMENT_UPLOAD } from '@entities/upload/model'
 import { useAgentRun } from '@features/agent-run/useAgentRun'
 
 /**
@@ -24,7 +25,7 @@ export function useSummarize(opts: SummarizeOptions = {}) {
     [style, targetLength, focusAreas, delayMs],
   )
 
-  const agent = useAgentRun<SummaryResult>({ run })
+  const agent = useAgentRun<SummaryResult>({ run, upload: DOCUMENT_UPLOAD })
 
   const toggleFocus = useCallback((area: FocusArea) => {
     setFocusAreas((prev) => (prev.includes(area) ? prev.filter((a) => a !== area) : [...prev, area]))

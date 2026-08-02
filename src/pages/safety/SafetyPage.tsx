@@ -31,6 +31,7 @@ export function SafetyPage({ onBack, apiOptions }: { onBack?: () => void; apiOpt
       onSelectDocument={s.setDocumentId}
       docSectionLabel="대상 작업 표준"
       emptyDocsLabel="참조할 작업 표준이 없습니다."
+      upload={s.upload}
       optionsLabel="작업 조건"
       runLabel="위험성평가 실시"
       runningLabel="평가 중…"

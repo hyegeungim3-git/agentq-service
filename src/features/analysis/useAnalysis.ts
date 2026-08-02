@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react'
 import type { AnalysisKind, AnalysisResult } from '@entities/analysis/model'
 import { datasetShape } from '@entities/dataset/model'
+import { DATASET_UPLOAD } from '@entities/upload/model'
 import { analyzeData, type AnalysisApiOptions } from '@shared/api/analysis'
-import { fetchDatasets } from '@shared/api/datasets'
+import { fetchDatasets, uploadDataset } from '@shared/api/datasets'
 import type { ApiResult } from '@shared/api/domains'
 import { useAgentRun, type AgentInput } from '@features/agent-run/useAgentRun'
 
@@ -30,6 +31,17 @@ async function loadDatasets(): Promise<ApiResult<AgentInput[]>> {
   }
 }
 
+/** 올린 데이터 파일도 목록과 같은 모양으로 만들어 돌려준다 */
+async function sendDataset(file: File): Promise<ApiResult<AgentInput>> {
+  const res = await uploadDataset(file)
+  if (!res.ok) return res
+  const d = res.data
+  return {
+    ok: true,
+    data: { id: d.id, name: d.name, sizeBytes: d.sizeBytes, detail: `${datasetShape(d)} · ${d.source}` },
+  }
+}
+
 export function useAnalysis(opts: AnalysisOptions = {}) {
   const [kind, setKind] = useState<AnalysisKind>('trend')
   const delayMs = opts.delayMs
@@ -37,6 +49,11 @@ export function useAnalysis(opts: AnalysisOptions = {}) {
     (datasetId: string) => analyzeData({ datasetId, kind }, { delayMs }),
     [kind, delayMs],
   )
-  const agent = useAgentRun<AnalysisResult, AgentInput>({ loadInputs: loadDatasets, run })
+  const agent = useAgentRun<AnalysisResult, AgentInput>({
+    loadInputs: loadDatasets,
+    run,
+    upload: DATASET_UPLOAD,
+    sendUpload: sendDataset,
+  })
   return { ...agent, run: agent.execute, kind, setKind }
 }

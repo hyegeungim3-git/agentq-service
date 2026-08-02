@@ -46,6 +46,7 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
       onSelectDocument={a.setDocumentId}
       docSectionLabel="분석할 데이터"
       emptyDocsLabel="분석할 데이터가 없습니다."
+      upload={a.upload}
       optionsLabel="분석 유형"
       runLabel="분석 실행"
       runningLabel="분석 중…"

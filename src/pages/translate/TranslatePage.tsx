@@ -25,6 +25,7 @@ export function TranslatePage({ onBack, apiOptions }: { onBack?: () => void; api
       onSelectDocument={t.setDocumentId}
       docSectionLabel="번역할 문서"
       emptyDocsLabel="번역할 문서가 없습니다."
+      upload={t.upload}
       optionsLabel="번역 설정"
       runLabel="번역 실행"
       runningLabel="번역 중…"

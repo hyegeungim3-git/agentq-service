@@ -32,6 +32,7 @@ export function ReviewPage({ onBack, apiOptions }: { onBack?: () => void; apiOpt
       onSelectDocument={r.setDocumentId}
       docSectionLabel="검토할 문서"
       emptyDocsLabel="검토할 문서가 없습니다."
+      upload={r.upload}
       optionsLabel="대조할 규정"
       runLabel="사전 검토 시작"
       runningLabel="검토 중…"

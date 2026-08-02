@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import type { ReportResult, ReportType } from '@entities/report/model'
 import { createReport, type ReportApiOptions } from '@shared/api/report'
+import { DOCUMENT_UPLOAD } from '@entities/upload/model'
 import { useAgentRun } from '@features/agent-run/useAgentRun'
 
 export type ReportOptions = ReportApiOptions
@@ -14,6 +15,6 @@ export function useReport(opts: ReportOptions = {}) {
     (documentId: string) => createReport({ documentId, type, includeCharts }, { delayMs }),
     [type, includeCharts, delayMs],
   )
-  const agent = useAgentRun<ReportResult>({ run })
+  const agent = useAgentRun<ReportResult>({ run, upload: DOCUMENT_UPLOAD })
   return { ...agent, run: agent.execute, type, setType, includeCharts, setIncludeCharts }
 }

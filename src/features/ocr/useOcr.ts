@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import type { OcrResult } from '@entities/ocr/model'
 import { recognizeDocument, type OcrApiOptions } from '@shared/api/ocr'
+import { SCAN_UPLOAD } from '@entities/upload/model'
 import { useAgentRun } from '@features/agent-run/useAgentRun'
 
 export type OcrOptions = OcrApiOptions
@@ -15,6 +16,6 @@ export function useOcr(opts: OcrOptions = {}) {
     (documentId: string) => recognizeDocument({ documentId, maskPii }, { delayMs }),
     [maskPii, delayMs],
   )
-  const agent = useAgentRun<OcrResult>({ kinds: [...TARGET_KINDS], run })
+  const agent = useAgentRun<OcrResult>({ kinds: [...TARGET_KINDS], run, upload: SCAN_UPLOAD })
   return { ...agent, run: agent.execute, maskPii, setMaskPii }
 }

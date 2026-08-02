@@ -22,6 +22,7 @@ export function KnowledgePage({ onBack, apiOptions }: { onBack?: () => void; api
       onSelectDocument={k.setDocumentId}
       docSectionLabel="검색 기준 문서"
       emptyDocsLabel="검색 기준이 될 문서가 없습니다."
+      upload={k.upload}
       optionsLabel="검색 조건"
       runLabel="유사 도면 검색"
       runningLabel="검색 중…"

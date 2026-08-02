@@ -26,6 +26,7 @@ export function SummaryPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
       onSelectDocument={s.setDocumentId}
       docSectionLabel="요약할 문서"
       emptyDocsLabel="요약할 문서가 없습니다."
+      upload={s.upload}
       optionsLabel="요약 방식"
       runLabel="요약 생성"
       runningLabel="요약 중…"

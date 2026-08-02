@@ -17,6 +17,54 @@ describe('SummaryPage', () => {
     expect(screen.getByRole('radio', { name: /상세 요약/ })).toBeChecked()
   })
 
+  /* 업로드는 파일을 목록에 얹는 일이 아니라 서버가 본문을 뽑아내는 일이다.
+     서버가 없으면 성공한 척하지 않는다 — 그러면 남의 문서에 대해
+     다른 문서의 분석 결과를 보여 주게 된다. */
+  describe('업로드', () => {
+    /* applyAccept를 끄는 이유: accept 속성은 파일 대화상자의 기본 필터일 뿐
+       강제가 아니다. 사용자가 '모든 파일'을 고르거나 끌어다 놓으면 그대로 들어온다. */
+    const pick = async (file: File, applyAccept = true) => {
+      const input = document.querySelector<HTMLInputElement>('input[type="file"]')
+      await userEvent.upload(input!, file, { applyAccept })
+    }
+
+    it('형식이 맞지 않으면 서버에 보내지 않고 이유를 말한다', async () => {
+      const spy = vi.spyOn(docApi, 'uploadDocument')
+      setup()
+      await screen.findByText('프레스_작업표준서_SOP-PR-011.pdf')
+      await pick(new File(['x'], '설치본.exe', { type: 'application/octet-stream' }), false)
+      expect(await screen.findByRole('alert')).toHaveTextContent('EXE')
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('서버가 없으면 실패를 그대로 알린다', async () => {
+      setup()
+      await screen.findByText('프레스_작업표준서_SOP-PR-011.pdf')
+      await pick(new File(['x'], '계약서.pdf', { type: 'application/pdf' }))
+      expect(await screen.findByRole('alert')).toHaveTextContent('서버에 연결된 뒤에 동작합니다')
+    })
+
+    /* 서버가 붙었을 때의 경로. 지금은 실패만 나지만 배선은 지금 맞춰 둔다 */
+    it('서버가 문서를 돌려주면 목록에 얹고 바로 선택한다', async () => {
+      vi.spyOn(docApi, 'uploadDocument').mockResolvedValue({
+        ok: true,
+        data: {
+          id: 'doc-uploaded',
+          name: '계약서.pdf',
+          kind: 'report',
+          sizeBytes: 2048,
+          text: '올린 문서 본문',
+        },
+      })
+      setup()
+      await screen.findByText('프레스_작업표준서_SOP-PR-011.pdf')
+      await pick(new File(['x'], '계약서.pdf', { type: 'application/pdf' }))
+      const added = await screen.findByRole('radio', { name: /계약서\.pdf/ })
+      expect(added).toBeChecked()
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    })
+  })
+
   it('요약을 생성하면 결과와 통계가 나온다', async () => {
     setup()
     await userEvent.click(await screen.findByRole('button', { name: '요약 생성' }))

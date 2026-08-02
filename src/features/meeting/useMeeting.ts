@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import type { MeetingResult } from '@entities/meeting/model'
 import { createMinutes, type MeetingApiOptions } from '@shared/api/meeting'
+import { AUDIO_UPLOAD } from '@entities/upload/model'
 import { useAgentRun } from '@features/agent-run/useAgentRun'
 
 export type MeetingOptions = MeetingApiOptions
@@ -16,6 +17,6 @@ export function useMeeting(opts: MeetingOptions = {}) {
     (documentId: string) => createMinutes({ documentId, includeUtterances }, { delayMs }),
     [includeUtterances, delayMs],
   )
-  const agent = useAgentRun<MeetingResult>({ kinds: [...TARGET_KINDS], run })
+  const agent = useAgentRun<MeetingResult>({ kinds: [...TARGET_KINDS], run, upload: AUDIO_UPLOAD })
   return { ...agent, run: agent.execute, includeUtterances, setIncludeUtterances }
 }

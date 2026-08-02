@@ -21,6 +21,7 @@ export function MeetingPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
       onSelectDocument={m.setDocumentId}
       docSectionLabel="회의 녹음"
       emptyDocsLabel="정리할 회의 녹음이 없습니다."
+      upload={m.upload}
       optionsLabel="작성 설정"
       runLabel="회의록 작성"
       runningLabel="정리 중…"

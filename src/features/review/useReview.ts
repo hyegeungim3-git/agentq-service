@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import type { RegulationSet, ReviewResult } from '@entities/review/model'
 import { createReview, type ReviewApiOptions } from '@shared/api/review'
+import { DOCUMENT_UPLOAD } from '@entities/upload/model'
 import { useAgentRun } from '@features/agent-run/useAgentRun'
 
 /** 사전 검토 화면의 옵션과 실행. 공통 흐름은 useAgentRun이 맡는다. */
@@ -19,7 +20,7 @@ export function useReview(opts: ReviewOptions = {}) {
     [regulationSets, delayMs],
   )
 
-  const agent = useAgentRun<ReviewResult>({ run })
+  const agent = useAgentRun<ReviewResult>({ run, upload: DOCUMENT_UPLOAD })
 
   const toggleSet = useCallback((set: RegulationSet) => {
     setRegulationSets((prev) => (prev.includes(set) ? prev.filter((s) => s !== set) : [...prev, set]))

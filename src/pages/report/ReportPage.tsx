@@ -22,6 +22,7 @@ export function ReportPage({ onBack, apiOptions }: { onBack?: () => void; apiOpt
       onSelectDocument={r.setDocumentId}
       docSectionLabel="근거 문서"
       emptyDocsLabel="참조할 문서가 없습니다."
+      upload={r.upload}
       optionsLabel="보고 유형"
       runLabel="보고서 생성"
       runningLabel="작성 중…"
