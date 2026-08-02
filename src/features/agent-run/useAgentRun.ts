@@ -26,15 +26,44 @@ export type RunPhase<R> =
   | { kind: 'failed'; message: string }
   | { kind: 'done'; result: R }
 
-export type UseAgentRunArgs<R> = {
+/**
+ * 목록에서 하나를 고르게 하는 데 필요한 최소 형태.
+ *
+ * 업무 문서(`BusinessDocument`)와 분석 데이터셋(`Dataset`)이 둘 다 이걸 만족한다.
+ * 분석 화면이 문서 대신 데이터 파일을 받게 되면서 생겼다 — 둘을 억지로 한 타입으로
+ * 합치지 않고, 목록이 실제로 쓰는 속성만 남겼다.
+ */
+export type AgentInput = {
+  id: string
+  name: string
+  sizeBytes: number
+  /** 이름 아래 한 줄. 데이터 파일의 '486행 × 24열'처럼 고를 때 필요한 정보 */
+  detail?: string
+}
+
+export type UseAgentRunArgs<R, I extends AgentInput> = {
   /** 대상 문서 종류. 생략하면 전체 — 번역은 성적서만 받는 식이다. */
   kinds?: DocumentKind[] | undefined
+  /**
+   * 입력 목록을 바꿔 끼운다. 생략하면 업무 문서 목록이다.
+   * 모듈 수준 함수를 넘길 것 — 렌더마다 새 함수를 만들면 목록을 계속 다시 불러온다.
+   */
+  loadInputs?: (() => Promise<ApiResult<I[]>>) | undefined
   /** 실제 호출. 호출부가 자기 옵션을 묶어 useCallback으로 넘긴다. */
   run: (documentId: string) => Promise<ApiResult<R>>
 }
 
-export function useAgentRun<R>({ kinds, run }: UseAgentRunArgs<R>) {
-  const [docs, setDocs] = useState<BusinessDocument[]>([])
+/**
+ * `I`는 목록 항목의 실제 타입이다. 기본값이 `BusinessDocument`라
+ * 문서형 에이전트는 종전대로 `docs[].kind`까지 볼 수 있다 —
+ * 공통 최소 타입으로 뭉개면 '성적서만 불러온다' 같은 검증이 타입에서 사라진다.
+ */
+export function useAgentRun<R, I extends AgentInput = BusinessDocument>({
+  kinds,
+  loadInputs,
+  run,
+}: UseAgentRunArgs<R, I>) {
+  const [docs, setDocs] = useState<I[]>([])
   const [documentId, setDocumentId] = useState<string | null>(null)
   const [phase, setPhase] = useState<RunPhase<R>>({ kind: 'loadingDocs' })
 
@@ -44,7 +73,11 @@ export function useAgentRun<R>({ kinds, run }: UseAgentRunArgs<R>) {
   useEffect(() => {
     let alive = true
     const filter = kindsKey ? (kindsKey.split(',') as DocumentKind[]) : undefined
-    void fetchDocuments(filter).then((res) => {
+    /* loadInputs가 없으면 I는 기본값 BusinessDocument다.
+       타입 인자로는 그 관계를 표현할 수 없어 이 한 곳에서만 좁힌다. */
+    const load: () => Promise<ApiResult<I[]>> =
+      loadInputs ?? (() => fetchDocuments(filter) as Promise<ApiResult<I[]>>)
+    void load().then((res) => {
       if (!alive) return
       if (!res.ok) {
         setPhase({ kind: 'docsError', message: res.error })
@@ -57,7 +90,7 @@ export function useAgentRun<R>({ kinds, run }: UseAgentRunArgs<R>) {
     return () => {
       alive = false
     }
-  }, [kindsKey])
+  }, [kindsKey, loadInputs])
 
   const execute = useCallback(async () => {
     if (!documentId) return

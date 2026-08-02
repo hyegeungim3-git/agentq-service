@@ -11,7 +11,9 @@ export async function analyzeData(
   opts: AnalysisApiOptions = {},
 ): Promise<ApiResult<AnalysisResult>> {
   await wait(opts.delayMs ?? 2000)
-  const base = ANALYSIS_RESULTS[req.kind]
-  if (!base) return { ok: false, error: `지원하지 않는 분석 유형입니다: ${req.kind}` }
-  return { ok: true, data: { ...base, documentId: req.documentId } }
+  const byKind = ANALYSIS_RESULTS[req.datasetId]
+  if (!byKind) return { ok: false, error: `분석 결과가 없는 데이터입니다: ${req.datasetId}` }
+  const result = byKind[req.kind]
+  if (!result) return { ok: false, error: `지원하지 않는 분석 유형입니다: ${req.kind}` }
+  return { ok: true, data: result }
 }

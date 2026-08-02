@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { formatSize, type BusinessDocument } from '@entities/document/model'
-import type { RunPhase } from '@features/agent-run/useAgentRun'
+import { formatSize } from '@entities/document/model'
+import type { AgentInput, RunPhase } from '@features/agent-run/useAgentRun'
 
 /**
  * 문서 입력형 에이전트의 공통 화면 골격.
@@ -19,7 +19,8 @@ export type AgentShellProps<R> = {
   onBack?: (() => void) | undefined
 
   phase: RunPhase<R>
-  docs: BusinessDocument[]
+  /** 문서일 수도, 데이터 파일일 수도 있다 — 목록이 쓰는 속성만 요구한다 */
+  docs: AgentInput[]
   documentId: string | null
   onSelectDocument: (id: string) => void
 
@@ -121,7 +122,10 @@ export function AgentShell<R>({
                         />
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-sm font-bold text-slate-800">{d.name}</span>
-                          <span className="block text-xs text-slate-500">{formatSize(d.sizeBytes)}</span>
+                          <span className="block text-xs text-slate-500">
+                            {d.detail ? `${d.detail} · ` : ''}
+                            {formatSize(d.sizeBytes)}
+                          </span>
                         </span>
                       </label>
                     </li>

@@ -37,4 +37,16 @@ test.describe('데이터 조회·분석', () => {
     await page.getByRole('button', { name: '분석 실행' }).click()
     await expect(page.getByText(/전체의 71%입니다/)).toBeVisible({ timeout: 10_000 })
   })
+
+  /* 고른 데이터가 결과를 바꾸지 않으면 고르는 행위에 의미가 없다 */
+  test('분석 — 데이터를 바꾸면 단위와 지표가 달라진다', async ({ page }) => {
+    await openAgent(page, /데이터 분석/)
+    await page.getByRole('radio', { name: /침탄로3호기_온도프로파일/ }).click()
+    await page.getByRole('button', { name: '분석 실행' }).click()
+    const table = page.getByRole('table', { name: '추이 분석 데이터' })
+    await expect(table).toBeVisible({ timeout: 10_000 })
+    await expect(table).toContainText('7.8℃')
+    await expect(table).not.toContainText('0.42%')
+    await expect(page.getByText(/빠진 데이터가 없습니다/)).toBeVisible()
+  })
 })

@@ -33,8 +33,10 @@ export type StatRow = {
 }
 
 export type AnalysisResult = {
-  documentId: string
+  datasetId: string
   kind: AnalysisKind
+  /** 실측값의 단위 — '%'·'℃'·'mm/s'. 데이터셋마다 다르므로 화면에 굳히지 않는다 */
+  unit: string
   trend: TrendPoint[]
   distribution: DistributionBar[]
   stats: StatRow[]
@@ -46,7 +48,7 @@ export type AnalysisResult = {
 }
 
 export type AnalysisRequest = {
-  documentId: string
+  datasetId: string
   kind: AnalysisKind
 }
 

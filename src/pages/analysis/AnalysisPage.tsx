@@ -97,7 +97,7 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
 
               <Suspense fallback={<ChartFallback />}>
                 {res.kind === 'trend' ? (
-                  <TrendChart data={res.trend} unit="%" />
+                  <TrendChart data={res.trend} unit={res.unit} />
                 ) : (
                   <DistributionChart data={res.distribution} />
                 )}
@@ -133,9 +133,14 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
                                 p.value > p.limit ? 'font-bold text-amber-700' : 'text-slate-700'
                               }`}
                             >
-                              {p.value}%{p.value > p.limit ? ' · 기준 초과' : ''}
+                              {p.value}
+                              {res.unit}
+                              {p.value > p.limit ? ' · 기준 초과' : ''}
                             </td>
-                            <td className="py-2 tabular-nums text-slate-500">{p.limit}%</td>
+                            <td className="py-2 tabular-nums text-slate-500">
+                              {p.limit}
+                              {res.unit}
+                            </td>
                           </tr>
                         ))
                       : res.distribution.map((d) => (
@@ -176,11 +181,18 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
               title="분석에서 빠진 데이터"
               notice="AI가 집계한 결과입니다. 의사결정 전 원본 데이터로 확인하십시오."
             >
-              <ul className="list-disc space-y-1 pl-5 text-sm text-slate-700">
-                {res.excludedReasons.map((r) => (
-                  <li key={r}>{r}</li>
-                ))}
-              </ul>
+              {/* 빠진 게 없으면 그렇다고 말한다 — 빈 목록만 두면 '아직 안 채운 칸'으로 읽힌다 */}
+              {res.excludedReasons.length === 0 ? (
+                <p className="text-sm text-slate-700">
+                  빠진 데이터가 없습니다. 수집 구간 전체가 분석에 쓰였습니다.
+                </p>
+              ) : (
+                <ul className="list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  {res.excludedReasons.map((r) => (
+                    <li key={r}>{r}</li>
+                  ))}
+                </ul>
+              )}
             </ResultSection>
           </>
         )
