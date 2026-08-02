@@ -87,3 +87,20 @@ test.describe('기준정보 표준화 — 주소 처리', () => {
     )
   })
 })
+
+test.describe('회의록 — 자료·참석자·안건', () => {
+  /* 논의되지 않은 안건과 명단 밖 발언자를 드러내는 것이 회의록의 실무 가치다 */
+  test('안건 논의 여부와 자료 근거가 결과에 반영된다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /회의록 작성/ }).click()
+
+    await page.getByRole('checkbox', { name: /작업표준서/ }).check()
+    await page.getByRole('button', { name: '회의록 작성' }).click()
+
+    const r = page.getByRole('region', { name: /공정회의/ })
+    await expect(r).toContainText('근거 · 프레스_작업표준서_SOP-PR-011.pdf 제5장', { timeout: 10_000 })
+    await expect(r).toContainText('논의되지 않은 안건이 1건 있습니다 (설비 투자 계획)')
+    await expect(r).toContainText('발언 기록 없음 · 이서준')
+  })
+})

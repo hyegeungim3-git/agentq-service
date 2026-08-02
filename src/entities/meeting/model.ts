@@ -22,6 +22,41 @@ export type Utterance = {
 export type Decision = {
   id: string
   text: string
+  /**
+   * 이 결정을 뒷받침하는 회의 자료. 자료를 첨부하지 않았으면 null —
+   * 발언만 듣고 정리한 결정과 문서 근거가 있는 결정은 무게가 다르다.
+   */
+  basis: string | null
+}
+
+/** 사람이 채우는 칸. 비우면 녹음에서 추정하고, 추정했다고 표시한다 */
+export type MeetingInputs = {
+  title: string
+  heldOn: string
+  place: string
+  /** 한 줄에 한 명. '이름' 또는 '이름,부서' */
+  attendees: string
+  /** 한 줄에 안건 하나 */
+  agenda: string
+}
+
+/**
+ * 명단과 발언을 대조한 결과.
+ * 명단에 없는 발언자는 오인식이거나 기재되지 않은 참석자다 — 둘 다 확인해야 한다.
+ */
+export type AttendanceCheck = {
+  spoke: string[]
+  /** 명단에 있지만 발언 기록이 없는 사람 */
+  silent: string[]
+  /** 발언은 있는데 명단에 없는 사람 */
+  unlisted: string[]
+}
+
+/** 안건별 논의 여부 — 논의되지 않은 안건을 드러내는 것이 회의록의 실무 가치다 */
+export type AgendaCoverage = {
+  no: number
+  topic: string
+  decisionIds: string[]
 }
 
 export type ActionItem = {
@@ -37,6 +72,15 @@ export type MeetingResult = {
   documentId: string
   title: string
   heldOn: string
+  place: string
+  /** 기본 정보를 사람이 넣었는지, 녹음에서 추정했는지 */
+  headerSource: 'input' | 'estimated'
+  /** 첨부한 회의 자료 이름 — 비면 발언에만 의존했다는 뜻이다 */
+  references: string[]
+  /** 참석자 명단을 넣지 않았으면 null */
+  attendance: AttendanceCheck | null
+  /** 안건을 넣지 않았으면 빈 배열 */
+  agendaCoverage: AgendaCoverage[]
   speakers: Speaker[]
   utterances: Utterance[]
   decisions: Decision[]
@@ -48,6 +92,22 @@ export type MeetingRequest = {
   documentId: string
   /** 발언 기록까지 포함할지 — 끄면 결정·조치만 남는다 */
   includeUtterances: boolean
+  /** 맥락으로 쓸 회의 자료 문서 id */
+  referenceIds: string[]
+  inputs: MeetingInputs
+}
+
+export const EMPTY_MEETING_INPUTS: MeetingInputs = {
+  title: '',
+  heldOn: '',
+  place: '',
+  attendees: '',
+  agenda: '',
+}
+
+/** 논의 기록이 없는 안건 — 회의가 끝났는데 남은 것 */
+export function uncoveredAgenda(items: AgendaCoverage[]): AgendaCoverage[] {
+  return items.filter((a) => a.decisionIds.length === 0)
 }
 
 /** 초 → mm:ss. 표시 변환은 한 곳에서만 한다. */
