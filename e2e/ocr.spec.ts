@@ -6,6 +6,25 @@ async function openOcr(page: import('@playwright/test').Page) {
   await page.getByRole('button', { name: /문서 인식/ }).click()
 }
 
+test.describe('표준 보고서 설정', () => {
+  /* 입력 칸이 결과에 안 들어가면 그건 장식이다 */
+  test('직접 입력한 내용이 보고서에 들어가고 확인 필요에서 빠진다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /표준 보고서 작성/ }).click()
+
+    await page.getByLabel('주요 실적').fill('수출 로트 3건 선적 완료')
+    await page.getByRole('radio', { name: /요약체/ }).check()
+    await page.getByRole('button', { name: '보고서 생성' }).click()
+
+    const r = page.getByRole('region', { name: /주간 실적 보고/ })
+    await expect(r).toContainText('수출 로트 3건 선적 완료', { timeout: 10_000 })
+    await expect(r).toContainText('출처 · 직접 입력')
+    await expect(page.getByText('주요 실적 — 직접 입력 필요')).toHaveCount(0)
+    await expect(page.getByText('다음 계획 — 직접 입력 필요')).toBeVisible()
+  })
+})
+
 test.describe('문서 인식 설정', () => {
   test('설정을 켜면 결과에 항목이 늘어난다', async ({ page }) => {
     await openOcr(page)
