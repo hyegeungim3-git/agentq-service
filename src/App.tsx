@@ -50,6 +50,10 @@ import { BlockRulePage } from '@pages/admin/users/BlockRulePage'
 import { ModelPage } from '@pages/admin/llmops/ModelPage'
 import { ReliabilityPage } from '@pages/admin/llmops/ReliabilityPage'
 import { QualityPage } from '@pages/admin/llmops/QualityPage'
+import { UsageHistoryPage } from '@pages/admin/analytics/UsageHistoryPage'
+import { SatisfactionPage } from '@pages/admin/analytics/SatisfactionPage'
+import { UsageStatsPage } from '@pages/admin/analytics/UsageStatsPage'
+import { ReportPage as AnalyticsReportPage } from '@pages/admin/analytics/ReportPage'
 
 /* 화면이 여럿이 됐지만 라우터는 아직 넣지 않는다.
    URL 공유·새로고침 복원이 요구사항으로 들어올 때 도입한다(가이드 §8, §12).
@@ -174,6 +178,10 @@ export default function App() {
         {view.menuId === 'llmops.models' && <ModelPage />}
         {view.menuId === 'llmops.reliability' && <ReliabilityPage />}
         {view.menuId === 'llmops.quality' && <QualityPage />}
+        {view.menuId === 'analytics.history' && <UsageHistoryPage />}
+        {view.menuId === 'analytics.satisfaction' && <SatisfactionPage />}
+        {view.menuId === 'analytics.stats' && <UsageStatsPage />}
+        {view.menuId === 'analytics.report' && <AnalyticsReportPage />}
         {menu !== null && menu.status === 'planned' && <PlannedPage menu={menu} />}
       </AdminShell>
     )

@@ -109,6 +109,12 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `PATCH /llm/guardrails/{id}` | `toggleGuardrail` | 규칙 켜기·끄기 |
 | `GET /llm/confidence-policy` | `fetchConfidencePolicy` | → `ConfidencePolicy`. 임계값과 **아래일 때 하는 일**을 함께 |
 | `GET /quality/reviews` | `fetchQualityReviews` | → `QualityReview[]`. 판정에는 검토 의견(`note`)을 함께 |
+| `GET /analytics/usage?mode=` | `fetchUsageEntries` | → `UsageEntry[]` (`entities/analytics/model.ts`). **질의 본문은 넣지 않는다** — §3-8 |
+| `GET /analytics/satisfaction` | `fetchSurvey` | → `SatisfactionSurvey`. 보낸 수(`sent`)와 답한 수(`responded`)를 함께 — 평균만 오면 표본을 알 수 없다 |
+| `POST /analytics/satisfaction:send` | `sendSurvey` | 조사 발송 |
+| `GET /analytics/stats?window=` | `fetchUsageStats` | `window`=`7d`\|`30d`\|`quarter` → `UsageStats`. `avgSeconds`는 성공한 요청 기준, 제외된 `failedQueries`를 함께 |
+| `GET /analytics/report-sections` | `fetchReportSections` | → `ReportSection[]`. 만들 수 없는 항목도 이유와 함께 준다 |
+| `POST /analytics/reports` | `buildReport` | 리포트 파일 생성 |
 | `GET /training/report?window=` | `fetchTrainerReport` | `window`=`day`\|`week`\|`month` → `TrainerReport`. 실패 작업에는 `note`(사유)가 있어야 한다 |
 
 `makeUserMessage`는 서버를 부르지 않는다. 사용자가 방금 친 말을 화면에 얹는 클라이언트 함수다.
@@ -205,7 +211,10 @@ OCR·번역·분석·보고서는 지금 fixture에서 4~15초 범위다.
 4. **감사 로그** — 누가 무엇을 조회·생성했는지 기록 범위
 5. **파일 보관** — 업로드본 보관 기간, 삭제 요청 경로
 6. **동시성·상한** — 분당 요청 수, 대용량 파일 동시 업로드
-7. **오류 코드 체계** — 위 `code` 값의 목록
+7. **질의 본문 보관 여부** — 접근 로그와 이용 이력 두 화면이 지금은 '본문을 남기지
+   않는다'로 통일돼 있다(이전 데모는 이용 이력에 본문을 그대로 보여 줬다). 남기기로
+   정하면 보관 기간·열람 권한·마스킹 범위가 함께 필요하다. 프론트가 정할 일이 아니라 비워 둔다.
+8. **오류 코드 체계** — 위 `code` 값의 목록
 
 ## 4. 이 문서가 코드와 갈라지지 않게 하는 법
 

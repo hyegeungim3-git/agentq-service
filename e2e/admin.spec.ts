@@ -31,7 +31,7 @@ test.describe('관리자 셸', () => {
   test('아직 안 만든 메뉴를 감추지 않고 준비 중으로 표시한다', async ({ page }) => {
     await enterAdmin(page)
     const nav = await adminNav(page)
-    await expect(nav.getByText(/화면 12개 사용 가능 · 18개 준비 중/)).toBeVisible()
+    await expect(nav.getByText(/화면 16개 사용 가능 · 17개 준비 중/)).toBeVisible()
 
     await nav.getByRole('button', { name: /HR 연계·그룹 관리/ }).click()
     await expect(page.getByRole('heading', { name: 'HR 연계·그룹 관리' })).toBeVisible()
@@ -205,6 +205,63 @@ test.describe('관리자 셸', () => {
     await expect(box).toContainText('이 브라우저에 남은 것만')
     await expect(box).toContainText('근거가 부족하다')
     await expect(box).toContainText(/어떤 질문이었는지도 이어 붙일 수 없습니다/)
+  })
+
+
+  /* 두 화면이 다른 말을 하면 어느 쪽이 사실인지 알 수 없다 */
+  test('이용 이력과 접근 로그가 본문 보관에 대해 같은 말을 한다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '사용자 관리' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '접근 로그' }).click()
+    await expect(page.getByText(/챗봇 질문 본문은 남기지 않습니다/)).toBeVisible()
+
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '서비스 분석' }).click()
+    await expect(page.getByRole('heading', { name: '이용 이력', level: 1 })).toBeVisible()
+    await expect(page.getByText('질의 본문은 이 목록에 없습니다')).toBeVisible()
+    await expect(page.getByText(/접근 로그와 같은 기준입니다/)).toBeVisible()
+  })
+
+  /* '평균 4.2점'만 크게 띄우면 전체가 4.2점이라고 읽는다 */
+  test('만족도는 답한 사람만의 평균이라고 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '서비스 분석' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '이용만족도' }).click()
+    await expect(page.getByText('4.2점')).toBeVisible()
+    await expect(page.getByText(/전사 만족도로 읽으면 안 됩니다/)).toBeVisible()
+    // 카드와 설명 문단 두 곳에 나오므로 카드 쪽(dd)으로 좁힌다
+    await expect(page.getByText('161명', { exact: true }).first()).toBeVisible()
+  })
+
+  test('이용 통계 구간을 바꾸면 집계가 달라진다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '서비스 분석' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '이용 통계' }).click()
+    await expect(page.getByText('1,842')).toBeVisible()
+    await pickLabel(page, '분기')
+    await expect(page.getByText('21,470')).toBeVisible()
+    await expect(page.getByText('성공한 요청만', { exact: true })).toBeVisible()
+  })
+
+  /* 목록에서 빼면 애초에 없는 지표로 읽힌다 */
+  test('리포트는 못 만드는 항목을 감추지 않는다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '서비스 분석' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '서비스 통계 리포트' }).click()
+    await expect(page.getByText(/지금 넣을 수 없는 항목 2개/)).toBeVisible()
+    await expect(page.getByText(/과금 단가가 정해지지 않아/)).toBeVisible()
+
+    await page.getByRole('checkbox').first().check()
+    await page.getByRole('button', { name: '리포트 만들기' }).click()
+    await expect(page.getByRole('alert')).toContainText(/지금은 내려받을 것이 없습니다/)
   })
 
 })
