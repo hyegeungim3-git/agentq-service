@@ -58,3 +58,32 @@ test.describe('문서 인식 설정', () => {
     )
   })
 })
+
+test.describe('기준정보 표준화 — 주소 처리', () => {
+  async function openMapping(page: import('@playwright/test').Page) {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /기준정보 표준화/ }).click()
+  }
+
+  /* 자동으로 끝나는 건수를 먼저 말한다 */
+  test('일괄 처리는 사람 몫이 몇 건인지 먼저 말한다', async ({ page }) => {
+    await openMapping(page)
+    await page.getByRole('radio', { name: /일괄 처리/ }).check()
+    await page.getByRole('button', { name: /주소 표준화$/ }).click()
+    const r = page.getByRole('region', { name: /일괄 표준화 결과 6건/ })
+    await expect(r).toContainText('6건 중 4건은 사람이 봐야 합니다', { timeout: 10_000 })
+    await expect(r).toContainText('2건은 AI로 해결되지 않습니다')
+  })
+
+  test('폐지된 코드는 조회되더라도 경고한다', async ({ page }) => {
+    await openMapping(page)
+    await page.getByRole('radio', { name: /코드 역조회/ }).check()
+    await page.getByRole('textbox').fill('4812110100')
+    await page.getByRole('button', { name: /코드 조회/ }).click()
+    await expect(page.getByRole('region', { name: '코드 역조회 결과' })).toContainText(
+      '폐지된 코드입니다',
+      { timeout: 10_000 },
+    )
+  })
+})

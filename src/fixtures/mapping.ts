@@ -8,9 +8,10 @@
  * status가 none인 후보를 반드시 남겼다. 전부 auto/review로 채우면
  * '검토만 하면 다 된다'는 착각을 만들고, 실제로는 설비를 바꿔야 하는 건이 있다.
  */
-import type { MappingResult } from '@entities/mapping/model'
+import type { TagMappingResult } from '@entities/mapping/model'
 
-export const MAPPING_RESULT: MappingResult = {
+export const MAPPING_RESULT: TagMappingResult = {
+  mode: 'tags',
   totalTags: 4_820,
   standardized: 2_988,
   elapsedSeconds: 6.8,
