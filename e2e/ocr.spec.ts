@@ -168,3 +168,19 @@ test.describe('번역 — 방향·직접 입력·요약', () => {
     )
   })
 })
+
+test.describe('복합 업무 오케스트레이션', () => {
+  /* 끝까지 갔다고 다 된 게 아니다 */
+  test('릴레이가 완주하고 사람 확인 지점을 합계로 먼저 말한다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /수입검사 성적서 접수 처리/ }).click()
+
+    await expect(page.getByRole('heading', { name: '성적서 인식' })).toBeVisible()
+    await page.getByRole('button', { name: '릴레이 실행' }).click()
+
+    await expect(page.getByText(/HBP-보전-2026-102 초안 작성/)).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByText(/사람이 확인해야 하는 지점이 \d+건 남았습니다/)).toBeVisible()
+    await expect(page.getByText(/OCR 신뢰도가 낮아 표준화하지 못함/)).toBeVisible()
+  })
+})

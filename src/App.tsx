@@ -17,6 +17,7 @@ import { DataQueryPage } from '@pages/dataquery/DataQueryPage'
 import { AnalysisPage } from '@pages/analysis/AnalysisPage'
 import { MappingPage } from '@pages/mapping/MappingPage'
 import { ChatPage } from '@pages/chat/ChatPage'
+import { OrchestrationPage } from '@pages/orchestration/OrchestrationPage'
 
 /* 화면이 여럿이 됐지만 라우터는 아직 넣지 않는다.
    URL 공유·새로고침 복원이 요구사항으로 들어올 때 도입한다(가이드 §8, §12).
@@ -25,6 +26,7 @@ type View =
   | { name: 'portal' }
   | { name: 'hub'; domainId: string }
   | { name: 'agent'; domainId: string; agentId: AgentId }
+  | { name: 'scenario'; domainId: string }
 
 export default function App() {
   const [view, setView] = useState<View>({ name: 'portal' })
@@ -52,6 +54,10 @@ export default function App() {
 
   if (view.name === 'portal') {
     return <PortalPage onSelect={(id) => setView({ name: 'hub', domainId: id })} />
+  }
+
+  if (view.name === 'scenario') {
+    return <OrchestrationPage onBack={() => setView({ name: 'hub', domainId: view.domainId })} />
   }
 
   if (view.name === 'agent') {
@@ -96,6 +102,7 @@ export default function App() {
       domain={domain}
       onBack={() => setView({ name: 'portal' })}
       onOpen={(agentId) => setView({ name: 'agent', domainId: domain.id, agentId })}
+      onOpenScenario={() => setView({ name: 'scenario', domainId: domain.id })}
     />
   )
 }

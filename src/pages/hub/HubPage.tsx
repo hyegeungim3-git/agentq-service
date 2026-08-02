@@ -5,6 +5,7 @@ import { sectorLabel } from '@entities/domain/model'
 export function HubPage({
   domain,
   onOpen,
+  onOpenScenario,
   onBack,
   /* 목록을 주입할 수 있게 둔다 — 13종이 모두 ready가 된 뒤에도
      '준비 중' 렌더 경로를 테스트로 지킬 수 있어야 한다. */
@@ -12,6 +13,8 @@ export function HubPage({
 }: {
   domain: Domain
   onOpen: (id: AgentId) => void
+  /** 복합 업무 시나리오 — 없으면 카드를 그리지 않는다 */
+  onOpenScenario?: (() => void) | undefined
   onBack: () => void
   agents?: AgentDefinition[]
 }) {
@@ -45,6 +48,25 @@ export function HubPage({
             </span>
           </p>
         </header>
+
+        {/* 한 에이전트로 끝나지 않는 업무는 릴레이로 묶는다 */}
+        {onOpenScenario && (
+          <button
+            type="button"
+            onClick={onOpenScenario}
+            className="mb-4 min-h-24 w-full rounded-xl border border-slate-300 bg-white p-4 text-left transition-colors hover:border-slate-400 hover:bg-slate-50"
+          >
+            <span className="flex flex-wrap items-center gap-2">
+              <span className="rounded bg-slate-900 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                복합 업무
+              </span>
+              <span className="font-bold text-slate-900">수입검사 성적서 접수 처리</span>
+            </span>
+            <span className="mt-1 block text-sm text-slate-600">
+              성적서 1건이 인식 → 주소 표준화 → 이력 조회 → 보고서 초안까지 이어집니다.
+            </span>
+          </button>
+        )}
 
         <ul className="grid gap-3 sm:grid-cols-2">
           {agents.map((a) => {
