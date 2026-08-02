@@ -102,6 +102,13 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /audit/coverage` | `fetchLogGaps` | → 로그에 **남지 않는 것** 목록. 없으면 화면이 '여기 있는 게 전부'로 그리게 된다 |
 | `GET /access-rules` | `fetchBlockRules` | → `BlockRule[]`. 만료된 규칙도 함께 준다 — 화면이 만료를 가려서 말한다 |
 | `POST /access-rules` | `createBlockRule` | 차단 규칙 추가 |
+| `GET /llm/models` | `fetchModels` | → `ModelEntry[]` (`entities/llmops/model.ts`). 중지 모델은 `stoppedReason` 필수 |
+| `PATCH /llm/models/{id}` | `updateModelParams` | 온도 등 파라미터. 서비스 전체 답변이 바뀌는 설정이다 |
+| `GET /llm/rerank-pipelines` | `fetchPipelines` | → `RerankPipeline[]`. **안 잰 효과는 `null`** — 0 금지, §2-8 |
+| `GET /llm/guardrails` | `fetchGuardrails` | → `GuardrailRule[]`. `riskIfOff`(껐을 때 통과하는 것) 필수 |
+| `PATCH /llm/guardrails/{id}` | `toggleGuardrail` | 규칙 켜기·끄기 |
+| `GET /llm/confidence-policy` | `fetchConfidencePolicy` | → `ConfidencePolicy`. 임계값과 **아래일 때 하는 일**을 함께 |
+| `GET /quality/reviews` | `fetchQualityReviews` | → `QualityReview[]`. 판정에는 검토 의견(`note`)을 함께 |
 | `GET /training/report?window=` | `fetchTrainerReport` | `window`=`day`\|`week`\|`month` → `TrainerReport`. 실패 작업에는 `note`(사유)가 있어야 한다 |
 
 `makeUserMessage`는 서버를 부르지 않는다. 사용자가 방금 친 말을 화면에 얹는 클라이언트 함수다.
@@ -174,6 +181,17 @@ OCR·번역·분석·보고서는 지금 fixture에서 4~15초 범위다.
 
 이 값들이 붙기 전까지 화면은 `서버 미연결 — 예시 값` 배지를 단다.
 **배지가 사라지는 것이 곧 연결 확인**이다.
+
+### 2-8. 측정값에 붙여야 하는 것
+
+'정확도 +18.4%' 같은 숫자는 **언제 몇 건으로 쟀는지 없으면 뜻이 없다.** 그래서
+효과 측정값은 `{gain, samples, measuredOn}` 묶음으로 요청한다.
+
+**아직 안 잰 것은 `null`로 준다.** `0`으로 주면 화면이 '효과 없음'으로 그리고
+평균에 섞여 전체 평균을 끌어내린다. 화면은 `null`을 '측정 전'으로 쓰고 평균에서 뺀다.
+
+같은 이유로 사용자 피드백 집계도 **표본 범위**를 함께 요청한다. 지금 화면은
+브라우저에 남은 것만 세고 있고, 그 사실을 숫자 옆에 적어 두었다.
 
 ## 3. 백엔드가 정해 주어야 하는 것
 

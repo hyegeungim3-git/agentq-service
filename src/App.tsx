@@ -47,6 +47,9 @@ import { ApprovalPage } from '@pages/admin/users/ApprovalPage'
 import { QuotaPage } from '@pages/admin/users/QuotaPage'
 import { AccessLogPage } from '@pages/admin/users/AccessLogPage'
 import { BlockRulePage } from '@pages/admin/users/BlockRulePage'
+import { ModelPage } from '@pages/admin/llmops/ModelPage'
+import { ReliabilityPage } from '@pages/admin/llmops/ReliabilityPage'
+import { QualityPage } from '@pages/admin/llmops/QualityPage'
 
 /* 화면이 여럿이 됐지만 라우터는 아직 넣지 않는다.
    URL 공유·새로고침 복원이 요구사항으로 들어올 때 도입한다(가이드 §8, §12).
@@ -168,6 +171,9 @@ export default function App() {
         {view.menuId === 'users.quota' && <QuotaPage />}
         {view.menuId === 'users.log' && <AccessLogPage />}
         {view.menuId === 'users.block' && <BlockRulePage />}
+        {view.menuId === 'llmops.models' && <ModelPage />}
+        {view.menuId === 'llmops.reliability' && <ReliabilityPage />}
+        {view.menuId === 'llmops.quality' && <QualityPage />}
         {menu !== null && menu.status === 'planned' && <PlannedPage menu={menu} />}
       </AdminShell>
     )

@@ -31,7 +31,7 @@ test.describe('관리자 셸', () => {
   test('아직 안 만든 메뉴를 감추지 않고 준비 중으로 표시한다', async ({ page }) => {
     await enterAdmin(page)
     const nav = await adminNav(page)
-    await expect(nav.getByText(/화면 9개 사용 가능 · 19개 준비 중/)).toBeVisible()
+    await expect(nav.getByText(/화면 12개 사용 가능 · 18개 준비 중/)).toBeVisible()
 
     await nav.getByRole('button', { name: /HR 연계·그룹 관리/ }).click()
     await expect(page.getByRole('heading', { name: 'HR 연계·그룹 관리' })).toBeVisible()
@@ -148,6 +148,63 @@ test.describe('관리자 셸', () => {
     await nav.getByRole('button', { name: '접근권한·차단' }).click()
     await expect(page.getByText(/차단 중 2건/)).toBeVisible()
     await expect(page.getByText(/만료돼 더 이상 막지 않는 규칙 1건/)).toBeVisible()
+  })
+
+
+  test('LLM 설정 — 모델을 고르면 맡은 업무와 중지 사유가 나온다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: 'LLM 운영' }).click()
+    await expect(page.getByRole('heading', { name: 'LLM 설정', level: 1 })).toBeVisible()
+
+    await page.getByRole('button', { name: /Solar-10.7B/ }).click()
+    await expect(page.getByText(/수치 인용 오류가 반복돼 중지했습니다/)).toBeVisible()
+    await expect(page.getByText(/지금 이 모델로 나가는 답변은 없습니다/)).toBeVisible()
+
+    nav = await adminNav(page)
+    for (const label of ['신뢰성 관리', 'AI 품질 관리']) {
+      await expect(nav.getByRole('button', { name: label })).toBeVisible()
+    }
+  })
+
+  /* 안 잰 것을 0으로 세면 효과가 없어 보이고 평균이 무너진다 */
+  test('신뢰성 관리 — 측정 전 항목을 평균에서 빼고 탭이 실제로 바뀐다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: 'LLM 운영' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '신뢰성 관리' }).click()
+
+    await expect(page.getByText(/위 평균에 포함하지 않았습니다/)).toBeVisible()
+    await expect(page.getByText('측정 전')).toBeVisible()
+
+    await page.getByRole('tab', { name: '출력 가드레일' }).click()
+    await expect(page.getByText(/문서에 있던 개인정보가 답변에 그대로 실려 나갑니다/)).toBeVisible()
+    await expect(page.getByText('Top-K')).toHaveCount(0)
+  })
+
+  /* 포털에서 누른 피드백이 관리자 화면으로 이어진다 */
+  test('AI 품질 관리 — 포털 피드백이 집계되고 한계를 밝힌다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
+    await expect(page.getByText(/타수 50만 타/)).toBeVisible({ timeout: 10_000 })
+    await page.getByRole('button', { name: '도움이 안 됐어요' }).click()
+    await page.getByRole('button', { name: '근거가 부족하다' }).click()
+
+    // 사이드바가 좁은 화면에서 오버레이라 UI로 되돌아가지 않고 다시 연다
+    // (피드백은 브라우저에 남으므로 새로 열어도 그대로다)
+    await page.goto('./')
+    await page.getByRole('button', { name: /관리자 시스템/ }).click()
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: 'LLM 운영' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: 'AI 품질 관리' }).click()
+
+    const box = page.getByRole('region', { name: '사용자 피드백' })
+    await expect(box).toContainText('이 브라우저에 남은 것만')
+    await expect(box).toContainText('근거가 부족하다')
+    await expect(box).toContainText(/어떤 질문이었는지도 이어 붙일 수 없습니다/)
   })
 
 })

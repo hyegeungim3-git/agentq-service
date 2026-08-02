@@ -67,3 +67,34 @@ export function useFeedback() {
 
   return { entries, rate, setReason, persisted }
 }
+
+/**
+ * 관리자 화면이 읽는 피드백 집계.
+ *
+ * ⚠️ **이 브라우저에 남은 것만 센다.** 서버가 없어 다른 사람이 누른 것은 여기 없다.
+ * 그리고 메시지 id는 새로고침하면 다시 매겨지므로 **어떤 질문이었는지 이어 붙일 수
+ * 없다.** 건수만 세고, 그 한계를 화면이 그대로 말한다.
+ *
+ * 서버가 붙으면 이 함수 대신 집계 API를 부른다.
+ */
+export type FeedbackSummary = {
+  up: number
+  down: number
+  reasons: { reason: string; count: number }[]
+}
+
+export function readFeedbackSummary(): FeedbackSummary {
+  const store = readJson<Store>(KEY, isStore) ?? {}
+  const entries = Object.values(store)
+  const counts = new Map<string, number>()
+  for (const e of entries) {
+    if (e.reason) counts.set(e.reason, (counts.get(e.reason) ?? 0) + 1)
+  }
+  return {
+    up: entries.filter((e) => e.verdict === 'up').length,
+    down: entries.filter((e) => e.verdict === 'down').length,
+    reasons: [...counts.entries()]
+      .map(([reason, count]) => ({ reason, count }))
+      .sort((a, b) => b.count - a.count),
+  }
+}
