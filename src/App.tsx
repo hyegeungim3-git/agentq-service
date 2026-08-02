@@ -1,13 +1,20 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { AgentId } from '@entities/agent/model'
 import type { Domain } from '@entities/domain/model'
 import { fetchDomain } from '@shared/api/domains'
 import { useConversations } from '@features/conversations/useConversations'
+import { unreadNotices, type Notice } from '@entities/notice/model'
+import type { Workspace } from '@entities/workspace/model'
+import { fetchWorkspaces } from '@shared/api/workspaces'
+import { fetchNotices } from '@shared/api/notices'
+import { readJson, writeJson } from '@shared/lib/storage'
 import { AppShell } from '@widgets/app-shell/AppShell'
 import type { ShellTab } from '@widgets/app-shell/tabs'
 import { PortalPage } from '@pages/portal/PortalPage'
 import { HubPage } from '@pages/hub/HubPage'
 import { SecurityPage } from '@pages/security/SecurityPage'
+import { NoticesPage } from '@pages/notices/NoticesPage'
+import { GuidePage } from '@pages/guide/GuidePage'
 import { SummaryPage } from '@pages/summary/SummaryPage'
 import { TranslatePage } from '@pages/translate/TranslatePage'
 import { ReviewPage } from '@pages/review/ReviewPage'
@@ -31,6 +38,8 @@ type View =
   /** 셸 안. tab이 무엇을 보여 줄지, agentId·scenario가 에이전트 탭의 안쪽을 정한다 */
   | { name: 'shell'; domainId: string; tab: ShellTab; agentId: AgentId | null; scenario: boolean }
 
+const READ_KEY = 'agentq.readNotices.v1'
+
 const shell = (domainId: string, tab: ShellTab): View => ({
   name: 'shell',
   domainId,
@@ -48,8 +57,40 @@ export default function App() {
         id가 다르면 아직 안 불러온 것으로 취급한다. */
   const [loaded, setLoaded] = useState<{ id: string; domain: Domain } | null>(null)
 
+  /* 워크스페이스·공지는 셸이 함께 들고 있는다 — 대화가 워크스페이스에 속하기 때문이다 */
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([])
+  const [workspaceId, setWorkspaceId] = useState('')
+  const [notices, setNotices] = useState<Notice[]>([])
+  const [readIds, setReadIds] = useState<string[]>(
+    () => readJson<string[]>(READ_KEY, (v): v is string[] => Array.isArray(v)) ?? [],
+  )
+
+  useEffect(() => {
+    let alive = true
+    void fetchWorkspaces().then((res) => {
+      if (!alive || !res.ok) return
+      setWorkspaces(res.data)
+      setWorkspaceId((prev) => prev || (res.data[0]?.id ?? ''))
+    })
+    void fetchNotices().then((res) => {
+      if (alive && res.ok) setNotices(res.data)
+    })
+    return () => {
+      alive = false
+    }
+  }, [])
+
+  const markRead = useCallback((ids: string[]) => {
+    setReadIds((prev) => {
+      const next = [...new Set([...prev, ...ids])]
+      if (next.length === prev.length) return prev
+      writeJson(READ_KEY, next)
+      return next
+    })
+  }, [])
+
   /* 대화는 셸이 소유한다 — 탭을 옮겨도, 다른 대화를 골라도 남아야 한다 */
-  const conv = useConversations()
+  const conv = useConversations(workspaceId)
 
   const domainId = view.name === 'portal' ? null : view.domainId
 
@@ -86,14 +127,23 @@ export default function App() {
       domain={domain}
       tab={view.tab}
       onTab={(tab) => setView(shell(domain.id, tab))}
+      workspaces={workspaces}
+      workspaceId={workspaceId}
+      onWorkspace={setWorkspaceId}
       conversations={conv.listed}
       activeConversationId={conv.activeId}
       onSelectConversation={conv.select}
       onNewConversation={conv.startNew}
+      onDeleteConversation={conv.remove}
+      onClearConversations={conv.clearAll}
+      conversationsPersisted={conv.persisted}
+      unreadNotices={unreadNotices(notices, readIds).length}
       onExit={() => setView({ name: 'portal' })}
     >
       {view.tab === 'general' && <ChatPage store={conv.store} />}
       {view.tab === 'security' && <SecurityPage />}
+      {view.tab === 'notices' && <NoticesPage onRead={markRead} />}
+      {view.tab === 'guide' && <GuidePage />}
       {view.tab === 'agents' && view.scenario && <OrchestrationPage onBack={backToAgents} />}
       {view.tab === 'agents' && !view.scenario && view.agentId === null && (
         <HubPage

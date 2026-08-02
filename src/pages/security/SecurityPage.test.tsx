@@ -21,6 +21,6 @@ describe('SecurityPage', () => {
     render(<SecurityPage />)
     expect(screen.getByText('이 브라우저 안')).toBeInTheDocument()
     expect(screen.getByText('전송되지 않음')).toBeInTheDocument()
-    expect(screen.getByText('이 세션 메모리에만')).toBeInTheDocument()
+    expect(screen.getAllByText('이 브라우저에 저장')).toHaveLength(2)
   })
 })

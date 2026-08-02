@@ -65,6 +65,8 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 |---|---|---|
 | `GET /domains` | `fetchDomains` | → `Domain[]` (`entities/domain/model.ts`) |
 | `GET /domains/{id}` | `fetchDomain` | → `Domain` |
+| `GET /workspaces` | `fetchWorkspaces` | → `Workspace[]` (`entities/workspace/model.ts`) |
+| `GET /notices` | `fetchNotices` | → `Notice[]` (`entities/notice/model.ts`) |
 | `GET /documents` | `fetchDocuments` | `?kind=sop\|report\|certificate\|minutes` → `BusinessDocument[]` (`entities/document/model.ts`) |
 | `POST /documents (multipart)` | `uploadDocument` | 파일 → `BusinessDocument` |
 | `GET /datasets` | `fetchDatasets` | → `Dataset[]` (`entities/dataset/model.ts`) |
@@ -110,6 +112,13 @@ OCR·번역·분석·보고서는 지금 fixture에서 4~15초 범위다.
 
 업로드는 파일을 얹는 일이 아니라 **서버가 본문을 파싱해 돌려주는 일**이다.
 `BusinessDocument.text`(추출 본문)가 응답에 있어야 요약·검토·번역이 이어진다.
+
+### 2-4. 브라우저에 남기는 것
+
+대화 기록과 공지 읽음 표시는 **브라우저에만** 저장한다(서버로 보내지 않는다).
+보관 기간 정책이 정해지기 전이라 지우는 방법을 함께 뒀다.
+서버가 대화 이력을 갖는 쪽으로 정해지면 `POST /conversations` 계열이 필요해진다 —
+그때 다시 제안한다. 지금 미리 만들지 않는다.
 
 ## 3. 백엔드가 정해 주어야 하는 것
 

@@ -71,7 +71,54 @@ test.describe('셸 — 최근 대화', () => {
     await expect(page.getByText(/타수 50만 타/)).toHaveCount(0)
 
     nav = await openSidebar(page)
-    await nav.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
+    // 삭제(✕) 버튼도 제목을 aria-label에 갖고 있어 정확한 이름으로 좁힌다
+    await nav.getByRole('button', { name: '금형 교체 주기가 어떻게 되나요?', exact: true }).click()
     await expect(page.getByText(/타수 50만 타/)).toBeVisible()
+  })
+})
+
+test.describe('셸 — 워크스페이스·공지·가이드', () => {
+  /* 워크스페이스가 대화를 실제로 나누지 않으면 이름표에 불과하다 */
+  test('워크스페이스를 바꾸면 대화 목록이 갈린다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+
+    await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
+    await expect(page.getByText(/타수 50만 타/)).toBeVisible({ timeout: 10_000 })
+
+    let nav = await openSidebar(page)
+    await expect(nav).toContainText('금형 교체 주기가 어떻게 되나요')
+
+    await nav.getByRole('combobox', { name: '워크스페이스' }).selectOption({ index: 1 })
+    nav = await openSidebar(page)
+    await expect(nav).toContainText('이 워크스페이스에는 아직 없습니다')
+
+    await nav.getByRole('combobox', { name: '워크스페이스' }).selectOption({ index: 0 })
+    nav = await openSidebar(page)
+    await expect(nav).toContainText('금형 교체 주기가 어떻게 되나요')
+  })
+
+  /* 새로고침해도 남아야 '저장'이라고 말할 수 있다 */
+  test('대화가 새로고침 뒤에도 남는다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /출장 여비 기준 알려줘/ }).click()
+    await expect(page.getByText(/일 60,000원/)).toBeVisible({ timeout: 10_000 })
+
+    await page.reload()
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    const nav = await openSidebar(page)
+    await expect(nav).toContainText('출장 여비 기준 알려줘')
+  })
+
+  test('공지와 사용 가이드가 실제 내용을 보여준다', async ({ page }) => {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+
+    await openTab(page, /^공지사항/)
+    await expect(page.getByRole('heading', { name: '공지사항' })).toBeVisible()
+
+    await openTab(page, /^사용 가이드/)
+    await expect(page.getByRole('heading', { name: '사용 가이드' })).toBeVisible()
   })
 })
