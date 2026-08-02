@@ -32,12 +32,12 @@ test.describe('관리자 셸', () => {
   test('아직 안 만든 메뉴를 감추지 않고 준비 중으로 표시한다', async ({ page }) => {
     await enterAdmin(page)
     const nav = await adminNav(page)
-    await expect(nav.getByText(/화면 19개 사용 가능 · 15개 준비 중/)).toBeVisible()
+    await expect(nav.getByText(/화면 23개 사용 가능 · 12개 준비 중/)).toBeVisible()
 
-    await nav.getByRole('button', { name: /HR 연계·그룹 관리/ }).click()
-    await expect(page.getByRole('heading', { name: 'HR 연계·그룹 관리' })).toBeVisible()
-    await expect(page.getByText('인사 시스템 연동과 조직 그룹')).toBeVisible()
-    await expect(page.getByText(/운영·관리 단계에서 만듭니다/)).toBeVisible()
+    await nav.getByRole('button', { name: /지식 관리/ }).click()
+    await expect(page.getByRole('heading', { name: '지식 관리' })).toBeVisible()
+    await expect(page.getByText('문서 수집·청킹·색인과 RAG 파이프라인')).toBeVisible()
+    await expect(page.getByText(/AI 서비스 단계에서 만듭니다/)).toBeVisible()
   })
 
   /* 인프라 수치는 로직이 없다 — 지어낸 값을 실측처럼 그리면 거짓 계기판이 된다 */
@@ -308,6 +308,44 @@ test.describe('관리자 셸', () => {
     await expect(page.getByRole('main').getByText(portalTitle)).toBeVisible()
 
     await page.getByRole('button', { name: '등록' }).isDisabled()
+  })
+
+
+  /* '842명 동기화 완료'만 보여 주면 잘 돌고 있는 것처럼 보인다 */
+  test('HR 연계는 처리 못 한 퇴직을 경고로 올린다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: 'HR 연계·그룹 관리' }).click()
+    await expect(page.getByText(/계정이 열린 채로 남은 변경 1건/)).toBeVisible()
+    await expect(page.getByText(/자동 처리를 기다리면 그동안 접속이 가능합니다/)).toBeVisible()
+  })
+
+  /* 목록에 있으면 언젠가 캡처되고 공유된다 */
+  test('API 화면에 키를 표시하지 않고 이유를 적는다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: 'API·프롬프트' }).click()
+    await expect(page.getByText(/API 키는 이 화면에 표시하지 않습니다/)).toBeVisible()
+
+    await page.getByRole('tab', { name: '프롬프트 관리' }).click()
+    await expect(page.getByText(/근거 없는 질문에 답을 지어내기 시작할 수 있습니다/)).toBeVisible()
+  })
+
+  test('시스템 설정 — 관리 홈 카드가 실제 화면으로 간다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '시스템 설정' }).click()
+    await expect(page.getByRole('heading', { name: '관리 홈', level: 1 })).toBeVisible()
+    await expect(page.getByText(/같은 화면을 두 벌 만들지 않았습니다/)).toBeVisible()
+
+    await page.getByRole('button', { name: /사용자 목록/ }).click()
+    await expect(page.getByRole('heading', { name: '사용자 목록', level: 1 })).toBeVisible()
+
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '시스템 설정' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '연계 SW 모니터링' }).click()
+    await expect(page.getByText(/진동 알람이 오지 않습니다/)).toBeVisible()
   })
 
 })

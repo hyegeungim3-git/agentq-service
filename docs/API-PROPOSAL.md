@@ -121,6 +121,12 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /notices` | `fetchManagedNotices` | 관리자와 포털이 **같은 엔드포인트**를 쓴다 — 따로 두면 고쳐도 포털에 안 나온다 |
 | `GET /chat/faq` | `fetchManagedFaq` | 위와 같은 이유로 포털과 같은 자원 |
 | `POST /notices` | `saveNotice` | 공지 등록 |
+| `GET /integrations/hr` | `fetchHrSync` | → `HrSyncState` (`entities/sysops/model.ts`). **처리 실패는 사유와 함께** — 퇴직이 밀리면 계정이 열려 있다 |
+| `POST /integrations/hr:sync` | `runHrSync` | 수동 동기화 |
+| `GET /apis` | `fetchApis` | → `ApiEntry[]`. **키 원문은 응답에 넣지 않는다** — §2-9 |
+| `POST /apis/{id}/keys` | `reissueApiKey` | 재발급. 키 원문은 이 응답에 **한 번만** 담고 이후 조회로는 못 본다 |
+| `GET /prompts` | `fetchPrompts` | → `PromptEntry[]`. 바꿨을 때의 영향(`affects`)을 함께 |
+| `GET /integrations` | `fetchIntegrations` | → `Integration[]`. 끊기면 무엇이 멈추는지(`impactIfDown`) 필수 |
 | `GET /training/report?window=` | `fetchTrainerReport` | `window`=`day`\|`week`\|`month` → `TrainerReport`. 실패 작업에는 `note`(사유)가 있어야 한다 |
 
 `makeUserMessage`는 서버를 부르지 않는다. 사용자가 방금 친 말을 화면에 얹는 클라이언트 함수다.
@@ -204,6 +210,17 @@ OCR·번역·분석·보고서는 지금 fixture에서 4~15초 범위다.
 
 같은 이유로 사용자 피드백 집계도 **표본 범위**를 함께 요청한다. 지금 화면은
 브라우저에 남은 것만 세고 있고, 그 사실을 숫자 옆에 적어 두었다.
+
+### 2-9. 키를 응답에 넣지 않는다
+
+API 키·토큰 원문은 **조회 응답에 넣지 않기를 요청한다.** 발급 응답에 한 번만 담고,
+그 뒤로는 서버도 원문을 갖지 않는 편이 낫다(해시만 보관).
+
+관리 화면에 키를 늘어놓으면 그 화면을 여는 사람 모두가 모든 키를 갖게 되고,
+화면은 캡처되고 공유된다. 키를 잃어버린 경우의 정답은 '다시 보기'가 아니라 '재발급'이다.
+
+같은 이유로 응답 어디에도 비밀번호·시크릿을 넣지 않는다. 지금 fixture에도 두지 않았고,
+테스트가 그것을 확인한다.
 
 ## 3. 백엔드가 정해 주어야 하는 것
 

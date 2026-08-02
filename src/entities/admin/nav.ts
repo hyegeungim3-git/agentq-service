@@ -98,7 +98,7 @@ export const ADMIN_MENUS: AdminMenu[] = [
   { id: 'users.quota', label: '할당량', section: '운영 · 관리', parentId: 'users', status: 'ready', phase: 'P2', summary: '사용자별 한도와 사용량' },
   { id: 'users.log', label: '접근 로그', section: '운영 · 관리', parentId: 'users', status: 'ready', phase: 'P2', summary: '누가 언제 무엇에 접근했는지' },
   { id: 'users.block', label: '접근권한·차단', section: '운영 · 관리', parentId: 'users', status: 'ready', phase: 'P2', summary: 'IP·계정 차단 규칙' },
-  { id: 'hr', label: 'HR 연계·그룹 관리', section: '운영 · 관리', parentId: null, status: 'planned', phase: 'P2', summary: '인사 시스템 연동과 조직 그룹' },
+  { id: 'hr', label: 'HR 연계·그룹 관리', section: '운영 · 관리', parentId: null, status: 'ready', phase: 'P2', summary: '인사 시스템 연동과 조직 그룹' },
   { id: 'llmops', label: 'LLM 운영', section: '운영 · 관리', parentId: null, status: 'ready', phase: 'P2', summary: '모델 설정·신뢰성·답변 품질' },
   { id: 'llmops.models', label: 'LLM 설정', section: '운영 · 관리', parentId: 'llmops', status: 'ready', phase: 'P2', summary: '등록 모델과 각 모델이 맡은 업무' },
   { id: 'llmops.reliability', label: '신뢰성 관리', section: '운영 · 관리', parentId: 'llmops', status: 'ready', phase: 'P2', summary: 'Re-rank·가드레일·신뢰도 임계값' },
@@ -112,8 +112,10 @@ export const ADMIN_MENUS: AdminMenu[] = [
   { id: 'logs.integrated', label: '통합 로그 관리', section: '운영 · 관리', parentId: 'logs', status: 'ready', phase: 'P2', summary: '추출·접속·작업·질의 기록' },
   { id: 'logs.usage', label: '사용량 모니터링', section: '운영 · 관리', parentId: 'logs', status: 'ready', phase: 'P2', summary: '업무별 토큰 소비와 한도' },
   { id: 'content', label: '콘텐츠 관리', section: '운영 · 관리', parentId: null, status: 'ready', phase: 'P2', summary: '공지·Q&A·설문 — 포털에 그대로 나온다' },
-  { id: 'prompts', label: 'API·프롬프트', section: '운영 · 관리', parentId: null, status: 'planned', phase: 'P2', summary: '시스템 프롬프트와 외부 연동 키' },
-  { id: 'settings', label: '시스템 설정', section: '운영 · 관리', parentId: null, status: 'planned', phase: 'P2', summary: '전역 설정과 보관 정책' },
+  { id: 'prompts', label: 'API·프롬프트', section: '운영 · 관리', parentId: null, status: 'ready', phase: 'P2', summary: '외부에 열어 준 API와 에이전트 프롬프트' },
+  { id: 'sysops', label: '시스템 설정', section: '운영 · 관리', parentId: null, status: 'ready', phase: 'P2', summary: '관리 홈과 외부 연동 상태' },
+  { id: 'sysops.home', label: '관리 홈', section: '운영 · 관리', parentId: 'sysops', status: 'ready', phase: 'P2', summary: '자주 여는 화면으로 가는 진입점' },
+  { id: 'sysops.integration', label: '연계 SW 모니터링', section: '운영 · 관리', parentId: 'sysops', status: 'ready', phase: 'P2', summary: '외부 시스템 연동 상태' },
 ]
 
 /** 구역의 최상위 항목만 — 하위 메뉴는 `childrenOf`로 편다 */
