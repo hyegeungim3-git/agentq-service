@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 /** 포털을 거쳐 요약 화면으로 들어간다 — 실제 사용자 동선을 그대로 탄다. */
 async function openSummary(page: import('@playwright/test').Page) {
-  await page.goto('/')
+  await page.goto('./')
   await page.getByRole('button', { name: /한빛정밀/ }).click()
   await page.getByRole('button', { name: /문서 요약/ }).click()
   await expect(page.getByRole('heading', { name: '문서 요약 에이전트' })).toBeVisible()

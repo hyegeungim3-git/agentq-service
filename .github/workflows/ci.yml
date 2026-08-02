@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+# 배포는 한 번에 하나만. 연달아 push해도 순서가 꼬이지 않게 한다.
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   verify:
@@ -25,3 +31,26 @@ jobs:
       # 브라우저 설치는 CI에서만 필요하다.
       - run: npx playwright install --with-deps chromium
       - run: npm run e2e
+
+      # verify가 만든 dist를 그대로 배포한다 — 다시 빌드하면 검증한 것과
+      # 다른 산출물이 나갈 수 있다.
+      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          path: dist
+
+  # 배포는 verify 뒤에만 온다. lint·타입·테스트·E2E를 통과하지 못한 산출물은
+  # 라이브로 나가지 않는다.
+  deploy:
+    needs: verify
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

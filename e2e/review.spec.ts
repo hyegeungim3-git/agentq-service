@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 async function openReview(page: import('@playwright/test').Page) {
-  await page.goto('/')
+  await page.goto('./')
   await page.getByRole('button', { name: /한빛정밀/ }).click()
   await page.getByRole('button', { name: /문서 사전 검토/ }).click()
   await expect(page.getByRole('heading', { name: '문서 사전 검토 에이전트' })).toBeVisible()

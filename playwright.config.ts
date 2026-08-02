@@ -8,7 +8,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',
-  use: { baseURL: 'http://localhost:5180', trace: 'on-first-retry' },
+  /* base가 '/agentq-service/'라 루트는 앱이 아니다(vite.config.ts 참조).
+     테스트는 page.goto('./')로 이 주소를 연다. */
+  use: { baseURL: 'http://localhost:5180/agentq-service/', trace: 'on-first-retry' },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
@@ -25,7 +27,7 @@ export default defineConfig({
     command: process.env.CI
       ? 'npm run build && npm run preview -- --port 5180 --strictPort'
       : 'npm run dev -- --port 5180 --strictPort',
-    url: 'http://localhost:5180',
+    url: 'http://localhost:5180/agentq-service/',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

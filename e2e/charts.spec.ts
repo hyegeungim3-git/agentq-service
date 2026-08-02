@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 async function openAgent(page: import('@playwright/test').Page, name: RegExp) {
-  await page.goto('/')
+  await page.goto('./')
   await page.getByRole('button', { name: /한빛정밀/ }).click()
   await page.getByRole('button', { name }).click()
 }

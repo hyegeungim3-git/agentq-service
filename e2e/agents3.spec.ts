@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { AGENTS, READY_AGENTS } from '../src/entities/agent/model'
 
 async function openAgent(page: import('@playwright/test').Page, name: RegExp) {
-  await page.goto('/')
+  await page.goto('./')
   await page.getByRole('button', { name: /한빛정밀/ }).click()
   await page.getByRole('button', { name }).click()
 }
@@ -39,7 +39,7 @@ test.describe('기준정보 표준화 · 챗봇', () => {
   })
 
   test('13종이 모두 열린다', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('./')
     await page.getByRole('button', { name: /한빛정밀/ }).click()
     await expect(page.getByText(`(이식 ${READY_AGENTS.length}/${AGENTS.length}종)`)).toBeVisible()
     // 비활성 버튼이 하나도 없어야 한다
