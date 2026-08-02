@@ -1,5 +1,13 @@
 import { useCallback, useState } from 'react'
-import type { LanguageCode, TranslationResult, TranslationTone } from '@entities/translation/model'
+import {
+  DIRECTIONS,
+  documentAvailable,
+  type Direction,
+  type TranslationResult,
+  type TranslationSource,
+  type TranslationTone,
+} from '@entities/translation/model'
+import { SAMPLE_SOURCE } from '@fixtures/translation'
 import { createTranslation, type TranslationApiOptions } from '@shared/api/translation'
 import { DOCUMENT_UPLOAD } from '@entities/upload/model'
 import { useAgentRun } from '@features/agent-run/useAgentRun'
@@ -12,15 +20,47 @@ export type TranslateOptions = TranslationApiOptions
 const TARGET_KINDS = ['certificate'] as const
 
 export function useTranslate(opts: TranslateOptions = {}) {
-  const [to, setTo] = useState<LanguageCode>('en')
+  const [direction, setDirectionState] = useState<Direction>(DIRECTIONS[0] as Direction)
+  const [source, setSource] = useState<TranslationSource>('document')
+  const [text, setText] = useState('')
   const [tone, setTone] = useState<TranslationTone>('technical')
   const [useGlossary, setUseGlossary] = useState(true)
+  const [withSummary, setWithSummary] = useState(false)
+
+  /**
+   * 사내 문서는 한국어라 영→한은 문서를 원문으로 쓸 수 없다.
+   * 방향을 바꿀 때 입력 방식을 함께 맞춰 준다 — 고를 수 없는 조합을 남겨 두면
+   * 실행하고 나서야 안 된다는 걸 알게 된다.
+   */
+  const setDirection = useCallback((next: Direction) => {
+    setDirectionState(next)
+    if (!documentAvailable(next)) {
+      setSource('text')
+      setText((prev) => (prev.trim().length > 0 ? prev : SAMPLE_SOURCE.en))
+    }
+  }, [])
+
+  const loadSample = useCallback(() => {
+    setText(direction.from === 'ko' ? SAMPLE_SOURCE.ko : SAMPLE_SOURCE.en)
+  }, [direction.from])
 
   const delayMs = opts.delayMs
   const run = useCallback(
     (documentId: string) =>
-      createTranslation({ documentId, from: 'ko', to, tone, useGlossary }, { delayMs }),
-    [to, tone, useGlossary, delayMs],
+      createTranslation(
+        {
+          documentId,
+          source,
+          from: direction.from,
+          to: direction.to,
+          tone,
+          useGlossary,
+          withSummary,
+        },
+        text,
+        { delayMs },
+      ),
+    [source, direction, tone, useGlossary, withSummary, text, delayMs],
   )
 
   const agent = useAgentRun<TranslationResult>({ kinds: [...TARGET_KINDS], run, upload: DOCUMENT_UPLOAD })
@@ -28,11 +68,19 @@ export function useTranslate(opts: TranslateOptions = {}) {
   return {
     ...agent,
     run: agent.execute,
-    to,
+    direction,
+    setDirection,
+    source,
+    setSource,
+    text,
+    setText,
+    loadSample,
     tone,
     useGlossary,
-    setTo,
+    withSummary,
     setTone,
     setUseGlossary,
+    setWithSummary,
+    canUseDocument: documentAvailable(direction),
   }
 }

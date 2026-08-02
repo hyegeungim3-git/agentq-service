@@ -137,3 +137,34 @@ test.describe('챗봇 — FAQ·출처 원문', () => {
     })
   })
 })
+
+test.describe('번역 — 방향·직접 입력·요약', () => {
+  async function openTranslate(page: import('@playwright/test').Page) {
+    await page.goto('./')
+    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /수출 문서 번역/ }).click()
+  }
+
+  /* 목표 언어를 바꿔도 같은 문장이 나오면 그 선택은 장식이다 */
+  test('방향을 바꾸면 번역문이 실제로 달라진다', async ({ page }) => {
+    await openTranslate(page)
+    await page.getByLabel('번역 방향').selectOption('ko-ja')
+    await page.getByRole('button', { name: '번역 실행' }).click()
+    const r = page.getByRole('region', { name: /번역 결과/ })
+    await expect(r).toContainText('本検査成績書は', { timeout: 10_000 })
+    await expect(r).not.toContainText('This inspection certificate records')
+  })
+
+  test('영→한은 사내 문서를 쓸 수 없다고 미리 말한다', async ({ page }) => {
+    await openTranslate(page)
+    await page.getByLabel('번역 방향').selectOption('en-ko')
+    await expect(page.getByRole('radio', { name: '사내 문서' })).toBeDisabled()
+    await expect(page.getByText(/사내 문서는 한국어라/)).toBeVisible()
+
+    await page.getByRole('button', { name: '번역 실행' }).click()
+    await expect(page.getByRole('region', { name: /번역 결과/ })).toContainText(
+      '본 검사성적서는 냉간압연강판',
+      { timeout: 10_000 },
+    )
+  })
+})

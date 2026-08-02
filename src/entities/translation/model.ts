@@ -12,10 +12,14 @@ export type TranslationTone = 'technical' | 'business' | 'plain'
 
 export type GlossaryEntry = {
   source: string
-  target: string
+  /** 목표 언어별 대응어. 하나만 두면 언어를 바꿔도 같은 말이 나온다 */
+  targets: Record<Exclude<LanguageCode, 'ko'>, string>
   /** 용어 분류 — 화면이 라벨을 조회한다 */
   category: 'process' | 'material' | 'quality' | 'equipment'
 }
+
+/** 원문을 어디서 받는가 */
+export type TranslationSource = 'document' | 'text'
 
 export type TranslationSegment = {
   id: number
@@ -25,6 +29,12 @@ export type TranslationSegment = {
   appliedTerms: string[]
   /** 0~1. 낮으면 사람이 봐야 한다 */
   confidence: number
+  /**
+   * 번역이 된 문장인가.
+   * 직접 입력한 임의 문장은 엔진 없이 번역할 수 없다 — 그럴듯한 결과를 만드는 대신
+   * 안 됐다고 표시한다.
+   */
+  translated: boolean
 }
 
 export type BackTranslationCheck = {
@@ -37,21 +47,48 @@ export type BackTranslationCheck = {
 
 export type TranslationRequest = {
   documentId: string
+  source: TranslationSource
   from: LanguageCode
   to: LanguageCode
   tone: TranslationTone
   useGlossary: boolean
+  /** 번역과 함께 요약까지 */
+  withSummary: boolean
 }
 
 export type TranslationResult = {
   documentId: string
+  source: TranslationSource
   from: LanguageCode
   to: LanguageCode
   segments: TranslationSegment[]
+  /** 번역하지 못한 문장 수 — 감추면 번역이 다 된 줄 안다 */
+  untranslated: number
   glossaryUsed: GlossaryEntry[]
   backChecks: BackTranslationCheck[]
+  /** 번역+요약을 켰을 때만 채워진다 */
+  summary: string | null
   elapsedSeconds: number
 }
+
+/**
+ * 고를 수 있는 번역 방향.
+ * 사내 문서는 한국어라 영→한은 직접 입력으로만 가능하다 — 그 제약을 타입이 아니라
+ * 화면이 말해 준다(`documentAvailable`).
+ */
+export type Direction = { from: LanguageCode; to: LanguageCode }
+
+export const DIRECTIONS: Direction[] = [
+  { from: 'ko', to: 'en' },
+  { from: 'ko', to: 'ja' },
+  { from: 'ko', to: 'zh' },
+  { from: 'en', to: 'ko' },
+]
+
+/** 사내 문서(한국어)를 원문으로 쓸 수 있는 방향인가 */
+export const documentAvailable = (d: Direction): boolean => d.from === 'ko'
+
+export const directionKey = (d: Direction): string => `${d.from}-${d.to}`
 
 /* ── 표시 규칙 ── */
 
