@@ -10,7 +10,13 @@ type State =
   | { kind: 'error'; message: string }
   | { kind: 'ready'; domains: Domain[] }
 
-export function PortalPage({ onSelect }: { onSelect: (id: string) => void }) {
+export function PortalPage({
+  onSelect,
+  onAdmin,
+}: {
+  onSelect: (id: string) => void
+  onAdmin: () => void
+}) {
   const [state, setState] = useState<State>({ kind: 'loading' })
 
   useEffect(() => {
@@ -102,6 +108,20 @@ export function PortalPage({ onSelect }: { onSelect: (id: string) => void }) {
             })}
           </ul>
         )}
+
+        {/* 관리자는 발주처가 아니라 플랫폼 전체를 다룬다 — 분야 목록과 줄을 나눈다 */}
+        <div className="mt-6 border-t border-slate-200 pt-6">
+          <button
+            type="button"
+            onClick={onAdmin}
+            className="w-full rounded-xl border border-slate-300 bg-white p-5 text-left hover:border-slate-400 hover:bg-slate-50"
+          >
+            <span className="block font-bold text-slate-900">관리자 시스템</span>
+            <span className="mt-0.5 block text-sm text-slate-600">
+              대시보드·모델 운영·사용자 관리. 발주처와 무관하게 플랫폼 전체를 봅니다.
+            </span>
+          </button>
+        </div>
 
         {/* 왜 못 고르는지 화면이 말한다 — 눌리지 않는 이유를 사용자가 추측하게 두지 않는다 */}
         {state.kind === 'ready' && state.domains.some((d) => d.status !== 'ready') && (

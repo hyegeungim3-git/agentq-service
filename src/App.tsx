@@ -35,6 +35,13 @@ import { AnalysisPage } from '@pages/analysis/AnalysisPage'
 import { MappingPage } from '@pages/mapping/MappingPage'
 import { ChatPage } from '@pages/chat/ChatPage'
 import { OrchestrationPage } from '@pages/orchestration/OrchestrationPage'
+import { AdminShell } from '@widgets/admin-shell/AdminShell'
+import { findMenu } from '@entities/admin/nav'
+import { SystemStatusPage } from '@pages/admin/system/SystemStatusPage'
+import { ServiceStatusPage } from '@pages/admin/service/ServiceStatusPage'
+import { GpuStatusPage } from '@pages/admin/gpu/GpuStatusPage'
+import { TrainerStatusPage } from '@pages/admin/trainer/TrainerStatusPage'
+import { PlannedPage } from '@pages/admin/planned/PlannedPage'
 
 /* 화면이 여럿이 됐지만 라우터는 아직 넣지 않는다.
    URL 공유·새로고침 복원이 요구사항으로 들어올 때 도입한다(가이드 §8, §12).
@@ -43,8 +50,14 @@ type View =
   | { name: 'portal' }
   /** 셸 안. tab이 무엇을 보여 줄지, agentId·scenario가 에이전트 탭의 안쪽을 정한다 */
   | { name: 'shell'; domainId: string; tab: ShellTab; agentId: AgentId | null; scenario: boolean }
+  /** 관리자. 발주처와 무관하다 — 플랫폼 전체를 본다 */
+  | { name: 'admin'; menuId: string }
 
 const READ_KEY = 'agentq.readNotices.v1'
+
+/* 관리자는 발주처 소속이 아니다 — 도메인 프로파일에서 가져오지 않는다.
+   실제로는 로그인 사용자 정보에서 온다(API 제안서 §3 인증). */
+const ADMIN = { name: '운영 담당자', org: 'AgentQ 플랫폼' }
 
 const shell = (domainId: string, tab: ShellTab): View => ({
   name: 'shell',
@@ -107,7 +120,7 @@ export default function App() {
   const conv = useConversations(workspaceId)
   const prefs = usePrefs()
 
-  const domainId = view.name === 'portal' ? null : view.domainId
+  const domainId = view.name === 'shell' ? view.domainId : null
 
   useEffect(() => {
     if (!domainId) return
@@ -123,7 +136,31 @@ export default function App() {
   const domain = loaded && loaded.id === domainId ? loaded.domain : null
 
   if (view.name === 'portal') {
-    return <PortalPage onSelect={(id) => setView(shell(id, 'general'))} />
+    return (
+      <PortalPage
+        onSelect={(id) => setView(shell(id, 'general'))}
+        onAdmin={() => setView({ name: 'admin', menuId: 'system' })}
+      />
+    )
+  }
+
+  if (view.name === 'admin') {
+    const menu = findMenu(view.menuId)
+    return (
+      <AdminShell
+        menuId={view.menuId}
+        onMenu={(id) => setView({ name: 'admin', menuId: id })}
+        onExitAdmin={() => setView({ name: 'portal' })}
+        onUserPortal={() => setView({ name: 'portal' })}
+        admin={ADMIN}
+      >
+        {view.menuId === 'system' && <SystemStatusPage />}
+        {view.menuId === 'service' && <ServiceStatusPage />}
+        {view.menuId === 'gpu' && <GpuStatusPage />}
+        {view.menuId === 'trainer' && <TrainerStatusPage />}
+        {menu !== null && menu.status === 'planned' && <PlannedPage menu={menu} />}
+      </AdminShell>
+    )
   }
 
   if (!domain) {

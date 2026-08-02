@@ -89,6 +89,12 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /chat/faq` | `fetchFaq` | → `FaqItem[]` |
 | `GET /metrics/live` | `fetchLiveMetrics` | → `LiveMetric[]` (`entities/metric/model.ts`) — 실제로는 스트리밍/폴링이 맞다. §2-3 참조 |
 | `GET /signals` | `fetchSignals` | → `WorkSignal[]` (`entities/signal/model.ts`) — 알림 센터·오늘의 브리핑이 함께 쓴다 |
+| `GET /infra/cluster` | `fetchCluster` | → `ClusterResource` (`entities/infra/model.ts`) — 비율은 0~1 |
+| `GET /infra/nodes` | `fetchNodes` | → `NodeInfo[]` |
+| `GET /infra/pods?window=` | `fetchPods` | `window`=`1h`\|`6h`\|`24h`\|`7d` → `PodInfo[]`. 구간은 **서버 질의 조건**이다 — §2-7 |
+| `GET /infra/services` | `fetchServices` | → `ServiceStatus[]`. 정상이 아니면 `reason`·`action`이 있어야 한다 — §2-7 |
+| `GET /infra/gpus` | `fetchGpuNodes` | → `GpuNode[]`. 과부하 판정은 화면이 한다(원시 값만 준다) |
+| `GET /training/report?window=` | `fetchTrainerReport` | `window`=`day`\|`week`\|`month` → `TrainerReport`. 실패 작업에는 `note`(사유)가 있어야 한다 |
 
 `makeUserMessage`는 서버를 부르지 않는다. 사용자가 방금 친 말을 화면에 얹는 클라이언트 함수다.
 
@@ -144,6 +150,22 @@ OCR·번역·분석·보고서는 지금 fixture에서 4~15초 범위다.
 보관 기간 정책이 정해지기 전이라 지우는 방법을 함께 뒀다.
 서버가 대화 이력을 갖는 쪽으로 정해지면 `POST /conversations` 계열이 필요해진다 —
 그때 다시 제안한다. 지금 미리 만들지 않는다.
+
+### 2-7. 관리자 대시보드에 요청하는 것
+
+세 가지를 요청한다. 없으면 화면이 관리자에게 쓸모없어진다.
+
+1. **구간은 질의 조건으로.** `window`를 받아 그 구간의 집계를 준다. 전 기간을 내려주고
+   화면이 자르는 방식은 쓰지 않는다 — '최근 1시간'을 보려고 7일치를 받게 된다.
+2. **나쁜 상태에는 사유와 조치.** `level: 'warn'`만 오면 관리자는 손쓸 수 없다.
+   `reason`(무엇이 잘못됐나)과 `action`(무엇을 해야 하나)을 함께 달라.
+   상태를 아는 것과 조치할 수 있는 것은 다르다.
+3. **판정이 아니라 원시 값.** 과부하 여부·색·정렬은 화면이 정한다. 서버는
+   사용률·온도·전력만 준다. 판정 기준이 서버와 화면 두 곳에 있으면 요약 숫자와
+   개별 배지가 어긋난다.
+
+이 값들이 붙기 전까지 화면은 `서버 미연결 — 예시 값` 배지를 단다.
+**배지가 사라지는 것이 곧 연결 확인**이다.
 
 ## 3. 백엔드가 정해 주어야 하는 것
 
