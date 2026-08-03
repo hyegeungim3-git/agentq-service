@@ -20,7 +20,8 @@ const CARDS: { menuId: string; desc: string }[] = [
   { menuId: 'content', desc: '공지·Q&A — 포털에 그대로 나갑니다' },
   { menuId: 'system', desc: '클러스터·노드·파드' },
   { menuId: 'sysops.integration', desc: '외부 시스템 연동 상태' },
-  { menuId: 'knowledge', desc: 'RAG 지식 DB와 접근 권한' },
+  { menuId: 'knowledge', desc: '지식영역·색인 상태·RAG 설정' },
+  { menuId: 'agents', desc: '에이전트 정의와 태스크플로우' },
 ]
 
 export function AdminHomePage({ onOpen }: { onOpen: (menuId: string) => void }) {

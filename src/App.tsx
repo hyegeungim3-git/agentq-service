@@ -63,6 +63,7 @@ import { IntegrationPage } from '@pages/admin/sysops/IntegrationPage'
 import { AdminHomePage } from '@pages/admin/sysops/AdminHomePage'
 import { GuardrailPage } from '@pages/admin/compliance/GuardrailPage'
 import { AiActPage } from '@pages/admin/compliance/AiActPage'
+import { KnowledgeBasePage } from '@pages/admin/knowledge/KnowledgeBasePage'
 
 /* 화면이 여럿이 됐지만 라우터는 아직 넣지 않는다.
    URL 공유·새로고침 복원이 요구사항으로 들어올 때 도입한다(가이드 §8, §12).
@@ -197,6 +198,7 @@ export default function App() {
         {view.menuId === 'hr' && <HrSyncPage />}
         {view.menuId === 'guardrail' && <GuardrailPage />}
         {view.menuId === 'aiact' && <AiActPage />}
+        {view.menuId === 'knowledge' && <KnowledgeBasePage />}
         {view.menuId === 'prompts' && <ApiPromptPage />}
         {view.menuId === 'sysops.integration' && <IntegrationPage />}
         {view.menuId === 'sysops.home' && (

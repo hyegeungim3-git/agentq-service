@@ -130,6 +130,10 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /compliance/systems` | `fetchAiSystems` | → `AiSystem[]`. 판정에는 근거(`reason`)와 운영 여부(`inService`)를 함께 |
 | `GET /compliance/labeling` | `fetchLabelRules` | → `LabelRule[]` |
 | `GET /compliance/assessments` | `fetchAssessments` | → `Assessment[]`. 안 끝난 것은 무엇이 남았는지(`remaining`) |
+| `GET /knowledge/areas` | `fetchAreas` | → `KnowledgeArea[]` (`entities/knowledgebase/model.ts`). **등록 수와 검색 가능 수를 따로** — 하나만 오면 '못 찾는 문서'를 그릴 수 없다 |
+| `GET /knowledge/index?area=` | `fetchIndexEntries` | → `IndexEntry[]`. 색인 안 된 문서는 사유(`reason`) 필수 |
+| `GET /knowledge/rag-config` | `fetchRagConfig` | → `RagConfig`. 재색인 진행률(`reindexedRatio`)을 함께 |
+| `POST /knowledge/areas/{id}:reindex` | `runReindex` | 재색인 |
 | `GET /integrations` | `fetchIntegrations` | → `Integration[]`. 끊기면 무엇이 멈추는지(`impactIfDown`) 필수 |
 | `GET /training/report?window=` | `fetchTrainerReport` | `window`=`day`\|`week`\|`month` → `TrainerReport`. 실패 작업에는 `note`(사유)가 있어야 한다 |
 

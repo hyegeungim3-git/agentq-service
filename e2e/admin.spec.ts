@@ -32,11 +32,11 @@ test.describe('관리자 셸', () => {
   test('아직 안 만든 메뉴를 감추지 않고 준비 중으로 표시한다', async ({ page }) => {
     await enterAdmin(page)
     const nav = await adminNav(page)
-    await expect(nav.getByText(/화면 25개 사용 가능 · 10개 준비 중/)).toBeVisible()
+    await expect(nav.getByText(/화면 26개 사용 가능 · 9개 준비 중/)).toBeVisible()
 
-    await nav.getByRole('button', { name: /지식 관리/ }).click()
-    await expect(page.getByRole('heading', { name: '지식 관리' })).toBeVisible()
-    await expect(page.getByText('문서 수집·청킹·색인과 RAG 파이프라인')).toBeVisible()
+    await nav.getByRole('button', { name: /도구 · 배포/ }).click()
+    await expect(page.getByRole('heading', { name: '도구 · 배포' })).toBeVisible()
+    await expect(page.getByText('도구 등록과 배포 대상 관리')).toBeVisible()
     await expect(page.getByText(/AI 서비스 단계에서 만듭니다/)).toBeVisible()
   })
 
@@ -370,6 +370,25 @@ test.describe('관리자 셸', () => {
 
     await page.getByRole('tab', { name: '생성물 표시' }).click()
     await expect(page.getByText(/제31조 표시 의무를 지금 채우지 못하고 있습니다/)).toBeVisible()
+  })
+
+
+  /* 등록 건수만 보면 다 찾을 수 있다고 믿는다 */
+  test('지식 관리는 등록됐지만 못 찾는 문서를 드러낸다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: '지식 관리' }).click()
+    await expect(page.getByText(/오류가 나지 않으므로 화면이 말하지 않으면/)).toBeVisible()
+
+    await page.getByRole('tab', { name: '못 찾는 문서' }).click()
+    await expect(page.getByText(/도면 PDF에서 글자를 뽑지 못했습니다/)).toBeVisible()
+    await expect(page.getByText(/비상 대피도/)).toBeVisible()
+
+    await page.getByLabel('지식영역').selectOption('k-safety')
+    await expect(page.getByText(/6건 · 실패 2건/)).toBeVisible()
+
+    await page.getByRole('tab', { name: 'RAG 설정' }).click()
+    await expect(page.getByText(/검색 품질이 조용히 나빠집니다/)).toBeVisible()
   })
 
 })

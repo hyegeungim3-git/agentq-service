@@ -90,7 +90,7 @@ export const ADMIN_MENUS: AdminMenu[] = [
   { id: 'agents', label: '에이전트', section: 'AI 서비스', parentId: null, status: 'planned', phase: 'P3', summary: '에이전트 정의·태스크플로우·시나리오' },
   { id: 'apps', label: '애플리케이션', section: 'AI 서비스', parentId: null, status: 'planned', phase: 'P3', summary: '사용자에게 열어 주는 앱 구성' },
 
-  { id: 'knowledge', label: '지식 관리', section: '지식 · RAG', parentId: null, status: 'planned', phase: 'P3', summary: '문서 수집·청킹·색인과 RAG 파이프라인' },
+  { id: 'knowledge', label: '지식 관리', section: '지식 · RAG', parentId: null, status: 'ready', phase: 'P3', summary: '지식영역·색인 상태·RAG 설정' },
 
   { id: 'users', label: '사용자 관리', section: '운영 · 관리', parentId: null, status: 'ready', phase: 'P2', summary: '계정·승인·권한 부여' },
   { id: 'users.list', label: '사용자 목록', section: '운영 · 관리', parentId: 'users', status: 'ready', phase: 'P2', summary: '계정 검색과 상태 확인' },
