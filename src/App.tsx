@@ -70,6 +70,9 @@ import { FlowBuilderPage } from '@pages/admin/agentdef/FlowBuilderPage'
 import { ScenarioBuilderPage } from '@pages/admin/agentdef/ScenarioBuilderPage'
 import { AppInstancePage } from '@pages/admin/appinst/AppInstancePage'
 import { PipelinePage } from '@pages/admin/appinst/PipelinePage'
+import { VectorDbPage } from '@pages/admin/datainfra/VectorDbPage'
+import { IngestPage } from '@pages/admin/datainfra/IngestPage'
+import { BenchmarkPage } from '@pages/admin/datainfra/BenchmarkPage'
 import { PackStudioPage } from '@pages/admin/packops/PackStudioPage'
 import { ToolDeployPage } from '@pages/admin/packops/ToolDeployPage'
 import { DatasetPage } from '@pages/admin/mlops/DatasetPage'
@@ -220,11 +223,14 @@ export default function App() {
         {view.menuId === 'apps.instance' && <AppInstancePage />}
         {view.menuId === 'packstudio' && <PackStudioPage />}
         {view.menuId === 'deploy' && <ToolDeployPage />}
-        {view.menuId === 'data' && <DatasetPage />}
+        {view.menuId === 'data.sets' && <DatasetPage />}
+        {view.menuId === 'data.vector' && <VectorDbPage />}
+        {view.menuId === 'data.ingest' && <IngestPage />}
         {view.menuId === 'devenv' && <DevEnvPage />}
         {view.menuId === 'registry' && <RegistryPage />}
         {view.menuId === 'training' && <TrainingPage />}
-        {view.menuId === 'evaluation' && <EvaluationPage />}
+        {view.menuId === 'evaluation.internal' && <EvaluationPage />}
+        {view.menuId === 'evaluation.benchmark' && <BenchmarkPage />}
         {view.menuId === 'prompts' && <ApiPromptPage />}
         {view.menuId === 'sysops.integration' && <IntegrationPage />}
         {view.menuId === 'sysops.home' && (

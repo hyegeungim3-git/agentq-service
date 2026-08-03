@@ -26,7 +26,10 @@ export function EvaluationPage() {
         <h1 className="text-lg font-black text-slate-900">모델 평가</h1>
         <ExampleBadge />
       </div>
-      <p className="mt-1 text-sm text-slate-600">평가셋별 점수입니다.</p>
+      <p className="mt-1 text-sm text-slate-600">
+        사내 평가셋 점수입니다. 공개 벤치마크(MTEB·KorQuAD 등)는 <b>평가 지표</b>에서 봅니다 —
+        재는 것이 달라 같은 표에 두지 않았습니다.
+      </p>
 
       {state.kind === 'loading' && (
         <div role="status" className="mt-4 h-40 animate-pulse rounded-xl border border-slate-200 bg-white">

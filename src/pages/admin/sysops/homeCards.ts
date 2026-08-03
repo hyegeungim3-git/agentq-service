@@ -21,4 +21,5 @@ export const ADMIN_HOME_CARDS: HomeCard[] = [
   { menuId: 'knowledge.areas', desc: '지식영역·색인 상태·RAG 설정' },
   { menuId: 'agents.ops', desc: '에이전트 운영 상태' },
   { menuId: 'registry', desc: '모델 버전·배포 이력' },
+  { menuId: 'data.vector', desc: '벡터 컬렉션과 임베딩 차원' },
 ]

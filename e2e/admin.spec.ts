@@ -569,4 +569,39 @@ test.describe('관리자 셸', () => {
     await expect(page.getByText('진행 중')).toBeVisible()
   })
 
+
+  /* 목록만 보면 그냥 나란한 컬렉션으로 보인다 */
+  test('벡터 DB가 차원이 섞인 것을 먼저 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '데이터 관리' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '벡터 DB' }).click()
+    await expect(page.getByText(/차원이 다른 컬렉션이 섞여 있습니다/)).toBeVisible()
+    await expect(page.getByText(/어느 지식영역에도 안 붙은 컬렉션이 1개/)).toBeVisible()
+  })
+
+  /* 스케줄은 도는데 마지막 실행이 실패했을 수 있다 */
+  test('자동 적재가 실패와 0건을 갈라서 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '데이터 관리' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '자동 적재' }).click()
+    await expect(page.getByText(/마지막 수집이 실패한 소스 1건/)).toBeVisible()
+    await expect(page.getByText(/성공했지만 한 건도 못 가져온 소스가 1건/)).toBeVisible()
+  })
+
+  /* 점수만 나란히 세우면 위키 독해 잘하는 모델을 사내 QA용으로 고르게 된다 */
+  test('평가 지표가 무엇을 재는지 점수보다 먼저 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '모델 평가' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '평가 지표' }).click()
+    await expect(page.getByText('이 지표들이 무엇을 재는가')).toBeVisible()
+    await expect(page.getByText(/업무와 다른 벤치마크로만 잰 모델 1종/)).toBeVisible()
+    await expect(page.getByText(/서로 다른 지표의 점수를 나란히 두고 비교하지 마십시오/)).toBeVisible()
+  })
+
 })
