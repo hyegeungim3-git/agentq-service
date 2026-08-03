@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
+import { ArrowRight, SlidersHorizontal } from 'lucide-react'
 import type { Domain } from '@entities/domain/model'
 import { sectorLabel } from '@entities/domain/model'
 import { fetchDomains } from '@shared/api/domains'
+import { BrandLock } from '@shared/ui/Brand'
+import { brandVars } from '@shared/lib/brand'
 
 /* 화면 상태 — 가이드 §10이 요구하는 기본·로딩·빈·오류를 처음부터 넣는다.
    이전 데모는 mock이라 로딩·오류가 아예 없었고, 서버가 붙는 순간 전부 새로 만들어야 했다. */
@@ -34,9 +37,8 @@ export function PortalPage({
     <main className="min-h-dvh bg-slate-50 px-4 py-10">
       <div className="mx-auto w-full max-w-3xl">
         <header className="mb-8">
-          <p className="text-xs font-bold tracking-widest text-slate-400">OCUBE</p>
-          <h1 className="mt-1 text-2xl font-black text-slate-900">AgentQ</h1>
-          <p className="mt-2 text-sm text-slate-600">
+          <BrandLock heading />
+          <p className="mt-4 text-sm text-slate-600">
             분야를 선택하면 해당 조직의 업무 환경으로 들어갑니다.
           </p>
         </header>
@@ -81,14 +83,14 @@ export function PortalPage({
                     onClick={() => onSelect(d.id)}
                     disabled={!ready}
                     aria-describedby={ready ? undefined : `${d.id}-status`}
-                    className="min-h-28 w-full rounded-xl border border-slate-200 bg-white p-5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 enabled:hover:border-slate-300 enabled:hover:bg-slate-50 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-60"
-                    style={{ outlineColor: d.brandColor }}
+                    /* 카드마다 브랜드 변수를 꽂는다 — 안쪽은 전부 토큰으로만 부른다 */
+                    style={brandVars(d.brandColor)}
+                    className="group relative min-h-32 w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-5 text-left transition-all outline-brand focus-visible:outline-2 focus-visible:outline-offset-2 enabled:hover:-translate-y-0.5 enabled:hover:border-brand-soft enabled:hover:shadow-md disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-60"
                   >
+                    {/* 브랜드 색 띠 — 어느 발주처인지 한눈에 */}
+                    <span className="bg-brand absolute inset-x-0 top-0 h-1" aria-hidden="true" />
                     <span className="flex flex-wrap items-center gap-2">
-                      <span
-                        className="inline-block rounded px-2 py-0.5 text-[11px] font-bold text-white"
-                        style={{ backgroundColor: d.brandColor }}
-                      >
+                      <span className="bg-brand text-brand-fg inline-block rounded px-2 py-0.5 text-[11px] font-bold">
                         {sectorLabel(d.sector)}
                       </span>
                       {!ready && (
@@ -100,7 +102,15 @@ export function PortalPage({
                         </span>
                       )}
                     </span>
-                    <span className="mt-2 block font-bold text-slate-900">{d.orgName}</span>
+                    <span className="mt-2 flex items-center gap-1.5">
+                      <span className="font-bold text-slate-900">{d.orgName}</span>
+                      {ready && (
+                        <ArrowRight
+                          className="text-brand size-4 transition-transform group-hover:translate-x-0.5"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </span>
                     <span className="mt-0.5 block text-sm text-slate-600">{d.tagline}</span>
                   </button>
                 </li>
@@ -114,11 +124,16 @@ export function PortalPage({
           <button
             type="button"
             onClick={onAdmin}
-            className="w-full rounded-xl border border-slate-300 bg-white p-5 text-left hover:border-slate-400 hover:bg-slate-50"
+            className="flex w-full items-center gap-4 rounded-xl border border-slate-300 bg-white p-5 text-left hover:border-slate-400 hover:bg-slate-50"
           >
-            <span className="block font-bold text-slate-900">관리자 시스템</span>
-            <span className="mt-0.5 block text-sm text-slate-600">
-              대시보드·모델 운영·사용자 관리. 발주처와 무관하게 플랫폼 전체를 봅니다.
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-slate-900">
+              <SlidersHorizontal className="size-5 text-white" aria-hidden="true" />
+            </span>
+            <span className="min-w-0">
+              <span className="block font-bold text-slate-900">관리자 시스템</span>
+              <span className="mt-0.5 block text-sm text-slate-600">
+                대시보드·모델 운영·사용자 관리. 발주처와 무관하게 플랫폼 전체를 봅니다.
+              </span>
             </span>
           </button>
         </div>

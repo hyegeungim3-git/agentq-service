@@ -53,7 +53,7 @@ export function RegulationPage({
                 {REGULATION_CATEGORIES.map((c) => (
                   <label
                     key={c}
-                    className="flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-900 has-checked:text-white"
+                    className="flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand has-checked:text-brand-fg"
                   >
                     <input
                       type="checkbox"
@@ -72,7 +72,7 @@ export function RegulationPage({
             type="button"
             onClick={() => void r.run()}
             disabled={!r.canRun || r.phase.kind === 'running'}
-            className="min-h-11 rounded-lg bg-slate-900 px-5 text-sm font-bold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+            className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {r.phase.kind === 'running' ? '조회 중…' : '규정 조회'}
           </button>

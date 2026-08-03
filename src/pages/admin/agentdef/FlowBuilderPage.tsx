@@ -185,7 +185,7 @@ export function FlowBuilderPage() {
                                 {s.order}. {s.name}
                               </span>
                               {s.humanCheck && (
-                                <span className="ml-1 rounded bg-slate-900 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                                <span className="ml-1 rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold text-brand-fg">
                                   사람 확인
                                 </span>
                               )}
@@ -211,7 +211,7 @@ export function FlowBuilderPage() {
                       <button
                         type="button"
                         onClick={() => save(d.agentId)}
-                        className="mt-3 min-h-11 rounded-lg bg-slate-900 px-3 text-[11px] font-bold text-white hover:bg-slate-800"
+                        className="mt-3 min-h-11 rounded-lg bg-brand px-3 text-[11px] font-bold text-brand-fg hover:opacity-90"
                       >
                         정의 저장
                       </button>

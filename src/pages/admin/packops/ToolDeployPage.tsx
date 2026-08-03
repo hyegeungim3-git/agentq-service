@@ -63,7 +63,7 @@ export function ToolDeployPage() {
             onClick={() => setTab(t.id)}
             className={`min-h-11 rounded-full border px-4 text-sm font-bold ${
               tab === t.id
-                ? 'border-slate-900 bg-slate-900 text-white'
+                ? 'border-slate-900 bg-brand text-brand-fg'
                 : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
             }`}
           >
@@ -253,7 +253,7 @@ export function ToolDeployPage() {
                             <span
                               className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${
                                 d.stage === 'production'
-                                  ? 'bg-slate-900 text-white'
+                                  ? 'bg-brand text-brand-fg'
                                   : 'bg-slate-100 text-slate-600'
                               }`}
                             >

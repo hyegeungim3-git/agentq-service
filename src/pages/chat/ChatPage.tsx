@@ -15,6 +15,8 @@ import type { LiveMetric } from '@entities/metric/model'
 import { LiveMetricCard } from '@widgets/live-metric/LiveMetricCard'
 import { DOWN_REASONS, useFeedback, type FeedbackEntry } from '@features/feedback/useFeedback'
 import { MapIntelCard } from '@widgets/map-intel/MapIntelCard'
+import { ChatSidePanel } from '@widgets/chat-panel/ChatSidePanel'
+import { BookOpen, MessageSquare } from 'lucide-react'
 
 export function ChatPage({
   onBack,
@@ -36,6 +38,7 @@ export function ChatPage({
   const c = useChat(apiOptions ?? {}, store)
   const fb = useFeedback()
   const endRef = useRef<HTMLDivElement>(null)
+  const [panelOpen, setPanelOpen] = useState(false)
 
   // 새 메시지가 오면 아래로 스크롤 — 대화가 길어지면 직접 내려야 하는 건 불편하다
   useEffect(() => {
@@ -43,7 +46,8 @@ export function ChatPage({
   }, [c.messages.length, c.pending])
 
   return (
-    <main className="flex min-h-dvh flex-col bg-slate-50">
+    <div className="flex min-h-dvh">
+    <main className="flex min-h-dvh min-w-0 flex-1 flex-col bg-slate-50">
       <header className="border-b border-slate-200 bg-white px-4 py-4">
         <div className="mx-auto w-full max-w-3xl">
           {onBack && (
@@ -56,17 +60,33 @@ export function ChatPage({
             </button>
           )}
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-lg font-black text-slate-900">업무 챗봇</h1>
-            <p className="text-sm text-slate-600">사내 문서를 근거로 답합니다.</p>
-            {c.messages.length > 0 && (
+            <span className="bg-brand flex size-9 shrink-0 items-center justify-center rounded-xl">
+              <MessageSquare className="text-brand-fg size-5" aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <h1 className="text-lg font-black text-slate-900">업무 챗봇</h1>
+              <p className="text-sm text-slate-600">사내 문서를 근거로 답합니다.</p>
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              {/* 좁은 화면에서는 근거 패널을 접어 둔다 — 열 수 있다는 것은 보여 준다 */}
               <button
                 type="button"
-                onClick={c.reset}
-                className="ml-auto min-h-11 text-sm font-bold text-slate-500 hover:text-slate-900"
+                onClick={() => setPanelOpen(true)}
+                className="flex min-h-11 items-center gap-1 rounded-lg border border-slate-200 px-3 text-sm font-bold text-slate-600 hover:bg-slate-50 xl:hidden"
               >
-                대화 지우기
+                <BookOpen className="size-4" aria-hidden="true" />
+                답변 근거
               </button>
-            )}
+              {c.messages.length > 0 && (
+                <button
+                  type="button"
+                  onClick={c.reset}
+                  className="min-h-11 text-sm font-bold text-slate-500 hover:text-slate-900"
+                >
+                  대화 지우기
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -132,7 +152,7 @@ export function ChatPage({
             {(['all', ...FAQ_CATEGORIES] as const).map((cat) => (
               <label
                 key={cat}
-                className="flex min-h-11 cursor-pointer items-center rounded-full border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-900 has-checked:text-white"
+                className="flex min-h-11 cursor-pointer items-center rounded-full border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand has-checked:text-brand-fg"
               >
                 <input
                   type="radio"
@@ -199,13 +219,35 @@ export function ChatPage({
             type="button"
             onClick={() => void c.send()}
             disabled={!c.canSend}
-            className="min-h-11 rounded-lg bg-slate-900 px-4 text-sm font-bold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+            className="bg-brand text-brand-fg min-h-11 rounded-lg px-4 text-sm font-bold hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             전송
           </button>
         </div>
       </div>
     </main>
+
+      {/* 넓은 화면에서는 옆에 붙여 둔다. `top-14`는 셸 상단 바 높이(h-14)다 —
+          본문을 내려도 근거 패널이 같이 사라지면 볼 이유가 없다 */}
+      <div className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] xl:block">
+        <ChatSidePanel />
+      </div>
+
+      {/* 좁은 화면에서는 덮어서 연다 — 같은 패널을 두 번 그리지 않는다 */}
+      {panelOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end xl:hidden">
+          <button
+            type="button"
+            aria-label="답변 근거 닫기 배경"
+            onClick={() => setPanelOpen(false)}
+            className="absolute inset-0 bg-slate-900/40"
+          />
+          <div className="relative h-dvh">
+            <ChatSidePanel onClose={() => setPanelOpen(false)} />
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -225,7 +267,7 @@ function MessageBubble({
   if (message.role === 'user') {
     return (
       <div className="flex justify-end">
-        <p className="max-w-[85%] rounded-xl bg-slate-900 px-4 py-2.5 text-sm text-white">{message.text}</p>
+        <p className="bg-brand text-brand-fg max-w-[85%] rounded-xl px-4 py-2.5 text-sm">{message.text}</p>
       </div>
     )
   }
@@ -404,7 +446,7 @@ function FeedbackBar({
           aria-label={v === 'up' ? '도움이 됐어요' : '도움이 안 됐어요'}
           className={`min-h-11 rounded-lg border px-3 text-xs font-bold ${
             entry?.verdict === v
-              ? 'border-slate-900 bg-slate-900 text-white'
+              ? 'border-slate-900 bg-brand text-brand-fg'
               : 'border-slate-200 text-slate-600 hover:bg-slate-50'
           }`}
         >

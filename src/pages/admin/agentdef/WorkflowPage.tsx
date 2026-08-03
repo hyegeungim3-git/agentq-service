@@ -29,7 +29,7 @@ const NODE_TONE: Record<NodeKind, string> = {
   agent: 'bg-sky-50 text-sky-900',
   branch: 'bg-amber-100 text-amber-900',
   tool: 'bg-slate-100 text-slate-600',
-  review: 'bg-slate-900 text-white',
+  review: 'bg-brand text-brand-fg',
   action: 'bg-rose-100 text-rose-800',
 }
 

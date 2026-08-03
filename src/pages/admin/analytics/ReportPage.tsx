@@ -48,7 +48,7 @@ export function ReportPage() {
           {STAT_WINDOWS.map((w) => (
             <label
               key={w}
-              className="flex min-h-11 cursor-pointer items-center rounded-full border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-900 has-checked:text-white"
+              className="flex min-h-11 cursor-pointer items-center rounded-full border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand has-checked:text-brand-fg"
             >
               <input
                 type="radio"
@@ -114,7 +114,7 @@ export function ReportPage() {
                   type="button"
                   onClick={build}
                   disabled={picked.size === 0}
-                  className="min-h-11 rounded-lg bg-slate-900 px-5 text-sm font-bold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   리포트 만들기
                 </button>

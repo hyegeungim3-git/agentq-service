@@ -99,7 +99,7 @@ export function MappingPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
             type="button"
             onClick={() => void m.run()}
             disabled={busy}
-            className="min-h-11 rounded-lg bg-slate-900 px-5 text-sm font-bold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+            className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {busy ? '처리 중…' : runLabel}
           </button>
@@ -570,7 +570,7 @@ function TagResultView({
               aria-pressed={filter === f.value}
               className={`min-h-11 rounded-full border px-3 text-xs font-bold ${
                 filter === f.value
-                  ? 'border-slate-900 bg-slate-900 text-white'
+                  ? 'border-slate-900 bg-brand text-brand-fg'
                   : 'border-slate-200 text-slate-700 hover:bg-slate-50'
               }`}
             >

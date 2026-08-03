@@ -92,7 +92,7 @@ export function RegistryPage() {
                           <span
                             className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${
                               m.stage === 'production'
-                                ? 'bg-slate-900 text-white'
+                                ? 'bg-brand text-brand-fg'
                                 : 'bg-slate-100 text-slate-600'
                             }`}
                           >

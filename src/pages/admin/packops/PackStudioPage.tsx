@@ -170,7 +170,7 @@ export function PackStudioPage() {
                   <button
                     type="submit"
                     disabled={name.trim() === ''}
-                    className="min-h-11 rounded-lg bg-slate-900 px-4 text-sm font-bold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="min-h-11 rounded-lg bg-brand px-4 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     팩 만들기
                   </button>

@@ -61,7 +61,7 @@ export function ContentPage() {
             onClick={() => setTab(t.id)}
             className={`min-h-11 rounded-full border px-4 text-sm font-bold ${
               tab === t.id
-                ? 'border-slate-900 bg-slate-900 text-white'
+                ? 'border-slate-900 bg-brand text-brand-fg'
                 : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
             }`}
           >
@@ -121,7 +121,7 @@ export function ContentPage() {
               <button
                 type="submit"
                 disabled={title.trim() === ''}
-                className="min-h-11 rounded-lg bg-slate-900 px-4 text-sm font-bold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="min-h-11 rounded-lg bg-brand px-4 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 등록
               </button>

@@ -1,6 +1,19 @@
 import { useState, type ReactNode } from 'react'
+import {
+  Bell,
+  Bot,
+  HelpCircle,
+  Menu,
+  MessageSquare,
+  Settings,
+  Shield,
+  User,
+  type LucideIcon,
+} from 'lucide-react'
 import type { Domain } from '@entities/domain/model'
 import { sectorLabel } from '@entities/domain/model'
+import { BrandLock } from '@shared/ui/Brand'
+import { brandVars } from '@shared/lib/brand'
 import type { Workspace } from '@entities/workspace/model'
 import type { Conversation } from '@features/conversations/useConversations'
 import type { SignalLink, WorkSignal } from '@entities/signal/model'
@@ -13,7 +26,20 @@ import { SignalBell } from './SignalBell'
  *
  * `<main>`은 각 화면이 갖고 있다. 셸은 `<nav>`와 배치만 맡는다 —
  * 셸에도 `<main>`을 두면 화면마다 main이 둘이 되어 보조기기가 본문을 못 찾는다.
+ *
+ * 발주처 브랜드 색은 **여기서 한 번만** 꽂는다(`brandVars`). 안쪽 화면들은
+ * `bg-brand`·`text-brand`로만 부르므로 새 화면을 만들어도 색을 빠뜨릴 자리가 없다.
  */
+
+/** 탭 아이콘 — 라벨과 같은 것을 두 번 말하지 않고, 좁은 화면에서 라벨 대신 선다 */
+const TAB_ICON: Record<ShellTab, LucideIcon> = {
+  general: MessageSquare,
+  agents: Bot,
+  security: Shield,
+  notices: Bell,
+  guide: HelpCircle,
+  settings: Settings,
+}
 
 export type ShellProps = {
   domain: Domain
@@ -70,18 +96,23 @@ export function AppShell({
   const sidebar = (
     <nav
       aria-label={t(uiLang, 'nav.workArea')}
-      className="flex h-full w-72 shrink-0 flex-col border-r border-slate-200 bg-white"
+      className="flex h-full w-72 shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-white"
     >
-      <div className="border-b border-slate-200 p-4">
-        <span
-          className="inline-block rounded px-2 py-0.5 text-[11px] font-bold"
-          /* 브랜드 색은 인라인이라 팔레트 변수를 안 따라간다 —
-             다크에서도 글자가 읽히도록 흰색을 직접 지정한다 */
-          style={{ backgroundColor: domain.brandColor, color: '#fff' }}
-        >
-          {sectorLabel(domain.sector)}
-        </span>
-        <p className="mt-2 font-black text-slate-900">{domain.orgName}</p>
+      {/* 로고를 누르면 홈(일반)으로 — 이전 데모와 같은 동작이다 */}
+      <button
+        type="button"
+        onClick={() => {
+          onTab('general')
+          close()
+        }}
+        aria-label={t(uiLang, 'nav.home')}
+        className="flex h-16 w-full shrink-0 items-center border-b border-slate-200 px-4 text-left hover:bg-slate-50"
+      >
+        <BrandLock context={sectorLabel(domain.sector)} />
+      </button>
+
+      <div className="border-b border-slate-200 px-4 py-3">
+        <p className="font-black text-slate-900">{domain.orgName}</p>
         <p className="text-xs text-slate-500">{domain.tagline}</p>
       </div>
 
@@ -105,30 +136,38 @@ export function AppShell({
         {current && <p className="mt-1 text-[11px] text-slate-500">{current.purpose}</p>}
       </div>
 
-      <ul className="border-b border-slate-200 p-2">
-        {SHELL_TABS.map((tab_) => (
-          <li key={tab_}>
-            <button
-              type="button"
-              onClick={() => {
-                onTab(tab_)
-                close()
-              }}
-              aria-current={tab === tab_ ? 'page' : undefined}
-              className={`min-h-11 w-full rounded-lg px-3 text-left text-sm font-bold ${
-                tab === tab_ ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              {shellTabLabel(tab_, uiLang)}
-              <span
-                className={`block text-[11px] font-normal ${tab === tab_ ? 'text-slate-300' : 'text-slate-500'}`}
-              >
-                {shellTabDesc(tab_, uiLang)}
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      {/* 업무 탭 — 세로 목록이 아니라 한 덩어리 스위처다. 셋이 나란히 있어야
+          '지금 어느 쪽에 있는지'와 '옆에 무엇이 있는지'가 함께 보인다 */}
+      <div className="border-b border-slate-200 p-3">
+        <ul className="flex gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1">
+          {SHELL_TABS.map((tab_) => {
+            const Icon = TAB_ICON[tab_]
+            const on = tab === tab_
+            return (
+              <li key={tab_} className="flex-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onTab(tab_)
+                    close()
+                  }}
+                  aria-current={on ? 'page' : undefined}
+                  className={`flex min-h-11 w-full items-center justify-center gap-1 rounded-lg text-[11px] font-bold transition-colors ${
+                    on
+                      ? 'bg-brand text-brand-fg shadow-sm'
+                      : 'text-slate-500 hover:bg-white hover:text-slate-800'
+                  }`}
+                >
+                  <Icon className="size-3.5" aria-hidden="true" />
+                  {shellTabLabel(tab_, uiLang)}
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+        {/* 라벨만으론 무엇을 하는 곳인지 모른다 — 지금 있는 탭의 설명을 한 줄로 */}
+        <p className="mt-2 px-1 text-[11px] text-slate-500">{shellTabDesc(tab, uiLang)}</p>
+      </div>
 
       <div className="flex min-h-0 flex-1 flex-col p-2">
         <button
@@ -198,7 +237,9 @@ export function AppShell({
       </div>
 
       <ul className="border-t border-slate-200 p-2">
-        {INFO_TABS.map((tab_) => (
+        {INFO_TABS.map((tab_) => {
+          const Icon = TAB_ICON[tab_]
+          return (
           <li key={tab_}>
             <button
               type="button"
@@ -211,6 +252,7 @@ export function AppShell({
                 tab === tab_ ? 'bg-slate-100 font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
+              <Icon className="size-4 shrink-0 text-slate-400" aria-hidden="true" />
               {shellTabLabel(tab_, uiLang)}
               {tab_ === 'notices' && unreadNotices > 0 && (
                 <span className="ml-auto rounded-full bg-rose-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
@@ -219,14 +261,22 @@ export function AppShell({
               )}
             </button>
           </li>
-        ))}
+          )
+        })}
       </ul>
 
       <div className="border-t border-slate-200 p-4">
-        <p className="text-sm font-bold text-slate-800">
-          {domain.user.name} {domain.user.title}
-        </p>
-        <p className="text-xs text-slate-500">{domain.user.dept}</p>
+        <div className="flex items-center gap-2.5">
+          <span className="bg-brand-soft border-brand-soft flex size-9 shrink-0 items-center justify-center rounded-full border">
+            <User className="text-brand size-4" aria-hidden="true" />
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-bold text-slate-800">
+              {domain.user.name} {domain.user.title}
+            </span>
+            <span className="block truncate text-xs text-slate-500">{domain.user.dept}</span>
+          </span>
+        </div>
         <button
           type="button"
           onClick={onExit}
@@ -239,7 +289,7 @@ export function AppShell({
   )
 
   return (
-    <div className="flex min-h-dvh bg-slate-50">
+    <div className="flex min-h-dvh bg-slate-50" style={brandVars(domain.brandColor)}>
       {/* 모바일에서 열렸을 때만 깔리는 막 */}
       {open && (
         <button
@@ -254,23 +304,39 @@ export function AppShell({
           데스크톱용과 모바일용을 따로 그리면 같은 id가 DOM에 둘 생기고,
           label htmlFor가 먼저 나온 쪽(숨은 쪽)에 붙어 뒤엣것이 이름을 잃는다.
           실제로 모바일에서 워크스페이스 선택이 이름 없는 콤보박스가 됐다. */}
-      <div className={`${open ? 'fixed inset-y-0 left-0 z-50' : 'hidden'} lg:static lg:block lg:z-auto`}>
+      {/* 데스크톱에서는 붙어 있는다 — 본문을 내려도 로고·탭이 따라 사라지면
+          '지금 어디에 있는지'가 사라진다 */}
+      <div
+        className={`${open ? 'fixed inset-y-0 left-0 z-50' : 'hidden'} lg:sticky lg:top-0 lg:z-auto lg:block lg:h-dvh`}
+      >
         {sidebar}
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* 상단 바는 모든 폭에서 보인다 — 알림은 좁은 화면에서만 필요한 것이 아니다 */}
-        <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-4 py-2">
+        {/* 높이를 h-14로 못박는다 — 아래 화면이 이 높이만큼 비켜서 붙기 때문이다
+            (대화 화면의 근거 패널이 `top-14`로 이 값을 쓴다) */}
+        <div className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-slate-200 bg-white px-4">
           <button
             type="button"
             onClick={() => setOpen(true)}
             aria-label={t(uiLang, 'nav.open')}
-            className="min-h-11 rounded-lg border border-slate-200 px-3 text-sm font-bold text-slate-700 lg:hidden"
+            className="relative min-h-11 rounded-lg border border-slate-200 px-3 text-slate-700 hover:bg-slate-50 lg:hidden"
           >
-            ☰
-            {unreadNotices > 0 && <span className="ml-1 text-[10px] text-rose-600">●</span>}
+            <Menu className="size-5" aria-hidden="true" />
+            {unreadNotices > 0 && (
+              <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-rose-600" />
+            )}
           </button>
+          {/* 지금 어느 탭에 있는지 — 아이콘은 사이드바의 스위처와 같은 것을 쓴다 */}
+          <span className="bg-brand-soft flex size-8 items-center justify-center rounded-lg">
+            {(() => {
+              const Icon = TAB_ICON[tab]
+              return <Icon className="text-brand size-4" aria-hidden="true" />
+            })()}
+          </span>
           <span className="text-sm font-bold text-slate-800">{shellTabLabel(tab, uiLang)}</span>
+          {/* 나가는 길은 사이드바 아래 한 곳뿐이다 — 같은 동작을 두 곳에 두지 않는다 */}
           <div className="ml-auto">
             <SignalBell signals={signals} onOpen={onOpenSignal} />
           </div>

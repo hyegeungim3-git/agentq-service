@@ -155,7 +155,7 @@ export function AgentShell<R>({
                 type="button"
                 onClick={onRun}
                 disabled={busy || !documentId || !canRun}
-                className="min-h-11 rounded-lg bg-slate-900 px-5 text-sm font-bold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+                className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {busy ? runningLabel : runLabel}
               </button>

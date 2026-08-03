@@ -36,10 +36,8 @@ export function HubPage({
             </button>
           )}
           <div className="flex flex-wrap items-center gap-2">
-            <span
-              className="rounded px-2 py-0.5 text-[11px] font-bold text-white"
-              style={{ backgroundColor: domain.brandColor }}
-            >
+            {/* 색은 셸이 꽂아 준 `--color-brand`를 따른다 — 화면이 직접 칠하지 않는다 */}
+            <span className="bg-brand text-brand-fg rounded px-2 py-0.5 text-[11px] font-bold">
               {sectorLabel(domain.sector)}
             </span>
             <h1 className="text-xl font-black text-slate-900">{domain.orgName}</h1>
@@ -60,7 +58,7 @@ export function HubPage({
             className="mb-4 min-h-24 w-full rounded-xl border border-slate-300 bg-white p-4 text-left transition-colors hover:border-slate-400 hover:bg-slate-50"
           >
             <span className="flex flex-wrap items-center gap-2">
-              <span className="rounded bg-slate-900 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <span className="rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold text-brand-fg">
                 복합 업무
               </span>
               <span className="font-bold text-slate-900">수입검사 성적서 접수 처리</span>

@@ -84,7 +84,7 @@ export function SummaryPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
               {FOCUS_AREAS.map((f) => (
                 <label
                   key={f}
-                  className="flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-900 has-checked:text-white"
+                  className="flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand has-checked:text-brand-fg"
                 >
                   <input
                     type="checkbox"

@@ -10,7 +10,7 @@ import { useOrchestration, type OrchestrationOptions } from '@features/orchestra
 
 const STATUS_STYLE: Record<StepStatus, string> = {
   pending: 'bg-slate-100 text-slate-500',
-  running: 'bg-slate-900 text-white',
+  running: 'bg-brand text-brand-fg',
   done: 'bg-emerald-100 text-emerald-800',
   failed: 'bg-rose-100 text-rose-800',
 }
@@ -67,7 +67,7 @@ export function OrchestrationPage({
               type="button"
               onClick={() => void o.run()}
               disabled={busy}
-              className="min-h-11 rounded-lg bg-slate-900 px-5 text-sm font-bold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+              className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {busy ? '진행 중…' : '릴레이 실행'}
             </button>

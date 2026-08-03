@@ -74,7 +74,7 @@ export function DataQueryPage({
             type="button"
             onClick={() => void q.run()}
             disabled={!q.canRun || q.phase.kind === 'running'}
-            className="min-h-11 rounded-lg bg-slate-900 px-5 text-sm font-bold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+            className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {q.phase.kind === 'running' ? '조회 중…' : '조회 실행'}
           </button>

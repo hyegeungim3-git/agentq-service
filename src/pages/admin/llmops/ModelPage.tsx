@@ -101,7 +101,7 @@ function Detail({
             type="button"
             disabled={!changed}
             onClick={() => onSave(model.id, temp)}
-            className="min-h-11 rounded-lg bg-slate-900 px-4 text-xs font-bold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="min-h-11 rounded-lg bg-brand px-4 text-xs font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             저장
           </button>

@@ -99,7 +99,7 @@ export function QualityPage() {
                 {(['all', ...VERDICTS] as const).map((v) => (
                   <label
                     key={v}
-                    className="flex min-h-11 cursor-pointer items-center rounded-full border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-900 has-checked:text-white"
+                    className="flex min-h-11 cursor-pointer items-center rounded-full border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand has-checked:text-brand-fg"
                   >
                     <input
                       type="radio"

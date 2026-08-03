@@ -157,7 +157,7 @@ export function ScenarioBuilderPage() {
                     <button
                       type="button"
                       onClick={() => save(s.id)}
-                      className="mt-3 min-h-11 rounded-lg bg-slate-900 px-3 text-[11px] font-bold text-white hover:bg-slate-800"
+                      className="mt-3 min-h-11 rounded-lg bg-brand px-3 text-[11px] font-bold text-brand-fg hover:opacity-90"
                     >
                       시나리오 저장
                     </button>

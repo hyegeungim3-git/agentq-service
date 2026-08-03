@@ -48,7 +48,7 @@ function Card({
         <button
           type="button"
           onClick={() => onDecide(req.id, true)}
-          className="min-h-11 rounded-lg bg-slate-900 px-4 text-xs font-bold text-white hover:bg-slate-800"
+          className="min-h-11 rounded-lg bg-brand px-4 text-xs font-bold text-brand-fg hover:opacity-90"
         >
           승인
         </button>

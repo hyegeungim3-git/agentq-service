@@ -1,5 +1,16 @@
 import { useState, type ReactNode } from 'react'
-import { ADMIN_SECTIONS, childrenOf, landingOf, menusOf, plannedCount, readyCount } from '@entities/admin/nav'
+import { Menu, User } from 'lucide-react'
+import {
+  ADMIN_SECTIONS,
+  childrenOf,
+  findMenu,
+  landingOf,
+  menusOf,
+  plannedCount,
+  readyCount,
+} from '@entities/admin/nav'
+import { BrandLock } from '@shared/ui/Brand'
+import { FALLBACK_ICON, MENU_ICONS, menuIcon } from './menuIcons'
 
 /**
  * 관리자 셸 — 좌측 메뉴와 상단 바.
@@ -10,6 +21,33 @@ import { ADMIN_SECTIONS, childrenOf, landingOf, menusOf, plannedCount, readyCoun
  * 읽힌다. 목록에 두되 '준비 중'으로 구분하고, 몇 개가 준비 중인지 위에서 먼저 말한다.
  * 눌러도 아무 일 없는 항목이 아니라, 무엇이 언제 오는지 말하는 화면으로 간다.
  */
+
+/**
+ * 지금 어느 구역의 어느 화면인지.
+ *
+ * 메뉴가 55개라 화면 제목만으론 위치를 모른다. **제목(h1)은 각 화면이 갖는다** —
+ * 여기는 그 위의 길만 말한다. 둘을 같은 곳에서 만들면 또 갈라진다.
+ */
+function Crumb({ menuId }: { menuId: string }) {
+  const here = findMenu(menuId)
+  if (!here) return <span className="text-sm font-bold text-slate-800">관리자</span>
+  const parent = here.parentId === null ? null : findMenu(here.parentId)
+  /* 표에서 바로 꺼낸다. 함수로 감싸면 린트가 '렌더 중에 컴포넌트를 만든다'로 본다 —
+     아이콘은 모듈 상수라 매 렌더 같은 것이지만, 규칙은 호출식을 구분하지 못한다 */
+  const Icon = MENU_ICONS[parent?.id ?? here.id] ?? FALLBACK_ICON
+  return (
+    <span className="flex min-w-0 items-center gap-2">
+      <span className="bg-brand-soft flex size-8 shrink-0 items-center justify-center rounded-lg">
+        <Icon className="text-brand size-4" aria-hidden="true" />
+      </span>
+      <span className="hidden min-w-0 truncate text-xs text-slate-500 sm:block">
+        {here.section}
+        {parent && ` · ${parent.label}`}
+      </span>
+      <span className="truncate text-sm font-bold text-slate-800">{here.label}</span>
+    </span>
+  )
+}
 
 export type AdminShellProps = {
   menuId: string
@@ -37,10 +75,10 @@ export function AdminShell({
       className="flex h-full w-72 shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-white"
     >
       <div className="border-b border-slate-200 p-4">
-        <p className="font-black text-slate-900">AgentQ Admin</p>
-        <p className="text-xs text-slate-500">{admin.org}</p>
+        <BrandLock context="관리자" size="sm" />
+        <p className="mt-2 text-xs text-slate-500">{admin.org}</p>
         {/* 목록을 보기 전에 얼마가 준비 중인지 먼저 말한다 */}
-        <p className="mt-2 text-[11px] text-slate-500">
+        <p className="mt-1 text-[11px] text-slate-500">
           화면 {readyCount()}개 사용 가능 · {plannedCount()}개 준비 중
         </p>
       </div>
@@ -53,6 +91,7 @@ export function AdminShell({
               const kids = childrenOf(m.id)
               /* 상위 항목 자체에는 화면이 없다 — 첫 하위 메뉴로 보낸다 */
               const active = menuId === m.id || kids.some((k) => k.id === menuId)
+              const Icon = menuIcon(m.id)
               return (
                 <li key={m.id}>
                   <button
@@ -64,19 +103,25 @@ export function AdminShell({
                     aria-current={menuId === m.id ? 'page' : undefined}
                     className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-sm ${
                       active && kids.length === 0
-                        ? 'bg-slate-900 font-bold text-white'
-                        : m.status === 'ready'
-                          ? 'font-bold text-slate-700 hover:bg-slate-50'
-                          : 'text-slate-500 hover:bg-slate-50'
+                        ? 'bg-brand text-brand-fg font-bold'
+                        : active
+                          ? 'bg-brand-soft text-brand font-bold'
+                          : m.status === 'ready'
+                            ? 'font-bold text-slate-700 hover:bg-slate-50'
+                            : 'text-slate-500 hover:bg-slate-50'
                     }`}
                   >
+                    <Icon
+                      className={`size-4 shrink-0 ${active ? '' : 'text-slate-400'}`}
+                      aria-hidden="true"
+                    />
                     <span className="min-w-0 flex-1 truncate">{m.label}</span>
                     {/* 색만으로 구분하지 않는다 */}
                     {m.status === 'planned' && (
                       <span
                         className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${
                           active && kids.length === 0
-                            ? 'bg-white text-slate-900'
+                            ? 'text-brand bg-white'
                             : 'bg-slate-100 text-slate-500'
                         }`}
                       >
@@ -99,7 +144,7 @@ export function AdminShell({
                             aria-current={menuId === k.id ? 'page' : undefined}
                             className={`flex min-h-11 w-full items-center rounded-lg px-3 text-left text-xs ${
                               menuId === k.id
-                                ? 'bg-slate-900 font-bold text-white'
+                                ? 'bg-brand text-brand-fg font-bold'
                                 : 'text-slate-600 hover:bg-slate-50'
                             }`}
                           >
@@ -117,8 +162,15 @@ export function AdminShell({
       ))}
 
       <div className="mt-auto border-t border-slate-200 p-4">
-        <p className="text-sm font-bold text-slate-800">{admin.name}</p>
-        <p className="text-xs text-slate-500">관리자</p>
+        <div className="flex items-center gap-2.5">
+          <span className="bg-brand-soft border-brand-soft flex size-9 shrink-0 items-center justify-center rounded-full border">
+            <User className="text-brand size-4" aria-hidden="true" />
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-bold text-slate-800">{admin.name}</span>
+            <span className="block text-xs text-slate-500">관리자</span>
+          </span>
+        </div>
         <div className="mt-2 flex flex-wrap gap-3">
           <button
             type="button"
@@ -152,22 +204,24 @@ export function AdminShell({
 
       {/* 사이드바는 한 번만 그린다 — 두 번 그리면 같은 id가 DOM에 둘 생긴다 */}
       <div
-        className={`${open ? 'fixed inset-y-0 left-0 z-50' : 'hidden'} lg:static lg:block lg:z-auto`}
+        className={`${open ? 'fixed inset-y-0 left-0 z-50' : 'hidden'} lg:sticky lg:top-0 lg:z-auto lg:block lg:h-dvh`}
       >
         {nav}
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-4 py-2">
+        <div className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-slate-200 bg-white px-4">
           <button
             type="button"
             onClick={() => setOpen(true)}
             aria-label="메뉴 열기"
-            className="min-h-11 rounded-lg border border-slate-200 px-3 text-sm font-bold text-slate-700 lg:hidden"
+            className="min-h-11 rounded-lg border border-slate-200 px-3 text-slate-700 hover:bg-slate-50 lg:hidden"
           >
-            ☰
+            <Menu className="size-5" aria-hidden="true" />
           </button>
-          <span className="text-sm font-bold text-slate-800">관리자</span>
+          <Crumb menuId={menuId} />
+          {/* 나가는 길은 사이드바 아래에 한 곳만 둔다 —
+              같은 동작을 두 곳에 두면 어느 쪽이 진짜인지 헷갈리고, 하나만 고치게 된다 */}
         </div>
         {children}
       </div>

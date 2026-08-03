@@ -122,7 +122,7 @@ export function KnowledgePage({
                   {(['all', ...SECURITY_LEVELS] as const).map((s) => (
                     <label
                       key={s}
-                      className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-900 has-checked:text-white"
+                      className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand has-checked:text-brand-fg"
                     >
                       <input
                         type="radio"
@@ -170,7 +170,7 @@ export function KnowledgePage({
                   {TOP_K_STEPS.map((n) => (
                     <label
                       key={n}
-                      className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-900 has-checked:text-white"
+                      className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand has-checked:text-brand-fg"
                     >
                       <input
                         type="radio"
@@ -192,7 +192,7 @@ export function KnowledgePage({
                 type="button"
                 onClick={() => void k.search()}
                 disabled={busy}
-                className="min-h-11 rounded-lg bg-slate-900 px-5 text-sm font-bold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+                className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {busy ? '검색 중…' : `${searchModeLabel(k.mode)} 시작`}
               </button>
