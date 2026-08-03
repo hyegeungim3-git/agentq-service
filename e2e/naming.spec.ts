@@ -48,14 +48,30 @@ test('메뉴 이름과 화면 제목이 같다', async ({ page }) => {
   }
 
   const mismatched: string[] = []
+  const unreachable: string[] = []
   for (const label of labels) {
-    const n = await adminNav(page)
-    const btn = n.getByRole('button', { name: label, exact: true }).first()
-    if ((await btn.count()) === 0) continue
+    let n = await adminNav(page)
+    // 하위 메뉴는 부모가 열려 있을 때만 보인다. 못 찾았다고 그냥 넘어가면
+    // **검사가 조용히 통과한다** — 실제로 하위 메뉴 대부분이 검사되지 않고 있었다.
+    if ((await n.getByRole('button', { name: label, exact: true }).count()) === 0) {
+      for (const t of tops) {
+        n = await adminNav(page)
+        await n.getByRole('button', { name: t, exact: true }).first().click()
+        n = await adminNav(page)
+        if ((await n.getByRole('button', { name: label, exact: true }).count()) > 0) break
+      }
+    }
+    const btn = (await adminNav(page)).getByRole('button', { name: label, exact: true }).first()
+    if ((await btn.count()) === 0) {
+      unreachable.push(label)
+      continue
+    }
     await btn.click()
     const heading = await page.getByRole('heading', { level: 1 }).first().innerText()
     if (heading !== label && !labels.has(heading)) mismatched.push(`${label} → ${heading}`)
   }
 
+  // 건너뛴 것이 있으면 검사가 통과해도 믿을 수 없다
+  expect(unreachable, '눌러 볼 수 없어 검사하지 못한 메뉴가 있습니다').toEqual([])
   expect(mismatched, '메뉴 이름과 화면 제목이 다릅니다').toEqual([])
 })

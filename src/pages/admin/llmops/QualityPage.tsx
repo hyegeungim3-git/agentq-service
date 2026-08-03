@@ -39,7 +39,7 @@ export function QualityPage() {
 
   return (
     <main className="min-w-0 p-4 sm:p-6">
-      <h1 className="text-lg font-black text-slate-900">AI 답변 품질 관리</h1>
+      <h1 className="text-lg font-black text-slate-900">AI 품질 관리</h1>
       <p className="mt-1 text-sm text-slate-600">전문가 검토 결과와 사용자 피드백입니다.</p>
 
       {state.kind === 'loading' && (
