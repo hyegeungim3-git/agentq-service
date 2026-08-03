@@ -4,6 +4,7 @@ import { blockedBy, unknownAgents } from '@entities/agentdef/model'
 import { fetchAgentDefs, fetchScenarioDefs, saveScenario } from '@shared/api/agentdef'
 import { useRemote } from '@features/remote/useRemote'
 import { TOOLS } from '@fixtures/packops'
+import { withSubject } from '@shared/lib/korean'
 
 /**
  * 시나리오 빌더 — 여러 에이전트를 잇는 복합 업무.
@@ -79,7 +80,8 @@ export function ScenarioBuilderPage() {
                         {x.missing.length > 0
                           ? '없는 에이전트를 부릅니다(' + x.missing.join(', ') + ')'
                           : x.blocked
-                              .map((bkd) => agentName(bkd.agentId) + '이(가) ' + toolName(bkd.toolId) + ' 사용')
+                              /* 괄호로 얼버무리지 않는다 — 받침으로 고른다 */
+                              .map((bkd) => withSubject(agentName(bkd.agentId)) + ' ' + toolName(bkd.toolId) + '를 씁니다')
                               .join(', ') + ' — 그 도구가 끊겨 있습니다'}
                       </li>
                     ))}

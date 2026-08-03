@@ -29,3 +29,13 @@ describe('조사 선택', () => {
     expect(withSubject('알림')).toBe('알림이')
   })
 })
+
+/* 실제로 화면이 부르는 이름들 — 새 화면에서 같은 실수를 반복하지 않게 */
+describe('화면에서 쓰는 이름', () => {
+  it('에이전트 이름에 조사를 맞춘다', () => {
+    expect(withSubject('데이터 분석')).toBe('데이터 분석이')
+    expect(withSubject('안전관리계획 수립')).toBe('안전관리계획 수립이')
+    expect(withSubject('업무 챗봇')).toBe('업무 챗봇이')
+    expect(withSubject('문서 요약')).toBe('문서 요약이')
+  })
+})
