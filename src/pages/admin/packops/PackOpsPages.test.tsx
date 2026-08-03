@@ -22,8 +22,9 @@ describe('도메인 팩 스튜디오', () => {
     render(<PackStudioPage />)
     // 항목 배지도 li라서 팩 목록으로 좁힌다
     const list = await screen.findByRole('list', { name: '발주처 팩' })
-    const items = within(list).getAllByRole('listitem', { name: undefined })
-    const packs = items.filter((el) => el.parentElement === list)
+    const packs = within(list)
+      .getAllByRole('listitem')
+      .filter((el) => el.parentElement === list)
     expect(packs[0]).toHaveTextContent('한빛정밀')
     expect(packs[1]).toHaveTextContent('공공기관')
   })
