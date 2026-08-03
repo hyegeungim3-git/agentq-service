@@ -83,7 +83,7 @@ describe('도구 · 배포', () => {
   it('운영에 안 나간 버전을 먼저 보여 준다', async () => {
     render(<ToolDeployPage />)
     await userEvent.click(screen.getByRole('tab', { name: '배포' }))
-    expect(await screen.findByText(/운영에 안 나간 버전 2건/)).toBeInTheDocument()
+    expect(await screen.findByText(/운영에 안 나간 버전 3건/)).toBeInTheDocument()
     expect(screen.getByText(/사용자가 보고 있는 것은 운영 버전입니다/)).toBeInTheDocument()
   })
 
@@ -114,7 +114,7 @@ describe('판정', () => {
   /* 검증과 운영이 같으면 반영할 것이 없다 */
   it('검증과 운영 버전이 같으면 반영 대상이 아니다', () => {
     const targets = pendingPromotion(DEPLOYMENTS).map((x) => x.target)
-    expect(targets).toEqual(['사용자 포털', '에이전트 실행기'])
+    expect(targets).toEqual(['사용자 포털', '에이전트 실행기', '에이전트 정의 (13종)'])
     expect(targets).not.toContain('관리자 시스템')
   })
 })

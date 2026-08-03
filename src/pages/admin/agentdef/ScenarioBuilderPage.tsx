@@ -39,8 +39,8 @@ export function ScenarioBuilderPage() {
     <main className="min-w-0 p-4 sm:p-6">
       <h1 className="text-lg font-black text-slate-900">시나리오 빌더</h1>
       <p className="mt-1 text-sm text-slate-600">
-        여러 에이전트를 이어 한 번에 처리하는 복합 업무입니다. 사용자 포털의 에이전트 탭 위쪽
-        카드가 이것입니다.
+        여러 에이전트를 <b>순서대로</b> 이어 처리하는 복합 업무입니다. 사용자 포털의 에이전트 탭
+        위쪽 카드가 이것입니다. 조건에 따라 길이 갈리는 것은 <b>워크플로우</b>에서 봅니다.
       </p>
 
       {failure && (

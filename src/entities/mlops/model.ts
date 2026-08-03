@@ -85,8 +85,23 @@ export type ModelVersion = {
 export const untraceable = (list: ModelVersion[]): ModelVersion[] =>
   list.filter((m) => m.trainJobId === null || m.datasetIds.length === 0)
 
+/** 학습 유형 — 이전 데모는 메뉴 넷으로 나눠 뒀다. 표 모양이 같아 필터로 둔다 */
+export type TrainKind = 'llm' | 'vlm' | 'embedding' | 'rerank'
+
+export const TRAIN_KIND_LABEL: Record<TrainKind, string> = {
+  llm: 'LLM 파인튜닝',
+  vlm: 'VLM 학습',
+  embedding: '임베딩 학습',
+  rerank: '리랭킹 학습',
+}
+
+export const TRAIN_KINDS: TrainKind[] = ['llm', 'vlm', 'embedding', 'rerank']
+
 export type TrainRun = {
   id: string
+  kind: TrainKind
+  /** 유형마다 다른 설정 — 무엇으로 돌렸는지 없으면 재현할 수 없다 */
+  config: { label: string; value: string }[]
   model: string
   method: string
   datasetIds: string[]

@@ -76,4 +76,8 @@ export const DEPLOYMENTS: Deployment[] = [
   { id: 'd-4', target: '관리자 시스템', stage: 'staging', version: 'v1.4.0', deployedAt: '2026-07-30 08:30', note: null },
   { id: 'd-5', target: '에이전트 실행기', stage: 'production', version: 'v0.9.3', deployedAt: '2026-07-22 14:40', note: '베타입니다. 외부 시스템에 붙이지 마십시오.' },
   { id: 'd-6', target: '에이전트 실행기', stage: 'staging', version: 'v0.9.5', deployedAt: '2026-08-02 07:10', note: null },
+  /* 에이전트 정의도 배포 대상이다 — 이전 데모의 '태스크플로우 배포'가 이것이다.
+     정의가 바뀌면 답이 달라지므로 검증에서 확인한 뒤 운영에 올린다 */
+  { id: 'd-7', target: '에이전트 정의 (13종)', stage: 'production', version: 'def-2026-07-18', deployedAt: '2026-07-18 15:00', note: '태스크플로우 빌더에서 보는 정의의 운영 버전입니다.' },
+  { id: 'd-8', target: '에이전트 정의 (13종)', stage: 'staging', version: 'def-2026-08-02', deployedAt: '2026-08-02 09:20', note: '안전관리계획에 사람 확인 지점을 넣은 버전입니다. 아직 운영에 안 나갔습니다.' },
 ]

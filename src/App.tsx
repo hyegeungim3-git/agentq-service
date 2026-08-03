@@ -68,6 +68,7 @@ import { AgentOpsPage } from '@pages/admin/agentops/AgentOpsPage'
 import { AppSurfacePage } from '@pages/admin/agentops/AppSurfacePage'
 import { FlowBuilderPage } from '@pages/admin/agentdef/FlowBuilderPage'
 import { ScenarioBuilderPage } from '@pages/admin/agentdef/ScenarioBuilderPage'
+import { WorkflowPage } from '@pages/admin/agentdef/WorkflowPage'
 import { AppInstancePage } from '@pages/admin/appinst/AppInstancePage'
 import { PipelinePage } from '@pages/admin/appinst/PipelinePage'
 import { VectorDbPage } from '@pages/admin/datainfra/VectorDbPage'
@@ -220,6 +221,7 @@ export default function App() {
         {view.menuId === 'agents.ops' && <AgentOpsPage />}
         {view.menuId === 'agents.flow' && <FlowBuilderPage />}
         {view.menuId === 'agents.scenario' && <ScenarioBuilderPage />}
+        {view.menuId === 'agents.workflow' && <WorkflowPage />}
         {view.menuId === 'apps.surface' && <AppSurfacePage />}
         {view.menuId === 'apps.instance' && <AppInstancePage />}
         {view.menuId === 'packstudio' && <PackStudioPage />}

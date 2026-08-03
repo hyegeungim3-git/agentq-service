@@ -40,11 +40,13 @@ export const MODEL_VERSIONS: ModelVersion[] = [
 ]
 
 export const TRAIN_RUNS: TrainRun[] = [
-  { id: 'JOB-992', model: 'GPT-OSS-120B', method: 'LoRA', datasetIds: ['ds-sop', 'ds-meeting'], startedAt: '2026-08-02 14:30', state: 'failed', note: 'genos-ai-01 GPU 2 과열로 중단(78°C). 트레이너 현황의 그 작업입니다.', gpuHours: 6.2 },
-  { id: 'JOB-991', model: 'Llama-3-Kor', method: 'QLoRA', datasetIds: ['ds-reg'], startedAt: '2026-08-01 09:00', state: 'done', note: null, gpuHours: 18.4 },
-  { id: 'VLM-102', model: 'InternVL-2-8B', method: 'VLM', datasetIds: ['ds-sop'], startedAt: '2026-08-02 10:00', state: 'running', note: null, gpuHours: 9.1 },
-  { id: 'JOB-988', model: 'GPT-OSS-120B', method: 'LoRA', datasetIds: [], startedAt: '2026-07-29 22:10', state: 'failed', note: '학습 데이터셋 경로가 비어 있었습니다.', gpuHours: 0.3 },
-  { id: 'JOB-974', model: 'GPT-OSS-120B', method: 'LoRA', datasetIds: ['ds-sop', 'ds-reg'], startedAt: '2026-07-18 11:20', state: 'done', note: null, gpuHours: 42.7 },
+  { id: 'JOB-992', kind: 'llm', config: [{ label: 'LoRA rank', value: '16' }, { label: '학습률', value: '2e-4' }, { label: 'epoch', value: '3' }], model: 'GPT-OSS-120B', method: 'LoRA', datasetIds: ['ds-sop', 'ds-meeting'], startedAt: '2026-08-02 14:30', state: 'failed', note: 'genos-ai-01 GPU 2 과열로 중단(78°C). 트레이너 현황의 그 작업입니다.', gpuHours: 6.2 },
+  { id: 'JOB-991', kind: 'llm', config: [{ label: 'LoRA rank', value: '8' }, { label: '학습률', value: '1e-4' }, { label: 'epoch', value: '2' }], model: 'Llama-3-Kor', method: 'QLoRA', datasetIds: ['ds-reg'], startedAt: '2026-08-01 09:00', state: 'done', note: null, gpuHours: 18.4 },
+  { id: 'VLM-102', kind: 'vlm', config: [{ label: '이미지 해상도', value: '448px' }, { label: '동결 구간', value: '비전 인코더' }], model: 'InternVL-2-8B', method: 'VLM', datasetIds: ['ds-sop'], startedAt: '2026-08-02 10:00', state: 'running', note: null, gpuHours: 9.1 },
+  { id: 'EMB-005', kind: 'embedding', config: [{ label: '출력 차원', value: '1024' }, { label: '손실', value: 'InfoNCE' }, { label: '배치', value: '256' }], model: 'KoE5-large', method: '대조학습', datasetIds: ['ds-sop', 'ds-reg'], startedAt: '2026-08-02 08:10', state: 'done', note: null, gpuHours: 11.5 },
+  { id: 'RR-014', kind: 'rerank', config: [{ label: 'Top-K', value: '50' }, { label: '음성 표본', value: '하드 네거티브 8' }], model: 'BGE-Reranker-v2', method: 'Cross-Encoder', datasetIds: ['ds-qa-eval'], startedAt: '2026-07-31 13:00', state: 'done', note: null, gpuHours: 5.8 },
+  { id: 'JOB-988', kind: 'llm', config: [], model: 'GPT-OSS-120B', method: 'LoRA', datasetIds: [], startedAt: '2026-07-29 22:10', state: 'failed', note: '학습 데이터셋 경로가 비어 있었습니다.', gpuHours: 0.3 },
+  { id: 'JOB-974', kind: 'llm', config: [{ label: 'LoRA rank', value: '16' }, { label: '학습률', value: '2e-4' }, { label: 'epoch', value: '3' }], model: 'GPT-OSS-120B', method: 'LoRA', datasetIds: ['ds-sop', 'ds-reg'], startedAt: '2026-07-18 11:20', state: 'done', note: null, gpuHours: 42.7 },
 ]
 
 export const EVAL_RESULTS: EvalResult[] = [

@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { TRAIN_KINDS, TRAIN_KIND_LABEL, type TrainKind } from '@entities/mlops/model'
 import { fetchTrainRuns } from '@shared/api/mlops'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
@@ -12,6 +14,10 @@ import { DATASETS } from '@fixtures/mlops'
  *
  * **데이터셋 없이 돈 작업**을 드러낸다. 무엇으로 학습했는지 모르는 모델이
  * 거기서 나온다 — 모델 레지스트리의 '계보가 끊긴 모델'이 이렇게 생긴다.
+ *
+ * 이전 데모는 LLM 파인튜닝·VLM·임베딩·리랭킹을 메뉴 넷으로 나눠 뒀다. 표 모양이
+ * 같아 화면 하나에 **유형 필터**를 뒀다 — 대신 유형마다 다른 설정을 함께 보여 준다.
+ * **설정이 없으면 같은 결과를 다시 만들 수 없다.**
  */
 
 const STATE_LABEL = { running: '학습 중', done: '완료', failed: '실패' } as const
@@ -24,6 +30,7 @@ const STATE_TONE = {
 const datasetName = (id: string): string => DATASETS.find((d) => d.id === id)?.name ?? id
 
 export function TrainingPage() {
+  const [kind, setKind] = useState<TrainKind | 'all'>('all')
   const state = useRemote(fetchTrainRuns, [])
 
   return (
@@ -37,6 +44,25 @@ export function TrainingPage() {
         같은 작업을 다른 각도로 보는 것이라 데이터를 복제하지 않았습니다.
       </p>
 
+      <div className="mt-4 flex flex-wrap gap-2">
+        {(['all', ...TRAIN_KINDS] as const).map((k) => (
+          <label
+            key={k}
+            className="flex min-h-11 cursor-pointer items-center rounded-full border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-900 has-checked:text-white"
+          >
+            <input
+              type="radio"
+              name="train-kind"
+              value={k}
+              checked={kind === k}
+              onChange={() => setKind(k)}
+              className="sr-only"
+            />
+            {k === 'all' ? '전체' : TRAIN_KIND_LABEL[k]}
+          </label>
+        ))}
+      </div>
+
       {state.kind === 'loading' && (
         <div role="status" className="mt-4 h-40 animate-pulse rounded-xl border border-slate-200 bg-white">
           <span className="sr-only">학습 작업을 불러오는 중입니다</span>
@@ -45,9 +71,10 @@ export function TrainingPage() {
 
       {state.kind === 'ready' &&
         (() => {
-          const noData = state.data.filter((r) => r.datasetIds.length === 0)
-          const failed = state.data.filter((r) => r.state === 'failed')
-          const gpuHours = state.data.reduce((n, r) => n + r.gpuHours, 0)
+          const shown = kind === 'all' ? state.data : state.data.filter((r) => r.kind === kind)
+          const noData = shown.filter((r) => r.datasetIds.length === 0)
+          const failed = shown.filter((r) => r.state === 'failed')
+          const gpuHours = shown.reduce((n, r) => n + r.gpuHours, 0)
           return (
             <>
               {noData.length > 0 && (
@@ -71,7 +98,7 @@ export function TrainingPage() {
               <dl className="mt-4 grid grid-cols-3 gap-3">
                 <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
                   <dt className="text-[11px] font-bold text-slate-500">작업</dt>
-                  <dd className="text-xl font-black text-slate-900">{state.data.length}건</dd>
+                  <dd className="text-xl font-black text-slate-900">{shown.length}건</dd>
                 </div>
                 <div
                   className={`rounded-xl border p-4 text-center ${
@@ -88,7 +115,7 @@ export function TrainingPage() {
               </dl>
 
               <ul className="mt-4 space-y-2">
-                {[...failed, ...state.data.filter((r) => r.state !== 'failed')].map((r) => (
+                {[...failed, ...shown.filter((r) => r.state !== 'failed')].map((r) => (
                   <li
                     key={r.id}
                     className={`rounded-xl border p-4 ${
@@ -103,6 +130,9 @@ export function TrainingPage() {
                       <span className="text-xs text-slate-600">
                         {r.model} · {r.method}
                       </span>
+                      <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">
+                        {TRAIN_KIND_LABEL[r.kind]}
+                      </span>
                       <span className="ml-auto text-[11px] tabular-nums text-slate-500">
                         {r.startedAt} · GPU {r.gpuHours.toFixed(1)}h
                       </span>
@@ -113,6 +143,15 @@ export function TrainingPage() {
                         <span className="font-bold text-rose-700">기록 없음</span>
                       ) : (
                         r.datasetIds.map(datasetName).join(', ')
+                      )}
+                    </p>
+                    {/* 설정이 없으면 같은 결과를 다시 만들 수 없다 */}
+                    <p className="mt-1 text-xs text-slate-600">
+                      설정 ·{' '}
+                      {r.config.length === 0 ? (
+                        <span className="font-bold text-amber-800">기록 없음 — 재현할 수 없습니다</span>
+                      ) : (
+                        r.config.map((c) => `${c.label} ${c.value}`).join(' · ')
                       )}
                     </p>
                     {/* 건수만 세면 손쓸 수 없다 */}

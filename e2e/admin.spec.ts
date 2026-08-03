@@ -467,7 +467,7 @@ test.describe('관리자 셸', () => {
     await expect(page.getByText(/서비스는 계속 돌고 있어 오류가 나지 않습니다/)).toBeVisible()
 
     await page.getByRole('tab', { name: '배포' }).click()
-    await expect(page.getByText(/운영에 안 나간 버전 2건/)).toBeVisible()
+    await expect(page.getByText(/운영에 안 나간 버전 3건/)).toBeVisible()
     await page.getByRole('button', { name: '운영 반영' }).first().click()
     await expect(page.getByRole('alert')).toContainText(/운영 버전은 그대로입니다/)
   })
@@ -644,6 +644,31 @@ test.describe('관리자 셸', () => {
     await expect(page.getByText(/85%를 넘긴 볼륨 1개/)).toBeVisible()
     await expect(page.getByText(/차면 학습 작업이 중간에 죽습니다/)).toBeVisible()
     await expect(page.getByText(/60일 넘게 아무도 안 쓴 볼륨이 1개/)).toBeVisible()
+  })
+
+
+  /* 갈림이 있으면 결과만 보고는 어느 길로 갔는지 알 수 없다 */
+  test('워크플로우가 안 탄 분기와 검토 없는 실행을 드러낸다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '에이전트' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '워크플로우' }).click()
+    await expect(page.getByText(/사람 검토 없이 실행까지 가는 워크플로우 1건/)).toBeVisible()
+    await expect(page.getByText(/한 번도 안 탄 길 1개/)).toBeVisible()
+    await expect(page.getByText(/PdM 센서 조회 도구가 끊겨 진단을 못 했습니다/)).toBeVisible()
+  })
+
+  /* 설정이 없으면 같은 결과를 다시 만들 수 없다 */
+  test('학습 유형 필터와 유형별 설정이 동작한다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: '학습 · 튜닝' }).click()
+    await expect(page.getByText(/LoRA rank 16/).first()).toBeVisible()
+
+    await pickLabel(page, '리랭킹 학습')
+    await expect(page.getByText(/Top-K 50 · 음성 표본 하드 네거티브 8/)).toBeVisible()
+    await expect(page.getByText('JOB-992')).toHaveCount(0)
   })
 
 })
