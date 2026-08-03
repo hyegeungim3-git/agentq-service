@@ -15,7 +15,8 @@
 
 export type AdminSection = '대시보드' | '인프라 · 개발' | 'AI 서비스' | '지식 · RAG' | '운영 · 관리'
 
-export type AdminPhase = 'P1' | 'P2' | 'P3' | 'P4'
+/* P5 = 전체 재검수(2026-08-03)에서 뒤늦게 찾은 하위 메뉴들 — SCOPE-PLAN §6 */
+export type AdminPhase = 'P1' | 'P2' | 'P3' | 'P4' | 'P5'
 
 export type AdminMenu = {
   id: string
@@ -87,7 +88,10 @@ export const ADMIN_MENUS: AdminMenu[] = [
   { id: 'aiact', label: 'AI 기본법 대응', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '고영향 AI 관리·생성물 표시·영향평가' },
   { id: 'packstudio', label: '도메인 팩 스튜디오', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '발주처별 업무 데이터 — 채워져야 포털에서 고를 수 있다' },
   { id: 'deploy', label: '도구 · 배포', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '에이전트가 부르는 도구와 떠 있는 버전' },
-  { id: 'agents', label: '에이전트', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '에이전트 운영 상태 — 목록은 포털과 같은 카탈로그' },
+  { id: 'agents', label: '에이전트', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '에이전트 운영·정의·시나리오' },
+  { id: 'agents.ops', label: '에이전트 운영', section: 'AI 서비스', parentId: 'agents', status: 'ready', phase: 'P3', summary: '지금 어떻게 돌고 있나 — 목록은 포털과 같은 카탈로그' },
+  { id: 'agents.flow', label: '태스크플로우 빌더', section: 'AI 서비스', parentId: 'agents', status: 'ready', phase: 'P5', summary: '에이전트가 밟는 단계와 능력' },
+  { id: 'agents.scenario', label: '시나리오 빌더', section: 'AI 서비스', parentId: 'agents', status: 'ready', phase: 'P5', summary: '여러 에이전트를 잇는 복합 업무' },
   { id: 'apps', label: '애플리케이션', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '사용자에게 열어 주는 앱과 발주처별 노출' },
 
   { id: 'knowledge', label: '지식 관리', section: '지식 · RAG', parentId: null, status: 'ready', phase: 'P3', summary: '지식영역·색인 상태·RAG 설정' },

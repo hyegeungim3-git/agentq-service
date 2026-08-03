@@ -1,0 +1,131 @@
+import { describe, it, expect } from 'vitest'
+import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { FlowBuilderPage } from './FlowBuilderPage'
+import { ScenarioBuilderPage } from './ScenarioBuilderPage'
+import { AGENTS } from '@entities/agent/model'
+import {
+  actingWithoutCheck,
+  blockedBy,
+  checkPoints,
+  noHumanCheck,
+  unknownAgents,
+} from '@entities/agentdef/model'
+import { AGENT_DEFS, SCENARIO_DEFS } from '@fixtures/agentdef'
+import { TOOLS } from '@fixtures/packops'
+
+describe('태스크플로우 빌더', () => {
+  /* 목록을 따로 가지면 '관리자에는 있는데 포털에는 없는 에이전트'가 생긴다 */
+  it('정의가 카탈로그 전 항목을 덮는다', () => {
+    expect(AGENT_DEFS).toHaveLength(AGENTS.length)
+    for (const d of AGENT_DEFS) {
+      expect(
+        AGENTS.some((a) => a.id === d.agentId),
+        d.agentId,
+      ).toBe(true)
+    }
+  })
+
+  /* 능력 배지를 나열만 하면 많을수록 좋아 보인다 */
+  it('사람 확인 없이 실행되는 에이전트를 맨 위에 올린다', async () => {
+    render(<FlowBuilderPage />)
+    expect(await screen.findByText(/사람 확인 없이 실행되는 에이전트 1종/)).toBeInTheDocument()
+    expect(screen.getByText(/결과가 그대로 나갑니다/)).toBeInTheDocument()
+
+    const list = await screen.findByRole('list', { name: '에이전트 정의' })
+    const items = within(list)
+      .getAllByRole('listitem')
+      .filter((el) => el.parentElement === list)
+    expect(items[0]).toHaveTextContent('안전관리계획 수립')
+  })
+
+  it('확인 지점이 없는 에이전트를 이름으로 말한다', async () => {
+    render(<FlowBuilderPage />)
+    expect(await screen.findByText(/결과가 문서나 지시로 이어지는 것은 확인 지점이 있어야 합니다/)).toBeInTheDocument()
+  })
+
+  /* 있는 것만 늘어놓으면 없는 것을 못 본다 */
+  it('없는 능력도 함께 표시한다', async () => {
+    render(<FlowBuilderPage />)
+    expect((await screen.findAllByText(/사람 확인\(HITL\) 없음/)).length).toBeGreaterThan(0)
+  })
+
+  it('단계를 펼치면 도구와 확인 지점이 나온다', async () => {
+    render(<FlowBuilderPage />)
+    const buttons = await screen.findAllByRole('button', { name: '단계 보기' })
+    await userEvent.click(buttons[0] as HTMLElement)
+    expect(screen.getByText(/설비 상태 조회/)).toBeInTheDocument()
+    // 끊긴 도구는 그 자리에서 보인다
+    expect(screen.getByText(/PdM 센서 조회\(끊김\)/)).toBeInTheDocument()
+  })
+
+  it('정의 저장은 성공한 척하지 않는다', async () => {
+    render(<FlowBuilderPage />)
+    await userEvent.click((await screen.findAllByRole('button', { name: '정의 저장' }))[0] as HTMLElement)
+    expect(await screen.findByRole('alert')).toHaveTextContent(/나가는 답은 그대로입니다/)
+  })
+})
+
+describe('시나리오 빌더', () => {
+  /* 목록에는 '켜짐'으로 보인다 — 눌러 보기 전까지 모른다 */
+  it('켜져 있지만 못 도는 시나리오를 먼저 말한다', async () => {
+    render(<ScenarioBuilderPage />)
+    expect(await screen.findByText(/켜져 있지만 지금 끝까지 못 도는 시나리오 1건/)).toBeInTheDocument()
+    expect(screen.getByText(/사용자에게는 카드가 그대로 보입니다/)).toBeInTheDocument()
+  })
+
+  it('어느 단계가 막혔는지 표시한다', async () => {
+    render(<ScenarioBuilderPage />)
+    expect((await screen.findAllByText(/도구 끊김/)).length).toBeGreaterThan(0)
+  })
+
+  /* 빼면 만든 적 없는 것으로 읽힌다 */
+  it('꺼 둔 시나리오도 목록에 남긴다', async () => {
+    render(<ScenarioBuilderPage />)
+    expect(await screen.findByText('사규 개정 영향 검토')).toBeInTheDocument()
+    expect(screen.getByText('꺼짐')).toBeInTheDocument()
+  })
+
+  it('시나리오 저장은 성공한 척하지 않는다', async () => {
+    render(<ScenarioBuilderPage />)
+    await userEvent.click((await screen.findAllByRole('button', { name: '시나리오 저장' }))[0] as HTMLElement)
+    expect(await screen.findByRole('alert')).toHaveTextContent(/실행 순서는 그대로입니다/)
+  })
+})
+
+describe('판정', () => {
+  it('확인 지점이 없으면 잡는다', () => {
+    const ids = noHumanCheck(AGENT_DEFS).map((d) => d.agentId)
+    expect(ids).toContain('chatbot')
+    expect(ids).not.toContain('review')
+  })
+
+  /* 답만 내놓는 것과 무언가를 하는 것은 위험이 다르다 */
+  it('실행형이면서 확인이 없는 것만 따로 센다', () => {
+    expect(actingWithoutCheck(AGENT_DEFS).map((d) => d.agentId)).toEqual(['safety'])
+  })
+
+  it('확인 지점을 단계에서 찾는다', () => {
+    const review = AGENT_DEFS.find((d) => d.agentId === 'review')
+    expect(checkPoints(review as NonNullable<typeof review>)).toHaveLength(1)
+  })
+
+  it('시나리오가 부르는 에이전트는 모두 카탈로그에 있다', () => {
+    const known = AGENTS.map((a) => a.id)
+    for (const s of SCENARIO_DEFS) {
+      expect(unknownAgents(s, known), s.id).toEqual([])
+    }
+  })
+
+  /* 도구·배포 화면과 같은 판정이어야 한다 */
+  it('끊긴 도구를 쓰는 시나리오를 잡는다', () => {
+    const broken = TOOLS.filter((t) => !t.connected).map((t) => t.id)
+    const s2 = SCENARIO_DEFS.find((s) => s.id === 'sc-2')
+    const hits = blockedBy(s2 as NonNullable<typeof s2>, AGENT_DEFS, broken)
+    expect(hits.length).toBeGreaterThan(0)
+    expect(hits.map((h) => h.toolId)).toContain('t-pdm')
+
+    const s1 = SCENARIO_DEFS.find((s) => s.id === 'sc-1')
+    expect(blockedBy(s1 as NonNullable<typeof s1>, AGENT_DEFS, broken)).toEqual([])
+  })
+})

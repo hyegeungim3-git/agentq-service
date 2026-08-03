@@ -19,6 +19,6 @@ export const ADMIN_HOME_CARDS: HomeCard[] = [
   { menuId: 'system', desc: '클러스터·노드·파드' },
   { menuId: 'sysops.integration', desc: '외부 시스템 연동 상태' },
   { menuId: 'knowledge', desc: '지식영역·색인 상태·RAG 설정' },
-  { menuId: 'agents', desc: '에이전트 운영 상태' },
+  { menuId: 'agents.ops', desc: '에이전트 운영 상태' },
   { menuId: 'registry', desc: '모델 버전·배포 이력' },
 ]

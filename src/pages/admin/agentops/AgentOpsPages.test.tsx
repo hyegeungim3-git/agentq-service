@@ -50,9 +50,11 @@ describe('에이전트 운영', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(/사용자 포털에는 그대로 보입니다/)
   })
 
-  it('정의를 여기서 바꾸지 않는 이유를 적는다', async () => {
+  /* 미뤄 두기만 하면 그 자리가 비어 있는 것이다 — 실제 화면으로 이었다 */
+  it('정의는 태스크플로우 빌더에서 본다고 잇는다', async () => {
     render(<AgentOpsPage />)
-    expect(await screen.findByText(/검토·되돌리기가 함께 있어야 하고/)).toBeInTheDocument()
+    expect(await screen.findByText(/같은\s*카탈로그를 두 각도로 나눠 본 것입니다/)).toBeInTheDocument()
+    expect(screen.getByText('태스크플로우 빌더')).toBeInTheDocument()
   })
 })
 

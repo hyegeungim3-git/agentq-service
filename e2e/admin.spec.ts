@@ -512,4 +512,33 @@ test.describe('관리자 셸', () => {
     await expect(page.getByText(/같은 작업을 다른 각도로 보는 것이라 데이터를 복제하지 않았습니다/)).toBeVisible()
   })
 
+
+  /* 능력 배지만 나열하면 많을수록 좋아 보인다 — 위험한 건 확인 없이 나가는 것 */
+  test('태스크플로우 빌더가 사람 확인 없는 실행형을 먼저 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '에이전트' }).click()
+    await expect(page.getByRole('heading', { name: '에이전트', level: 1 })).toBeVisible()
+
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '태스크플로우 빌더' }).click()
+    await expect(page.getByText(/사람 확인 없이 실행되는 에이전트 1종/)).toBeVisible()
+    await expect(page.getByText(/결과가 그대로 나갑니다/)).toBeVisible()
+
+    await page.getByRole('button', { name: '단계 보기' }).first().click()
+    await expect(page.getByText(/PdM 센서 조회\(끊김\)/)).toBeVisible()
+  })
+
+  /* 목록에는 '켜짐'으로 보인다 — 눌러 보기 전까지 모른다 */
+  test('시나리오 빌더가 켜져 있지만 못 도는 것을 먼저 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '에이전트' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '시나리오 빌더' }).click()
+    await expect(page.getByText(/켜져 있지만 지금 끝까지 못 도는 시나리오 1건/)).toBeVisible()
+    await expect(page.getByText(/사용자에게는 카드가 그대로 보입니다/)).toBeVisible()
+    await expect(page.getByText('사규 개정 영향 검토')).toBeVisible()
+  })
+
 })

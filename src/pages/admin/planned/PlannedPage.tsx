@@ -15,6 +15,7 @@ const PHASE_NOTE: Record<AdminMenu['phase'], string> = {
   P2: '운영·관리 단계에서 만듭니다',
   P3: 'AI 서비스 단계에서 만듭니다',
   P4: '인프라·개발 단계에서 만듭니다',
+  P5: '재검수에서 찾은 화면입니다 — 다음 배치에서 만듭니다',
 }
 
 export function PlannedPage({ menu }: { menu: AdminMenu }) {

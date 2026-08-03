@@ -66,6 +66,8 @@ import { AiActPage } from '@pages/admin/compliance/AiActPage'
 import { KnowledgeBasePage } from '@pages/admin/knowledge/KnowledgeBasePage'
 import { AgentOpsPage } from '@pages/admin/agentops/AgentOpsPage'
 import { AppSurfacePage } from '@pages/admin/agentops/AppSurfacePage'
+import { FlowBuilderPage } from '@pages/admin/agentdef/FlowBuilderPage'
+import { ScenarioBuilderPage } from '@pages/admin/agentdef/ScenarioBuilderPage'
 import { PackStudioPage } from '@pages/admin/packops/PackStudioPage'
 import { ToolDeployPage } from '@pages/admin/packops/ToolDeployPage'
 import { DatasetPage } from '@pages/admin/mlops/DatasetPage'
@@ -208,7 +210,9 @@ export default function App() {
         {view.menuId === 'guardrail' && <GuardrailPage />}
         {view.menuId === 'aiact' && <AiActPage />}
         {view.menuId === 'knowledge' && <KnowledgeBasePage />}
-        {view.menuId === 'agents' && <AgentOpsPage />}
+        {view.menuId === 'agents.ops' && <AgentOpsPage />}
+        {view.menuId === 'agents.flow' && <FlowBuilderPage />}
+        {view.menuId === 'agents.scenario' && <ScenarioBuilderPage />}
         {view.menuId === 'apps' && <AppSurfacePage />}
         {view.menuId === 'packstudio' && <PackStudioPage />}
         {view.menuId === 'deploy' && <ToolDeployPage />}
