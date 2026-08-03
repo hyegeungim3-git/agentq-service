@@ -8,6 +8,7 @@ import {
   packRatio,
 } from '@entities/packops/model'
 import { createPack, fetchPacks } from '@shared/api/packops'
+import { withSubject } from '@shared/lib/korean'
 import { useRemote } from '@features/remote/useRemote'
 
 /**
@@ -137,8 +138,10 @@ export function PackStudioPage() {
 
                       {!meetsMinimum(p) && (
                         <p className="mt-2 text-xs font-bold text-rose-800">
-                          {blockers.map((k) => PACK_ITEM_LABEL[k]).join(', ')}이(가) 없어 포털에서 고를
-                          수 없습니다. 이게 없으면 다른 발주처의 자료가 그대로 보입니다.
+                          {/* '문서이(가)'처럼 괄호로 얼버무리지 않는다 — 받침으로 고른다 */}
+                          {withSubject(blockers.map((k) => PACK_ITEM_LABEL[k]).join(', '))} 없어
+                          포털에서 고를 수 없습니다. 이게 없으면 다른 발주처의 자료가 그대로
+                          보입니다.
                         </p>
                       )}
                       {meetsMinimum(p) && !p.usable && (
