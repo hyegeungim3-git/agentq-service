@@ -138,6 +138,11 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `PATCH /agents/{id}` | `setAgentExposure` | 포털 노출 전환 |
 | `GET /apps` | `fetchAppSurfaces` | → `AppSurface[]`. 못 여는 앱은 사유(`blockedReason`)와 함께 |
 | `GET /apps/domains` | `fetchDomainExposure` | → `DomainExposure[]`. 포털의 선택 가능 여부와 **같은 기준**이어야 한다 |
+| `GET /packs` | `fetchPacks` | → `DomainPack[]` (`entities/packops/model.ts`). **포털의 선택 가능 여부와 같은 근거**여야 한다 |
+| `POST /packs` | `createPack` | 팩 생성 |
+| `GET /tools` | `fetchTools` | → `ToolEntry[]`. 끊기면 못 도는 에이전트(`usedBy`)를 함께 |
+| `GET /deployments` | `fetchDeployments` | → `Deployment[]`. 검증·운영 버전을 모두 준다 — 화면이 미반영을 계산한다 |
+| `POST /deployments:promote` | `promote` | 운영 반영 |
 | `GET /integrations` | `fetchIntegrations` | → `Integration[]`. 끊기면 무엇이 멈추는지(`impactIfDown`) 필수 |
 | `GET /training/report?window=` | `fetchTrainerReport` | `window`=`day`\|`week`\|`month` → `TrainerReport`. 실패 작업에는 `note`(사유)가 있어야 한다 |
 

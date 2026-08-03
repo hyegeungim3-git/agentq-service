@@ -32,12 +32,16 @@ test.describe('관리자 셸', () => {
   test('아직 안 만든 메뉴를 감추지 않고 준비 중으로 표시한다', async ({ page }) => {
     await enterAdmin(page)
     const nav = await adminNav(page)
-    await expect(nav.getByText(/화면 28개 사용 가능 · 7개 준비 중/)).toBeVisible()
+    await expect(nav.getByText(/화면 30개 사용 가능 · 5개 준비 중/)).toBeVisible()
 
-    await nav.getByRole('button', { name: /도구 · 배포/ }).click()
-    await expect(page.getByRole('heading', { name: '도구 · 배포' })).toBeVisible()
-    await expect(page.getByText('도구 등록과 배포 대상 관리')).toBeVisible()
-    await expect(page.getByText(/AI 서비스 단계에서 만듭니다/)).toBeVisible()
+    // 특정 메뉴를 지목하면 그 화면을 만들 때마다 이 테스트가 깨진다.
+    // '준비 중' 배지가 붙은 것을 찾아 누른다 — 무엇이 남았든 동작한다.
+    const planned = nav.getByRole('button').filter({ hasText: '준비 중' }).first()
+    const label = (await planned.innerText()).replace('준비 중', '').trim()
+    await planned.click()
+    await expect(page.getByRole('heading', { name: label, level: 1 })).toBeVisible()
+    await expect(page.getByText('아직 만들지 않았습니다', { exact: false })).toBeVisible()
+    await expect(page.getByText(/눌러도 아무 일이 없는 껍데기 화면을 두지 않습니다/)).toBeVisible()
   })
 
   /* 인프라 수치는 로직이 없다 — 지어낸 값을 실측처럼 그리면 거짓 계기판이 된다 */
@@ -417,6 +421,33 @@ test.describe('관리자 셸', () => {
     await expect(page.getByText(/여기서만 열려 있는 것처럼 보이면/)).toBeVisible()
     await expect(page.getByText(/인증 방식이 정해지지 않아 열 수 없습니다/)).toBeVisible()
     await expect(page.getByText('0종')).toHaveCount(3)
+  })
+
+
+  /* 저기는 결과(0종), 여기는 이유(무엇이 비었나) */
+  test('도메인 팩 스튜디오가 포털에서 못 고르는 이유를 항목으로 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: '도메인 팩 스튜디오' }).click()
+    await expect(page.getByText(/업무 문서 없음\(필수\)/).first()).toBeVisible()
+    await expect(
+      page.getByText(/이게 없으면 다른 발주처의 자료가 그대로 보입니다/).first(),
+    ).toBeVisible()
+    await expect(page.getByText(/이름만으로는 팩이 되지 않습니다/)).toBeVisible()
+  })
+
+  /* 도구는 끊겨도 서비스가 죽지 않아 더 늦게 발견된다 */
+  test('도구·배포가 끊긴 도구의 영향과 미반영 버전을 먼저 보여 준다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: '도구 · 배포' }).click()
+    await expect(page.getByText(/끊긴 도구 때문에 못 도는 에이전트 2종/)).toBeVisible()
+    await expect(page.getByText(/서비스는 계속 돌고 있어 오류가 나지 않습니다/)).toBeVisible()
+
+    await page.getByRole('tab', { name: '배포' }).click()
+    await expect(page.getByText(/운영에 안 나간 버전 2건/)).toBeVisible()
+    await page.getByRole('button', { name: '운영 반영' }).first().click()
+    await expect(page.getByRole('alert')).toContainText(/운영 버전은 그대로입니다/)
   })
 
 })
