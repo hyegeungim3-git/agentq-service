@@ -143,6 +143,12 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /tools` | `fetchTools` | → `ToolEntry[]`. 끊기면 못 도는 에이전트(`usedBy`)를 함께 |
 | `GET /deployments` | `fetchDeployments` | → `Deployment[]`. 검증·운영 버전을 모두 준다 — 화면이 미반영을 계산한다 |
 | `POST /deployments:promote` | `promote` | 운영 반영 |
+| `GET /datasets` | `fetchDatasets` | → `Dataset[]` (`entities/mlops/model.ts`). 학습·평가 겸용 여부와 출처를 함께 |
+| `GET /workspaces` | `fetchWorkspaces` | → `Workspace[]`. 마지막 계산 시각(`lastActiveAt`)이 있어야 유휴를 잰다 |
+| `POST /workspaces/{id}:release` | `releaseWorkspace` | 자원 회수 |
+| `GET /models/versions` | `fetchModelVersions` | → `ModelVersion[]`. **계보**(`trainJobId`·`datasetIds`)를 함께 — 없으면 삭제 요청에 답할 수 없다 |
+| `GET /training/runs` | `fetchTrainRuns` | → `TrainRun[]`. 트레이너 현황(`/training/report`)과 **같은 작업**의 상세다 |
+| `GET /evaluations` | `fetchEvalResults` | → `EvalResult[]`. **학습셋과 겹쳤는지**(`trustworthy`)를 서버가 판정해 준다 |
 | `GET /integrations` | `fetchIntegrations` | → `Integration[]`. 끊기면 무엇이 멈추는지(`impactIfDown`) 필수 |
 | `GET /training/report?window=` | `fetchTrainerReport` | `window`=`day`\|`week`\|`month` → `TrainerReport`. 실패 작업에는 `note`(사유)가 있어야 한다 |
 

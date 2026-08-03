@@ -68,6 +68,11 @@ import { AgentOpsPage } from '@pages/admin/agentops/AgentOpsPage'
 import { AppSurfacePage } from '@pages/admin/agentops/AppSurfacePage'
 import { PackStudioPage } from '@pages/admin/packops/PackStudioPage'
 import { ToolDeployPage } from '@pages/admin/packops/ToolDeployPage'
+import { DatasetPage } from '@pages/admin/mlops/DatasetPage'
+import { DevEnvPage } from '@pages/admin/mlops/DevEnvPage'
+import { RegistryPage } from '@pages/admin/mlops/RegistryPage'
+import { TrainingPage } from '@pages/admin/mlops/TrainingPage'
+import { EvaluationPage } from '@pages/admin/mlops/EvaluationPage'
 
 /* 화면이 여럿이 됐지만 라우터는 아직 넣지 않는다.
    URL 공유·새로고침 복원이 요구사항으로 들어올 때 도입한다(가이드 §8, §12).
@@ -207,6 +212,11 @@ export default function App() {
         {view.menuId === 'apps' && <AppSurfacePage />}
         {view.menuId === 'packstudio' && <PackStudioPage />}
         {view.menuId === 'deploy' && <ToolDeployPage />}
+        {view.menuId === 'data' && <DatasetPage />}
+        {view.menuId === 'devenv' && <DevEnvPage />}
+        {view.menuId === 'registry' && <RegistryPage />}
+        {view.menuId === 'training' && <TrainingPage />}
+        {view.menuId === 'evaluation' && <EvaluationPage />}
         {view.menuId === 'prompts' && <ApiPromptPage />}
         {view.menuId === 'sysops.integration' && <IntegrationPage />}
         {view.menuId === 'sysops.home' && (

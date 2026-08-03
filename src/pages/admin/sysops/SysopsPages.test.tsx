@@ -109,11 +109,11 @@ describe('관리 홈', () => {
   })
 
   /* 감추면 없는 기능으로, 그냥 두면 죽은 카드로 읽힌다.
-     몇 개가 준비 중인지는 진행에 따라 바뀌므로 목록에서 유도한다 */
-  it('아직 안 만든 화면 카드는 준비 중으로 표시한다', () => {
+     전부 만들고 나면 준비 중이 0개가 되므로 목록에서 유도한다 —
+     '하나는 있어야 한다'로 쓰면 완성되는 순간 테스트가 거짓으로 깨진다 */
+  it('아직 안 만든 화면 카드만 준비 중으로 표시한다', () => {
     const planned = ADMIN_HOME_CARDS.filter((c) => findMenu(c.menuId)?.status === 'planned')
-    expect(planned.length, '관리 홈에 준비 중 카드가 하나도 없다').toBeGreaterThan(0)
     render(<AdminHomePage onOpen={() => {}} />)
-    expect(screen.getAllByText('준비 중')).toHaveLength(planned.length)
+    expect(screen.queryAllByText('준비 중')).toHaveLength(planned.length)
   })
 })

@@ -77,11 +77,11 @@ export const ADMIN_MENUS: AdminMenu[] = [
     summary: '학습 작업 집계와 자원 배분',
   },
 
-  { id: 'data', label: '데이터 관리', section: '인프라 · 개발', parentId: null, status: 'planned', phase: 'P4', summary: '학습·평가에 쓰는 데이터셋의 등록과 버전 관리' },
-  { id: 'devenv', label: '개발 환경', section: '인프라 · 개발', parentId: null, status: 'planned', phase: 'P4', summary: '노트북·워크스페이스 자원 할당' },
-  { id: 'registry', label: '모델 레지스트리', section: '인프라 · 개발', parentId: null, status: 'planned', phase: 'P4', summary: '모델 버전·아티팩트·배포 이력' },
-  { id: 'training', label: '학습 · 튜닝', section: '인프라 · 개발', parentId: null, status: 'planned', phase: 'P4', summary: 'LoRA·QLoRA 등 학습 작업 생성과 추적' },
-  { id: 'evaluation', label: '모델 평가', section: '인프라 · 개발', parentId: null, status: 'planned', phase: 'P4', summary: '평가 세트별 지표 비교' },
+  { id: 'data', label: '데이터 관리', section: '인프라 · 개발', parentId: null, status: 'ready', phase: 'P4', summary: '학습·평가 데이터셋과 출처·개인정보' },
+  { id: 'devenv', label: '개발 환경', section: '인프라 · 개발', parentId: null, status: 'ready', phase: 'P4', summary: '작업 공간과 잡고 있는 GPU' },
+  { id: 'registry', label: '모델 레지스트리', section: '인프라 · 개발', parentId: null, status: 'ready', phase: 'P4', summary: '모델 버전과 계보(어떤 데이터로 학습했나)' },
+  { id: 'training', label: '학습 · 튜닝', section: '인프라 · 개발', parentId: null, status: 'ready', phase: 'P4', summary: '학습 작업 하나하나 — 집계는 트레이너 현황' },
+  { id: 'evaluation', label: '모델 평가', section: '인프라 · 개발', parentId: null, status: 'ready', phase: 'P4', summary: '평가셋별 점수 — 믿을 수 없는 결과는 순위에서 뺀다' },
 
   { id: 'guardrail', label: '가드레일', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '규칙에 걸린 실제 기록 — 규칙 설정은 신뢰성 관리' },
   { id: 'aiact', label: 'AI 기본법 대응', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '고영향 AI 관리·생성물 표시·영향평가' },

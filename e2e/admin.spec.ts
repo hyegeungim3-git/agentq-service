@@ -28,20 +28,42 @@ test.describe('관리자 셸', () => {
     await expect(page.getByRole('heading', { name: 'AgentQ' })).toBeVisible()
   })
 
-  /* 감추면 '이 제품에는 사용자 관리가 없다'로 읽힌다 */
-  test('아직 안 만든 메뉴를 감추지 않고 준비 중으로 표시한다', async ({ page }) => {
+  /* 감추면 '이 제품에는 사용자 관리가 없다'로 읽힌다.
+     전부 만들고 나면 준비 중이 0개가 되므로, 남아 있으면 준비 중 화면을 확인하고
+     하나도 없으면 그 사실을 확인한다 — '하나는 준비 중이어야 한다'로 쓰면
+     완성되는 순간 테스트가 거짓으로 깨진다 */
+  test('준비 중 메뉴는 무엇이 언제 오는지 말한다', async ({ page }) => {
     await enterAdmin(page)
     const nav = await adminNav(page)
-    await expect(nav.getByText(/화면 30개 사용 가능 · 5개 준비 중/)).toBeVisible()
+    const planned = nav.getByRole('button').filter({ hasText: '준비 중' })
+    const count = await planned.count()
 
-    // 특정 메뉴를 지목하면 그 화면을 만들 때마다 이 테스트가 깨진다.
-    // '준비 중' 배지가 붙은 것을 찾아 누른다 — 무엇이 남았든 동작한다.
-    const planned = nav.getByRole('button').filter({ hasText: '준비 중' }).first()
-    const label = (await planned.innerText()).replace('준비 중', '').trim()
-    await planned.click()
+    if (count === 0) {
+      await expect(nav.getByText(/0개 준비 중/)).toBeVisible()
+      return
+    }
+    const first = planned.first()
+    const label = (await first.innerText()).replace('준비 중', '').trim()
+    await first.click()
     await expect(page.getByRole('heading', { name: label, level: 1 })).toBeVisible()
     await expect(page.getByText('아직 만들지 않았습니다', { exact: false })).toBeVisible()
     await expect(page.getByText(/눌러도 아무 일이 없는 껍데기 화면을 두지 않습니다/)).toBeVisible()
+  })
+
+  /* 관리자 화면이 전부 열렸는지 — 메뉴를 눌렀는데 빈 화면이 나오면 안 된다 */
+  test('모든 메뉴가 실제 화면을 연다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    const labels = await nav.getByRole('button').allInnerTexts()
+    const menus = labels
+      .map((t) => t.replace('준비 중', '').trim())
+      .filter((t) => t !== '' && !['사용자 포털로', '포털 선택으로'].includes(t))
+
+    for (const label of menus) {
+      const n = await adminNav(page)
+      await n.getByRole('button', { name: label, exact: true }).first().click()
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    }
   })
 
   /* 인프라 수치는 로직이 없다 — 지어낸 값을 실측처럼 그리면 거짓 계기판이 된다 */
@@ -448,6 +470,46 @@ test.describe('관리자 셸', () => {
     await expect(page.getByText(/운영에 안 나간 버전 2건/)).toBeVisible()
     await page.getByRole('button', { name: '운영 반영' }).first().click()
     await expect(page.getByRole('alert')).toContainText(/운영 버전은 그대로입니다/)
+  })
+
+
+  /* 인프라 수치는 숫자 자체가 전부다 — 지어낸 값을 실측처럼 그리면 거짓 계기판이 된다 */
+  test('P4 다섯 화면이 모두 예시 값임을 먼저 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    for (const menu of ['데이터 관리', '개발 환경', '모델 레지스트리', '학습 · 튜닝', '모델 평가']) {
+      const nav = await adminNav(page)
+      await nav.getByRole('button', { name: menu }).click()
+      await expect(page.getByRole('heading', { name: menu, level: 1 })).toBeVisible()
+      await expect(page.getByText(/서버 미연결 — 예시 값/).first()).toBeVisible()
+    }
+  })
+
+  /* 운영 중인데 무슨 데이터로 학습했는지 모르면 삭제 요청에 답할 수 없다 */
+  test('계보가 끊긴 모델과 부풀려진 평가 점수를 드러낸다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '모델 레지스트리' }).click()
+    await expect(page.getByText(/계보가 끊긴 모델 1건/)).toBeVisible()
+    await expect(page.getByText(/평가 기록 없이 운영 중인 모델/)).toBeVisible()
+
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '모델 평가' }).click()
+    await expect(page.getByText(/믿을 수 없는 평가 결과 1건 — 순위에서 뺐습니다/)).toBeVisible()
+    // 부풀려진 점수는 순위 표에 없다
+    await expect(page.getByRole('table')).not.toContainText('95.8%')
+  })
+
+  test('노는 GPU와 학습 데이터 기록 없는 작업을 드러낸다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '개발 환경' }).click()
+    await expect(page.getByText(/놀면서 GPU를 잡고 있는 작업 공간/)).toBeVisible()
+    await expect(page.getByText(/자동 회수 기준은 정해지지 않았습니다/)).toBeVisible()
+
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '학습 · 튜닝' }).click()
+    await expect(page.getByText(/학습 데이터 기록이 없는 작업 1건/)).toBeVisible()
+    await expect(page.getByText(/같은 작업을 다른 각도로 보는 것이라 데이터를 복제하지 않았습니다/)).toBeVisible()
   })
 
 })
