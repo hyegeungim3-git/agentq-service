@@ -11,6 +11,14 @@ import {
   type ImpactVerdict,
 } from '@entities/compliance/model'
 import { fetchAiSystems, fetchAssessments, fetchLabelRules } from '@shared/api/compliance'
+import {
+  STORE_LABEL,
+  browserOnly,
+  noRecord,
+  provableRatio,
+  type EvidenceStore,
+} from '@entities/evidence/model'
+import { fetchEvidence } from '@shared/api/evidence'
 import { useRemote } from '@features/remote/useRemote'
 
 /**
@@ -26,13 +34,20 @@ import { useRemote } from '@features/remote/useRemote'
  *     그 상태를 감추면 화면이 안전한 것처럼 보인다.
  */
 
-type Tab = 'systems' | 'label' | 'assessment'
+type Tab = 'systems' | 'label' | 'assessment' | 'evidence'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'systems', label: '고영향 AI 관리' },
   { id: 'label', label: '생성물 표시' },
   { id: 'assessment', label: '영향평가 현황' },
+  { id: 'evidence', label: '감사 추적' },
 ]
+
+const STORE_TONE: Record<EvidenceStore, string> = {
+  server: 'bg-emerald-100 text-emerald-800',
+  browser: 'bg-amber-100 text-amber-900',
+  none: 'bg-rose-100 text-rose-800',
+}
 
 const VERDICT_TONE: Record<ImpactVerdict, string> = {
   high: 'bg-rose-100 text-rose-800',
@@ -53,6 +68,7 @@ export function AiActPage() {
   const systems = useRemote(fetchAiSystems, [])
   const labels = useRemote(fetchLabelRules, [])
   const assessments = useRemote(fetchAssessments, [])
+  const evidence = useRemote(fetchEvidence, [])
 
   return (
     <main className="min-w-0 p-4 sm:p-6">
@@ -245,6 +261,103 @@ export function AiActPage() {
                     </li>
                   ))}
                 </ul>
+              </>
+            )
+          })()}
+        </section>
+      )}
+
+      {tab === 'evidence' && evidence.kind === 'ready' && (
+        <section className="mt-4">
+          {(() => {
+            const none = noRecord(evidence.data)
+            const browser = browserOnly(evidence.data)
+            const ratio = provableRatio(evidence.data)
+            return (
+              <>
+                {/* '이행했다'와 '이행을 증명할 수 있다'는 다르다 */}
+                <div className="max-w-3xl rounded-xl border border-slate-200 bg-white p-4">
+                  <p className="text-sm font-black text-slate-900">
+                    지금 서버 기록으로 증명할 수 있는 책무 ·{' '}
+                    {evidence.data.filter((e) => e.store === 'server').length} /{' '}
+                    {evidence.data.length}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-600">
+                    제34조 책무를 <b>지켰다는 것</b>과 <b>지켰다고 증명할 수 있는 것</b>은 다릅니다.
+                    고영향 AI 관리 탭에서 '이행'으로 표시된 항목도, 감사에서 근거를 물으면 내놓을
+                    기록이 있어야 합니다.
+                  </p>
+                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className="h-full bg-slate-800"
+                      style={{ width: `${(ratio * 100).toFixed(0)}%` }}
+                    />
+                  </div>
+                </div>
+
+                {none.length > 0 && (
+                  <div className="mt-3 max-w-3xl rounded-xl border border-rose-200 bg-rose-50 p-4">
+                    <p className="text-sm font-black text-rose-900">
+                      아무 데도 기록이 남지 않는 항목 {none.length}건
+                    </p>
+                    <ul className="mt-2 space-y-1">
+                      {none.map((e) => (
+                        <li key={e.duty} className="text-xs text-rose-800">
+                          <b>{DUTY_LABEL[e.duty]}</b> — {e.what}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-2 text-xs font-bold text-rose-900">
+                      지금 감사를 받으면 이 항목들은 근거로 내놓을 것이 없습니다.
+                    </p>
+                  </div>
+                )}
+
+                {browser.length > 0 && (
+                  <p className="mt-3 max-w-3xl rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+                    브라우저에만 남는 항목이 {browser.length}건 있습니다. 그 사람이 브라우저를
+                    지우면 사라지고, 다른 사람 것은 볼 수 없습니다 — <b>기관 차원의 기록이
+                    아닙니다.</b>
+                  </p>
+                )}
+
+                <ul aria-label="이행 증거" className="mt-4 space-y-2">
+                  {[...none, ...browser, ...evidence.data.filter((e) => e.store === 'server')].map(
+                    (e) => (
+                      <li
+                        key={e.duty}
+                        className={`rounded-xl border p-4 ${
+                          e.store === 'none'
+                            ? 'border-rose-200 bg-rose-50'
+                            : e.store === 'browser'
+                              ? 'border-amber-200 bg-white'
+                              : 'border-slate-200 bg-white'
+                        }`}
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-sm font-black text-slate-900">{DUTY_LABEL[e.duty]}</p>
+                          <span
+                            className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${STORE_TONE[e.store]}`}
+                          >
+                            {STORE_LABEL[e.store]}
+                          </span>
+                          {/* 어디서 볼 수 있는지 없으면 확인할 방법이 없다 */}
+                          {e.where && (
+                            <span className="ml-auto text-[11px] text-slate-500">{e.where}</span>
+                          )}
+                        </div>
+                        <p className="mt-1 text-xs text-slate-700">{e.what}</p>
+                        <p className="mt-1 text-[11px] text-slate-600">{e.note}</p>
+                      </li>
+                    ),
+                  )}
+                </ul>
+
+                <p className="mt-4 max-w-3xl text-xs text-slate-500">
+                  서버가 붙어 기록이 쌓이기 시작하면 이 표의 '남지 않음'이 '서버 기록'으로
+                  바뀝니다. 지금 숫자가 낮은 것은 잘못된 것이 아니라 사실입니다 — 감추면
+                  이행한 것처럼 보이게 됩니다.
+                </p>
               </>
             )
           })()}

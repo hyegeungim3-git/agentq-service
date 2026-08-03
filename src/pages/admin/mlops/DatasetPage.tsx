@@ -23,10 +23,13 @@ export function DatasetPage() {
   return (
     <main className="min-w-0 p-4 sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
-        <h1 className="text-lg font-black text-slate-900">데이터 관리</h1>
+        <h1 className="text-lg font-black text-slate-900">데이터셋</h1>
         <ExampleBadge />
       </div>
-      <p className="mt-1 text-sm text-slate-600">학습·평가에 쓰는 데이터셋입니다.</p>
+      <p className="mt-1 text-sm text-slate-600">
+        학습·평가에 쓰는 데이터셋입니다. 검색용 벡터는 <b>벡터 DB</b>, 바깥에서 가져오는 것은{' '}
+        <b>자동 적재</b>에서 봅니다.
+      </p>
 
       {state.kind === 'loading' && (
         <div role="status" className="mt-4 h-40 animate-pulse rounded-xl border border-slate-200 bg-white">

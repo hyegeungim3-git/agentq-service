@@ -28,10 +28,12 @@ export function DevEnvPage() {
   return (
     <main className="min-w-0 p-4 sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
-        <h1 className="text-lg font-black text-slate-900">개발 환경</h1>
+        <h1 className="text-lg font-black text-slate-900">작업 공간</h1>
         <ExampleBadge />
       </div>
-      <p className="mt-1 text-sm text-slate-600">사람별 작업 공간과 잡고 있는 GPU입니다.</p>
+      <p className="mt-1 text-sm text-slate-600">
+        사람별 작업 공간과 잡고 있는 GPU입니다. 함께 쓰는 저장소는 <b>공유 볼륨</b>에서 봅니다.
+      </p>
 
       {failure && (
         <p role="alert" className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">

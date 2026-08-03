@@ -476,10 +476,19 @@ test.describe('관리자 셸', () => {
   /* 인프라 수치는 숫자 자체가 전부다 — 지어낸 값을 실측처럼 그리면 거짓 계기판이 된다 */
   test('P4 다섯 화면이 모두 예시 값임을 먼저 말한다', async ({ page }) => {
     await enterAdmin(page)
-    for (const menu of ['데이터 관리', '개발 환경', '모델 레지스트리', '학습 · 튜닝', '모델 평가']) {
+    // 데이터 관리·개발 환경·모델 평가는 그룹이 되어 첫 하위 화면으로 간다.
+    // 메뉴 이름과 화면 제목은 같아야 한다 — 갈라지면 여기서 걸린다.
+    const pairs: [string, string][] = [
+      ['데이터 관리', '데이터셋'],
+      ['개발 환경', '작업 공간'],
+      ['모델 레지스트리', '모델 레지스트리'],
+      ['학습 · 튜닝', '학습 · 튜닝'],
+      ['모델 평가', '평가 결과'],
+    ]
+    for (const [menu, heading] of pairs) {
       const nav = await adminNav(page)
-      await nav.getByRole('button', { name: menu }).click()
-      await expect(page.getByRole('heading', { name: menu, level: 1 })).toBeVisible()
+      await nav.getByRole('button', { name: menu, exact: true }).first().click()
+      await expect(page.getByRole('heading', { name: heading, level: 1 })).toBeVisible()
       await expect(page.getByText(/서버 미연결 — 예시 값/).first()).toBeVisible()
     }
   })
@@ -602,6 +611,39 @@ test.describe('관리자 셸', () => {
     await expect(page.getByText('이 지표들이 무엇을 재는가')).toBeVisible()
     await expect(page.getByText(/업무와 다른 벤치마크로만 잰 모델 1종/)).toBeVisible()
     await expect(page.getByText(/서로 다른 지표의 점수를 나란히 두고 비교하지 마십시오/)).toBeVisible()
+  })
+
+
+  /* '이행했다'와 '이행을 증명할 수 있다'는 다르다 */
+  test('감사 추적 탭이 증명할 수 없는 책무를 드러낸다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: 'AI 기본법 대응' }).click()
+    await page.getByRole('tab', { name: '감사 추적' }).click()
+    await expect(page.getByText(/지금 서버 기록으로 증명할 수 있는 책무 · 1 \/ 5/)).toBeVisible()
+    await expect(page.getByText(/아무 데도 기록이 남지 않는 항목 3건/)).toBeVisible()
+    await expect(page.getByText(/지금 감사를 받으면 이 항목들은 근거로 내놓을 것이 없습니다/)).toBeVisible()
+  })
+
+  /* 인프라 주소를 지어내지 않는다 */
+  test('MCP 서버 탭이 주소를 표시하지 않는 이유를 적는다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: '도구 · 배포' }).click()
+    await page.getByRole('tab', { name: 'MCP 서버' }).click()
+    await expect(page.getByText(/서버 주소와 접속 토큰은 이 화면에 표시하지 않습니다/)).toBeVisible()
+    await expect(page.getByText(/사외로 나가는 서버가 1개/)).toBeVisible()
+  })
+
+  test('공유 볼륨이 곧 찰 볼륨과 방치된 볼륨을 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '개발 환경' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '공유 볼륨' }).click()
+    await expect(page.getByText(/85%를 넘긴 볼륨 1개/)).toBeVisible()
+    await expect(page.getByText(/차면 학습 작업이 중간에 죽습니다/)).toBeVisible()
+    await expect(page.getByText(/60일 넘게 아무도 안 쓴 볼륨이 1개/)).toBeVisible()
   })
 
 })

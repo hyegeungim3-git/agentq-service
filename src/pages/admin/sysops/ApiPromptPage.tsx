@@ -37,7 +37,7 @@ export function ApiPromptPage() {
 
   return (
     <main className="min-w-0 p-4 sm:p-6">
-      <h1 className="text-lg font-black text-slate-900">API · 프롬프트 관리</h1>
+      <h1 className="text-lg font-black text-slate-900">API·프롬프트</h1>
       <p className="mt-1 text-sm text-slate-600">외부에 열어 준 API와 에이전트 프롬프트입니다.</p>
 
       {failure && (

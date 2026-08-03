@@ -77,6 +77,7 @@ import { PackStudioPage } from '@pages/admin/packops/PackStudioPage'
 import { ToolDeployPage } from '@pages/admin/packops/ToolDeployPage'
 import { DatasetPage } from '@pages/admin/mlops/DatasetPage'
 import { DevEnvPage } from '@pages/admin/mlops/DevEnvPage'
+import { VolumePage } from '@pages/admin/mlops/VolumePage'
 import { RegistryPage } from '@pages/admin/mlops/RegistryPage'
 import { TrainingPage } from '@pages/admin/mlops/TrainingPage'
 import { EvaluationPage } from '@pages/admin/mlops/EvaluationPage'
@@ -226,7 +227,8 @@ export default function App() {
         {view.menuId === 'data.sets' && <DatasetPage />}
         {view.menuId === 'data.vector' && <VectorDbPage />}
         {view.menuId === 'data.ingest' && <IngestPage />}
-        {view.menuId === 'devenv' && <DevEnvPage />}
+        {view.menuId === 'devenv.workspace' && <DevEnvPage />}
+        {view.menuId === 'devenv.volume' && <VolumePage />}
         {view.menuId === 'registry' && <RegistryPage />}
         {view.menuId === 'training' && <TrainingPage />}
         {view.menuId === 'evaluation.internal' && <EvaluationPage />}

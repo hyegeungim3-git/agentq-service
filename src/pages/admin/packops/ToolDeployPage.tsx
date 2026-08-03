@@ -6,6 +6,8 @@ import {
   pendingPromotion,
 } from '@entities/packops/model'
 import { fetchDeployments, fetchTools, promote } from '@shared/api/packops'
+import { externalServers } from '@entities/evidence/model'
+import { fetchMcpServers } from '@shared/api/evidence'
 import { useRemote } from '@features/remote/useRemote'
 
 /**
@@ -19,12 +21,13 @@ import { useRemote } from '@features/remote/useRemote'
  * 목록만 나열하면 무엇이 아직 사용자에게 안 갔는지 훑어서 찾아야 한다.
  */
 
-type Tab = 'tools' | 'deploy'
+type Tab = 'tools' | 'servers' | 'deploy'
 
 export function ToolDeployPage() {
   const [tab, setTab] = useState<Tab>('tools')
   const [failure, setFailure] = useState<string | null>(null)
   const tools = useRemote(fetchTools, [])
+  const servers = useRemote(fetchMcpServers, [])
   const deployments = useRemote(fetchDeployments, [])
 
   const doPromote = (target: string, version: string) => {
@@ -48,6 +51,7 @@ export function ToolDeployPage() {
         {(
           [
             { id: 'tools' as const, label: '도구' },
+            { id: 'servers' as const, label: 'MCP 서버' },
             { id: 'deploy' as const, label: '배포' },
           ] as const
         ).map((t) => (
@@ -128,6 +132,64 @@ export function ToolDeployPage() {
               </>
             )
           })()}
+        </section>
+      )}
+
+      {tab === 'servers' && servers.kind === 'ready' && tools.kind === 'ready' && (
+        <section className="mt-4">
+          {/* 인프라 주소를 지어내지 않는다 — 키를 안 보여 주는 이유와 같다 */}
+          <p className="max-w-3xl rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-600">
+            서버 주소와 접속 토큰은 이 화면에 표시하지 않습니다. 관리 화면에 인프라 주소를
+            늘어놓을 이유가 없고, 주소는 서버가 알고 있습니다. 여기서는 <b>어느 도구가 어느
+            서버에 묶여 있고 지금 응답하는지</b>만 봅니다.
+          </p>
+
+          {externalServers(servers.data).length > 0 && (
+            <p className="mt-3 max-w-3xl rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+              사외로 나가는 서버가 {externalServers(servers.data).length}개 있습니다(
+              {externalServers(servers.data).map((x) => x.name).join(', ')}). 이 경로로 나가는
+              데이터는 사내에 남지 않습니다 — 무엇이 나가는지는 보안 정책에서 정합니다.
+            </p>
+          )}
+
+          <ul aria-label="MCP 서버" className="mt-4 grid gap-3 lg:grid-cols-2">
+            {[...servers.data].sort((a, b) => Number(a.connected) - Number(b.connected)).map((sv) => (
+              <li
+                key={sv.id}
+                className={`rounded-xl border p-4 ${
+                  sv.connected ? 'border-slate-200 bg-white' : 'border-rose-200 bg-rose-50'
+                }`}
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-black text-slate-900">{sv.name}</p>
+                  <span
+                    className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${
+                      sv.connected ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                    }`}
+                  >
+                    {sv.connected ? '응답함' : '끊김'}
+                  </span>
+                  {sv.external && (
+                    <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-900">
+                      사외
+                    </span>
+                  )}
+                  <span className="ml-auto text-[11px] text-slate-500">
+                    마지막 응답 {sv.lastSeenAt}
+                  </span>
+                </div>
+                {sv.downReason && (
+                  <p className="mt-2 text-xs font-bold text-rose-800">{sv.downReason}</p>
+                )}
+                <p className="mt-2 rounded-lg bg-slate-50 p-2 text-[11px] text-slate-700">
+                  이 서버가 주는 도구 ·{' '}
+                  {sv.toolIds
+                    .map((tid) => tools.data.find((t) => t.id === tid)?.name ?? tid)
+                    .join(', ')}
+                </p>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 

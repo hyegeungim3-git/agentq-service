@@ -23,7 +23,7 @@ export function EvaluationPage() {
   return (
     <main className="min-w-0 p-4 sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
-        <h1 className="text-lg font-black text-slate-900">모델 평가</h1>
+        <h1 className="text-lg font-black text-slate-900">평가 결과</h1>
         <ExampleBadge />
       </div>
       <p className="mt-1 text-sm text-slate-600">

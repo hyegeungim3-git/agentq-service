@@ -69,6 +69,10 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /notices` | `fetchNotices` | → `Notice[]` (`entities/notice/model.ts`) |
 | `GET /documents` | `fetchDocuments` | `?kind=sop\|report\|certificate\|minutes` → `BusinessDocument[]` (`entities/document/model.ts`) |
 | `POST /documents (multipart)` | `uploadDocument` | 파일 → `BusinessDocument` |
+| `GET /compliance/evidence` | `fetchEvidence` | → `EvidenceItem[]` (`entities/evidence/model.ts`). 책무마다 **기록이 어디에 남는지** — '이행했다'와 '증명할 수 있다'는 다르다 |
+| `GET /tools/servers` | `fetchMcpServers` | → `McpServer[]`. **주소·토큰은 응답에 넣지 않는다** — §2-9와 같은 이유 |
+| `GET /volumes` | `fetchVolumes` | → `Volume[]` |
+| `DELETE /volumes/{id}` | `releaseVolume` | 볼륨 비우기 |
 | `GET /vector/collections` | `fetchCollections` | → `VectorCollection[]` (`entities/datainfra/model.ts`). **차원과 임베딩 모델을 함께** — 다르면 같은 검색에서 못 섞는다 |
 | `GET /ingest/sources` | `fetchIngestSources` | → `IngestSource[]`. 마지막 실행 성공 여부와 **가져온 건수**를 함께 — 성공 표시만으로는 0건을 못 잡는다 |
 | `POST /ingest/sources/{id}:run` | `runIngest` | 수동 수집 |
