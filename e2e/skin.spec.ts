@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test'
-import { openSidebar, openTab } from './shell'
+import { enterDomain, openSidebar, openTab } from './shell'
+import { AGENTS } from '../src/entities/agent/model'
+
+const AGENT_NAMES = AGENTS.map((a) => a.name)
 
 /**
  * 브랜드 색이 화면에 실제로 닿는지.
@@ -54,4 +57,29 @@ test('로고와 근거 패널이 자리를 지킨다', async ({ page }) => {
   const panel = page.getByRole('complementary', { name: '답변 근거' })
   await expect(panel).toContainText('지금 답변 근거로 쓸 수 있는 문서')
   await expect(panel).toContainText('등록됐지만 못 찾는 문서가 있는 영역')
+})
+
+/**
+ * 에이전트 13종이 같은 제품으로 보이는지.
+ *
+ * 화면마다 다른 사람이 다른 날 만들면 머리 모양이 제각각이 된다 — 실제로
+ * 절반은 공통 셸을 쓰고 절반은 각자 만들어서, 하나는 '← 돌아가기' 글자
+ * 버튼이고 하나는 없었다. 눈으로 13번 보는 대신 여기서 훑는다.
+ */
+test('에이전트 13종의 머리가 같은 모양이다', async ({ page }) => {
+  await enterDomain(page)
+  const missing: string[] = []
+  for (const name of AGENT_NAMES) {
+    await openTab(page, /^에이전트/)
+    await page.getByRole('button', { name, exact: true }).click()
+    const h1 = page.getByRole('heading', { level: 1 })
+    await expect(h1, name).toBeVisible()
+    // 돌아가는 길이 있어야 한다 — 셸을 쓰든 안 쓰든
+    if ((await page.getByRole('button', { name: '돌아가기' }).count()) === 0) missing.push(name)
+    const over = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    )
+    expect(over, `${name} 가로 스크롤`).toBeLessThanOrEqual(0)
+  }
+  expect(missing, '돌아가는 길이 없는 에이전트').toEqual([])
 })

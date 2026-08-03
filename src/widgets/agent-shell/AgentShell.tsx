@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react'
 import { useId, useRef, useState } from 'react'
+import { ChevronLeft, CloudUpload, FileText, Play, type LucideIcon } from 'lucide-react'
 import { formatSize } from '@entities/document/model'
 import { acceptAttr } from '@entities/upload/model'
+import type { AgentId } from '@entities/agent/model'
+import { AGENT_ICONS, FALLBACK_AGENT_ICON } from '@shared/ui/agentIcons'
 import type { AgentInput, RunPhase, UploadSlot } from '@features/agent-run/useAgentRun'
 
 /**
@@ -18,6 +21,8 @@ import type { AgentInput, RunPhase, UploadSlot } from '@features/agent-run/useAg
 export type AgentShellProps<R> = {
   title: string
   desc: string
+  /** 아이콘을 고르는 데 쓴다. 허브 카드와 같은 아이콘이라야 같은 곳으로 읽힌다 */
+  agentId?: AgentId
   onBack?: (() => void) | undefined
 
   phase: RunPhase<R>
@@ -52,6 +57,7 @@ export type AgentShellProps<R> = {
 export function AgentShell<R>({
   title,
   desc,
+  agentId,
   onBack,
   phase,
   docs,
@@ -71,22 +77,29 @@ export function AgentShell<R>({
   result,
 }: AgentShellProps<R>) {
   const busy = phase.kind === 'running'
+  const Icon = (agentId && AGENT_ICONS[agentId]) ?? FALLBACK_AGENT_ICON
 
   return (
     <main className="min-h-dvh bg-slate-50 px-4 py-8">
       <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-6">
+        <header className="mb-6 flex items-start gap-3">
           {onBack && (
             <button
               type="button"
               onClick={onBack}
-              className="mb-3 min-h-11 text-sm font-bold text-slate-500 hover:text-slate-900"
+              aria-label="돌아가기"
+              className="flex size-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-900"
             >
-              ← 돌아가기
+              <ChevronLeft className="size-5" aria-hidden="true" />
             </button>
           )}
-          <h1 className="text-xl font-black text-slate-900">{title}</h1>
-          <p className="mt-1 text-sm text-slate-600">{desc}</p>
+          <span className="bg-brand flex size-11 shrink-0 items-center justify-center rounded-xl">
+            <Icon className="text-brand-fg size-6" aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <h1 className="text-xl font-black text-slate-900">{title}</h1>
+            <p className="mt-1 text-sm text-slate-600">{desc}</p>
+          </div>
         </header>
 
         {phase.kind === 'loadingDocs' && (
@@ -116,7 +129,7 @@ export function AgentShell<R>({
                 <ul className="space-y-2">
                   {docs.map((d) => (
                     <li key={d.id}>
-                      <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-50">
+                      <label className="has-checked:border-brand has-checked:bg-brand-soft flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50">
                         <input
                           type="radio"
                           name="document"
@@ -125,6 +138,7 @@ export function AgentShell<R>({
                           onChange={() => onSelectDocument(d.id)}
                           className="size-4"
                         />
+                        <FileText className="size-4 shrink-0 text-slate-400" aria-hidden="true" />
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-sm font-bold text-slate-800">{d.name}</span>
                           <span className="block text-xs text-slate-500">
@@ -155,8 +169,9 @@ export function AgentShell<R>({
                 type="button"
                 onClick={onRun}
                 disabled={busy || !documentId || !canRun}
-                className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                className="bg-brand text-brand-fg flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg px-5 text-sm font-bold shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
               >
+                <Play className="size-4" aria-hidden="true" />
                 {busy ? runningLabel : runLabel}
               </button>
               {phase.kind === 'done' && (
@@ -237,10 +252,11 @@ function UploadZone({ slot }: { slot: UploadSlot }) {
           setOver(false)
           take(e.dataTransfer.files)
         }}
-        className={`rounded-lg border border-dashed p-4 text-center transition-colors ${
-          over ? 'border-slate-900 bg-slate-50' : 'border-slate-300'
+        className={`rounded-lg border border-dashed p-5 text-center transition-colors ${
+          over ? 'border-brand bg-brand-soft' : 'border-slate-300'
         }`}
       >
+        <CloudUpload className="mx-auto mb-2 size-7 text-slate-400" aria-hidden="true" />
         <input
           ref={inputRef}
           id={inputId}
@@ -274,6 +290,55 @@ function UploadZone({ slot }: { slot: UploadSlot }) {
   )
 }
 
+/**
+ * 에이전트 화면 머리 — 셸을 쓰지 않는 화면(질문 입력형·릴레이)이 쓴다.
+ *
+ * 셸을 안 쓴다고 머리까지 제각각이면, 같은 '에이전트 탭' 안에서 화면마다
+ * 다른 제품처럼 보인다. 아이콘은 허브 카드와 **같은 것**을 쓴다 —
+ * 카드에서 본 모양이 그대로 나와야 같은 곳으로 읽힌다.
+ */
+export function AgentPageHeader({
+  agentId,
+  icon,
+  title,
+  desc,
+  onBack,
+  aside,
+}: {
+  agentId?: AgentId
+  /** 카탈로그에 없는 화면(복합 업무 릴레이 등)이 쓸 아이콘 */
+  icon?: LucideIcon
+  title: string
+  desc: ReactNode
+  onBack?: (() => void) | undefined
+  /** 오른쪽에 붙는 것(부제 배지 등). 없으면 안 그린다 */
+  aside?: ReactNode
+}) {
+  const Icon = icon ?? (agentId && AGENT_ICONS[agentId]) ?? FALLBACK_AGENT_ICON
+  return (
+    <header className="mb-6 flex items-start gap-3">
+      {onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="돌아가기"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+        >
+          <ChevronLeft className="size-5" aria-hidden="true" />
+        </button>
+      )}
+      <span className="bg-brand flex size-11 shrink-0 items-center justify-center rounded-xl">
+        <Icon className="text-brand-fg size-6" aria-hidden="true" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <h1 className="text-xl font-black text-slate-900">{title}</h1>
+        <p className="mt-1 text-sm text-slate-600">{desc}</p>
+      </div>
+      {aside}
+    </header>
+  )
+}
+
 /** 결과 절 공용 — 제목과 지표 카드가 반복돼 함께 뺐다. */
 export function ResultSection({
   id,
@@ -296,7 +361,7 @@ export function ResultSection({
       {stats && stats.length > 0 && (
         <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {stats.map(([k, v]) => (
-            <div key={k} className="rounded-lg bg-slate-50 px-3 py-2">
+            <div key={k} className="bg-brand-soft rounded-lg px-3 py-2">
               <dt className="text-[11px] text-slate-500">{k}</dt>
               <dd className="text-sm font-black text-slate-900">{v}</dd>
             </div>

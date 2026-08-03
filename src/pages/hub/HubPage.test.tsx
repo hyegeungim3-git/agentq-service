@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HubPage } from './HubPage'
 import { AGENTS } from '@entities/agent/model'
+import { noHumanCheck } from '@entities/agentdef/model'
+import { AGENT_DEFS } from '@fixtures/agentdef'
 import type { Domain } from '@entities/domain/model'
 
 const domain: Domain = {
@@ -74,5 +76,29 @@ describe('HubPage', () => {
     setup()
     expect(screen.getByRole('heading', { name: '한빛정밀' })).toBeInTheDocument()
     expect(screen.getByText('제조')).toBeInTheDocument()
+  })
+
+  /* 이름과 한 줄 설명만으로는 눌러 보기 전에 무엇을 하는지 모른다 */
+  it('카드가 밟는 단계를 정의에서 가져와 보여준다', async () => {
+    setup()
+    const def = AGENT_DEFS.find((d) => d.agentId === 'summary')
+    for (const s of def?.steps ?? []) {
+      expect(await screen.findByText(s.name)).toBeInTheDocument()
+    }
+  })
+
+  /* 배지를 늘어놓으면 능력이 많을수록 좋아 보인다. 정작 위험한 것은 이쪽이다 */
+  it('사람 확인 지점이 없는 에이전트를 카드에서 말한다', async () => {
+    setup()
+    const bare = noHumanCheck(AGENT_DEFS).length
+    expect(bare, '확인 지점이 없는 에이전트가 fixture에 있어야 이 경로가 산다').toBeGreaterThan(0)
+    expect(await screen.findAllByText('사람 확인 지점 없음')).toHaveLength(bare)
+  })
+
+  /* 버튼 이름이 길어지면 다른 에이전트와 겹친다 — 실제로 겹쳐서 테스트가 깨졌다 */
+  it('카드 버튼의 이름은 에이전트 이름뿐이다', async () => {
+    setup()
+    await screen.findByText('문서 본문 추출')
+    expect(screen.getByRole('button', { name: '데이터 조회' })).toBeInTheDocument()
   })
 })

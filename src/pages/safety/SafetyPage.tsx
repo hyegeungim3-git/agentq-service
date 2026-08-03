@@ -23,6 +23,7 @@ export function SafetyPage({ onBack, apiOptions }: { onBack?: () => void; apiOpt
   return (
     <AgentShell<SafetyPlan>
       title="안전관리계획 수립 에이전트"
+      agentId="safety"
       desc="작업 단계별 위험요인을 빈도×강도로 평가하고, 대책과 잔여 위험을 함께 제시합니다."
       onBack={onBack}
       phase={s.phase}

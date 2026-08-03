@@ -7,6 +7,8 @@ import {
   type StepStatus,
 } from '@entities/orchestration/model'
 import { useOrchestration, type OrchestrationOptions } from '@features/orchestration/useOrchestration'
+import { AgentPageHeader } from '@widgets/agent-shell/AgentShell'
+import { Workflow } from 'lucide-react'
 
 const STATUS_STYLE: Record<StepStatus, string> = {
   pending: 'bg-slate-100 text-slate-500',
@@ -37,22 +39,17 @@ export function OrchestrationPage({
   return (
     <main className="min-h-dvh bg-slate-50 px-4 py-8">
       <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-6">
-          {onBack && (
-            <button
-              type="button"
-              onClick={onBack}
-              className="mb-3 min-h-11 text-sm font-bold text-slate-500 hover:text-slate-900"
-            >
-              ← 돌아가기
-            </button>
-          )}
-          <h1 className="text-xl font-black text-slate-900">{o.scenario.title}</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            요청 하나가 여러 에이전트를 거쳐 산출물까지 갑니다. 중간에 사람이 봐야 할 것을 모아 마지막에
+        <AgentPageHeader
+          icon={Workflow}
+          title={o.scenario.title}
+          desc={
+            <>
+              요청 하나가 여러 에이전트를 거쳐 산출물까지 갑니다. 중간에 사람이 봐야 할 것을 모아 마지막에
             함께 보여 줍니다.
-          </p>
-        </header>
+            </>
+          }
+          onBack={onBack}
+        />
 
         <div className="space-y-5">
           <section className="rounded-xl border border-slate-200 bg-white p-5">

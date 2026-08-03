@@ -1,5 +1,7 @@
 import { DATA_SOURCES, sourceLabel, type QueryResult } from '@entities/dataquery/model'
 import { useDataQuery, type DataQueryOptions } from '@features/dataquery/useDataQuery'
+import { AgentPageHeader } from '@widgets/agent-shell/AgentShell'
+import { Play } from 'lucide-react'
 
 /**
  * 데이터 조회는 질문 입력형이라 AgentShell을 쓰지 않는다(내규 조회와 같은 이유).
@@ -16,21 +18,16 @@ export function DataQueryPage({
   return (
     <main className="min-h-dvh bg-slate-50 px-4 py-8">
       <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-6">
-          {onBack && (
-            <button
-              type="button"
-              onClick={onBack}
-              className="mb-3 min-h-11 text-sm font-bold text-slate-500 hover:text-slate-900"
-            >
-              ← 돌아가기
-            </button>
-          )}
-          <h1 className="text-xl font-black text-slate-900">데이터 조회 에이전트</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            자연어를 SQL로 바꿔 조회하고, AI가 무엇을 가정했는지 함께 보여 줍니다.
-          </p>
-        </header>
+        <AgentPageHeader
+          agentId="dbquery"
+          title="데이터 조회 에이전트"
+          desc={
+            <>
+              자연어를 SQL로 바꿔 조회하고, AI가 무엇을 가정했는지 함께 보여 줍니다.
+            </>
+          }
+          onBack={onBack}
+        />
 
         <div className="space-y-5">
           <section className="rounded-xl border border-slate-200 bg-white p-5">
@@ -40,7 +37,7 @@ export function DataQueryPage({
                 {DATA_SOURCES.map((s) => (
                   <label
                     key={s}
-                    className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-50"
+                    className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft"
                   >
                     <input
                       type="radio"
@@ -74,8 +71,9 @@ export function DataQueryPage({
             type="button"
             onClick={() => void q.run()}
             disabled={!q.canRun || q.phase.kind === 'running'}
-            className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            className="bg-brand text-brand-fg flex min-h-11 items-center gap-2 rounded-lg px-5 text-sm font-bold shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
+            <Play className="size-4" aria-hidden="true" />
             {q.phase.kind === 'running' ? '조회 중…' : '조회 실행'}
           </button>
 

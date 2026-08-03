@@ -37,7 +37,7 @@ function RadioRow<T extends string>({
       {items.map((v) => (
         <label
           key={v}
-          className="flex min-h-11 flex-1 cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-50"
+          className="flex min-h-11 flex-1 cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft"
         >
           <input
             type="radio"
@@ -88,6 +88,7 @@ export function OcrPage({ onBack, apiOptions }: { onBack?: () => void; apiOption
   return (
     <AgentShell<OcrResult>
       title="문서 인식(OCR) 에이전트"
+      agentId="ocr"
       desc="스캔 문서를 텍스트로 변환하고, 못 읽은 줄과 가린 개인정보를 함께 보여 줍니다."
       onBack={onBack}
       phase={o.phase}

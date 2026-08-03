@@ -34,6 +34,13 @@
 .bg-brand-soft {
   background-color: color-mix(in oklab, var(--color-brand) 10%, var(--color-white));
 }
+
+/* 라디오·체크박스의 기본 강조색은 브라우저 파랑이다. 화면마다 클래스를 붙이면
+   또 빠뜨리므로 여기서 한 번에 브랜드 색으로 바꾼다 */
+input[type='radio'],
+input[type='checkbox'] {
+  accent-color: var(--color-brand);
+}
 .border-brand-soft {
   border-color: color-mix(in oklab, var(--color-brand) 28%, var(--color-white));
 }

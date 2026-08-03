@@ -1,5 +1,7 @@
 import { REGULATION_CATEGORIES, categoryLabel, isStale } from '@entities/regulation/model'
 import { useRegulation, type RegulationOptions } from '@features/regulation/useRegulation'
+import { AgentPageHeader } from '@widgets/agent-shell/AgentShell'
+import { Play } from 'lucide-react'
 
 /**
  * 내규 조회는 문서 선택이 아니라 질문 입력형이라 AgentShell을 쓰지 않는다.
@@ -17,21 +19,16 @@ export function RegulationPage({
   return (
     <main className="min-h-dvh bg-slate-50 px-4 py-8">
       <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-6">
-          {onBack && (
-            <button
-              type="button"
-              onClick={onBack}
-              className="mb-3 min-h-11 text-sm font-bold text-slate-500 hover:text-slate-900"
-            >
-              ← 돌아가기
-            </button>
-          )}
-          <h1 className="text-xl font-black text-slate-900">내규·규정 조회 에이전트</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            사내 규정을 조항 근거와 함께 조회합니다. 근거를 찾지 못하면 답을 지어내지 않습니다.
-          </p>
-        </header>
+        <AgentPageHeader
+          agentId="internalreg"
+          title="내규·규정 조회 에이전트"
+          desc={
+            <>
+              사내 규정을 조항 근거와 함께 조회합니다. 근거를 찾지 못하면 답을 지어내지 않습니다.
+            </>
+          }
+          onBack={onBack}
+        />
 
         <div className="space-y-5">
           <section className="rounded-xl border border-slate-200 bg-white p-5">
@@ -72,8 +69,9 @@ export function RegulationPage({
             type="button"
             onClick={() => void r.run()}
             disabled={!r.canRun || r.phase.kind === 'running'}
-            className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            className="bg-brand text-brand-fg flex min-h-11 items-center gap-2 rounded-lg px-5 text-sm font-bold shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
+            <Play className="size-4" aria-hidden="true" />
             {r.phase.kind === 'running' ? '조회 중…' : '규정 조회'}
           </button>
 

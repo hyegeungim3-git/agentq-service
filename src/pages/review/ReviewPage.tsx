@@ -24,6 +24,7 @@ export function ReviewPage({ onBack, apiOptions }: { onBack?: () => void; apiOpt
   return (
     <AgentShell<ReviewResult>
       title="문서 사전 검토 에이전트"
+      agentId="review"
       desc="기안문을 사규와 대조해 위반 소지와 조치 사항을 찾아 줍니다."
       onBack={onBack}
       phase={r.phase}
@@ -47,7 +48,7 @@ export function ReviewPage({ onBack, apiOptions }: { onBack?: () => void; apiOpt
             {REGULATION_SETS.map((set) => (
               <label
                 key={set}
-                className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-50"
+                className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft"
               >
                 <input
                   type="checkbox"

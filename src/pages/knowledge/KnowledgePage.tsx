@@ -13,6 +13,8 @@ import {
 } from '@entities/knowledge/model'
 import { REFERENCE_SPEC } from '@fixtures/knowledge'
 import { useKnowledge, type KnowledgeOptions } from '@features/knowledge/useKnowledge'
+import { AgentPageHeader } from '@widgets/agent-shell/AgentShell'
+import { Play } from 'lucide-react'
 
 const EXAMPLES = ['브래킷 굽힘 금형', '진동 관리 기준', '절삭유 농도', '버 과다']
 
@@ -30,21 +32,16 @@ export function KnowledgePage({
   return (
     <main className="min-h-dvh bg-slate-50 px-4 py-8">
       <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-6">
-          {onBack && (
-            <button
-              type="button"
-              onClick={onBack}
-              className="mb-3 min-h-11 text-sm font-bold text-slate-500 hover:text-slate-900"
-            >
-              ← 돌아가기
-            </button>
-          )}
-          <h1 className="text-xl font-black text-slate-900">지식 검색 에이전트</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            축적 도면·표준·사례를 검색합니다. 필터에 걸려 빠진 문서가 있으면 함께 알립니다.
-          </p>
-        </header>
+        <AgentPageHeader
+          agentId="knowledge"
+          title="지식 검색 에이전트"
+          desc={
+            <>
+              축적 도면·표준·사례를 검색합니다. 필터에 걸려 빠진 문서가 있으면 함께 알립니다.
+            </>
+          }
+          onBack={onBack}
+        />
 
         {k.phase.kind === 'loadingBases' && (
           <div role="status" aria-live="polite" className="rounded-xl border border-slate-200 bg-white p-5">
@@ -97,7 +94,7 @@ export function KnowledgePage({
                   {SEARCH_MODES.map((m) => (
                     <label
                       key={m}
-                      className="flex min-h-11 cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-50"
+                      className="flex min-h-11 cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft"
                     >
                       <input
                         type="radio"
@@ -145,7 +142,7 @@ export function KnowledgePage({
                 <ul className="space-y-2">
                   {k.bases.map((b) => (
                     <li key={b.id}>
-                      <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-50">
+                      <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft">
                         <input
                           type="checkbox"
                           checked={k.baseIds.includes(b.id)}
@@ -192,8 +189,9 @@ export function KnowledgePage({
                 type="button"
                 onClick={() => void k.search()}
                 disabled={busy}
-                className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                className="bg-brand text-brand-fg flex min-h-11 items-center gap-2 rounded-lg px-5 text-sm font-bold shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
               >
+            <Play className="size-4" aria-hidden="true" />
                 {busy ? '검색 중…' : `${searchModeLabel(k.mode)} 시작`}
               </button>
               {k.phase.kind === 'done' && (

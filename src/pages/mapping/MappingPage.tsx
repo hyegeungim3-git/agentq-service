@@ -18,6 +18,8 @@ import {
 } from '@entities/mapping/model'
 import { useMapping, type MappingOptions } from '@features/mapping/useMapping'
 import { formatCount } from '@shared/lib/format'
+import { AgentPageHeader } from '@widgets/agent-shell/AgentShell'
+import { Play } from 'lucide-react'
 
 const STATUS_STYLE: Record<MappingStatus, string> = {
   auto: 'bg-emerald-100 text-emerald-800',
@@ -43,22 +45,17 @@ export function MappingPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
   return (
     <main className="min-h-dvh bg-slate-50 px-4 py-8">
       <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-6">
-          {onBack && (
-            <button
-              type="button"
-              onClick={onBack}
-              className="mb-3 min-h-11 text-sm font-bold text-slate-500 hover:text-slate-900"
-            >
-              ← 돌아가기
-            </button>
-          )}
-          <h1 className="text-xl font-black text-slate-900">기준정보 표준화 에이전트</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            설비 태그와 협력사·사업장 주소를 표준 체계로 맞추고, 어디까지가 자동이고 어디부터 사람이
+        <AgentPageHeader
+          agentId="address"
+          title="기준정보 표준화 에이전트"
+          desc={
+            <>
+              설비 태그와 협력사·사업장 주소를 표준 체계로 맞추고, 어디까지가 자동이고 어디부터 사람이
             판단할지 나눕니다.
-          </p>
-        </header>
+            </>
+          }
+          onBack={onBack}
+        />
 
         <div className="space-y-5">
           <section className="rounded-xl border border-slate-200 bg-white p-5">
@@ -67,7 +64,7 @@ export function MappingPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
               {MAPPING_MODES.map((v) => (
                 <label
                   key={v}
-                  className="flex min-h-11 cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-50"
+                  className="flex min-h-11 cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft"
                 >
                   <input
                     type="radio"
@@ -99,8 +96,9 @@ export function MappingPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
             type="button"
             onClick={() => void m.run()}
             disabled={busy}
-            className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            className="bg-brand text-brand-fg flex min-h-11 items-center gap-2 rounded-lg px-5 text-sm font-bold shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
+            <Play className="size-4" aria-hidden="true" />
             {busy ? '처리 중…' : runLabel}
           </button>
 
@@ -570,7 +568,7 @@ function TagResultView({
               aria-pressed={filter === f.value}
               className={`min-h-11 rounded-full border px-3 text-xs font-bold ${
                 filter === f.value
-                  ? 'border-slate-900 bg-brand text-brand-fg'
+                  ? 'border-brand bg-brand text-brand-fg'
                   : 'border-slate-200 text-slate-700 hover:bg-slate-50'
               }`}
             >

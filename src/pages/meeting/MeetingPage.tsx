@@ -59,6 +59,7 @@ export function MeetingPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
   return (
     <AgentShell<MeetingResult>
       title="회의록 작성 에이전트"
+      agentId="meeting"
       desc="녹음을 발언자별로 정리하고, 결정 사항과 조치 항목을 뽑아 줍니다."
       onBack={onBack}
       phase={m.phase}
@@ -85,7 +86,7 @@ export function MeetingPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
             <ul className="space-y-2">
               {REFERENCE_CHOICES.map((r) => (
                 <li key={r.id}>
-                  <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-50">
+                  <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft">
                     <input
                       type="checkbox"
                       checked={m.referenceIds.includes(r.id)}

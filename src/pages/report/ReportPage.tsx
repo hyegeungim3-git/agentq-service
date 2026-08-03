@@ -82,7 +82,7 @@ function RadioCards<T extends string>({
       {items.map((v) => (
         <label
           key={v}
-          className="flex min-h-11 cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-50"
+          className="flex min-h-11 cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft"
         >
           <input
             type="radio"
@@ -108,6 +108,7 @@ export function ReportPage({ onBack, apiOptions }: { onBack?: () => void; apiOpt
   return (
     <AgentShell<ReportResult>
       title="표준 보고서 작성 에이전트"
+      agentId="report"
       desc="실적 데이터를 표준 양식에 채우고, 사람이 확인해야 하는 칸을 표시합니다."
       onBack={onBack}
       phase={r.phase}

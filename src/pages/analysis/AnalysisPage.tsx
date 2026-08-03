@@ -38,6 +38,7 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
   return (
     <AgentShell<AnalysisResult>
       title="공정 데이터 분석 에이전트"
+      agentId="dataanalysis"
       desc="추이와 분포를 차트로 보여 주고, 분석에 쓰이지 못한 데이터를 함께 밝힙니다."
       onBack={onBack}
       phase={a.phase}
@@ -60,7 +61,7 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
             {ANALYSIS_KINDS.map((k) => (
               <label
                 key={k}
-                className="flex min-h-11 cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-50"
+                className="flex min-h-11 cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft"
               >
                 <input
                   type="radio"

@@ -18,6 +18,7 @@ export function SummaryPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
   return (
     <AgentShell<SummaryResult>
       title="문서 요약 에이전트"
+      agentId="summary"
       desc="문서를 고르고 방식을 정하면 핵심을 구조화해 요약합니다."
       onBack={onBack}
       phase={s.phase}
@@ -41,7 +42,7 @@ export function SummaryPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
               {SUMMARY_STYLES.map((st) => (
                 <label
                   key={st}
-                  className="flex min-h-11 cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-50"
+                  className="flex min-h-11 cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft"
                 >
                   <input
                     type="radio"
