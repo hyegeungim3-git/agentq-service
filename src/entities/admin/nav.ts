@@ -92,9 +92,13 @@ export const ADMIN_MENUS: AdminMenu[] = [
   { id: 'agents.ops', label: '에이전트 운영', section: 'AI 서비스', parentId: 'agents', status: 'ready', phase: 'P3', summary: '지금 어떻게 돌고 있나 — 목록은 포털과 같은 카탈로그' },
   { id: 'agents.flow', label: '태스크플로우 빌더', section: 'AI 서비스', parentId: 'agents', status: 'ready', phase: 'P5', summary: '에이전트가 밟는 단계와 능력' },
   { id: 'agents.scenario', label: '시나리오 빌더', section: 'AI 서비스', parentId: 'agents', status: 'ready', phase: 'P5', summary: '여러 에이전트를 잇는 복합 업무' },
-  { id: 'apps', label: '애플리케이션', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '사용자에게 열어 주는 앱과 발주처별 노출' },
+  { id: 'apps', label: '애플리케이션', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '앱 묶음과 개별 앱' },
+  { id: 'apps.surface', label: '앱 구성', section: 'AI 서비스', parentId: 'apps', status: 'ready', phase: 'P3', summary: '열어 주는 묶음과 발주처별 노출' },
+  { id: 'apps.instance', label: '앱 인스턴스', section: 'AI 서비스', parentId: 'apps', status: 'ready', phase: 'P5', summary: '사람들이 만든 개별 앱 — 채팅·보고서·데이터 분석' },
 
-  { id: 'knowledge', label: '지식 관리', section: '지식 · RAG', parentId: null, status: 'ready', phase: 'P3', summary: '지식영역·색인 상태·RAG 설정' },
+  { id: 'knowledge', label: '지식 관리', section: '지식 · RAG', parentId: null, status: 'ready', phase: 'P3', summary: '지식영역과 색인 파이프라인' },
+  { id: 'knowledge.areas', label: '지식영역', section: '지식 · RAG', parentId: 'knowledge', status: 'ready', phase: 'P3', summary: '영역별 검색 가능 문서와 RAG 설정' },
+  { id: 'knowledge.pipeline', label: 'RAG 파이프라인', section: '지식 · RAG', parentId: 'knowledge', status: 'ready', phase: 'P5', summary: '문서가 어느 단계에서 떨어졌나' },
 
   { id: 'users', label: '사용자 관리', section: '운영 · 관리', parentId: null, status: 'ready', phase: 'P2', summary: '계정·승인·권한 부여' },
   { id: 'users.list', label: '사용자 목록', section: '운영 · 관리', parentId: 'users', status: 'ready', phase: 'P2', summary: '계정 검색과 상태 확인' },

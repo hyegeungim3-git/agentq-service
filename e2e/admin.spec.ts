@@ -541,4 +541,32 @@ test.describe('관리자 셸', () => {
     await expect(page.getByText('사규 개정 영향 검토')).toBeVisible()
   })
 
+
+  /* 묶음이 열려 있어도 개별 앱은 꺼져 있을 수 있다 */
+  test('앱 인스턴스가 내려간 이유와 안 쓰는 앱을 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '애플리케이션' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: '앱 인스턴스' }).click()
+    await expect(page.getByText(/안전 문서 색인이 끝나지 않아 답이 부실해 내렸습니다/)).toBeVisible()
+    await expect(page.getByText(/만들어 두고 잊힌 앱도 계속 자원을 잡고/)).toBeVisible()
+
+    await pickLabel(page, '보고서 생성')
+    await expect(page.getByText('내규 Q&A 봇')).toHaveCount(0)
+  })
+
+  /* 결과만 보면 고칠 곳을 못 찾는다 */
+  test('RAG 파이프라인이 어느 단계에서 떨어졌는지 보여 준다', async ({ page }) => {
+    await enterAdmin(page)
+    let nav = await adminNav(page)
+    await nav.getByRole('button', { name: '지식 관리' }).click()
+    nav = await adminNav(page)
+    await nav.getByRole('button', { name: 'RAG 파이프라인' }).click()
+    await expect(page.getByText(/스캔 이미지라 글자를 뽑지 못함 — 1건/)).toBeVisible()
+    await expect(page.getByText(/가장 많이 떨어지는 단계/).first()).toBeVisible()
+    // 안 끝난 실행을 끝난 것처럼 그리지 않는다
+    await expect(page.getByText('진행 중')).toBeVisible()
+  })
+
 })

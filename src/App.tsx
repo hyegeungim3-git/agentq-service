@@ -68,6 +68,8 @@ import { AgentOpsPage } from '@pages/admin/agentops/AgentOpsPage'
 import { AppSurfacePage } from '@pages/admin/agentops/AppSurfacePage'
 import { FlowBuilderPage } from '@pages/admin/agentdef/FlowBuilderPage'
 import { ScenarioBuilderPage } from '@pages/admin/agentdef/ScenarioBuilderPage'
+import { AppInstancePage } from '@pages/admin/appinst/AppInstancePage'
+import { PipelinePage } from '@pages/admin/appinst/PipelinePage'
 import { PackStudioPage } from '@pages/admin/packops/PackStudioPage'
 import { ToolDeployPage } from '@pages/admin/packops/ToolDeployPage'
 import { DatasetPage } from '@pages/admin/mlops/DatasetPage'
@@ -209,11 +211,13 @@ export default function App() {
         {view.menuId === 'hr' && <HrSyncPage />}
         {view.menuId === 'guardrail' && <GuardrailPage />}
         {view.menuId === 'aiact' && <AiActPage />}
-        {view.menuId === 'knowledge' && <KnowledgeBasePage />}
+        {view.menuId === 'knowledge.areas' && <KnowledgeBasePage />}
+        {view.menuId === 'knowledge.pipeline' && <PipelinePage />}
         {view.menuId === 'agents.ops' && <AgentOpsPage />}
         {view.menuId === 'agents.flow' && <FlowBuilderPage />}
         {view.menuId === 'agents.scenario' && <ScenarioBuilderPage />}
-        {view.menuId === 'apps' && <AppSurfacePage />}
+        {view.menuId === 'apps.surface' && <AppSurfacePage />}
+        {view.menuId === 'apps.instance' && <AppInstancePage />}
         {view.menuId === 'packstudio' && <PackStudioPage />}
         {view.menuId === 'deploy' && <ToolDeployPage />}
         {view.menuId === 'data' && <DatasetPage />}

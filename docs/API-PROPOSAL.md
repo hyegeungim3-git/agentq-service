@@ -69,6 +69,9 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /notices` | `fetchNotices` | → `Notice[]` (`entities/notice/model.ts`) |
 | `GET /documents` | `fetchDocuments` | `?kind=sop\|report\|certificate\|minutes` → `BusinessDocument[]` (`entities/document/model.ts`) |
 | `POST /documents (multipart)` | `uploadDocument` | 파일 → `BusinessDocument` |
+| `GET /apps/instances` | `fetchAppInstances` | → `AppInstance[]` (`entities/appinst/model.ts`). 내려간 앱은 사유(`downReason`) 필수 |
+| `PATCH /apps/instances/{id}` | `setInstanceLive` | 앱 올리기·내리기 |
+| `GET /knowledge/pipeline-runs` | `fetchPipelineRuns` | → `PipelineRun[]`. **단계별 들어온 수·나간 수·떨어진 사유**를 함께 — 최종 건수만 오면 고칠 곳을 못 찾는다 |
 | `GET /agents/definitions` | `fetchAgentDefs` | → `AgentDefinition[]` (`entities/agentdef/model.ts`). **단계와 사람 확인 지점을 함께** — 능력 배지만 오면 '확인 없이 나가는 에이전트'를 그릴 수 없다 |
 | `PUT /agents/definitions/{id}` | `saveAgentDef` | 정의 변경 — 답이 달라지는 일이라 검토·되돌리기가 함께 필요하다 |
 | `GET /scenarios` | `fetchScenarioDefs` | → `ScenarioDefinition[]`. 단계마다 어느 에이전트를 부르는지 |

@@ -58,9 +58,10 @@ export function KnowledgeBasePage() {
 
   return (
     <main className="min-w-0 p-4 sm:p-6">
-      <h1 className="text-lg font-black text-slate-900">지식 관리</h1>
+      <h1 className="text-lg font-black text-slate-900">지식영역</h1>
       <p className="mt-1 text-sm text-slate-600">
-        챗봇과 지식 검색이 뒤지는 문서들입니다. 신뢰성 관리에서 미뤄 둔 RAG 설정도 여기 있습니다.
+        챗봇과 지식 검색이 뒤지는 문서들입니다. 못 찾는 문서가 <b>어느 단계에서 떨어졌는지</b>는{' '}
+        <b>RAG 파이프라인</b>에서 봅니다.
       </p>
 
       {failure && (
