@@ -83,8 +83,8 @@ export const ADMIN_MENUS: AdminMenu[] = [
   { id: 'training', label: '학습 · 튜닝', section: '인프라 · 개발', parentId: null, status: 'planned', phase: 'P4', summary: 'LoRA·QLoRA 등 학습 작업 생성과 추적' },
   { id: 'evaluation', label: '모델 평가', section: '인프라 · 개발', parentId: null, status: 'planned', phase: 'P4', summary: '평가 세트별 지표 비교' },
 
-  { id: 'guardrail', label: '가드레일', section: 'AI 서비스', parentId: null, status: 'planned', phase: 'P3', summary: '금칙어·개인정보·유해 표현 필터와 차단 이력' },
-  { id: 'aiact', label: 'AI 기본법 대응', section: 'AI 서비스', parentId: null, status: 'planned', phase: 'P3', summary: '고영향 AI 관리·생성물 표시·영향평가' },
+  { id: 'guardrail', label: '가드레일', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '규칙에 걸린 실제 기록 — 규칙 설정은 신뢰성 관리' },
+  { id: 'aiact', label: 'AI 기본법 대응', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '고영향 AI 관리·생성물 표시·영향평가' },
   { id: 'packstudio', label: '도메인 팩 스튜디오', section: 'AI 서비스', parentId: null, status: 'planned', phase: 'P3', summary: '발주처별 업무 데이터 구성' },
   { id: 'deploy', label: '도구 · 배포', section: 'AI 서비스', parentId: null, status: 'planned', phase: 'P3', summary: '도구 등록과 배포 대상 관리' },
   { id: 'agents', label: '에이전트', section: 'AI 서비스', parentId: null, status: 'planned', phase: 'P3', summary: '에이전트 정의·태스크플로우·시나리오' },

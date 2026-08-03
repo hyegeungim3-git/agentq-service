@@ -126,6 +126,10 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /apis` | `fetchApis` | → `ApiEntry[]`. **키 원문은 응답에 넣지 않는다** — §2-9 |
 | `POST /apis/{id}/keys` | `reissueApiKey` | 재발급. 키 원문은 이 응답에 **한 번만** 담고 이후 조회로는 못 본다 |
 | `GET /prompts` | `fetchPrompts` | → `PromptEntry[]`. 바꿨을 때의 영향(`affects`)을 함께 |
+| `GET /guardrails/hits` | `fetchGuardrailHits` | → `GuardrailHit[]` (`entities/compliance/model.ts`). **걸린 원문은 넣지 않는다** — 종류만 |
+| `GET /compliance/systems` | `fetchAiSystems` | → `AiSystem[]`. 판정에는 근거(`reason`)와 운영 여부(`inService`)를 함께 |
+| `GET /compliance/labeling` | `fetchLabelRules` | → `LabelRule[]` |
+| `GET /compliance/assessments` | `fetchAssessments` | → `Assessment[]`. 안 끝난 것은 무엇이 남았는지(`remaining`) |
 | `GET /integrations` | `fetchIntegrations` | → `Integration[]`. 끊기면 무엇이 멈추는지(`impactIfDown`) 필수 |
 | `GET /training/report?window=` | `fetchTrainerReport` | `window`=`day`\|`week`\|`month` → `TrainerReport`. 실패 작업에는 `note`(사유)가 있어야 한다 |
 

@@ -32,7 +32,7 @@ test.describe('관리자 셸', () => {
   test('아직 안 만든 메뉴를 감추지 않고 준비 중으로 표시한다', async ({ page }) => {
     await enterAdmin(page)
     const nav = await adminNav(page)
-    await expect(nav.getByText(/화면 23개 사용 가능 · 12개 준비 중/)).toBeVisible()
+    await expect(nav.getByText(/화면 25개 사용 가능 · 10개 준비 중/)).toBeVisible()
 
     await nav.getByRole('button', { name: /지식 관리/ }).click()
     await expect(page.getByRole('heading', { name: '지식 관리' })).toBeVisible()
@@ -346,6 +346,30 @@ test.describe('관리자 셸', () => {
     nav = await adminNav(page)
     await nav.getByRole('button', { name: '연계 SW 모니터링' }).click()
     await expect(page.getByText(/진동 알람이 오지 않습니다/)).toBeVisible()
+  })
+
+
+  /* 경고만 한 건은 실제로는 나갔다 — 합계에 섞으면 다 막은 것처럼 읽힌다 */
+  test('가드레일은 경고만 한 건을 차단과 따로 세고 규칙 설정 위치를 밝힌다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: '가드레일' }).click()
+    await expect(page.getByText('경고만 — 나갔음')).toBeVisible()
+    await expect(page.getByText(/실제로 사용자에게 나갔습니다/)).toBeVisible()
+    await expect(page.getByText(/같은 목록을 두 화면에 두지 않았습니다/)).toBeVisible()
+  })
+
+  /* 화면이 판정하는 것처럼 보이면 의무를 화면에 넘기게 된다 */
+  test('AI 기본법 화면은 법적 판단을 내리지 않는다고 먼저 말한다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: 'AI 기본법 대응' }).click()
+    await expect(page.getByText(/이 화면은 법적 판단을 내리지 않습니다/)).toBeVisible()
+    await expect(page.getByText(/고영향인데 책무를 다 못 채운 시스템 2건/)).toBeVisible()
+    await expect(page.getByText(/해당 여부를 확인 중인데 이미 운영 중인 시스템 1건/)).toBeVisible()
+
+    await page.getByRole('tab', { name: '생성물 표시' }).click()
+    await expect(page.getByText(/제31조 표시 의무를 지금 채우지 못하고 있습니다/)).toBeVisible()
   })
 
 })
