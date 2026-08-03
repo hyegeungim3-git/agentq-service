@@ -134,6 +134,10 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /knowledge/index?area=` | `fetchIndexEntries` | → `IndexEntry[]`. 색인 안 된 문서는 사유(`reason`) 필수 |
 | `GET /knowledge/rag-config` | `fetchRagConfig` | → `RagConfig`. 재색인 진행률(`reindexedRatio`)을 함께 |
 | `POST /knowledge/areas/{id}:reindex` | `runReindex` | 재색인 |
+| `GET /agents/ops` | `fetchAgentOps` | → `AgentOps[]` (`entities/agentops/model.ts`). **목록이 아니라 운영 정보만** — 카탈로그는 한 곳이어야 한다 |
+| `PATCH /agents/{id}` | `setAgentExposure` | 포털 노출 전환 |
+| `GET /apps` | `fetchAppSurfaces` | → `AppSurface[]`. 못 여는 앱은 사유(`blockedReason`)와 함께 |
+| `GET /apps/domains` | `fetchDomainExposure` | → `DomainExposure[]`. 포털의 선택 가능 여부와 **같은 기준**이어야 한다 |
 | `GET /integrations` | `fetchIntegrations` | → `Integration[]`. 끊기면 무엇이 멈추는지(`impactIfDown`) 필수 |
 | `GET /training/report?window=` | `fetchTrainerReport` | `window`=`day`\|`week`\|`month` → `TrainerReport`. 실패 작업에는 `note`(사유)가 있어야 한다 |
 

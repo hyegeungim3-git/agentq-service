@@ -87,8 +87,8 @@ export const ADMIN_MENUS: AdminMenu[] = [
   { id: 'aiact', label: 'AI 기본법 대응', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '고영향 AI 관리·생성물 표시·영향평가' },
   { id: 'packstudio', label: '도메인 팩 스튜디오', section: 'AI 서비스', parentId: null, status: 'planned', phase: 'P3', summary: '발주처별 업무 데이터 구성' },
   { id: 'deploy', label: '도구 · 배포', section: 'AI 서비스', parentId: null, status: 'planned', phase: 'P3', summary: '도구 등록과 배포 대상 관리' },
-  { id: 'agents', label: '에이전트', section: 'AI 서비스', parentId: null, status: 'planned', phase: 'P3', summary: '에이전트 정의·태스크플로우·시나리오' },
-  { id: 'apps', label: '애플리케이션', section: 'AI 서비스', parentId: null, status: 'planned', phase: 'P3', summary: '사용자에게 열어 주는 앱 구성' },
+  { id: 'agents', label: '에이전트', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '에이전트 운영 상태 — 목록은 포털과 같은 카탈로그' },
+  { id: 'apps', label: '애플리케이션', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '사용자에게 열어 주는 앱과 발주처별 노출' },
 
   { id: 'knowledge', label: '지식 관리', section: '지식 · RAG', parentId: null, status: 'ready', phase: 'P3', summary: '지식영역·색인 상태·RAG 설정' },
 

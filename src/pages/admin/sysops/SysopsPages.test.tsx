@@ -5,6 +5,8 @@ import { HrSyncPage } from './HrSyncPage'
 import { ApiPromptPage } from './ApiPromptPage'
 import { IntegrationPage } from './IntegrationPage'
 import { AdminHomePage } from './AdminHomePage'
+import { ADMIN_HOME_CARDS } from './homeCards'
+import { findMenu } from '@entities/admin/nav'
 import { failedChanges, riskyPending } from '@entities/sysops/model'
 import { APIS, HR_SYNC, INTEGRATIONS } from '@fixtures/sysops'
 
@@ -106,9 +108,12 @@ describe('관리 홈', () => {
     expect(screen.getByText(/같은 화면을 두 벌 만들지\s*않았습니다/)).toBeInTheDocument()
   })
 
-  /* 감추면 없는 기능으로, 그냥 두면 죽은 카드로 읽힌다 */
+  /* 감추면 없는 기능으로, 그냥 두면 죽은 카드로 읽힌다.
+     몇 개가 준비 중인지는 진행에 따라 바뀌므로 목록에서 유도한다 */
   it('아직 안 만든 화면 카드는 준비 중으로 표시한다', () => {
+    const planned = ADMIN_HOME_CARDS.filter((c) => findMenu(c.menuId)?.status === 'planned')
+    expect(planned.length, '관리 홈에 준비 중 카드가 하나도 없다').toBeGreaterThan(0)
     render(<AdminHomePage onOpen={() => {}} />)
-    expect(screen.getByText('준비 중')).toBeInTheDocument()
+    expect(screen.getAllByText('준비 중')).toHaveLength(planned.length)
   })
 })

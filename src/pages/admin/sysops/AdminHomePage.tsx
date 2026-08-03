@@ -1,4 +1,5 @@
 import { ADMIN_MENUS, findMenu } from '@entities/admin/nav'
+import { ADMIN_HOME_CARDS } from './homeCards'
 
 /**
  * 관리 홈 — 자주 여는 화면으로 가는 진입점.
@@ -10,19 +11,6 @@ import { ADMIN_MENUS, findMenu } from '@entities/admin/nav'
  * 아직 안 만든 화면으로 가는 카드는 '준비 중'으로 표시한다. 감추면 없는 기능으로
  * 읽히고, 그냥 두면 눌렀을 때 아무 일도 없는 카드가 된다.
  */
-
-const CARDS: { menuId: string; desc: string }[] = [
-  { menuId: 'users.list', desc: '계정·권한·상태' },
-  { menuId: 'users.approval', desc: '가입·권한·한도 신청' },
-  { menuId: 'analytics.stats', desc: '질의량·활성 사용자' },
-  { menuId: 'users.log', desc: '누가 언제 무엇에 접근했는지' },
-  { menuId: 'llmops.quality', desc: '전문가 검토와 사용자 피드백' },
-  { menuId: 'content', desc: '공지·Q&A — 포털에 그대로 나갑니다' },
-  { menuId: 'system', desc: '클러스터·노드·파드' },
-  { menuId: 'sysops.integration', desc: '외부 시스템 연동 상태' },
-  { menuId: 'knowledge', desc: '지식영역·색인 상태·RAG 설정' },
-  { menuId: 'agents', desc: '에이전트 정의와 태스크플로우' },
-]
 
 export function AdminHomePage({ onOpen }: { onOpen: (menuId: string) => void }) {
   const ready = ADMIN_MENUS.filter((m) => m.status === 'ready')
@@ -36,7 +24,7 @@ export function AdminHomePage({ onOpen }: { onOpen: (menuId: string) => void }) 
       </p>
 
       <ul className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {CARDS.map((c) => {
+        {ADMIN_HOME_CARDS.map((c) => {
           const menu = findMenu(c.menuId)
           if (!menu) return null
           const isReady = menu.status === 'ready'

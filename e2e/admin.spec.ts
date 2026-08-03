@@ -32,7 +32,7 @@ test.describe('관리자 셸', () => {
   test('아직 안 만든 메뉴를 감추지 않고 준비 중으로 표시한다', async ({ page }) => {
     await enterAdmin(page)
     const nav = await adminNav(page)
-    await expect(nav.getByText(/화면 26개 사용 가능 · 9개 준비 중/)).toBeVisible()
+    await expect(nav.getByText(/화면 28개 사용 가능 · 7개 준비 중/)).toBeVisible()
 
     await nav.getByRole('button', { name: /도구 · 배포/ }).click()
     await expect(page.getByRole('heading', { name: '도구 · 배포' })).toBeVisible()
@@ -389,6 +389,34 @@ test.describe('관리자 셸', () => {
 
     await page.getByRole('tab', { name: 'RAG 설정' }).click()
     await expect(page.getByText(/검색 품질이 조용히 나빠집니다/)).toBeVisible()
+  })
+
+
+  /* 답이 부실한 원인은 대개 에이전트가 아니라 그 아래 데이터에 있다 */
+  test('에이전트 화면이 근거 문서 빈틈을 지식 관리와 이어 준다', async ({ page }) => {
+    await enterAdmin(page)
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: '에이전트' }).click()
+    await expect(page.getByText(/포털이 그리는 목록과 같은 카탈로그입니다/)).toBeVisible()
+    await expect(page.getByText(/근거 문서에 빈틈이 있는 에이전트/)).toBeVisible()
+    await expect(page.getByText(/에이전트보다 먼저 지식 관리를 보십시오/)).toBeVisible()
+
+    // 실패율이 가장 높은 것이 맨 위
+    await expect(page.getByRole('row').nth(1)).toContainText('안전관리계획 수립')
+  })
+
+  /* 관리자에서만 열려 있는 것처럼 보이면 안 된다 */
+  test('애플리케이션의 발주처 노출이 포털과 같은 기준이다', async ({ page }) => {
+    await page.goto('./')
+    // 포털에서 고를 수 없는 곳이 있는지 먼저 본다
+    await expect(page.getByText(/업무 데이터가 준비된 발주처만 선택할 수 있습니다/)).toBeVisible()
+
+    await page.getByRole('button', { name: /관리자 시스템/ }).click()
+    const nav = await adminNav(page)
+    await nav.getByRole('button', { name: '애플리케이션' }).click()
+    await expect(page.getByText(/여기서만 열려 있는 것처럼 보이면/)).toBeVisible()
+    await expect(page.getByText(/인증 방식이 정해지지 않아 열 수 없습니다/)).toBeVisible()
+    await expect(page.getByText('0종')).toHaveCount(3)
   })
 
 })
