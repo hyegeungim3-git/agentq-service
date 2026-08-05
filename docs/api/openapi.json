@@ -750,6 +750,38 @@
         }
       }
     },
+    "/agents/adopted": {
+      "get": {
+        "operationId": "fetchAdoptedAgents",
+        "summary": "이 발주처가 **도입한** 에이전트 id 목록",
+        "description": "→ 이 발주처가 **도입한** 에이전트 id 목록. 카탈로그의 '아직 안 만든 화면'과 다른 축이다 — 화면은 있는데 이 발주처엔 안 들어온 것",
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "응답 형태 미정 — 제안서 본문 참조"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/agents/definitions/{id}": {
       "put": {
         "operationId": "saveAgentDef",

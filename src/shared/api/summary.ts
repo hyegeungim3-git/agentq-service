@@ -6,8 +6,8 @@
  * 로딩 UI가 한 번도 실행되지 않은 채 배포된다.
  */
 import type { SummaryRequest, SummaryResult } from '@entities/summary/model'
-import { SUMMARY_RESULTS } from '@fixtures/summary'
 import type { ApiResult } from './domains'
+import { currentPack } from './pack'
 
 /** 테스트에서 지연을 0으로 만들기 위한 주입점 — 테스트가 4초를 기다리게 두지 않는다. */
 export type SummaryApiOptions = { delayMs?: number | undefined }
@@ -22,7 +22,10 @@ export async function createSummary(
   await wait(opts.delayMs ?? 1600)
   // TODO(api-미확정): POST /summaries 로 교체. 제거 조건 = 요약 모델·응답 형식 확정.
 
-  const byDoc = SUMMARY_RESULTS[req.documentId]
+  const pack = currentPack()
+  if (!pack) return { ok: false, error: '이 발주처의 업무 데이터가 아직 없습니다.' }
+
+  const byDoc = pack.summaries[req.documentId]
   if (!byDoc) return { ok: false, error: `요약할 문서를 찾지 못했습니다: ${req.documentId}` }
 
   const result = byDoc[req.style]

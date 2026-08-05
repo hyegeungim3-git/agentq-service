@@ -82,6 +82,7 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `PATCH /apps/instances/{id}` | `setInstanceLive` | 앱 올리기·내리기 |
 | `GET /knowledge/pipeline-runs` | `fetchPipelineRuns` | → `PipelineRun[]`. **단계별 들어온 수·나간 수·떨어진 사유**를 함께 — 최종 건수만 오면 고칠 곳을 못 찾는다 |
 | `GET /agents/definitions` | `fetchAgentDefs` | → `AgentDefinition[]` (`entities/agentdef/model.ts`). **단계와 사람 확인 지점을 함께** — 능력 배지만 오면 '확인 없이 나가는 에이전트'를 그릴 수 없다 |
+| `GET /agents/adopted` | `fetchAdoptedAgents` | → 이 발주처가 **도입한** 에이전트 id 목록. 카탈로그의 '아직 안 만든 화면'과 다른 축이다 — 화면은 있는데 이 발주처엔 안 들어온 것 |
 | `PUT /agents/definitions/{id}` | `saveAgentDef` | 정의 변경 — 답이 달라지는 일이라 검토·되돌리기가 함께 필요하다 |
 | `GET /workflows` | `fetchWorkflows` | → `Workflow[]` (`entities/workflow/model.ts`). **탄 분기와 멈춘 노드를 함께** — 성공률만 오면 왜 실패했는지·안 타는 분기를 그릴 수 없다 |
 | `PATCH /workflows/{id}` | `setWorkflowEnabled` | 켜기·끄기 |

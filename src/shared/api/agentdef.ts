@@ -1,6 +1,8 @@
 import type { AgentDefinition, ScenarioDefinition } from '@entities/agentdef/model'
 import { AGENT_DEFS, SCENARIO_DEFS } from '@fixtures/agentdef'
+import type { AgentId } from '@entities/agent/model'
 import type { ApiResult } from './domains'
+import { withPack } from './pack'
 
 /**
  * 에이전트 정의 · 시나리오 정의의 데이터 경계.
@@ -39,4 +41,22 @@ export function saveScenario(id: string): Promise<ApiResult<never>> {
     ok: false,
     error: '시나리오를 저장하지 못했습니다. 서버가 연결되지 않아 실행 순서는 그대로입니다.',
   })
+}
+
+/**
+ * 이 발주처가 도입한 에이전트.
+ *
+ * 카탈로그의 `status`(아직 안 만든 화면)와 **다른 축**이다 — 화면은 있는데
+ * 이 발주처에는 아직 안 들어온 것이다. 둘을 뭉뚱그리면 '없는 기능'과
+ * '아직 안 산 기능'을 구분할 수 없다.
+ */
+export type AdoptionInfo = {
+  agents: AgentId[]
+  /** 복합 업무 시나리오 소개. 없으면 허브가 카드를 그리지 않는다 */
+  scenario: { title: string; summary: string } | null
+}
+
+export function fetchAdoptedAgents(): Promise<ApiResult<AdoptionInfo>> {
+  // TODO(api-미확정): GET /agents/adopted 로 교체. 제거 조건 = 백엔드가 테넌시(§3-2)를 확정.
+  return withPack((p) => ({ agents: p.agents, scenario: p.scenario }))
 }

@@ -7,7 +7,7 @@ import {
 } from '@entities/agentdef/model'
 import type { Domain } from '@entities/domain/model'
 import { sectorLabel } from '@entities/domain/model'
-import { fetchAgentDefs } from '@shared/api/agentdef'
+import { fetchAdoptedAgents, fetchAgentDefs } from '@shared/api/agentdef'
 import { useRemote } from '@features/remote/useRemote'
 import { AGENT_ICONS, FALLBACK_AGENT_ICON } from '@shared/ui/agentIcons'
 
@@ -44,6 +44,11 @@ export function HubPage({
   const total = agents.length
   const ready = agents.filter((a) => a.status === 'ready').length
   const defs = useRemote(fetchAgentDefs, [])
+  /* 이 발주처가 도입한 에이전트. 못 받았으면 아무것도 막지 않는다 —
+     목록을 잘못 잠그는 것보다 그대로 두는 편이 덜 위험하다 */
+  const adopted = useRemote(fetchAdoptedAgents, [domain.id])
+  const adoptedIds = adopted.kind === 'ready' ? adopted.data.agents : null
+  const scenario = adopted.kind === 'ready' ? adopted.data.scenario : null
   const flowOf = (id: AgentId): AgentFlow | null =>
     defs.kind === 'ready' ? (defs.data.find((d) => d.agentId === id) ?? null) : null
 
@@ -76,7 +81,7 @@ export function HubPage({
         </header>
 
         {/* 한 에이전트로 끝나지 않는 업무는 릴레이로 묶는다 */}
-        {onOpenScenario && (
+        {onOpenScenario && scenario && (
           <button
             type="button"
             onClick={onOpenScenario}
@@ -90,11 +95,9 @@ export function HubPage({
                 <span className="bg-brand text-brand-fg rounded px-1.5 py-0.5 text-[10px] font-bold">
                   복합 업무
                 </span>
-                <span className="font-bold text-slate-900">수입검사 성적서 접수 처리</span>
+                <span className="font-bold text-slate-900">{scenario.title}</span>
               </span>
-              <span className="mt-1 block text-sm text-slate-600">
-                성적서 1건이 인식 → 주소 표준화 → 이력 조회 → 보고서 초안까지 이어집니다.
-              </span>
+              <span className="mt-1 block text-sm text-slate-600">{scenario.summary}</span>
             </span>
             <ChevronRight className="text-brand mt-2 size-5 shrink-0" aria-hidden="true" />
           </button>
@@ -102,7 +105,11 @@ export function HubPage({
 
         <ul className="grid gap-3 sm:grid-cols-2">
           {agents.map((a) => {
-            const usable = a.status === 'ready'
+            /* 두 가지 이유로 못 쓴다 — 아직 안 만든 화면과, 이 발주처가 아직 안 도입한 것.
+               뭉뚱그리면 '없는 기능'과 '아직 안 산 기능'을 구분할 수 없다 */
+            const built = a.status === 'ready'
+            const notAdopted = built && adoptedIds !== null && !adoptedIds.includes(a.id)
+            const usable = built && !notAdopted
             const Icon = AGENT_ICONS[a.id] ?? FALLBACK_AGENT_ICON
             const flow = flowOf(a.id)
             const checks = flow ? checkPoints(flow) : []
@@ -132,11 +139,16 @@ export function HubPage({
                         className="text-left font-bold text-slate-900 after:absolute after:inset-0 after:content-[''] disabled:cursor-not-allowed"
                       >
                         {a.name}
-                        {!usable && <span className="sr-only"> — 준비 중</span>}
+                        {!usable && (
+                          <span className="sr-only">
+                            {' '}
+                            — {notAdopted ? '이 발주처 도입 전' : '준비 중'}
+                          </span>
+                        )}
                       </button>
                       {!usable && (
                         <span className="rounded bg-slate-200 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">
-                          준비 중
+                          {notAdopted ? '도입 전' : '준비 중'}
                         </span>
                       )}
                     </div>

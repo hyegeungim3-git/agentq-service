@@ -11,10 +11,10 @@
 import type { Domain } from '@entities/domain/model'
 
 /*
- * status가 'ready'인 발주처는 지금 한 곳뿐이다.
- * 에이전트 13종이 쓰는 문서·용어·수치 fixture가 전부 한빛정밀(제조) 기준이기 때문이다.
- * 나머지 세 곳을 'ready'로 바꾸려면 각 발주처의 업무 데이터를 먼저 만들어야 한다 —
- * 플래그만 바꾸면 제조 데이터가 그대로 노출된다.
+ * `status`는 **업무 데이터(팩)가 갖춰졌는가**를 말한다.
+ * 플래그만 바꾸면 안 된다 — 팩이 없으면 다른 발주처의 문서가 그대로 노출된다.
+ * 그래서 `fixtures/packs.ts`에 팩이 등록된 발주처만 'ready'다.
+ * `scripts/pack-leak.test.ts`가 둘이 어긋나면 깨뜨린다.
  */
 export const DOMAIN_FIXTURES: Domain[] = [
   {
@@ -35,7 +35,7 @@ export const DOMAIN_FIXTURES: Domain[] = [
     sector: 'public',
     brandColor: '#003087',
     tagline: '부동산 공시 업무 생성형 AI 플랫폼',
-    status: 'planned',
+    status: 'ready',
     docPrefix: 'KREA',
     user: { name: '김민준', dept: '부동산공시처', title: '과장' },
   },

@@ -12,6 +12,7 @@
  * 돌려주고, 경계 함수는 '이 발주처의 업무 데이터가 없다'고 말한다. 조용히
  * 채워 넣으면 그게 바로 이전 데모의 사고다.
  */
+import type { AgentId } from '@entities/agent/model'
 import type { ChatMessage, FaqItem } from '@entities/chat/model'
 import type { BusinessDocument } from '@entities/document/model'
 import type { Dataset } from '@entities/dataset/model'
@@ -20,6 +21,7 @@ import type { MapIntel } from '@entities/mapintel/model'
 import type { LiveMetric } from '@entities/metric/model'
 import type { Notice } from '@entities/notice/model'
 import type { WorkSignal } from '@entities/signal/model'
+import type { SummaryResult, SummaryStyle } from '@entities/summary/model'
 import type { Workspace } from '@entities/workspace/model'
 import type { ChatEntry } from './chat'
 import type { CorpusItem } from './knowledge'
@@ -32,6 +34,14 @@ import type { RegulationEntry } from './regulation'
  * '거의 다 됐다'는 상태로 발주처를 열 수 없게 하려는 것이다.
  */
 export type DomainPackData = {
+  /**
+   * 이 발주처가 **도입한** 에이전트.
+   *
+   * 13종 전부를 첫날부터 쓰는 발주처는 없다. 업무 데이터가 갖춰진 것부터 연다.
+   * 카탈로그의 `status`(아직 안 만든 화면)와는 다른 축이다 — 화면은 있는데
+   * 이 발주처에는 아직 안 들어온 것이다. 둘을 뭉뚱그리면 어느 쪽인지 알 수 없다.
+   */
+  agents: AgentId[]
   documents: BusinessDocument[]
   workspaces: Workspace[]
   notices: Notice[]
@@ -53,13 +63,24 @@ export type DomainPackData = {
   /** 분석에 넣는 데이터 파일 */
   datasets: Dataset[]
   regulations: RegulationEntry[]
+  /** 문서별·방식별 요약 결과 */
+  summaries: Record<string, Record<SummaryStyle, SummaryResult>>
+  /**
+   * 복합 업무 시나리오 소개. 없으면 허브에 카드를 그리지 않는다.
+   *
+   * 릴레이는 에이전트 여러 개가 다 있어야 돈다 — 도입 전인 발주처에 카드를
+   * 띄우면 눌러도 아무 일 없는 버튼이 된다.
+   */
+  scenario: { title: string; summary: string } | null
 }
 
 /* 팩은 자기 모듈에서 자기 것만 만든다 — 서로를 참조하지 않는다 */
 import { MANUFACTURING_PACK } from './packs/manufacturing'
+import { PUBLIC_PACK } from './packs/public'
 
 const PACKS: Record<string, DomainPackData> = {
   manufacturing: MANUFACTURING_PACK,
+  public: PUBLIC_PACK,
 }
 
 /** 이 발주처의 업무 데이터. 없으면 null — 부르는 쪽이 그 사실을 말해야 한다 */

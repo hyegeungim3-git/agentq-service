@@ -26,6 +26,7 @@
 | `PATCH /apps/instances/{id}` | `setInstanceLive` | `src/pages/admin/appinst/AppInstancePage.tsx` |
 | `GET /knowledge/pipeline-runs` | `fetchPipelineRuns` | `src/pages/admin/appinst/PipelinePage.tsx` |
 | `GET /agents/definitions` | `fetchAgentDefs` | `src/pages/admin/agentdef/FlowBuilderPage.tsx`<br>`src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/hub/HubPage.tsx` |
+| `GET /agents/adopted` | `fetchAdoptedAgents` | `src/pages/hub/HubPage.tsx` |
 | `PUT /agents/definitions/{id}` | `saveAgentDef` | `src/pages/admin/agentdef/FlowBuilderPage.tsx` |
 | `GET /workflows` | `fetchWorkflows` | `src/pages/admin/agentdef/WorkflowPage.tsx` |
 | `PATCH /workflows/{id}` | `setWorkflowEnabled` | `src/pages/admin/agentdef/WorkflowPage.tsx` |

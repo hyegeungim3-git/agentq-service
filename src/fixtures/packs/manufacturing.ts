@@ -5,6 +5,7 @@
  * 여기서는 **모아서 팩 하나로 보이게** 할 뿐이다. 옮기면 그 파일들을 직접 읽는
  * 테스트 20여 개가 함께 깨지고, 옮기는 김에 내용이 조금씩 바뀐다.
  */
+import { AGENTS } from '@entities/agent/model'
 import { CHAT_ENTRIES, CHAT_UNKNOWN, FAQ_ITEMS } from '../chat'
 import { DATASETS } from '../datasets'
 import { DOCUMENTS } from '../documents'
@@ -14,10 +15,13 @@ import { PRESS_VIBRATION } from '../metrics'
 import { NOTICES } from '../notices'
 import { REGULATION_ENTRIES } from '../regulation'
 import { SIGNALS } from '../signals'
+import { SUMMARY_RESULTS } from '../summary'
 import { WORKSPACES } from '../workspaces'
 import type { DomainPackData } from '../packs'
 
+/* 제조는 13종을 전부 도입했다 — 업무 데이터가 다 갖춰져 있다 */
 export const MANUFACTURING_PACK: DomainPackData = {
+  agents: AGENTS.map((a) => a.id),
   documents: DOCUMENTS,
   workspaces: WORKSPACES,
   notices: NOTICES,
@@ -33,4 +37,9 @@ export const MANUFACTURING_PACK: DomainPackData = {
   knowledgeCorpus: CORPUS,
   datasets: DATASETS,
   regulations: REGULATION_ENTRIES,
+  summaries: SUMMARY_RESULTS,
+  scenario: {
+    title: '수입검사 성적서 접수 처리',
+    summary: '성적서 1건이 인식 → 주소 표준화 → 이력 조회 → 보고서 초안까지 이어집니다.',
+  },
 }
