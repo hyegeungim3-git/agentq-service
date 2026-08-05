@@ -113,7 +113,7 @@ describe('태스크플로우 배포', () => {
 
   it('정의의 검증본이 운영에 안 나간 것을 잡는다', () => {
     const targets = pendingPromotion(DEPLOYMENTS).map((x) => x.target)
-    expect(targets).toContain('에이전트 정의 (13종)')
+    expect(targets).toContain('에이전트 정의')
   })
 })
 

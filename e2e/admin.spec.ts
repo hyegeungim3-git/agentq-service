@@ -687,3 +687,21 @@ test.describe('관리자 셸', () => {
   })
 
 })
+
+/* 도구는 발주처 데이터, 배포는 플랫폼 것 — 한 화면에서 축이 다르다 */
+test('도구·배포에서 발주처를 바꾸면 도구가 바뀌고 배포는 그대로다', async ({ page }) => {
+  await enterAdmin(page)
+  const nav = await adminNav(page)
+  await nav.getByRole('button', { name: '도구 · 배포' }).click()
+  await expect(page.getByText('MES 조회')).toBeVisible()
+
+  await page.getByLabel('발주처').selectOption({ label: '새빛대학교병원 (의료)' })
+  await expect(page.getByText('청구 자료 조회')).toBeVisible()
+  await expect(page.getByText('MES 조회')).toHaveCount(0)
+  await expect(page.getByText(/끊긴 도구 없음/)).toBeVisible()
+
+  /* 배포 탭에는 발주처 선택이 없다 — 플랫폼이 한 번 올리면 모두가 그 버전을 쓴다 */
+  await page.getByRole('tab', { name: '배포' }).click()
+  await expect(page.getByLabel('발주처')).toHaveCount(0)
+  await expect(page.getByText(/검증에만 올라가 있고 운영에 안 나간 버전/)).toBeVisible()
+})

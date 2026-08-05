@@ -22,6 +22,7 @@ import { makeReportSimulator } from '../report'
 import { PUBLIC_QUERY_RESULTS, PUBLIC_QUERY_SOURCES } from '../public/dataquery'
 import { PUBLIC_DOCUMENTS } from '../public/documents'
 import { PUBLIC_AGENT_DEFS, PUBLIC_SCENARIO_DEFS } from '../public/agentdef'
+import { PUBLIC_MCP_SERVERS, PUBLIC_TOOLS } from '../public/tools'
 import { PUBLIC_CORPUS, PUBLIC_KNOWLEDGE_BASES, PUBLIC_REFERENCE_SPEC } from '../public/knowledge'
 import { LAND_PRICE_CHANGE } from '../public/mapintel'
 import { PUBLIC_REGULATIONS } from '../public/regulation'
@@ -85,4 +86,6 @@ export const PUBLIC_PACK: DomainPackData = {
   scenario: null,
   agentDefs: PUBLIC_AGENT_DEFS,
   scenarioDefs: PUBLIC_SCENARIO_DEFS,
+  tools: PUBLIC_TOOLS,
+  mcpServers: PUBLIC_MCP_SERVERS,
 }

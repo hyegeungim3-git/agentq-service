@@ -14,6 +14,8 @@
  */
 import type { AgentId } from '@entities/agent/model'
 import type { AgentDefinition, ScenarioDefinition } from '@entities/agentdef/model'
+import type { McpServer } from '@entities/evidence/model'
+import type { ToolSpec } from '@entities/packops/model'
 import type { AnalysisKind, AnalysisResult } from '@entities/analysis/model'
 import type { ChatMessage, FaqItem } from '@entities/chat/model'
 import type { BusinessDocument } from '@entities/document/model'
@@ -139,6 +141,17 @@ export type DomainPackData = {
    * 부르면 못 돈다는 사실을 관리자 화면이 말한다.
    */
   scenarioDefs: ScenarioDefinition[]
+  /**
+   * 이 발주처에 **실제로 연결된 도구**.
+   *
+   * 도구도 발주처마다 다르다 — 공장은 MES를, 시청은 처리 대장을 부른다.
+   * 하나만 두었더니 관리자 도구 화면이 어느 발주처를 보든 제조 시스템을 보여 줬다.
+   *
+   * `usedBy`(사용처)는 여기 없다. 정의에서 유도한다 — 손으로 적으면 어긋난다.
+   */
+  tools: ToolSpec[]
+  /** 그 도구를 주는 서버. 도구 id로 이어지므로 같은 팩 안에서 짝이 맞아야 한다 */
+  mcpServers: McpServer[]
 }
 
 /* 팩은 자기 모듈에서 자기 것만 만든다 — 서로를 참조하지 않는다 */

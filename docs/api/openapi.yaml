@@ -6377,7 +6377,13 @@ components:
       description: "목표 분량 — 글자 수 원시값. '300자' 같은 문자열로 굳히지 않는다."
     ToolEntry:
       type: object
+      additionalProperties: false
       properties:
+        usedBy:
+          type: array
+          items:
+            type: string
+          description: 이 도구를 쓰는 에이전트 이름 — 정의에서 유도한다
         id:
           type: string
         name:
@@ -6387,11 +6393,6 @@ components:
         connected:
           type: boolean
           description: 실제로 붙어 있는가. 정의만 있고 안 붙은 것과 구분한다
-        usedBy:
-          type: array
-          items:
-            type: string
-          description: 이 도구를 쓰는 에이전트 이름
         downReason:
           type:
             - string
@@ -6400,14 +6401,13 @@ components:
         calls7d:
           type: number
       required:
-        - id
-        - name
-        - kind
-        - connected
-        - usedBy
-        - downReason
         - calls7d
-      additionalProperties: false
+        - connected
+        - downReason
+        - id
+        - kind
+        - name
+        - usedBy
     ToolKind:
       type: string
       enum:

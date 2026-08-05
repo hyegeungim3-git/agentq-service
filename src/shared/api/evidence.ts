@@ -1,6 +1,8 @@
 import type { EvidenceItem, McpServer, Volume } from '@entities/evidence/model'
-import { EVIDENCE, MCP_SERVERS, VOLUMES } from '@fixtures/evidence'
+import { EVIDENCE, VOLUMES } from '@fixtures/evidence'
 import type { ApiResult } from './domains'
+import type { DomainPackData } from '@fixtures/packs'
+import { withPack, withPackOf } from './pack'
 
 /**
  * 이행 증거 · MCP 서버 · 공유 볼륨의 데이터 경계.
@@ -17,9 +19,11 @@ export function fetchEvidence(): Promise<ApiResult<EvidenceItem[]>> {
   return Promise.resolve({ ok: true, data: EVIDENCE })
 }
 
-export function fetchMcpServers(): Promise<ApiResult<McpServer[]>> {
+/** MCP 서버도 발주처 데이터다 — 도구 id로 이어지므로 같은 팩에서 나와야 짝이 맞는다 */
+export function fetchMcpServers(domainId?: string | null): Promise<ApiResult<McpServer[]>> {
   // TODO(api-미확정): GET /tools/servers 로 교체. 주소·토큰은 응답에 넣지 않는다.
-  return Promise.resolve({ ok: true, data: MCP_SERVERS })
+  const read = (p: DomainPackData): McpServer[] => p.mcpServers
+  return domainId === undefined ? withPack(read) : withPackOf(domainId, read)
 }
 
 export function fetchVolumes(): Promise<ApiResult<Volume[]>> {

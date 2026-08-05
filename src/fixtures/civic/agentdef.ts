@@ -4,8 +4,8 @@
  * 같은 13종이라도 **밟는 단계와 담당이 발주처마다 다르다.**
  * 여기 단계 이름은 민원·옥외광고·재난 상황보고 업무의 말이다.
  *
- * ⚠️ `toolIds`는 플랫폼에 실제로 연결된 도구만 가리킨다. 시청의 업무 시스템은
- * 아직 도구로 등록돼 있지 않아 단계 이름으로만 적는다.
+ * ⚠️ `toolIds`는 **이 팩의 도구**(`civic/tools.ts`)를 가리킨다. 데이터 분석 2단계가
+ * 끊긴 강우 관측 연계를 쓴다 — 그 에이전트만 조용히 옛 값으로 답한다.
  */
 import type { AgentDefinition, ScenarioDefinition } from '@entities/agentdef/model'
 
@@ -45,7 +45,7 @@ export const CIVIC_AGENT_DEFS: AgentDefinition[] = [
     purpose: '상황·처리 실적을 표준 보고서로 작성하고 사람이 채울 칸을 비워 둡니다.',
     capabilities: ['rag', 'hitl'], responseMode: 'grounded',
     steps: [
-      { order: 1, name: '접수·조치 현황 집계', toolIds: [], humanCheck: false },
+      { order: 1, name: '접수·조치 현황 집계', toolIds: ['t-hsc-civil'], humanCheck: false },
       { order: 2, name: '양식에 채우기', toolIds: [], humanCheck: false },
       { order: 3, name: '사람이 채울 칸 확인', toolIds: [], humanCheck: true },
     ],
@@ -95,7 +95,7 @@ export const CIVIC_AGENT_DEFS: AgentDefinition[] = [
     capabilities: ['rag', 'a2a'], responseMode: 'grounded',
     steps: [
       { order: 1, name: '질의 해석 · SQL 생성', toolIds: [], humanCheck: false },
-      { order: 2, name: '처리 대장 조회', toolIds: [], humanCheck: false },
+      { order: 2, name: '처리 대장 조회', toolIds: ['t-hsc-civil'], humanCheck: false },
       { order: 3, name: '가정한 조건 표시', toolIds: [], humanCheck: false },
     ],
   },
@@ -104,8 +104,9 @@ export const CIVIC_AGENT_DEFS: AgentDefinition[] = [
     purpose: '접수·처리 자료를 차트·통계로 분석하고 적용률을 밝힙니다.',
     capabilities: ['rag', 'a2a'], responseMode: 'grounded',
     steps: [
-      { order: 1, name: '접수 자료 적재', toolIds: [], humanCheck: false },
-      { order: 2, name: '부서·지역별 집계', toolIds: [], humanCheck: false },
+      { order: 1, name: '접수 자료 적재', toolIds: ['t-hsc-civil'], humanCheck: false },
+      /* 끊긴 도구를 쓴다 — 이 에이전트만 조용히 옛 값으로 답한다 */
+      { order: 2, name: '부서·지역별 집계', toolIds: ['t-hsc-rain'], humanCheck: false },
       { order: 3, name: '분석·차트 생성', toolIds: [], humanCheck: false },
     ],
   },
@@ -115,7 +116,7 @@ export const CIVIC_AGENT_DEFS: AgentDefinition[] = [
     purpose: '현장 확인 업무의 위험요인을 평가해 관리계획을 만들고 잔여 위험을 남깁니다.',
     capabilities: ['rag', 'a2a', 'actionable'], responseMode: 'direct',
     steps: [
-      { order: 1, name: '확인 구역 정보 확인', toolIds: [], humanCheck: false },
+      { order: 1, name: '확인 구역 정보 확인', toolIds: ['t-hsc-civil'], humanCheck: false },
       { order: 2, name: '위험요인 평가', toolIds: ['t-rag'], humanCheck: false },
       { order: 3, name: '관리계획 생성', toolIds: [], humanCheck: false },
     ],

@@ -8,8 +8,8 @@
  * 관리자 화면의 '확인 없이 나가는 실행형' 수가 발주처마다 다른 이유이며,
  * 그 수가 실제 데이터에서 나온다는 증거이기도 하다.
  *
- * ⚠️ `toolIds`는 플랫폼에 실제로 연결된 도구만 가리킨다. 원내 시스템은 아직
- * 도구로 등록돼 있지 않아 단계 이름으로만 적는다.
+ * ⚠️ `toolIds`는 **이 팩의 도구**(`medical/tools.ts`)를 가리킨다. 원내 청구·병상
+ * 시스템이며 사외로 나가는 것은 없다.
  */
 import type { AgentDefinition, ScenarioDefinition } from '@entities/agentdef/model'
 
@@ -49,7 +49,7 @@ export const MEDICAL_AGENT_DEFS: AgentDefinition[] = [
     purpose: '점검·운영 실적을 표준 보고서로 작성하고 사람이 채울 칸을 비워 둡니다.',
     capabilities: ['rag', 'hitl'], responseMode: 'grounded',
     steps: [
-      { order: 1, name: '점검 실적 집계', toolIds: [], humanCheck: false },
+      { order: 1, name: '점검 실적 집계', toolIds: ['t-suh-claim'], humanCheck: false },
       { order: 2, name: '양식에 채우기', toolIds: [], humanCheck: false },
       { order: 3, name: '사람이 채울 칸 확인', toolIds: [], humanCheck: true },
     ],
@@ -99,7 +99,7 @@ export const MEDICAL_AGENT_DEFS: AgentDefinition[] = [
     capabilities: ['rag', 'a2a'], responseMode: 'grounded',
     steps: [
       { order: 1, name: '질의 해석 · SQL 생성', toolIds: [], humanCheck: false },
-      { order: 2, name: '점검·운영 자료 조회', toolIds: [], humanCheck: false },
+      { order: 2, name: '점검·운영 자료 조회', toolIds: ['t-suh-claim', 't-suh-bed'], humanCheck: false },
       { order: 3, name: '가정한 조건 표시', toolIds: [], humanCheck: false },
     ],
   },
@@ -108,7 +108,7 @@ export const MEDICAL_AGENT_DEFS: AgentDefinition[] = [
     purpose: '운영 자료를 차트·통계로 분석하고 적용률을 밝힙니다.',
     capabilities: ['rag', 'a2a'], responseMode: 'grounded',
     steps: [
-      { order: 1, name: '운영 자료 적재', toolIds: [], humanCheck: false },
+      { order: 1, name: '운영 자료 적재', toolIds: ['t-suh-bed'], humanCheck: false },
       { order: 2, name: '부서별 집계', toolIds: [], humanCheck: false },
       { order: 3, name: '분석·차트 생성', toolIds: [], humanCheck: false },
     ],
@@ -119,7 +119,7 @@ export const MEDICAL_AGENT_DEFS: AgentDefinition[] = [
     purpose: '운영 위험요인을 평가해 관리계획을 만들고 잔여 위험을 남깁니다.',
     capabilities: ['rag', 'a2a', 'actionable', 'hitl'], responseMode: 'direct',
     steps: [
-      { order: 1, name: '운영 현황 확인', toolIds: [], humanCheck: false },
+      { order: 1, name: '운영 현황 확인', toolIds: ['t-suh-bed'], humanCheck: false },
       { order: 2, name: '위험요인 평가', toolIds: ['t-rag'], humanCheck: false },
       { order: 3, name: '관리계획 생성', toolIds: [], humanCheck: false },
       { order: 4, name: '환자안전 담당 확인', toolIds: [], humanCheck: true },

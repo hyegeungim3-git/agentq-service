@@ -8,7 +8,9 @@ import {
 import { fetchDeployments, fetchTools, promote } from '@shared/api/packops'
 import { externalServers } from '@entities/evidence/model'
 import { fetchMcpServers } from '@shared/api/evidence'
+import { fetchDomains } from '@shared/api/domains'
 import { useRemote } from '@features/remote/useRemote'
+import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
 
 /**
  * 도구 · 배포.
@@ -19,6 +21,10 @@ import { useRemote } from '@features/remote/useRemote'
  *
  * 배포는 **검증에만 올라가 있고 운영에 안 나간 버전**을 먼저 보여 준다.
  * 목록만 나열하면 무엇이 아직 사용자에게 안 갔는지 훑어서 찾아야 한다.
+ *
+ * ⚠️ **도구와 서버는 발주처마다 다르고, 배포는 아니다.** 공장은 MES를 부르고
+ * 시청은 처리 대장을 부른다 — 그래서 도구·서버 탭은 발주처를 고른다.
+ * 배포는 플랫폼이 한 번 올리면 모든 발주처가 그 버전을 쓰므로 고르지 않는다.
  */
 
 type Tab = 'tools' | 'servers' | 'deploy'
@@ -26,8 +32,12 @@ type Tab = 'tools' | 'servers' | 'deploy'
 export function ToolDeployPage() {
   const [tab, setTab] = useState<Tab>('tools')
   const [failure, setFailure] = useState<string | null>(null)
-  const tools = useRemote(fetchTools, [])
-  const servers = useRemote(fetchMcpServers, [])
+  const domains = useRemote(fetchDomains, [])
+  const ready = domains.kind === 'ready' ? domains.data.filter((d) => d.status === 'ready') : []
+  const [picked, setPicked] = useState<string | null>(null)
+  const domainId = picked ?? ready[0]?.id ?? null
+  const tools = useRemote(() => fetchTools(domainId), [domainId])
+  const servers = useRemote(() => fetchMcpServers(domainId), [domainId])
   const deployments = useRemote(fetchDeployments, [])
 
   const doPromote = (target: string, version: string) => {
@@ -72,6 +82,15 @@ export function ToolDeployPage() {
         ))}
       </div>
 
+      {tab !== 'deploy' && (
+        <DomainSelect
+          domains={ready}
+          value={domainId}
+          onChange={setPicked}
+          note="도구와 서버는 발주처마다 다릅니다. 배포는 플랫폼 것이라 발주처를 고르지 않습니다."
+        />
+      )}
+
       {tab === 'tools' && tools.kind === 'ready' && (
         <section className="mt-4">
           {(() => {
@@ -80,6 +99,13 @@ export function ToolDeployPage() {
             const blocked = blockedAgents(tools.data)
             return (
               <>
+                {/* 0을 안 보여 주면 '끊긴 게 없다'와 '안 봤다'를 구분할 수 없다 */}
+                {blocked.length === 0 && (
+                  <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900">
+                    끊긴 도구 없음 — 이 발주처의 도구 {tools.data.length}개가 모두 응답합니다.
+                  </p>
+                )}
+
                 {/* 도구는 끊겨도 서비스가 죽지 않아 더 늦게 발견된다 */}
                 {blocked.length > 0 && (
                   <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
@@ -143,6 +169,12 @@ export function ToolDeployPage() {
             늘어놓을 이유가 없고, 주소는 서버가 알고 있습니다. 여기서는 <b>어느 도구가 어느
             서버에 묶여 있고 지금 응답하는지</b>만 봅니다.
           </p>
+
+          {externalServers(servers.data).length === 0 && (
+            <p className="mt-3 max-w-3xl rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900">
+              사외로 나가는 서버 없음 — 이 발주처의 도구는 모두 내부에서 돕니다.
+            </p>
+          )}
 
           {externalServers(servers.data).length > 0 && (
             <p className="mt-3 max-w-3xl rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">

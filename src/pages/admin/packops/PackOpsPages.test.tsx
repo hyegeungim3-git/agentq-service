@@ -10,7 +10,8 @@ import {
   pendingPromotion,
   type DomainPack,
 } from '@entities/packops/model'
-import { DEPLOYMENTS, TOOLS } from '@fixtures/packops'
+import { DEPLOYMENTS } from '@fixtures/packops'
+import { fetchTools } from '@shared/api/packops'
 import { DOMAIN_FIXTURES } from '@fixtures/domains'
 import { PACKED_DOMAIN_IDS } from '@fixtures/packs'
 import { fetchPacks } from '@shared/api/packops'
@@ -90,8 +91,34 @@ describe('도구 · 배포', () => {
   it('끊긴 도구 때문에 못 도는 에이전트를 이름으로 말한다', async () => {
     render(<ToolDeployPage />)
     expect(await screen.findByText(/끊긴 도구 때문에 못 도는 에이전트 2종/)).toBeInTheDocument()
-    expect(screen.getByText('안전관리계획 수립, 데이터 분석')).toBeInTheDocument()
+    /* 순서는 정의 순서를 따른다 — 손으로 적던 때와 달라졌다 */
+    expect(screen.getByText('데이터 분석, 안전관리계획 수립')).toBeInTheDocument()
     expect(screen.getByText(/서비스는 계속 돌고 있어 오류가 나지 않습니다/)).toBeInTheDocument()
+  })
+
+  /**
+   * **도구도 발주처마다 다르다.** 하나만 두었을 때는 어느 발주처를 보든
+   * MES가 떴다. 값이 실제로 갈리는지 본다.
+   */
+  it('발주처를 바꾸면 도구 목록이 그 발주처 것으로 바뀐다', async () => {
+    render(<ToolDeployPage />)
+    expect(await screen.findByText('MES 조회')).toBeInTheDocument()
+
+    const select = await screen.findByLabelText('발주처')
+    await userEvent.selectOptions(select, screen.getByRole('option', { name: /한성시청/ }))
+    expect(await screen.findByText('민원 처리 대장 조회')).toBeInTheDocument()
+    expect(screen.queryByText('MES 조회')).not.toBeInTheDocument()
+    /* 이 발주처의 끊긴 도구는 강우 관측이고, 그래서 데이터 분석이 멈춘다 */
+    expect(screen.getByText(/끊긴 도구 때문에 못 도는 에이전트 1종/)).toBeInTheDocument()
+    expect(screen.getByText('데이터 분석', { selector: 'p' })).toBeInTheDocument()
+  })
+
+  /* 0을 안 보여 주면 '끊긴 게 없다'와 '안 봤다'를 구분할 수 없다 */
+  it('끊긴 도구가 없는 발주처에서는 없다고 말한다', async () => {
+    render(<ToolDeployPage />)
+    const select = await screen.findByLabelText('발주처')
+    await userEvent.selectOptions(select, screen.getByRole('option', { name: /새빛대학교병원/ }))
+    expect(await screen.findByText(/끊긴 도구 없음/)).toBeInTheDocument()
   })
 
   it('끊긴 도구를 맨 위에 둔다', async () => {
@@ -142,14 +169,21 @@ describe('판정', () => {
     expect(packMissing(full)).toEqual([])
   })
 
-  it('끊긴 도구를 쓰는 에이전트를 중복 없이 모은다', () => {
-    expect(blockedAgents(TOOLS)).toEqual(['안전관리계획 수립', '데이터 분석'])
+  /**
+   * 사용처는 **정의에서 유도한다** — 손으로 적었더니 어긋났다.
+   * 안전관리계획이 지식 검색을 부르는데 그 도구의 사용처에는 없었고,
+   * 화면이 '끊기면 멈추는 에이전트'를 실제보다 적게 말하고 있었다.
+   */
+  it('끊긴 도구를 쓰는 에이전트를 경계가 유도해 준다', async () => {
+    const res = await fetchTools('manufacturing')
+    if (!res.ok) throw new Error(res.error)
+    expect(blockedAgents(res.data).sort()).toEqual(['데이터 분석', '안전관리계획 수립'])
   })
 
   /* 검증과 운영이 같으면 반영할 것이 없다 */
   it('검증과 운영 버전이 같으면 반영 대상이 아니다', () => {
     const targets = pendingPromotion(DEPLOYMENTS).map((x) => x.target)
-    expect(targets).toEqual(['사용자 포털', '에이전트 실행기', '에이전트 정의 (13종)'])
+    expect(targets).toEqual(['사용자 포털', '에이전트 실행기', '에이전트 정의'])
     expect(targets).not.toContain('관리자 시스템')
   })
 })

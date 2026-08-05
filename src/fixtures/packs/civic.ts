@@ -31,6 +31,7 @@ import {
 import { CIVIC_CHAT, CIVIC_CHAT_UNKNOWN, CIVIC_FAQ } from '../civic/chat'
 import { CIVIC_DOCUMENTS } from '../civic/documents'
 import { CIVIC_AGENT_DEFS, CIVIC_SCENARIO_DEFS } from '../civic/agentdef'
+import { CIVIC_MCP_SERVERS, CIVIC_TOOLS } from '../civic/tools'
 import {
   CIVIC_CIVIL_QUEUE,
   CIVIC_DATASETS,
@@ -101,4 +102,6 @@ export const CIVIC_PACK: DomainPackData = {
   scenario: null,
   agentDefs: CIVIC_AGENT_DEFS,
   scenarioDefs: CIVIC_SCENARIO_DEFS,
+  tools: CIVIC_TOOLS,
+  mcpServers: CIVIC_MCP_SERVERS,
 }

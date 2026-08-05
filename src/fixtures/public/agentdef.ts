@@ -4,9 +4,8 @@
  * 단계 이름은 **그 발주처의 업무 용어**이고 담당도 그 발주처 부서다.
  * 코어에 하나만 두었더니 다른 발주처 허브에 제조의 단계가 그대로 떴다.
  *
- * ⚠️ `toolIds`는 플랫폼에 **실제로 연결된 도구**만 가리킨다(`fixtures/packops`).
- * RTMS·조사 대장처럼 이 발주처의 시스템은 아직 도구로 등록돼 있지 않아
- * 단계 이름으로만 적는다 — 없는 연결을 있는 것처럼 그리지 않는다.
+ * ⚠️ `toolIds`는 **이 팩의 도구**(`public/tools.ts`)를 가리킨다. 도구도 발주처마다
+ * 다르다 — 여기는 실거래 신고와 표준지 조사 대장을 부른다.
  *
  * 도입한 11종만 있다. 번역·기준정보 표준화는 도입 전이라 정의도 없다.
  */
@@ -48,7 +47,7 @@ export const PUBLIC_AGENT_DEFS: AgentDefinition[] = [
     purpose: '조사 실적을 표준 보고서로 작성하고 사람이 채울 칸을 비워 둡니다.',
     capabilities: ['rag', 'hitl'], responseMode: 'grounded',
     steps: [
-      { order: 1, name: '조사 실적 집계', toolIds: [], humanCheck: false },
+      { order: 1, name: '조사 실적 집계', toolIds: ['t-reb-parcel'], humanCheck: false },
       { order: 2, name: '양식에 채우기', toolIds: [], humanCheck: false },
       { order: 3, name: '사람이 채울 칸 확인', toolIds: [], humanCheck: true },
     ],
@@ -98,7 +97,7 @@ export const PUBLIC_AGENT_DEFS: AgentDefinition[] = [
     capabilities: ['rag', 'a2a'], responseMode: 'grounded',
     steps: [
       { order: 1, name: '질의 해석 · SQL 생성', toolIds: [], humanCheck: false },
-      { order: 2, name: '신고·대장 자료 조회', toolIds: [], humanCheck: false },
+      { order: 2, name: '신고·대장 자료 조회', toolIds: ['t-reb-rtms', 't-reb-parcel'], humanCheck: false },
       { order: 3, name: '가정한 조건 표시', toolIds: [], humanCheck: false },
     ],
   },
@@ -107,7 +106,7 @@ export const PUBLIC_AGENT_DEFS: AgentDefinition[] = [
     purpose: '조사 자료를 차트·통계로 분석하고 적용률을 밝힙니다.',
     capabilities: ['rag', 'a2a'], responseMode: 'grounded',
     steps: [
-      { order: 1, name: '조사 자료 적재', toolIds: [], humanCheck: false },
+      { order: 1, name: '조사 자료 적재', toolIds: ['t-reb-parcel'], humanCheck: false },
       { order: 2, name: '지역·용도별 집계', toolIds: [], humanCheck: false },
       { order: 3, name: '분석·차트 생성', toolIds: [], humanCheck: false },
     ],
@@ -118,7 +117,7 @@ export const PUBLIC_AGENT_DEFS: AgentDefinition[] = [
     purpose: '현장조사 위험요인을 평가해 관리계획을 만들고 잔여 위험을 남깁니다.',
     capabilities: ['rag', 'a2a', 'actionable'], responseMode: 'direct',
     steps: [
-      { order: 1, name: '조사 구역 정보 확인', toolIds: [], humanCheck: false },
+      { order: 1, name: '조사 구역 정보 확인', toolIds: ['t-reb-parcel'], humanCheck: false },
       { order: 2, name: '위험요인 평가', toolIds: ['t-rag'], humanCheck: false },
       { order: 3, name: '관리계획 생성', toolIds: [], humanCheck: false },
     ],

@@ -9080,7 +9080,15 @@
       },
       "ToolEntry": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
+          "usedBy": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "이 도구를 쓰는 에이전트 이름 — 정의에서 유도한다"
+          },
           "id": {
             "type": "string"
           },
@@ -9094,13 +9102,6 @@
             "type": "boolean",
             "description": "실제로 붙어 있는가. 정의만 있고 안 붙은 것과 구분한다"
           },
-          "usedBy": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "이 도구를 쓰는 에이전트 이름"
-          },
           "downReason": {
             "type": [
               "string",
@@ -9113,15 +9114,14 @@
           }
         },
         "required": [
-          "id",
-          "name",
-          "kind",
+          "calls7d",
           "connected",
-          "usedBy",
           "downReason",
-          "calls7d"
-        ],
-        "additionalProperties": false
+          "id",
+          "kind",
+          "name",
+          "usedBy"
+        ]
       },
       "ToolKind": {
         "type": "string",

@@ -91,6 +91,34 @@ describe('발주처 팩 누수', () => {
     }
   })
 
+  /**
+   * 도구도 팩으로 들어왔다. **정의와 도구가 같은 팩 안에서 짝이 맞아야** 한다.
+   *
+   * 안 맞으면 화면이 도구 이름 대신 `t-mes` 같은 날 id를 그린다 —
+   * 오류는 안 나고 화면만 이상해져서 늦게 발견된다.
+   */
+  it('정의가 부르는 도구가 그 팩에 있다', () => {
+    for (const id of PACKED_DOMAIN_IDS) {
+      const pack = packOf(id)
+      if (!pack) throw new Error(`${id} 팩이 없다`)
+      const have = new Set(pack.tools.map((t) => t.id))
+      const dangling = pack.agentDefs.flatMap((d) =>
+        d.steps.flatMap((s) => s.toolIds.filter((t) => !have.has(t))),
+      )
+      expect([...new Set(dangling)], `${id}: 팩에 없는 도구를 부른다`).toEqual([])
+    }
+  })
+
+  it('서버가 주는 도구도 그 팩에 있다', () => {
+    for (const id of PACKED_DOMAIN_IDS) {
+      const pack = packOf(id)
+      if (!pack) throw new Error(`${id} 팩이 없다`)
+      const have = new Set(pack.tools.map((t) => t.id))
+      const dangling = pack.mcpServers.flatMap((sv) => sv.toolIds.filter((t) => !have.has(t)))
+      expect([...new Set(dangling)], `${id}: 팩에 없는 도구를 주는 서버가 있다`).toEqual([])
+    }
+  })
+
   /* 표시만 있고 내용이 없으면 화면이 빈칸을 그린다 */
   it('팩마다 자기 말이 실제로 들어 있다', () => {
     for (const id of PACKED_DOMAIN_IDS) {

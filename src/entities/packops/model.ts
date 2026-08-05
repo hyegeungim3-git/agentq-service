@@ -72,17 +72,27 @@ export const TOOL_KIND_LABEL: Record<ToolKind, string> = {
   external: '외부 연동',
 }
 
-export type ToolEntry = {
+/**
+ * 도구 자체 — **누가 쓰는지는 여기 없다.**
+ *
+ * 사용처를 손으로 적어 두었더니 실제와 어긋났다. 안전관리계획이 지식 검색을
+ * 부르는데 그 도구의 사용처 목록에는 없었다 — 화면이 '끊기면 멈추는 에이전트'를
+ * 실제보다 적게 말하고 있었다. 사용처는 **에이전트 정의에서 나온다.**
+ */
+export type ToolSpec = {
   id: string
   name: string
   kind: ToolKind
   /** 실제로 붙어 있는가. 정의만 있고 안 붙은 것과 구분한다 */
   connected: boolean
-  /** 이 도구를 쓰는 에이전트 이름 */
-  usedBy: string[]
   /** 끊겼으면 왜인지 */
   downReason: string | null
   calls7d: number
+}
+
+export type ToolEntry = ToolSpec & {
+  /** 이 도구를 쓰는 에이전트 이름 — 정의에서 유도한다 */
+  usedBy: string[]
 }
 
 /** 끊긴 도구 때문에 못 도는 에이전트 */

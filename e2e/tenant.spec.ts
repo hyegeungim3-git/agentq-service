@@ -263,3 +263,28 @@ test('허브 카드의 단계가 발주처마다 다르다', async ({ page }) =>
     await expect(page.getByText(word)).toHaveCount(0)
   }
 })
+
+/**
+ * 대화 화면 오른쪽의 **연동 도구**도 그 발주처 것인가.
+ *
+ * 도구 목록이 플랫폼에 하나뿐이던 때는 어느 발주처를 골라도 `MES 조회`가 떴다.
+ */
+/* 좁은 화면에서는 근거 패널이 오버레이라 먼저 열어야 한다 */
+const openTools = async (page: import('@playwright/test').Page) => {
+  if ((page.viewportSize()?.width ?? 0) < 1280) {
+    await openTab(page, /^일반/)
+    await page.getByRole('button', { name: '답변 근거' }).click()
+  }
+  await page.getByRole('button', { name: '연동 도구' }).click()
+}
+
+test('연동 도구 패널이 발주처마다 다르다', async ({ page }) => {
+  await enter(page, /한빛정밀/)
+  await openTools(page)
+  await expect(page.getByText('MES 조회')).toBeVisible()
+
+  await enter(page, /새빛대학교병원/)
+  await openTools(page)
+  await expect(page.getByText('청구 자료 조회')).toBeVisible()
+  await expect(page.getByText('MES 조회')).toHaveCount(0)
+})
