@@ -5,6 +5,7 @@ import { HubPage } from './HubPage'
 import { AGENTS } from '@entities/agent/model'
 import { noHumanCheck } from '@entities/agentdef/model'
 import { AGENT_DEFS } from '@fixtures/agentdef'
+import * as agentdefApi from '@shared/api/agentdef'
 import type { Domain } from '@entities/domain/model'
 
 const domain: Domain = {
@@ -100,5 +101,26 @@ describe('HubPage', () => {
     setup()
     await screen.findByText('문서 본문 추출')
     expect(screen.getByRole('button', { name: '데이터 조회' })).toBeInTheDocument()
+  })
+})
+
+/**
+ * **도입 전 표시 경로를 지킨다.**
+ *
+ * 네 발주처가 13종을 모두 도입하면서 이 경로를 밟을 실제 데이터가 없어졌다.
+ * 단언을 지우면 팩에서 하나를 빼도 아무도 모른다 — 그래서 값을 주입해 밟는다.
+ * ('안 만든 것'과 '아직 안 산 것'은 다른 축이라 둘 다 화면에 있어야 한다)
+ */
+describe('도입 전 표시', () => {
+  it('도입하지 않은 에이전트는 사유를 붙여 막는다', async () => {
+    vi.spyOn(agentdefApi, 'fetchAdoptedAgents').mockResolvedValue({
+      ok: true,
+      data: { agents: ['summary'], scenario: null },
+    })
+    render(<HubPage domain={domain} onOpen={vi.fn()} onBack={vi.fn()} />)
+
+    expect((await screen.findAllByText('도입 전')).length).toBe(AGENTS.length - 1)
+    expect(screen.getByRole('button', { name: /^문서 요약/ })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /^문서 번역/ })).toBeDisabled()
   })
 })

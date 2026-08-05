@@ -6,7 +6,8 @@ import { MappingPage } from './MappingPage'
 const setup = () => render(<MappingPage apiOptions={{ delayMs: 0 }} />)
 const analyze = async () => {
   setup()
-  await userEvent.click(screen.getByRole('button', { name: '태그 수집·매핑 분석' }))
+  /* 처리 유형은 발주처가 정한다 — 목록이 오기 전에는 실행 버튼도 없다 */
+  await userEvent.click(await screen.findByRole('button', { name: '태그·코드 매핑 분석' }))
   return screen.findByRole('region', { name: '표준화 현황' })
 }
 
@@ -55,7 +56,8 @@ describe('MappingPage', () => {
   describe('주소 처리', () => {
     const pickMode = async (name: RegExp) => {
       setup()
-      await userEvent.click(screen.getByRole('radio', { name }))
+      /* 처리 유형 목록은 발주처에서 온다 — 오기 전에는 라디오가 없다 */
+      await userEvent.click(await screen.findByRole('radio', { name }))
     }
     const typeAndRun = async (value: string, runName: RegExp) => {
       await userEvent.type(screen.getByRole('textbox'), value)
@@ -125,7 +127,7 @@ describe('MappingPage', () => {
     /* 다른 유형의 결과가 남아 있으면 방금 돌린 것으로 오해한다 */
     it('처리 유형을 바꾸면 이전 결과가 사라진다', async () => {
       setup()
-      await userEvent.click(screen.getByRole('button', { name: '태그 수집·매핑 분석' }))
+      await userEvent.click(await screen.findByRole('button', { name: '태그·코드 매핑 분석' }))
       await screen.findByRole('region', { name: '표준화 현황' })
 
       await userEvent.click(screen.getByRole('radio', { name: /단일 주소/ }))

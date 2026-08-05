@@ -8,7 +8,7 @@
  * 개인정보도 직원 연락처로 뒀다 — 환자 정보를 예시로 만들면 그 자체가
  * 이 제품이 없애려는 것이 된다.
  *
- * 도입 11종. 번역과 기준정보 표준화는 앞선 팩과 같은 이유로 도입 전이다.
+ * **13종을 모두 도입했다.** 번역 말뭉치와 표준화 대장까지 갖췄다.
  */
 import type { AgentId } from '@entities/agent/model'
 import {
@@ -36,6 +36,9 @@ import { MEDICAL_AGENT_DEFS, MEDICAL_SCENARIO_DEFS } from '../medical/agentdef'
 import { MEDICAL_MCP_SERVERS, MEDICAL_TOOLS } from '../medical/tools'
 import { MEDICAL_AREAS, MEDICAL_INDEX_ENTRIES } from '../medical/knowledgebase'
 import { MEDICAL_AGENT_OPS } from '../medical/agentops'
+import { MEDICAL_TRANSLATION } from '../medical/translation'
+import { MEDICAL_CODE_MAPPING } from '../medical/mapping'
+import { makeTranslationSimulator, sampleSourceOf } from '../translation'
 import {
   MEDICAL_DATASETS,
   MEDICAL_ER_CENSUS,
@@ -64,6 +67,8 @@ const ADOPTED: AgentId[] = [
   'ocr',
   'report',
   'meeting',
+  'translate',
+  'address',
 ]
 
 export const MEDICAL_PACK: DomainPackData = {
@@ -99,10 +104,12 @@ export const MEDICAL_PACK: DomainPackData = {
   simulate: {
     ocr: simulateMedicalOcr,
     report: simulateMedicalReport,
+    translate: makeTranslationSimulator(MEDICAL_TRANSLATION),
     meeting: simulateMedicalMinutes,
   },
-  samples: { attendees: MEDICAL_ATTENDEE_SAMPLE, agenda: MEDICAL_AGENDA_SAMPLE },
-  /* 릴레이가 부르는 표준화·번역이 도입 전이라 카드를 두지 않는다 */
+  samples: { translationSource: sampleSourceOf(MEDICAL_TRANSLATION), attendees: MEDICAL_ATTENDEE_SAMPLE, agenda: MEDICAL_AGENDA_SAMPLE },
+  /* 릴레이 흐름 자체가 아직 제조 이야기로 고정돼 있어 카드를 두지 않는다.
+     정의는 관리자 시나리오 빌더에 있다 */
   scenario: null,
   agentDefs: MEDICAL_AGENT_DEFS,
   scenarioDefs: MEDICAL_SCENARIO_DEFS,
@@ -111,4 +118,14 @@ export const MEDICAL_PACK: DomainPackData = {
   knowledgeAreas: MEDICAL_AREAS,
   indexEntries: MEDICAL_INDEX_ENTRIES,
   agentOps: MEDICAL_AGENT_OPS,
+  mapping: {
+    /* 병원은 주소가 아니라 청구 항목 코드를 푼다 */
+    modes: ['tags'],
+    address: null,
+    tagResult: MEDICAL_CODE_MAPPING,
+    tagsTargetNote: '진료과가 등록한 청구 항목 명칭 전체를 대상으로 합니다. 별도 입력이 필요하지 않습니다.',
+    ocrDocument: null,
+    addressExamples: [],
+    codeExamples: [],
+  },
 }

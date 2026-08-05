@@ -1,8 +1,11 @@
 /**
- * 문서 번역 fixture.
+ * 문서 번역 — **제조(한빛정밀) 대역과 공장 함수.**
  *
- * 세계관은 요약 fixture와 같은 제조(한빛정밀)다 — 같은 문서를 다른 에이전트로
+ * 세계관은 요약 fixture와 같은 제조다 — 같은 문서를 다른 에이전트로
  * 처리할 수 있어야 시연에서 이야기가 이어진다.
+ *
+ * ⚠️ 계산은 여기 두고 **말뭉치는 팩이 준다**(`makeTranslationSimulator`).
+ * 발주처마다 번역하는 문서도, 용어집도, 역번역이 흔들리는 문장도 다르다.
  *
  * 일부러 낮은 신뢰도 문장과 역번역 불일치를 섞었다. 전부 완벽하면
  * '사람이 봐야 하는 지점'을 보여주는 화면이 죽은 코드가 된다.
@@ -55,7 +58,7 @@ export const GLOSSARY: GlossaryEntry[] = [
 ]
 
 /** 문장 사전 — 성적서 5문장 */
-type SentenceEntry = {
+export type SentenceEntry = {
   id: number
   ko: string
   en: string
@@ -187,8 +190,8 @@ const pick = (e: SentenceEntry, lang: LanguageCode): string =>
   lang === 'ko' ? e.ko : lang === 'en' ? e.en : lang === 'ja' ? e.ja : e.zh
 
 /** 문서 전체(성적서 5문장)를 번역한다 */
-function documentSegments(req: TranslationRequest): TranslationSegment[] {
-  return SENTENCES.map((s) => ({
+function documentSegments(corpus: TranslationCorpus, req: TranslationRequest): TranslationSegment[] {
+  return corpus.sentences.map((s) => ({
     id: s.id,
     source: pick(s, req.from),
     target: pick(s, req.to),
@@ -204,13 +207,17 @@ function documentSegments(req: TranslationRequest): TranslationSegment[] {
  * 사전에 없는 문장은 번역하지 않고 그렇다고 표시한다 — 임의 문장은 엔진 없이
  * 번역할 수 없고, 그럴듯한 결과를 만들면 그게 제일 위험하다.
  */
-function textSegments(req: TranslationRequest, text: string): TranslationSegment[] {
+function textSegments(
+  corpus: TranslationCorpus,
+  req: TranslationRequest,
+  text: string,
+): TranslationSegment[] {
   return text
     .split('\n')
     .map((l) => l.trim())
     .filter((l) => l.length > 0)
     .map((line, i) => {
-      const hit = SENTENCES.find((s) => norm(pick(s, req.from)) === norm(line))
+      const hit = corpus.sentences.find((s) => norm(pick(s, req.from)) === norm(line))
       if (!hit) {
         return { id: i + 1, source: line, target: '', appliedTerms: [], confidence: 0, translated: false }
       }
@@ -235,14 +242,68 @@ const SUMMARY_BY_LANG: Record<LanguageCode, string> = {
   zh: 'SPCC 2.0T进货检验结果：硬度接近规格下限，渗碳热处理温度偏差超出管理界限，判定为有条件合格。毛刺在标准内，但模具更换时期临近。',
 }
 
+/**
+ * 한 발주처의 번역 말뭉치.
+ *
+ * 문장은 **네 언어를 모두** 갖는다. 목표 언어를 바꿔도 영어가 나오면
+ * 고른 것이 결과를 안 바꾸는 화면이 된다 — 이 저장소가 이미 밟은 함정이다.
+ */
+export type TranslationCorpus = {
+  glossary: GlossaryEntry[]
+  sentences: SentenceEntry[]
+  /** 한→외 번역문을 한국어로 되돌린 결과. 언어마다 되돌아오는 문장이 다르다 */
+  backToKo: Record<TargetLang, BackTranslationCheck[]>
+  /** 영→한일 때의 역번역 */
+  backToEn: BackTranslationCheck[]
+  summaryByLang: Record<LanguageCode, string>
+}
+
+export const MANUFACTURING_TRANSLATION: TranslationCorpus = {
+  glossary: GLOSSARY,
+  sentences: SENTENCES,
+  backToKo: BACK_TO_KO,
+  backToEn: BACK_TO_EN,
+  summaryByLang: SUMMARY_BY_LANG,
+}
+
+/** 말뭉치를 받아 번역기를 만든다 — 팩이 자기 말뭉치를 넣는다 */
+export function makeTranslationSimulator(
+  corpus: TranslationCorpus,
+): (req: TranslationRequest, text: string) => TranslationResult {
+  return (req, text) => simulateWith(corpus, req, text)
+}
+
+/** 예시 원문도 말뭉치에서 뽑는다 — 발주처를 바꾸면 입력창도 바뀐다 */
+export function sampleSourceOf(corpus: TranslationCorpus): Record<'ko' | 'en', string> {
+  return {
+    ko: corpus.sentences
+      .slice(0, 3)
+      .map((s) => s.ko)
+      .join('\n'),
+    en: corpus.sentences
+      .slice(0, 3)
+      .map((s) => s.en)
+      .join('\n'),
+  }
+}
+
 /** 설정을 반영한 번역 — 엔진이 붙으면 이 함수가 사라진다 */
 export function simulateTranslation(req: TranslationRequest, text: string): TranslationResult {
-  const segments = req.source === 'document' ? documentSegments(req) : textSegments(req, text)
+  return simulateWith(MANUFACTURING_TRANSLATION, req, text)
+}
+
+function simulateWith(
+  corpus: TranslationCorpus,
+  req: TranslationRequest,
+  text: string,
+): TranslationResult {
+  const segments =
+    req.source === 'document' ? documentSegments(corpus, req) : textSegments(corpus, req, text)
   const translated = segments.filter((s) => s.translated)
 
   const usedTerms = new Set(translated.flatMap((s) => s.appliedTerms))
   const ids = new Set(translated.map((s) => s.id))
-  const backSource = req.from === 'ko' ? BACK_TO_KO[req.to as TargetLang] : BACK_TO_EN
+  const backSource = req.from === 'ko' ? corpus.backToKo[req.to as TargetLang] : corpus.backToEn
 
   return {
     documentId: req.documentId,
@@ -251,10 +312,10 @@ export function simulateTranslation(req: TranslationRequest, text: string): Tran
     to: req.to,
     segments,
     untranslated: segments.length - translated.length,
-    glossaryUsed: req.useGlossary ? GLOSSARY.filter((g) => usedTerms.has(g.source)) : [],
+    glossaryUsed: req.useGlossary ? corpus.glossary.filter((g) => usedTerms.has(g.source)) : [],
     // 직접 입력이면 번역된 문장에 대해서만 역번역을 붙인다
     backChecks: backSource.filter((c) => ids.has(c.segmentId)),
-    summary: req.withSummary ? SUMMARY_BY_LANG[req.to] : null,
+    summary: req.withSummary ? corpus.summaryByLang[req.to] : null,
     elapsedSeconds: Math.round((segments.length * 1.6 + (req.withSummary ? 2.4 : 0)) * 10) / 10,
   }
 }

@@ -13,6 +13,8 @@ const GPT = { modelId: 'm-gpt-oss', modelName: 'GPT-OSS-120B' }
 const LLAMA = { modelId: 'm-llama-kor', modelName: 'Llama-3-Kor-Instruct' }
 
 export const CIVIC_AGENT_OPS: AgentOps[] = [
+  { agentId: 'address', ...LLAMA, areaIds: ['k-hsc-civil'], runs7d: 62, failed7d: 4, owner: '이서연 팀장', exposed: true },
+  { agentId: 'translate', ...LLAMA, areaIds: [], runs7d: 58, failed7d: 3, owner: '이서연 팀장', exposed: true },
   { agentId: 'summary', ...GPT, areaIds: ['k-hsc-rule'], runs7d: 142, failed7d: 4, owner: '이서연 팀장', exposed: true },
   { agentId: 'review', ...GPT, areaIds: ['k-hsc-rule'], runs7d: 174, failed7d: 6, owner: '이서연 팀장', exposed: true },
   { agentId: 'chatbot', ...GPT, areaIds: ['k-hsc-rule', 'k-hsc-civil', 'k-hsc-safety'], runs7d: 812, failed7d: 33, owner: '오현석 팀장', exposed: true },

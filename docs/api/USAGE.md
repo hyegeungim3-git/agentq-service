@@ -46,6 +46,7 @@
 | `POST /ocr:recognize` | `recognizeDocument` | `src/features/ocr/useOcr.ts`<br>`src/features/orchestration/useOrchestration.ts` |
 | `GET /queries/sources` | `fetchQuerySources` | `src/features/dataquery/useDataQuery.ts` |
 | `POST /queries` | `runQuery` | `src/features/dataquery/useDataQuery.ts`<br>`src/features/orchestration/useOrchestration.ts` |
+| `GET /mapping/config` | `fetchMappingConfig` | `src/features/mapping/useMapping.ts` |
 | `POST /mapping:run` | `runMapping` | `src/features/mapping/useMapping.ts`<br>`src/features/orchestration/useOrchestration.ts` |
 | `POST /analyses` | `analyzeData` | `src/features/analysis/useAnalysis.ts` |
 | `POST /safety-plans` | `createSafetyPlan` | `src/features/safety/useSafety.ts` |

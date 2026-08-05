@@ -11,6 +11,26 @@ import type { AgentDefinition, ScenarioDefinition } from '@entities/agentdef/mod
 
 export const CIVIC_AGENT_DEFS: AgentDefinition[] = [
   {
+    agentId: 'address', code: 'AGT-011', version: 'v0.9', owner: '이서연 · 민원여권과',
+    purpose: '신고서의 위치 표기를 도로명·행정동 체계로 맞추고 상한을 밝힙니다.',
+    capabilities: ['rag'], responseMode: 'grounded',
+    steps: [
+      { order: 1, name: '위치 표기 정규화', toolIds: [], humanCheck: false },
+      { order: 2, name: '점검 대장 대조', toolIds: ['t-hsc-civil'], humanCheck: false },
+      { order: 3, name: '표준화율·잔여 건수 산출', toolIds: [], humanCheck: false },
+    ],
+  },
+  {
+    agentId: 'translate', code: 'AGT-002', version: 'v1.1', owner: '이서연 · 민원여권과',
+    purpose: '외국인 주민 안내문을 용어집을 적용해 번역하고 역번역으로 검증합니다.',
+    capabilities: ['rag', 'hitl'], responseMode: 'grounded',
+    steps: [
+      { order: 1, name: '행정 용어집 적용 번역', toolIds: [], humanCheck: false },
+      { order: 2, name: '역번역 일치도 계산', toolIds: [], humanCheck: false },
+      { order: 3, name: '일치도 낮은 문장 검토', toolIds: [], humanCheck: true },
+    ],
+  },
+  {
     agentId: 'summary', code: 'AGT-001', version: 'v1.9', owner: '이서연 · 민원여권과',
     purpose: '처리지침·조례를 방식별로 요약하고 압축률을 함께 보여 줍니다.',
     capabilities: ['rag'], responseMode: 'grounded',

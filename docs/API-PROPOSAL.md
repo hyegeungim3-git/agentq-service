@@ -102,6 +102,7 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `POST /ocr:recognize` | `recognizeDocument` | `OcrRequest` → `OcrResult` (`entities/ocr/model.ts`) |
 | `GET /queries/sources` | `fetchQuerySources` | → `DataSourceOption[]` (`entities/dataquery/model.ts`). **소스 이름도 예시 질의도 발주처가 정한다** |
 | `POST /queries` | `runQuery` | `QueryRequest` → `QueryResult` (`entities/dataquery/model.ts`) |
+| `GET /mapping/config` | `fetchMappingConfig` | → 이 발주처가 쓰는 처리 유형·예시·대상 문서. **안 쓰는 유형을 라디오에 두면 고를 수 있는데 아무 일도 안 하는 칸이 된다** — 병원은 주소가 아니라 청구 항목 코드를 푼다 |
 | `POST /mapping:run` | `runMapping` | `MappingRequest` → `MappingResult` (`entities/mapping/model.ts`) |
 | `POST /analyses` | `analyzeData` | `AnalysisRequest` → `AnalysisResult` (`entities/analysis/model.ts`) |
 | `POST /safety-plans` | `createSafetyPlan` | `SafetyRequest` → `SafetyPlan` (`entities/safety/model.ts`) |

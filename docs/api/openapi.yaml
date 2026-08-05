@@ -977,6 +977,26 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/QueryRequest"
+  /mapping/config:
+    get:
+      operationId: fetchMappingConfig
+      summary: 이 발주처가 쓰는 처리 유형·예시·대상 문서
+      description: → 이 발주처가 쓰는 처리 유형·예시·대상 문서. **안 쓰는 유형을 라디오에 두면 고를 수 있는데 아무 일도 안 하는 칸이 된다** — 병원은 주소가 아니라 청구 항목 코드를 푼다
+      tags:
+        - mapping
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
   /mapping:run:
     post:
       operationId: runMapping

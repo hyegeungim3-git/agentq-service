@@ -1,5 +1,9 @@
 /**
- * 주소 표준화 fixture.
+ * 주소 표준화 — **제조(한빛정밀) 대역과 공장 함수.**
+ *
+ * ⚠️ 계산은 여기 두고 **주소 대장은 팩이 준다**(`makeAddressResolver`).
+ * 발주처마다 표준화하는 것이 다르다 — 공장은 사업장·협력사 주소를,
+ * 공시는 필지 소재지를, 시청은 광고물 위치를 푼다.
  *
  * ⚠️ 아래 `resolveAddress`는 **주소 정제 서버가 할 일의 대역**이다.
  * 실제 주소 API가 붙으면 이 파일은 사라지고 `shared/api/mapping`이 엔드포인트를 부른다.
@@ -20,7 +24,7 @@ import type {
   OcrAddressCandidate,
 } from '@entities/mapping/model'
 
-type AddressEntry = {
+export type AddressEntry = {
   /** 검색에 쓰는 표기들 — 현장에서 실제로 쓰는 축약·구표기 */
   aliases: string[]
   roadAddress: string
@@ -89,7 +93,7 @@ function fail(blocker: string, basisDetail: string): AddressResolution {
 }
 
 /** 비정형 주소 한 줄을 표준 주소로 — 서버가 붙으면 이 함수가 사라진다 */
-export function resolveAddress(input: string): AddressResolution {
+function resolveWith(book: AddressEntry[], input: string): AddressResolution {
   const q = norm(input)
   if (q.length === 0) {
     return fail('입력이 비어 있습니다.', '변환할 문자열이 없음')
@@ -103,7 +107,7 @@ export function resolveAddress(input: string): AddressResolution {
     )
   }
 
-  const hits = ADDRESS_BOOK.filter((e) => e.aliases.some((a) => q.includes(norm(a)) || norm(a).includes(q)))
+  const hits = book.filter((e) => e.aliases.some((a) => q.includes(norm(a)) || norm(a).includes(q)))
 
   if (hits.length === 0) {
     return fail(
@@ -179,12 +183,12 @@ export const BATCH_SAMPLE = [
   '1F, 21 Jurong East St 31, Singapore',
 ].join('\n')
 
-export function resolveBatch(text: string): BatchAddressRow[] {
+function batchWith(book: AddressEntry[], text: string): BatchAddressRow[] {
   return text
     .split('\n')
     .map((l) => l.trim())
     .filter((l) => l.length > 0)
-    .map((input, i) => ({ id: `row-${i}`, input, resolved: resolveAddress(input) }))
+    .map((input, i) => ({ id: `row-${i}`, input, resolved: resolveWith(book, input) }))
 }
 
 /**
@@ -192,14 +196,16 @@ export function resolveBatch(text: string): BatchAddressRow[] {
  * OCR 신뢰도가 낮은 줄은 주소가 맞는지부터 의심해야 하므로 표준화 불가로 둔다 —
  * 잘못 읽은 글자로 만든 '정상 주소'가 제일 위험하다.
  */
-const OCR_LINES: { text: string; lineNo: number; ocrConfidence: number }[] = [
+export type OcrLineSpec = { text: string; lineNo: number; ocrConfidence: number }
+
+const OCR_LINES: OcrLineSpec[] = [
   { text: '공급업체: 대성정밀공업(주) 부산 사상구 학감대로 123', lineNo: 2, ocrConfidence: 0.94 },
   { text: '납품처: 한빛정밀 창원본사 공단로 274', lineNo: 5, ocrConfidence: 0.97 },
   { text: '경유지: 광주 하남산단6번로 1O7', lineNo: 9, ocrConfidence: 0.63 },
 ]
 
-export function extractAddresses(): OcrAddressCandidate[] {
-  return OCR_LINES.map((l, i) => ({
+function extractWith(book: AddressEntry[], lines: OcrLineSpec[]): OcrAddressCandidate[] {
+  return lines.map((l, i) => ({
     id: `ocr-${i}`,
     text: l.text,
     lineNo: l.lineNo,
@@ -210,12 +216,14 @@ export function extractAddresses(): OcrAddressCandidate[] {
             'OCR 신뢰도가 낮아 원문을 신뢰할 수 없습니다. 원본과 대조한 뒤 다시 처리하십시오.',
             `OCR 신뢰도 ${Math.round(l.ocrConfidence * 100)}% — 기준 85% 미만`,
           )
-        : resolveAddress(l.text),
+        : resolveWith(book, l.text),
   }))
 }
 
 /** 법정동코드 → 주소. 폐지 코드를 하나 남겼다 — 실제 대장에는 반드시 있다 */
-const LEGAL_CODES: Record<string, { road: string; jibun: string; superseded: string | null; note: string }> = {
+export type LegalCodeEntry = { road: string; jibun: string; superseded: string | null; note: string }
+
+const LEGAL_CODES: Record<string, LegalCodeEntry> = {
   '4812310300': {
     road: '경상남도 창원시 성산구 공단로 274',
     jibun: '경상남도 창원시 성산구 신촌동',
@@ -242,9 +250,9 @@ const LEGAL_CODES: Record<string, { road: string; jibun: string; superseded: str
   },
 }
 
-export function lookupCode(code: string): CodeLookupResult {
+function lookupWith(codes: Record<string, LegalCodeEntry>, code: string): CodeLookupResult {
   const key = code.replace(/\D/g, '')
-  const hit = LEGAL_CODES[key]
+  const hit = codes[key]
 
   if (!hit) {
     return {
@@ -274,5 +282,44 @@ export function lookupCode(code: string): CodeLookupResult {
     status: hit.superseded ? 'review' : 'auto',
     blocker: null,
     elapsedSeconds: 1.4,
+  }
+}
+
+/**
+ * 한 발주처의 주소 표준화 자료.
+ *
+ * 대장에 없으면 못 푼다 — 그 사실을 그대로 답한다. 되는 척하면 잘못된
+ * 표준 주소가 대장에 들어가고, 그건 나중에 사람이 못 찾는다.
+ */
+export type AddressCorpus = {
+  book: AddressEntry[]
+  /** 문서에서 뽑은 주소 후보 — OCR 신뢰도가 낮으면 주소가 맞는지부터 의심한다 */
+  ocrLines: OcrLineSpec[]
+  legalCodes: Record<string, LegalCodeEntry>
+  /** 일괄 처리 예시 — 세 판정이 모두 나오도록 고른다 */
+  batchSample: string
+}
+
+export const MANUFACTURING_ADDRESS: AddressCorpus = {
+  book: ADDRESS_BOOK,
+  ocrLines: OCR_LINES,
+  legalCodes: LEGAL_CODES,
+  batchSample: BATCH_SAMPLE,
+}
+
+export type AddressResolver = {
+  resolveAddress: (input: string) => AddressResolution
+  resolveBatch: (text: string) => BatchAddressRow[]
+  extractAddresses: () => OcrAddressCandidate[]
+  lookupCode: (code: string) => CodeLookupResult
+}
+
+/** 자료를 받아 표준화기를 만든다 — 팩이 자기 대장을 넣는다 */
+export function makeAddressResolver(corpus: AddressCorpus): AddressResolver {
+  return {
+    resolveAddress: (input) => resolveWith(corpus.book, input),
+    resolveBatch: (text) => batchWith(corpus.book, text),
+    extractAddresses: () => extractWith(corpus.book, corpus.ocrLines),
+    lookupCode: (code) => lookupWith(corpus.legalCodes, code),
   }
 }

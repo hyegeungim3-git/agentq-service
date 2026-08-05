@@ -15,6 +15,26 @@ import type { AgentDefinition, ScenarioDefinition } from '@entities/agentdef/mod
 
 export const MEDICAL_AGENT_DEFS: AgentDefinition[] = [
   {
+    agentId: 'address', code: 'AGT-011', version: 'v1.1', owner: '서지은 · 적정진료관리실',
+    purpose: '진료과 항목 명칭을 급여 기준 코드 체계로 맞추고 상한을 밝힙니다.',
+    capabilities: ['rag'], responseMode: 'grounded',
+    steps: [
+      { order: 1, name: '항목 명칭 정규화', toolIds: [], humanCheck: false },
+      { order: 2, name: '급여 기준 코드 대조', toolIds: ['t-suh-claim'], humanCheck: false },
+      { order: 3, name: '표준화율·잔여 건수 산출', toolIds: [], humanCheck: false },
+    ],
+  },
+  {
+    agentId: 'translate', code: 'AGT-002', version: 'v1.3', owner: '고윤성 · 원무팀',
+    purpose: '외국인 환자 안내문을 용어집을 적용해 번역하고 역번역으로 검증합니다.',
+    capabilities: ['rag', 'hitl'], responseMode: 'grounded',
+    steps: [
+      { order: 1, name: '보험 용어집 적용 번역', toolIds: [], humanCheck: false },
+      { order: 2, name: '역번역 일치도 계산', toolIds: [], humanCheck: false },
+      { order: 3, name: '비용 안내 문장 확인', toolIds: [], humanCheck: true },
+    ],
+  },
+  {
     agentId: 'summary', code: 'AGT-001', version: 'v2.2', owner: '서지은 · 적정진료관리실',
     purpose: '심사지침·평가 결과를 방식별로 요약하고 압축률을 함께 보여 줍니다.',
     capabilities: ['rag'], responseMode: 'grounded',

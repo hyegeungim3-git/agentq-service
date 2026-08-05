@@ -12,7 +12,7 @@ async function openAgent(page: import('@playwright/test').Page, name: RegExp) {
 test.describe('기준정보 표준화 · 챗봇', () => {
   test('표준화 — AI로 안 되는 건수와 상한을 밝힌다', async ({ page }) => {
     await openAgent(page, /기준정보 표준화/)
-    await page.getByRole('button', { name: '태그 수집·매핑 분석' }).click()
+    await page.getByRole('button', { name: '태그·코드 매핑 분석' }).click()
     const s = page.getByRole('region', { name: '표준화 현황' })
     await expect(s).toBeVisible({ timeout: 10_000 })
     await expect(s).toContainText('660개는 AI로 해결되지 않습니다')
@@ -21,7 +21,7 @@ test.describe('기준정보 표준화 · 챗봇', () => {
 
   test('표준화 — 자동 확정 반영이 집계값으로 계산된다', async ({ page }) => {
     await openAgent(page, /기준정보 표준화/)
-    await page.getByRole('button', { name: '태그 수집·매핑 분석' }).click()
+    await page.getByRole('button', { name: '태그·코드 매핑 분석' }).click()
     await page.getByRole('button', { name: /자동 확정 1,172건 반영/ }).click()
     await expect(page.getByText(/표준화 62% → 86%/)).toBeVisible()
   })

@@ -67,15 +67,19 @@ test('제조 포털에 공공의 말이 한 글자도 없다', async ({ page }) 
   await expect(page.getByText(/PRS-C03/).first()).toBeVisible()
 })
 
-/* 13종을 첫날부터 쓰는 발주처는 없다 — '안 만든 것'과 '아직 안 산 것'을 구분한다 */
-test('도입 전 에이전트를 준비 중과 구분해 말한다', async ({ page }) => {
+/**
+ * 네 발주처가 이제 13종을 모두 도입했다.
+ *
+ * ⚠️ '도입 전' **표시 경로 자체는 살아 있다** — 팩의 `agents`에서 빼면 다시 그린다.
+ * 그 렌더 경로는 단위 테스트가 값을 주입해 지킨다(`HubPage.test.tsx`).
+ * 여기서는 지금 사실을 본다: 고를 수 있는 것이 실제로 다 열려 있는가.
+ */
+test('도입한 에이전트는 모두 열려 있다', async ({ page }) => {
   await enter(page, /한국부동산원/)
   await openTab(page, /^에이전트/)
-  /* 도입 전 카드의 접근성 이름에는 사유가 붙는다('회의록 작성 — 이 발주처 도입 전').
-     보조기기가 이유를 읽을 수 있어야 해서다 — 그래서 정확히 같은 이름으로 찾지 않는다 */
   await expect(page.getByRole('button', { name: '문서 요약', exact: true })).toBeEnabled()
-  await expect(page.getByRole('button', { name: /^문서 번역/ })).toBeDisabled()
-  await expect(page.getByText('도입 전').first()).toBeVisible()
+  await expect(page.getByRole('button', { name: '기준정보 표준화', exact: true })).toBeEnabled()
+  await expect(page.getByText('도입 전')).toHaveCount(0)
 })
 
 test('발주처 색이 실제로 바뀐다', async ({ page }) => {
@@ -144,14 +148,20 @@ test('공공 문서 인식은 공공 서식을 읽는다', async ({ page }) => {
   await expect(result).not.toContainText('수입검사 성적서')
 })
 
-/* 도입 안 한 에이전트는 눌러도 못 들어간다. 억지로 들어가더라도
-   경계가 '도입하지 않았습니다'라고 답해야 한다 — 빈 결과를 주면 더 나쁘다 */
-test('도입 전 에이전트는 목록에서 막혀 있다', async ({ page }) => {
+/* 안 쓰는 처리 유형은 라디오에 두지 않는다 — 고를 수 있는데 아무 일도 안 하는 칸이 된다 */
+test('기준정보 표준화가 발주처마다 다른 것을 푼다', async ({ page }) => {
   await enter(page, /한국부동산원/)
   await openTab(page, /^에이전트/)
-  for (const name of [/^문서 번역/, /^기준정보 표준화/]) {
-    await expect(page.getByRole('button', { name })).toBeDisabled()
-  }
+  await page.getByRole('button', { name: '기준정보 표준화', exact: true }).click()
+  await expect(page.getByRole('radio', { name: /단일 주소/ })).toBeVisible()
+  await expect(page.getByRole('radio', { name: /태그·코드 매핑/ })).toHaveCount(0)
+
+  /* 병원은 주소가 아니라 청구 항목 코드를 푼다 */
+  await enter(page, /새빛대학교병원/)
+  await openTab(page, /^에이전트/)
+  await page.getByRole('button', { name: '기준정보 표준화', exact: true }).click()
+  await expect(page.getByRole('radio', { name: /태그·코드 매핑/ })).toBeVisible()
+  await expect(page.getByRole('radio', { name: /단일 주소/ })).toHaveCount(0)
 })
 
 test('공공 보고서·회의록이 공공 내용으로 나온다', async ({ page }) => {
@@ -316,5 +326,21 @@ test('답변 근거의 지식 영역이 발주처마다 다르다', async ({ pag
   await expect(panel).toContainText('심사지침·급여 기준')
   for (const word of ['설비 대장·정비 이력', '작업표준·공정 문서', '협력사 공유 문서']) {
     await expect(panel).not.toContainText(word)
+  }
+})
+
+/* 번역은 목표 언어를 바꾸면 결과가 바뀌어야 하고, 문서도 발주처 것이어야 한다 */
+test('번역이 발주처 문서와 용어집으로 나온다', async ({ page }) => {
+  await enter(page, /새빛대학교병원/)
+  await openTab(page, /^에이전트/)
+  await page.getByRole('button', { name: '문서 번역', exact: true }).click()
+  await page.getByRole('button', { name: '번역 실행' }).click()
+
+  const result = page.getByRole('region', { name: /번역 결과/ })
+  await expect(result).toBeVisible({ timeout: 10_000 })
+  await expect(result).toContainText('본인부담금')
+  await expect(page.getByRole('region', { name: '적용된 용어집' })).toContainText('요양급여')
+  for (const word of ['침탄', '금형', '냉간압연강판']) {
+    await expect(result).not.toContainText(word)
   }
 })

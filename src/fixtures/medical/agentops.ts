@@ -14,6 +14,8 @@ const GPT = { modelId: 'm-gpt-oss', modelName: 'GPT-OSS-120B' }
 const LLAMA = { modelId: 'm-llama-kor', modelName: 'Llama-3-Kor-Instruct' }
 
 export const MEDICAL_AGENT_OPS: AgentOps[] = [
+  { agentId: 'address', ...LLAMA, areaIds: ['k-suh-guide'], runs7d: 88, failed7d: 6, owner: '서지은 실장', exposed: true },
+  { agentId: 'translate', ...LLAMA, areaIds: [], runs7d: 72, failed7d: 4, owner: '고윤성 팀장', exposed: true },
   { agentId: 'summary', ...GPT, areaIds: ['k-suh-guide', 'k-suh-notice'], runs7d: 214, failed7d: 9, owner: '서지은 실장', exposed: true },
   { agentId: 'review', ...GPT, areaIds: ['k-suh-guide'], runs7d: 96, failed7d: 5, owner: '고윤성 팀장', exposed: true },
   { agentId: 'chatbot', ...GPT, areaIds: ['k-suh-guide', 'k-suh-notice', 'k-suh-adjust'], runs7d: 1_024, failed7d: 41, owner: '서지은 실장', exposed: true },

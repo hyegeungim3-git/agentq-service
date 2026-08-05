@@ -25,6 +25,9 @@ import { PUBLIC_AGENT_DEFS, PUBLIC_SCENARIO_DEFS } from '../public/agentdef'
 import { PUBLIC_MCP_SERVERS, PUBLIC_TOOLS } from '../public/tools'
 import { PUBLIC_AREAS, PUBLIC_INDEX_ENTRIES } from '../public/knowledgebase'
 import { PUBLIC_AGENT_OPS } from '../public/agentops'
+import { PUBLIC_TRANSLATION } from '../public/translation'
+import { PUBLIC_ADDRESS } from '../public/mapping'
+import { makeTranslationSimulator, sampleSourceOf } from '../translation'
 import { PUBLIC_CORPUS, PUBLIC_KNOWLEDGE_BASES, PUBLIC_REFERENCE_SPEC } from '../public/knowledge'
 import { LAND_PRICE_CHANGE } from '../public/mapintel'
 import { PUBLIC_REGULATIONS } from '../public/regulation'
@@ -42,7 +45,7 @@ import { PUBLIC_SUMMARIES } from '../public/summary'
 import type { DomainPackData } from '../packs'
 
 /** 1단계 도입 — 업무 데이터가 갖춰진 것부터 */
-const ADOPTED: AgentId[] = ['chatbot', 'knowledge', 'internalreg', 'summary', 'review', 'dbquery', 'dataanalysis', 'safety', 'ocr', 'report', 'meeting']
+const ADOPTED: AgentId[] = ['chatbot', 'knowledge', 'internalreg', 'summary', 'review', 'dbquery', 'dataanalysis', 'safety', 'ocr', 'report', 'meeting', 'translate', 'address']
 
 export const PUBLIC_PACK: DomainPackData = {
   agents: ADOPTED,
@@ -79,12 +82,13 @@ export const PUBLIC_PACK: DomainPackData = {
   simulate: {
     ocr: simulatePublicOcr,
     report: makeReportSimulator(PUBLIC_REPORT_BASE),
+    translate: makeTranslationSimulator(PUBLIC_TRANSLATION),
     meeting: simulatePublicMinutes,
   },
   /* 번역·주소 예시는 그 에이전트를 도입할 때 함께 채운다 */
-  samples: { attendees: PUBLIC_ATTENDEE_SAMPLE, agenda: PUBLIC_AGENDA_SAMPLE },
-  /* 릴레이가 부르는 표준화·보고서가 아직 도입 전이라 카드를 두지 않는다.
-     띄워 두면 눌러도 아무 일 없는 버튼이 된다 */
+  samples: { translationSource: sampleSourceOf(PUBLIC_TRANSLATION), attendees: PUBLIC_ATTENDEE_SAMPLE, agenda: PUBLIC_AGENDA_SAMPLE },
+  /* 릴레이 흐름 자체가 아직 제조 이야기로 고정돼 있어 카드를 두지 않는다.
+     정의는 관리자 시나리오 빌더에 있다 */
   scenario: null,
   agentDefs: PUBLIC_AGENT_DEFS,
   scenarioDefs: PUBLIC_SCENARIO_DEFS,
@@ -93,4 +97,13 @@ export const PUBLIC_PACK: DomainPackData = {
   knowledgeAreas: PUBLIC_AREAS,
   indexEntries: PUBLIC_INDEX_ENTRIES,
   agentOps: PUBLIC_AGENT_OPS,
+  mapping: {
+    modes: ['address-single', 'address-batch', 'address-ocr', 'code-lookup'],
+    address: PUBLIC_ADDRESS,
+    tagResult: null,
+    tagsTargetNote: null,
+    ocrDocument: '표준지공시지가_이의신청서_2026-0417.pdf',
+    addressExamples: ['강남구 역삼동 737', '서초구 서초동 1303', '부산 해운대구 우동'],
+    codeExamples: ['1168010100', '4812110100', '9999999999'],
+  },
 }

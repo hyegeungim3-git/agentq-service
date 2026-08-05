@@ -9,6 +9,7 @@ import {
   blockedBy,
   checkPoints,
   noHumanCheck,
+  notAdopted,
   unknownAgents,
 } from '@entities/agentdef/model'
 import { AGENT_DEFS, SCENARIO_DEFS } from '@fixtures/agentdef'
@@ -119,17 +120,15 @@ describe('시나리오 빌더', () => {
   })
 
   /**
-   * 포털에 릴레이 카드가 없는 이유를 관리자도 같은 말로 해야 한다.
-   *
-   * 카탈로그에는 있으니 '없는 에이전트'로는 안 걸린다 — **안 산 것**이다.
+   * 네 발주처가 13종을 모두 도입해 '안 산 에이전트' 시나리오가 없어졌다.
+   * 판정 자체는 순수 함수로 지킨다(아래 `판정` 묶음) — 화면에서는
+   * 지금 사실을 본다: 병원 시나리오는 부르는 에이전트가 다 있다.
    */
-  it('도입하지 않은 에이전트를 부르는 시나리오를 못 도는 것으로 표시한다', async () => {
+  it('부르는 에이전트가 다 있는 시나리오는 못 도는 것으로 표시하지 않는다', async () => {
     render(<ScenarioBuilderPage />)
     await pick('새빛대학교병원')
-    expect(
-      await screen.findByText(/이 발주처가 도입하지 않은 에이전트를 부릅니다\(기준정보 표준화\)/),
-    ).toBeInTheDocument()
-    expect((await screen.findAllByText(/도입 전/)).length).toBeGreaterThan(0)
+    expect(await screen.findByText('청구 보류 건 회신 처리')).toBeInTheDocument()
+    expect(screen.queryByText(/도입하지 않은 에이전트를 부릅니다/)).not.toBeInTheDocument()
   })
 
   it('시나리오 저장은 성공한 척하지 않는다', async () => {
@@ -154,6 +153,14 @@ describe('판정', () => {
   it('확인 지점을 단계에서 찾는다', () => {
     const review = AGENT_DEFS.find((d) => d.agentId === 'review')
     expect(checkPoints(review as NonNullable<typeof review>)).toHaveLength(1)
+  })
+
+  /* 도입 목록에서 빠진 에이전트를 부르면 그 시나리오는 거기서 멈춘다 */
+  it('안 산 에이전트를 부르면 잡는다', () => {
+    const s = SCENARIO_DEFS[0] as NonNullable<(typeof SCENARIO_DEFS)[0]>
+    expect(notAdopted(s, AGENTS.map((a) => a.id))).toEqual([])
+    const without = AGENTS.map((a) => a.id).filter((id) => id !== 'address')
+    expect(notAdopted(s, without)).toEqual(['address'])
   })
 
   it('시나리오가 부르는 에이전트는 모두 카탈로그에 있다', () => {

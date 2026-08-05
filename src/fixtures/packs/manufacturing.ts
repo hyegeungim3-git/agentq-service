@@ -11,6 +11,8 @@ import { TOOLS } from '../packops'
 import { MCP_SERVERS } from '../evidence'
 import { AREAS, INDEX_ENTRIES } from '../knowledgebase'
 import { AGENT_OPS } from '../agentops'
+import { MANUFACTURING_ADDRESS } from '../address'
+import { MAPPING_RESULT } from '../mapping'
 import { ANALYSIS_RESULTS } from '../analysis'
 import { HAZARDS_CREW_1, HAZARDS_CREW_2, SAFETY_REFERENCES } from '../safety'
 import { CHAT_ENTRIES, CHAT_UNKNOWN, FAQ_ITEMS } from '../chat'
@@ -88,4 +90,13 @@ export const MANUFACTURING_PACK: DomainPackData = {
   knowledgeAreas: AREAS,
   indexEntries: INDEX_ENTRIES,
   agentOps: AGENT_OPS,
+  mapping: {
+    modes: ['tags', 'address-single', 'address-batch', 'address-ocr', 'code-lookup'],
+    address: MANUFACTURING_ADDRESS,
+    tagResult: MAPPING_RESULT,
+    tagsTargetNote: '수집 서버에 쌓인 설비 태그 전체를 대상으로 합니다. 별도 입력이 필요하지 않습니다.',
+    ocrDocument: '수입검사성적서_SPCC-2211.pdf',
+    addressExamples: ['창원본사 공단로 274', '대성정밀공업 부산 사상구', '한빛테크 광주 하남산단'],
+    codeExamples: ['4812310300', '4812110100', '9999999999'],
+  },
 }

@@ -176,7 +176,7 @@ const STATUS_LABEL: Record<MappingStatus, string> = {
 }
 
 const MODE_LABEL: Record<MappingMode, string> = {
-  tags: '설비 태그 매핑',
+  tags: '태그·코드 매핑',
   'address-single': '단일 주소',
   'address-batch': '일괄 처리',
   'address-ocr': 'OCR 파일',
@@ -184,10 +184,10 @@ const MODE_LABEL: Record<MappingMode, string> = {
 }
 
 const MODE_DESC: Record<MappingMode, string> = {
-  tags: '수집 태그를 표준 명명규칙으로 매핑·정비',
+  tags: '수집한 식별자를 표준 명명규칙으로 매핑·정비',
   'address-single': '비정형 주소 1건을 도로명·우편번호·법정동코드로 변환',
-  'address-batch': '협력사·사업장 목록을 붙여넣어 일괄 표준화',
-  'address-ocr': '검사성적서·거래명세서에서 주소를 뽑아 표준화',
+  'address-batch': '목록을 붙여넣어 일괄 표준화',
+  'address-ocr': '스캔 문서에서 주소를 뽑아 표준화',
   'code-lookup': '법정동코드로 정식 주소를 역방향 조회',
 }
 

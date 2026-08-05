@@ -25,6 +25,8 @@ import type { Dataset } from '@entities/dataset/model'
 import type { KnowledgeBase } from '@entities/knowledge/model'
 import type { IndexEntry, KnowledgeArea } from '@entities/knowledgebase/model'
 import type { MapIntel } from '@entities/mapintel/model'
+import type { MappingMode, TagMappingResult } from '@entities/mapping/model'
+import type { AddressCorpus } from './address'
 import type { LiveMetric } from '@entities/metric/model'
 import type { MeetingRequest, MeetingResult } from '@entities/meeting/model'
 import type { Notice } from '@entities/notice/model'
@@ -174,6 +176,28 @@ export type DomainPackData = {
    * 빈 값이 되고, 화면은 '빈틈 없음'이라고 말하게 된다.
    */
   agentOps: AgentOps[]
+  /**
+   * 기준정보 표준화 — **무엇을 표준화하는가가 발주처마다 다르다.**
+   *
+   * 공장은 설비 태그와 사업장 주소를, 공시는 필지 소재지를, 시청은 광고물
+   * 위치를, 병원은 청구 항목 코드를 푼다. 그래서 **쓰는 처리 유형**부터 다르다 —
+   * 안 쓰는 유형을 라디오에 두면 고를 수 있는데 아무 일도 안 하는 칸이 된다.
+   */
+  mapping: {
+    /** 이 발주처가 쓰는 처리 유형. 화면은 여기 있는 것만 그린다 */
+    modes: MappingMode[]
+    /** 주소 대장. 주소 유형을 안 쓰면 null — 병원은 주소가 아니라 코드를 푼다 */
+    address: AddressCorpus | null
+    /** 태그·코드 매핑 결과. 그 유형을 안 쓰면 null */
+    tagResult: TagMappingResult | null
+    /** 태그·코드 매핑이 무엇을 대상으로 하는가 — 공장은 설비 태그, 병원은 청구 항목이다 */
+    tagsTargetNote: string | null
+    /** 주소를 뽑을 문서. 그 유형을 안 쓰면 null */
+    ocrDocument: string | null
+    /** 입력창 아래 예시 — 이것도 발주처 것이다 */
+    addressExamples: string[]
+    codeExamples: string[]
+  }
 }
 
 /* 팩은 자기 모듈에서 자기 것만 만든다 — 서로를 참조하지 않는다 */

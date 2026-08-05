@@ -7,11 +7,32 @@
  * ⚠️ `toolIds`는 **이 팩의 도구**(`public/tools.ts`)를 가리킨다. 도구도 발주처마다
  * 다르다 — 여기는 실거래 신고와 표준지 조사 대장을 부른다.
  *
- * 도입한 11종만 있다. 번역·기준정보 표준화는 도입 전이라 정의도 없다.
+ * 13종을 모두 도입했다. 도입 전인 에이전트가 생기면 그 정의도 함께 빼야 한다 —
+ * 짝이 안 맞으면 못 쓰는 카드에 단계가 그려진다(팩 검사가 잡는다).
  */
 import type { AgentDefinition, ScenarioDefinition } from '@entities/agentdef/model'
 
 export const PUBLIC_AGENT_DEFS: AgentDefinition[] = [
+  {
+    agentId: 'address', code: 'AGT-011', version: 'v1.0', owner: '윤서경 · 토지공시부',
+    purpose: '이의신청서의 소재지 표기를 지번·법정동코드 체계로 맞추고 상한을 밝힙니다.',
+    capabilities: ['rag'], responseMode: 'grounded',
+    steps: [
+      { order: 1, name: '소재지 표기 정규화', toolIds: [], humanCheck: false },
+      { order: 2, name: '조사 대장 대조', toolIds: ['t-reb-parcel'], humanCheck: false },
+      { order: 3, name: '표준화율·잔여 건수 산출', toolIds: [], humanCheck: false },
+    ],
+  },
+  {
+    agentId: 'translate', code: 'AGT-002', version: 'v1.2', owner: '서지호 · 정보화지원부',
+    purpose: '외국인 안내문을 용어집을 적용해 번역하고 역번역으로 검증합니다.',
+    capabilities: ['rag', 'hitl'], responseMode: 'grounded',
+    steps: [
+      { order: 1, name: '제도 용어집 적용 번역', toolIds: [], humanCheck: false },
+      { order: 2, name: '역번역 일치도 계산', toolIds: [], humanCheck: false },
+      { order: 3, name: '일치도 낮은 문장 검토', toolIds: [], humanCheck: true },
+    ],
+  },
   {
     agentId: 'summary', code: 'AGT-001', version: 'v2.0', owner: '윤서경 · 토지공시부',
     purpose: '조사지침·과업지시서를 방식별로 요약하고 압축률을 함께 보여 줍니다.',
