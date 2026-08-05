@@ -35,7 +35,33 @@ jobs:
       # E2E는 preview 빌드를 띄워 돌린다(playwright.config.ts 참조).
       # 브라우저 설치는 CI에서만 필요하다.
       - run: npx playwright install --with-deps chromium
-      - run: npm run e2e
+
+      # 기능과 접근성을 **다른 step으로** 나눈다. 한 덩어리면 CI가 빨개졌을 때
+      # 로그를 열어야 어느 쪽인지 알 수 있다 — step 이름이 그 답을 대신한다.
+      #
+      # 잡(job)으로 나누지 않은 이유: 실측으로 접근성 20건은 10초, 기능 274건은
+      # 58초다. 잡을 나누면 checkout·npm ci·build·preview·브라우저 설치가 한 번
+      # 더 돌아 2~3분이 늘어난다. 10초를 병렬로 벌자고 3분을 더 쓰는 셈이다.
+      #
+      # 두 step의 `--grep`과 `--grep-invert`는 **같은 태그**를 쓴다. 그래서 어떤
+      # 테스트도 양쪽에서 다 빠질 수 없다 — 태그를 안 붙인 새 테스트는 기능 쪽으로
+      # 간다(안 도는 게 아니라). '안 본 화면이 통과한 화면처럼 보이는' 상태를 막는다.
+      # 지금은 두 명령이 서로의 여집합이라 구멍이 날 수 없다. 하지만 누군가
+      # `--grep`을 다른 태그로 바꾸면 그 순간 조용히 빠지는 테스트가 생긴다.
+      # 그래서 '두 몫의 합이 전체와 같은가'를 먼저 센다.
+      - name: 두 몫이 전체를 덮는지
+        run: |
+          count() { npx playwright test "$@" --list | sed -n 's/^Total: \([0-9]*\).*/\1/p'; }
+          A=$(count --grep @a11y)
+          B=$(count --grep-invert @a11y)
+          T=$(count)
+          echo "접근성 $A + 기능 $B = $((A+B)) / 전체 $T"
+          [ "$((A+B))" -eq "$T" ] || { echo "::error::어느 몫에도 안 들어간 테스트 $((T-A-B))건"; exit 1; }
+
+      - name: E2E — 기능
+        run: npm run e2e:app
+      - name: E2E — 접근성 (axe · 훑기 · 낭독기 재료)
+        run: npm run e2e:a11y
 
       # verify가 만든 dist를 그대로 배포한다 — 다시 빌드하면 검증한 것과
       # 다른 산출물이 나갈 수 있다.

@@ -156,7 +156,7 @@ const audit = async (
     return { findings: out, seen }
   }, where)
 
-test('접근성 훑기', async ({ page }) => {
+test('접근성 훑기 @a11y', async ({ page }) => {
   const all: Finding[] = []
   const thin: string[] = []
 
@@ -222,7 +222,7 @@ test('접근성 훑기', async ({ page }) => {
   expect(all).toEqual([])
 })
 
-test('키보드만으로 대화까지 간다', async ({ page }) => {
+test('키보드만으로 대화까지 간다 @a11y', async ({ page }) => {
   await page.goto('./')
   const trail: string[] = []
   for (let i = 0; i < 12; i += 1) {
@@ -251,7 +251,7 @@ test('키보드만으로 대화까지 간다', async ({ page }) => {
  * 팔레트를 뒤집는 방식이라 **한쪽에서 고친 명암비가 다른 쪽에서 깨질 수 있다.**
  * 실제로 흐린 글자 두 단계를 라이트에서 낮추자 다크 쪽 대응 색조가 함께 움직였다.
  */
-test('다크 스킨도 대비를 지킨다', async ({ page }) => {
+test('다크 스킨도 대비를 지킨다 @a11y', async ({ page }) => {
   await page.goto('./')
   await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'))
   await page.addStyleTag({
@@ -270,7 +270,7 @@ test('다크 스킨도 대비를 지킨다', async ({ page }) => {
 })
 
 /* 손가락으로 누르는 것은 44px보다 작으면 안 된다 */
-test('모바일 터치 타깃이 44px 이상이다', async ({ page, viewport }) => {
+test('모바일 터치 타깃이 44px 이상이다 @a11y', async ({ page, viewport }) => {
   /* 좁은 화면에서만 본다 — 넓은 화면의 조밀한 도구 모음까지 44px을 강요하지 않는다 */
   if ((viewport?.width ?? 0) > 500) return
   await page.goto('./')

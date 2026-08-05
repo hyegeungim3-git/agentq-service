@@ -33,7 +33,7 @@ const tree = async (page: import('@playwright/test').Page): Promise<Node[]> => {
   return out
 }
 
-test('낭독기가 화면 구조를 훑을 수 있다', async ({ page }) => {
+test('낭독기가 화면 구조를 훑을 수 있다 @a11y', async ({ page }) => {
   await page.goto('./')
   await page.getByRole('button', { name: /새빛대학교병원/ }).click()
   await expect(page.getByRole('textbox').first()).toBeVisible()
@@ -54,7 +54,7 @@ test('낭독기가 화면 구조를 훑을 수 있다', async ({ page }) => {
   expect(nodes.some((n) => n.role === 'heading' && n.name.length > 0)).toBe(true)
 })
 
-test('같은 이름의 조작 요소가 겹치지 않는다', async ({ page }) => {
+test('같은 이름의 조작 요소가 겹치지 않는다 @a11y', async ({ page }) => {
   await page.goto('./')
   await page.getByRole('button', { name: /새빛대학교병원/ }).click()
   await openTab(page, /^에이전트/)
@@ -73,7 +73,7 @@ test('같은 이름의 조작 요소가 겹치지 않는다', async ({ page }) =
   expect(dup, '이름이 같은 버튼이 여럿이면 골라 누를 수 없다').toEqual([])
 })
 
-test('결과가 나오면 낭독기에 알린다', async ({ page }) => {
+test('결과가 나오면 낭독기에 알린다 @a11y', async ({ page }) => {
   await page.goto('./')
   await page.getByRole('button', { name: /새빛대학교병원/ }).click()
   await openTab(page, /^에이전트/)

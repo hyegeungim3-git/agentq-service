@@ -40,7 +40,7 @@ const scan = async (page: import('@playwright/test').Page, where: string): Promi
   }))
 }
 
-test('규칙 엔진이 아는 위반이 없다 — 사용자 포털', async ({ page }) => {
+test('규칙 엔진이 아는 위반이 없다 — 사용자 포털 @a11y', async ({ page }) => {
   const all: Violation[] = []
 
   await page.goto('./')
@@ -70,7 +70,7 @@ test('규칙 엔진이 아는 위반이 없다 — 사용자 포털', async ({ p
   expect(all).toEqual([])
 })
 
-test('규칙 엔진이 아는 위반이 없다 — 관리자', async ({ page }) => {
+test('규칙 엔진이 아는 위반이 없다 — 관리자 @a11y', async ({ page }) => {
   const all: Violation[] = []
 
   await page.goto('./')
@@ -95,7 +95,7 @@ test('규칙 엔진이 아는 위반이 없다 — 관리자', async ({ page }) 
 })
 
 /* 팔레트를 뒤집으면 대비만 바뀌는 게 아니다 — 엔진에게 한 번 더 물어본다 */
-test('다크 스킨도 규칙 엔진을 통과한다', async ({ page }) => {
+test('다크 스킨도 규칙 엔진을 통과한다 @a11y', async ({ page }) => {
   await page.goto('./')
   await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'))
   await expect(page.getByRole('button', { name: /새빛대학교병원/ })).toBeVisible()
