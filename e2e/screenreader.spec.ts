@@ -41,7 +41,11 @@ test('낭독기가 화면 구조를 훑을 수 있다 @a11y', async ({ page }) =
   const nodes = await tree(page)
   const roles = nodes.map((n) => n.role)
 
-  /* 본문·탐색이 있어야 '본문으로 건너뛰기'가 성립한다 */
+  /* ⚠️ 랜드마크가 있다고 '본문으로 건너뛰기'가 되는 것은 아니다. 이 저장소에는
+     skip link가 0건이고, 사이드바 정지점 40여 곳을 Tab으로 다 지나야 본문에 닿는다.
+     낭독기 사용자는 D(랜드마크 이동)로 우회하지만 키보드만 쓰는 사람에겐 우회로가 없다.
+     여기서 보는 것은 '랜드마크로 본문을 찾을 수 있는가'까지다 —
+     건너뛰기 링크 자체는 docs/A11Y-SCREENREADER.md의 알려진 결함 15번이다 */
   expect(roles, '본문 랜드마크가 없으면 낭독기가 본문을 못 찾는다').toContain('main')
   expect(roles.filter((r) => r === 'main'), '본문이 둘이면 어느 쪽이 본문인지 알 수 없다').toHaveLength(1)
   /* 좁은 화면에서는 사이드바가 접혀 있어 탐색이 트리에 없다 — 대신 여는 버튼이

@@ -120,7 +120,7 @@ function QueryResultView({ result, sourceLabel }: { result: QueryResult; sourceL
           ['소요', `${result.elapsedSeconds}초`],
         ]}
       >
-        <div className="overflow-x-auto" tabIndex={0}>
+        <div className="overflow-x-auto" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
           <table className="w-full min-w-[30rem] text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
@@ -155,7 +155,7 @@ function QueryResultView({ result, sourceLabel }: { result: QueryResult; sourceL
         title="질의 해석 근거"
         notice="AI가 생성한 조회입니다. 수치를 인용하기 전 가정과 주의 사항을 확인하십시오."
       >
-        <div className="overflow-x-auto" tabIndex={0}>
+        <div className="overflow-x-auto" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
           <table className="w-full min-w-[26rem] text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-left text-xs text-slate-500">

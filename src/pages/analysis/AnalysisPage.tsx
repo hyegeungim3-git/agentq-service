@@ -106,7 +106,7 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
               </Suspense>
 
               {/* 차트는 스크린리더가 못 읽는다 — 같은 데이터를 표로도 준다 */}
-              <div className="mt-4 overflow-x-auto" tabIndex={0}>
+              <div className="mt-4 overflow-x-auto" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
                 <table className="w-full min-w-[22rem] text-sm">
                   <caption className="sr-only">{analysisKindLabel(res.kind)} 데이터</caption>
                   <thead>

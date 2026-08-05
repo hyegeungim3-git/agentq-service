@@ -266,7 +266,7 @@ export function ToolDeployPage() {
                   </div>
                 )}
 
-                <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white" tabIndex={0}>
+                <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
                   <table className="w-full min-w-[40rem] text-left text-xs">
                     <thead className="bg-slate-50 text-[11px] text-slate-500">
                       <tr>

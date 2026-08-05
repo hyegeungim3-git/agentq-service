@@ -86,7 +86,7 @@ export function AppSurfacePage() {
             사용자 포털에서 고를 수 있는 곳과 같은 기준입니다 — 여기서만 열려 있는 것처럼 보이면
             안 됩니다.
           </p>
-          <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" tabIndex={0}>
+          <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
             <table className="w-full min-w-[36rem] text-left text-xs">
               <thead className="bg-slate-50 text-[11px] text-slate-500">
                 <tr>

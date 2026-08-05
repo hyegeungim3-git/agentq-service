@@ -221,7 +221,7 @@ export function OcrPage({ onBack, apiOptions }: { onBack?: () => void; apiOption
 
             {res.table.length > 0 && (
               <ResultSection id="ocr-table" title="추출한 표">
-                <div className="overflow-x-auto" tabIndex={0}>
+                <div className="overflow-x-auto" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
                   <table className="w-full min-w-[22rem] text-sm">
                     <caption className="sr-only">추출한 표</caption>
                     <thead>

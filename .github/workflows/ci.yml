@@ -60,7 +60,12 @@ jobs:
 
       - name: E2E — 기능
         run: npm run e2e:app
+      # `if: always()`가 없으면 기능이 깨진 커밋의 접근성은 통과도 실패도 아닌
+      # **'안 봄'**이 된다 — 그런데 화면에는 빨간 verify 하나만 남아서
+      # 안 본 것이 안 보인다. 이 저장소가 가장 싫어하는 상태다.
+      # 앞 step이 실패해도 돌리고, 결과는 그대로 잡의 성패에 반영된다.
       - name: E2E — 접근성 (axe · 훑기 · 낭독기 재료)
+        if: always()
         run: npm run e2e:a11y
 
       # verify가 만든 dist를 그대로 배포한다 — 다시 빌드하면 검증한 것과
