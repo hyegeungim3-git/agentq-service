@@ -1,6 +1,6 @@
 import { DATA_SOURCES, sourceLabel, type QueryResult } from '@entities/dataquery/model'
 import { useDataQuery, type DataQueryOptions } from '@features/dataquery/useDataQuery'
-import { AgentPageHeader } from '@widgets/agent-shell/AgentShell'
+import { AgentPageHeader, ResultSection } from '@widgets/agent-shell/AgentShell'
 import { Play } from 'lucide-react'
 
 /**
@@ -105,13 +105,15 @@ export function DataQueryPage({
 function QueryResultView({ result }: { result: QueryResult }) {
   return (
     <>
-      <section aria-labelledby="query-rows" className="rounded-xl border border-slate-200 bg-white p-5">
-        <h2 id="query-rows" className="text-sm font-black text-slate-900">
-          조회 결과 — {sourceLabel(result.source)} {result.rows.length}건
-        </h2>
-        <p className="mt-1 text-xs text-slate-500">소요 {result.elapsedSeconds}초</p>
-
-        <div className="mt-3 overflow-x-auto">
+      <ResultSection
+        id="query-rows"
+        title={`조회 결과 — ${sourceLabel(result.source)} ${result.rows.length}건`}
+        stats={[
+          ['조회 건수', `${result.rows.length}건`],
+          ['소요', `${result.elapsedSeconds}초`],
+        ]}
+      >
+        <div className="overflow-x-auto">
           <table className="w-full min-w-[30rem] text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
@@ -138,15 +140,15 @@ function QueryResultView({ result }: { result: QueryResult }) {
             </tbody>
           </table>
         </div>
-      </section>
+      </ResultSection>
 
       {/* 이 절이 이 에이전트의 값어치다 — 말없이 가정하면 틀린 수치를 맞다고 믿는다 */}
-      <section aria-labelledby="query-basis" className="rounded-xl border border-slate-200 bg-white p-5">
-        <h2 id="query-basis" className="text-sm font-black text-slate-900">
-          질의 해석 근거
-        </h2>
-
-        <div className="mt-3 overflow-x-auto">
+      <ResultSection
+        id="query-basis"
+        title="질의 해석 근거"
+        notice="AI가 생성한 조회입니다. 수치를 인용하기 전 가정과 주의 사항을 확인하십시오."
+      >
+        <div className="overflow-x-auto">
           <table className="w-full min-w-[26rem] text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
@@ -209,10 +211,7 @@ function QueryResultView({ result }: { result: QueryResult }) {
           </div>
         )}
 
-        <p className="mt-5 text-xs text-slate-400">
-          AI가 생성한 조회입니다. 수치를 인용하기 전 가정과 주의 사항을 확인하십시오.
-        </p>
-      </section>
+      </ResultSection>
     </>
   )
 }

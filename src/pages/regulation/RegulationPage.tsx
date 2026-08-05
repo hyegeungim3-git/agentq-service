@@ -1,6 +1,6 @@
 import { REGULATION_CATEGORIES, categoryLabel, isStale } from '@entities/regulation/model'
 import { useRegulation, type RegulationOptions } from '@features/regulation/useRegulation'
-import { AgentPageHeader } from '@widgets/agent-shell/AgentShell'
+import { AgentPageHeader, ResultSection } from '@widgets/agent-shell/AgentShell'
 import { Play } from 'lucide-react'
 
 /**
@@ -94,14 +94,12 @@ export function RegulationPage({
           )}
 
           {r.phase.kind === 'done' && (
-            <section
-              aria-labelledby="reg-answer"
-              className="rounded-xl border border-slate-200 bg-white p-5"
+            <ResultSection
+              id="reg-answer"
+              title="조회 결과"
+              notice="AI가 검색한 결과입니다. 최종 판단은 원문과 담당 부서 확인이 필요합니다."
             >
-              <h2 id="reg-answer" className="text-sm font-black text-slate-900">
-                조회 결과
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-slate-800">{r.phase.result.answer}</p>
+              <p className="text-sm leading-relaxed text-slate-800">{r.phase.result.answer}</p>
 
               {r.phase.result.citations.length === 0 ? (
                 <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-bold text-amber-900">
@@ -143,10 +141,7 @@ export function RegulationPage({
                 </>
               )}
 
-              <p className="mt-5 text-xs text-slate-400">
-                AI가 검색한 결과입니다. 최종 판단은 원문과 담당 부서 확인이 필요합니다.
-              </p>
-            </section>
+            </ResultSection>
           )}
         </div>
       </div>

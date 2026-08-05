@@ -13,7 +13,7 @@ import {
 } from '@entities/knowledge/model'
 import { REFERENCE_SPEC } from '@fixtures/knowledge'
 import { useKnowledge, type KnowledgeOptions } from '@features/knowledge/useKnowledge'
-import { AgentPageHeader } from '@widgets/agent-shell/AgentShell'
+import { AgentPageHeader, ResultSection } from '@widgets/agent-shell/AgentShell'
 import { Play } from 'lucide-react'
 
 const EXAMPLES = ['브래킷 굽힘 금형', '진동 관리 기준', '절삭유 농도', '버 과다']
@@ -242,28 +242,22 @@ function SearchResultView({
 
   return (
     <>
-      <section aria-labelledby="k-summary" className="rounded-xl border border-slate-200 bg-white p-5">
-        <h2 id="k-summary" className="text-sm font-black text-slate-900">
-          검색 결과 {result.hits.length}건
-        </h2>
-
-        <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            ['검색어', result.query],
-            ['검색 범위', `${result.indexedCount.toLocaleString('ko-KR')}개 문서`],
-            ['방식', searchModeLabel(result.mode)],
-            ['소요', `${result.elapsedSeconds}초`],
-          ].map(([label, value]) => (
-            <div key={label} className="rounded-lg bg-slate-50 px-3 py-2">
-              <dt className="text-[11px] text-slate-500">{label}</dt>
-              <dd className="truncate text-sm font-black text-slate-900">{value}</dd>
-            </div>
-          ))}
-        </dl>
-
+      <ResultSection
+        id="k-summary"
+        title={`검색 결과 ${result.hits.length}건`}
+        stats={[
+          ['검색어', result.query],
+          ['검색 범위', `${result.indexedCount.toLocaleString('ko-KR')}개 문서`],
+          ['방식', searchModeLabel(result.mode)],
+          ['소요', `${result.elapsedSeconds}초`],
+        ]}
+        notice={
+          result.hits.length > 0 ? 'AI가 찾은 결과입니다. 적용 전 담당자 검토가 필요합니다.' : undefined
+        }
+      >
         {/* 필터에 걸려 빠진 것을 감추면 '없다'로 읽힌다 — 있는데 안 보여 준 것뿐인데 */}
         {hidden && (
-          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
             <p className="text-sm font-bold text-amber-900">조건에 맞았지만 빠진 문서가 있습니다.</p>
             <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm text-amber-900">
               {result.excludedBySecurity > 0 && (
@@ -290,15 +284,11 @@ function SearchResultView({
               : '이 검색 범위에는 해당하는 문서가 없습니다. 다른 말로 찾거나 시맨틱 검색을 써 보십시오.'}
           </p>
         )}
-      </section>
+      </ResultSection>
 
       {result.hits.map((hit) => (
         <HitCard key={hit.id} hit={hit} baseName={baseName} />
       ))}
-
-      {result.hits.length > 0 && (
-        <p className="text-xs text-slate-400">AI가 찾은 결과입니다. 적용 전 담당자 검토가 필요합니다.</p>
-      )}
     </>
   )
 }

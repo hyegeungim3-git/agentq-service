@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useId, useRef, useState } from 'react'
-import { ChevronLeft, CloudUpload, FileText, Play, type LucideIcon } from 'lucide-react'
+import { ChevronLeft, CloudUpload, FileText, Info, Play, Sparkles, type LucideIcon } from 'lucide-react'
 import { formatSize } from '@entities/document/model'
 import { acceptAttr } from '@entities/upload/model'
 import type { AgentId } from '@entities/agent/model'
@@ -339,7 +339,16 @@ export function AgentPageHeader({
   )
 }
 
-/** 결과 절 공용 — 제목과 지표 카드가 반복돼 함께 뺐다. */
+/**
+ * 결과 절 공용 — 제목과 지표 카드가 반복돼 함께 뺐다.
+ *
+ * **입력 카드와 같은 모양이면 안 된다.** 문서 고르기·옵션·결과가 전부 흰 카드라
+ * 스크롤하다 보면 어디부터가 AI가 만든 것인지 모른다. 그래서 결과에만 머리 띠를 두고
+ * 브랜드 색을 쓴다 — 이 아래가 사람이 고른 것이 아니라 **모델이 만든 것**이다.
+ *
+ * `notice`(AI 생성물 고지)는 예전에 가장 흐린 회색 한 줄이었다. 규제상 붙여야 하는
+ * 문구인데 화면에서 가장 안 보이는 자리에 있었다 — 블록으로 세운다.
+ */
 export function ResultSection({
   id,
   title,
@@ -351,25 +360,39 @@ export function ResultSection({
   title: string
   stats?: [string, string][]
   children: ReactNode
-  notice?: string
+  notice?: string | undefined
 }) {
   return (
-    <section aria-labelledby={id} className="rounded-xl border border-slate-200 bg-white p-5">
-      <h2 id={id} className="text-sm font-black text-slate-900">
-        {title}
-      </h2>
-      {stats && stats.length > 0 && (
-        <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {stats.map(([k, v]) => (
-            <div key={k} className="bg-brand-soft rounded-lg px-3 py-2">
-              <dt className="text-[11px] text-slate-500">{k}</dt>
-              <dd className="text-sm font-black text-slate-900">{v}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
-      <div className="mt-4">{children}</div>
-      {notice && <p className="mt-5 text-xs text-slate-400">{notice}</p>}
+    <section
+      aria-labelledby={id}
+      className="border-brand-soft overflow-hidden rounded-xl border bg-white"
+    >
+      <div className="bg-brand-soft border-brand-soft flex items-center gap-2 border-b px-5 py-3">
+        <Sparkles className="text-brand size-4 shrink-0" aria-hidden="true" />
+        <h2 id={id} className="min-w-0 text-sm font-black text-slate-900">
+          {title}
+        </h2>
+      </div>
+
+      <div className="p-5">
+        {stats && stats.length > 0 && (
+          <dl className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {stats.map(([k, v]) => (
+              <div key={k} className="rounded-lg border border-slate-200 px-3 py-2">
+                <dt className="text-[11px] text-slate-500">{k}</dt>
+                <dd className="text-brand text-base font-black">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+        {children}
+        {notice && (
+          <p className="mt-5 flex items-start gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+            <Info className="mt-0.5 size-3.5 shrink-0 text-slate-400" aria-hidden="true" />
+            <span>{notice}</span>
+          </p>
+        )}
+      </div>
     </section>
   )
 }
