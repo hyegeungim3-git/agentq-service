@@ -124,7 +124,8 @@ export function PortalPage({
           <button
             type="button"
             onClick={onAdmin}
-            className="flex w-full items-center gap-4 rounded-xl border border-slate-300 bg-white p-5 text-left hover:border-slate-400 hover:bg-slate-50"
+            /* 발주처 카드와 같은 포커스 표시 — 이 버튼만 브라우저 기본 테두리였다 */
+            className="flex w-full items-center gap-4 rounded-xl border border-slate-300 bg-white p-5 text-left outline-slate-900 hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-slate-900">
               <SlidersHorizontal className="size-5 text-white" aria-hidden="true" />
