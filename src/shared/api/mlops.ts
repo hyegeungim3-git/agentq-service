@@ -19,13 +19,14 @@ export function fetchDatasets(): Promise<ApiResult<Dataset[]>> {
 }
 
 export function fetchWorkspaces(): Promise<ApiResult<Workspace[]>> {
-  // TODO(api-미확정): GET /workspaces 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
+  /* 포털의 업무 공간(`shared/api/workspaces`)과 **다른 자원**이다 — 여기는 GPU를 잡는 개발 방이다 */
+  // TODO(api-미확정): GET /devenv/workspaces 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
   return Promise.resolve({ ok: true, data: WORKSPACES })
 }
 
 export function releaseWorkspace(id: string): Promise<ApiResult<never>> {
   void id
-  // TODO(api-미확정): POST /workspaces/{id}:release 로 교체. 제거 조건 = 백엔드가 인증·회수 정책을 확정.
+  // TODO(api-미확정): POST /devenv/workspaces/{id}:release 로 교체. 제거 조건 = 백엔드가 인증·회수 정책을 확정.
   return Promise.resolve({
     ok: false,
     error: '자원을 회수하지 못했습니다. 서버가 연결되지 않아 GPU는 그대로 잡혀 있습니다.',

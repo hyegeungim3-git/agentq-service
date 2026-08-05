@@ -60,6 +60,23 @@ export type UnmatchedReason = {
 export type MappingMode = 'tags' | 'address-single' | 'address-batch' | 'address-ocr' | 'code-lookup'
 
 /** 주소 한 건의 표준화 결과 */
+/**
+ * 표준화 요청.
+ *
+ * 다른 에이전트의 요청 타입과 마찬가지로 **엔티티가 갖는다.**
+ * 경계 파일(`shared/api`)에 두면 계약 타입이 화면 코드와 같은 층에 섞이고,
+ * 명세를 뽑을 때 한 곳에서 못 찾는다 — 실제로 OpenAPI 생성이 이것만 놓쳤다.
+ */
+export type MappingRequest = {
+  mode: MappingMode
+  /** 단일 주소·코드 역조회의 입력 */
+  query: string
+  /** 일괄 처리 입력 — 줄바꿈으로 구분 */
+  batchText: string
+  /** OCR 대상 문서 이름 */
+  documentName: string
+}
+
 export type AddressResolution = {
   status: MappingStatus
   /** 0~1 */

@@ -1,0 +1,116 @@
+# 주소별 사용처 (자동 생성)
+
+> `node scripts/build-openapi.mjs` 가 코드에서 뽑는다. 손으로 고치지 마십시오.
+>
+> 응답을 바꾸기 전에 **여기 적힌 파일이 무엇을 그리는지** 보십시오.
+> 비어 있는 줄은 아직 화면이 안 쓰는 것이다 — 지금 만들 필요가 없다는 뜻이기도 하다.
+
+| 주소 | 클라이언트 함수 | 쓰는 곳 |
+|---|---|---|
+| `GET /domains` | `fetchDomains` | `src/pages/portal/PortalPage.tsx` |
+| `GET /domains/{id}` | `fetchDomain` | `src/App.tsx` |
+| `GET /workspaces` | `fetchWorkspaces` | `src/App.tsx` |
+| `GET /notices` | `fetchNotices` | `src/App.tsx`<br>`src/pages/notices/NoticesPage.tsx` |
+| `GET /documents` | `fetchDocuments` | `src/features/agent-run/useAgentRun.ts` |
+| `POST /documents` | `uploadDocument` | `src/features/agent-run/useAgentRun.ts` |
+| `GET /compliance/evidence` | `fetchEvidence` | `src/pages/admin/compliance/AiActPage.tsx` |
+| `GET /tools/servers` | `fetchMcpServers` | `src/pages/admin/packops/ToolDeployPage.tsx` |
+| `GET /volumes` | `fetchVolumes` | `src/pages/admin/mlops/VolumePage.tsx` |
+| `DELETE /volumes/{id}` | `releaseVolume` | `src/pages/admin/mlops/VolumePage.tsx` |
+| `GET /vector/collections` | `fetchCollections` | `src/pages/admin/datainfra/VectorDbPage.tsx` |
+| `GET /ingest/sources` | `fetchIngestSources` | `src/pages/admin/datainfra/IngestPage.tsx` |
+| `POST /ingest/sources/{id}:run` | `runIngest` | `src/pages/admin/datainfra/IngestPage.tsx` |
+| `GET /benchmarks` | `fetchBenchmarks` | `src/pages/admin/datainfra/BenchmarkPage.tsx` |
+| `GET /benchmarks/runs` | `fetchBenchmarkRuns` | `src/pages/admin/datainfra/BenchmarkPage.tsx` |
+| `GET /apps/instances` | `fetchAppInstances` | `src/pages/admin/appinst/AppInstancePage.tsx` |
+| `PATCH /apps/instances/{id}` | `setInstanceLive` | `src/pages/admin/appinst/AppInstancePage.tsx` |
+| `GET /knowledge/pipeline-runs` | `fetchPipelineRuns` | `src/pages/admin/appinst/PipelinePage.tsx` |
+| `GET /agents/definitions` | `fetchAgentDefs` | `src/pages/admin/agentdef/FlowBuilderPage.tsx`<br>`src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/hub/HubPage.tsx` |
+| `PUT /agents/definitions/{id}` | `saveAgentDef` | `src/pages/admin/agentdef/FlowBuilderPage.tsx` |
+| `GET /workflows` | `fetchWorkflows` | `src/pages/admin/agentdef/WorkflowPage.tsx` |
+| `PATCH /workflows/{id}` | `setWorkflowEnabled` | `src/pages/admin/agentdef/WorkflowPage.tsx` |
+| `GET /scenarios` | `fetchScenarioDefs` | `src/pages/admin/agentdef/ScenarioBuilderPage.tsx` |
+| `PUT /scenarios/{id}` | `saveScenario` | `src/pages/admin/agentdef/ScenarioBuilderPage.tsx` |
+| `GET /analysis/datasets` | `fetchDatasets` | `src/features/analysis/useAnalysis.ts` |
+| `POST /analysis/datasets` | `uploadDataset` | `src/features/analysis/useAnalysis.ts` |
+| `POST /summaries` | `createSummary` | `src/features/summarize/useSummarize.ts` |
+| `POST /translations` | `createTranslation` | `src/features/translate/useTranslate.ts` |
+| `POST /reviews` | `createReview` | `src/features/review/useReview.ts` |
+| `POST /reports` | `createReport` | `src/features/orchestration/useOrchestration.ts`<br>`src/features/report/useReport.ts` |
+| `POST /minutes` | `createMinutes` | `src/features/meeting/useMeeting.ts` |
+| `POST /regulations:search` | `askRegulation` | `src/features/regulation/useRegulation.ts` |
+| `GET /knowledge-bases` | `fetchKnowledgeBases` | `src/features/knowledge/useKnowledge.ts` |
+| `POST /knowledge:search` | `searchKnowledge` | `src/features/knowledge/useKnowledge.ts` |
+| `POST /ocr:recognize` | `recognizeDocument` | `src/features/ocr/useOcr.ts`<br>`src/features/orchestration/useOrchestration.ts` |
+| `POST /queries` | `runQuery` | `src/features/dataquery/useDataQuery.ts`<br>`src/features/orchestration/useOrchestration.ts` |
+| `POST /mapping:run` | `runMapping` | `src/features/mapping/useMapping.ts`<br>`src/features/orchestration/useOrchestration.ts` |
+| `POST /analyses` | `analyzeData` | `src/features/analysis/useAnalysis.ts` |
+| `POST /safety-plans` | `createSafetyPlan` | `src/features/safety/useSafety.ts` |
+| `POST /chat/messages` | `sendMessage` | `src/features/chat/useChat.ts` |
+| `GET /chat/faq` | `fetchFaq` | `src/features/chat/useChat.ts` |
+| `GET /metrics/live` | `fetchLiveMetrics` | `src/App.tsx` |
+| `GET /signals` | `fetchSignals` | `src/App.tsx` |
+| `GET /infra/cluster` | `fetchCluster` | `src/pages/admin/system/SystemStatusPage.tsx` |
+| `GET /infra/nodes` | `fetchNodes` | `src/pages/admin/system/SystemStatusPage.tsx` |
+| `GET /infra/pods` | `fetchPods` | `src/pages/admin/system/SystemStatusPage.tsx` |
+| `GET /infra/services` | `fetchServices` | `src/pages/admin/service/ServiceStatusPage.tsx` |
+| `GET /infra/gpus` | `fetchGpuNodes` | `src/pages/admin/gpu/GpuStatusPage.tsx` |
+| `GET /users` | `fetchUsers` | `src/pages/admin/users/QuotaPage.tsx`<br>`src/pages/admin/users/UserListPage.tsx` |
+| `PATCH /users/{id}` | `updateUserState` | `src/pages/admin/users/UserListPage.tsx` |
+| `GET /approvals` | `fetchApprovals` | `src/pages/admin/users/ApprovalPage.tsx` |
+| `POST /approvals/{id}:decide` | `decideApproval` | `src/pages/admin/users/ApprovalPage.tsx` |
+| `GET /audit/access` | `fetchAccessLogs` | `src/pages/admin/users/AccessLogPage.tsx` |
+| `GET /audit/coverage` | `fetchLogGaps` | `src/pages/admin/users/AccessLogPage.tsx` |
+| `GET /access-rules` | `fetchBlockRules` | `src/pages/admin/users/BlockRulePage.tsx` |
+| `POST /access-rules` | `createBlockRule` | `src/pages/admin/users/BlockRulePage.tsx` |
+| `GET /llm/models` | `fetchModels` | `src/pages/admin/llmops/ModelPage.tsx` |
+| `PATCH /llm/models/{id}` | `updateModelParams` | `src/pages/admin/llmops/ModelPage.tsx` |
+| `GET /llm/rerank-pipelines` | `fetchPipelines` | `src/pages/admin/llmops/ReliabilityPage.tsx` |
+| `GET /llm/guardrails` | `fetchGuardrails` | `src/pages/admin/llmops/ReliabilityPage.tsx` |
+| `PATCH /llm/guardrails/{id}` | `toggleGuardrail` | `src/pages/admin/llmops/ReliabilityPage.tsx` |
+| `GET /llm/confidence-policy` | `fetchConfidencePolicy` | `src/pages/admin/llmops/ReliabilityPage.tsx` |
+| `GET /quality/reviews` | `fetchQualityReviews` | `src/pages/admin/llmops/QualityPage.tsx` |
+| `GET /analytics/usage` | `fetchUsageEntries` | `src/pages/admin/analytics/UsageHistoryPage.tsx` |
+| `GET /analytics/satisfaction` | `fetchSurvey` | `src/pages/admin/analytics/SatisfactionPage.tsx` |
+| `POST /analytics/satisfaction:send` | `sendSurvey` | `src/pages/admin/analytics/SatisfactionPage.tsx` |
+| `GET /analytics/stats` | `fetchUsageStats` | `src/pages/admin/analytics/UsageStatsPage.tsx` |
+| `GET /analytics/report-sections` | `fetchReportSections` | `src/pages/admin/analytics/ReportPage.tsx` |
+| `POST /analytics/reports` | `buildReport` | `src/pages/admin/analytics/ReportPage.tsx` |
+| `GET /audit/logs` | `fetchOpLogs` | `src/pages/admin/oplog/IntegratedLogPage.tsx` |
+| `GET /audit/logs.csv` | `exportLogsCsv` | `src/pages/admin/oplog/IntegratedLogPage.tsx` |
+| `GET /usage/buckets` | `fetchUsageBuckets` | `src/pages/admin/oplog/UsageMonitorPage.tsx` |
+| `GET /notices` | `fetchManagedNotices` | `src/pages/admin/content/ContentPage.tsx` |
+| `GET /chat/faq` | `fetchManagedFaq` | `src/pages/admin/content/ContentPage.tsx` |
+| `POST /notices` | `saveNotice` | `src/pages/admin/content/ContentPage.tsx` |
+| `GET /integrations/hr` | `fetchHrSync` | `src/pages/admin/sysops/HrSyncPage.tsx` |
+| `POST /integrations/hr:sync` | `runHrSync` | `src/pages/admin/sysops/HrSyncPage.tsx` |
+| `GET /apis` | `fetchApis` | `src/pages/admin/sysops/ApiPromptPage.tsx` |
+| `POST /apis/{id}/keys` | `reissueApiKey` | `src/pages/admin/sysops/ApiPromptPage.tsx` |
+| `GET /prompts` | `fetchPrompts` | `src/pages/admin/sysops/ApiPromptPage.tsx` |
+| `GET /guardrails/hits` | `fetchGuardrailHits` | `src/pages/admin/compliance/GuardrailPage.tsx` |
+| `GET /compliance/systems` | `fetchAiSystems` | `src/pages/admin/compliance/AiActPage.tsx` |
+| `GET /compliance/labeling` | `fetchLabelRules` | `src/pages/admin/compliance/AiActPage.tsx` |
+| `GET /compliance/assessments` | `fetchAssessments` | `src/pages/admin/compliance/AiActPage.tsx` |
+| `GET /knowledge/areas` | `fetchAreas` | `src/pages/admin/agentops/AgentOpsPage.tsx`<br>`src/pages/admin/knowledge/KnowledgeBasePage.tsx`<br>`src/widgets/chat-panel/ChatSidePanel.tsx` |
+| `GET /knowledge/index` | `fetchIndexEntries` | `src/pages/admin/knowledge/KnowledgeBasePage.tsx` |
+| `GET /knowledge/rag-config` | `fetchRagConfig` | `src/pages/admin/knowledge/KnowledgeBasePage.tsx` |
+| `POST /knowledge/areas/{id}:reindex` | `runReindex` | `src/pages/admin/knowledge/KnowledgeBasePage.tsx` |
+| `GET /agents/ops` | `fetchAgentOps` | `src/pages/admin/agentops/AgentOpsPage.tsx` |
+| `PATCH /agents/{id}` | `setAgentExposure` | `src/pages/admin/agentops/AgentOpsPage.tsx` |
+| `GET /apps` | `fetchAppSurfaces` | `src/pages/admin/agentops/AppSurfacePage.tsx` |
+| `GET /apps/domains` | `fetchDomainExposure` | `src/pages/admin/agentops/AppSurfacePage.tsx` |
+| `GET /packs` | `fetchPacks` | `src/pages/admin/packops/PackStudioPage.tsx` |
+| `POST /packs` | `createPack` | `src/pages/admin/packops/PackStudioPage.tsx` |
+| `GET /tools` | `fetchTools` | `src/pages/admin/packops/ToolDeployPage.tsx`<br>`src/widgets/chat-panel/ChatSidePanel.tsx` |
+| `GET /deployments` | `fetchDeployments` | `src/pages/admin/packops/ToolDeployPage.tsx` |
+| `POST /deployments:promote` | `promote` | `src/pages/admin/packops/ToolDeployPage.tsx` |
+| `GET /datasets` | `fetchDatasets` | `src/pages/admin/mlops/DatasetPage.tsx` |
+| `GET /devenv/workspaces` | `fetchWorkspaces` | `src/pages/admin/mlops/DevEnvPage.tsx` |
+| `POST /devenv/workspaces/{id}:release` | `releaseWorkspace` | `src/pages/admin/mlops/DevEnvPage.tsx` |
+| `GET /models/versions` | `fetchModelVersions` | `src/pages/admin/mlops/RegistryPage.tsx` |
+| `GET /training/runs` | `fetchTrainRuns` | `src/pages/admin/mlops/TrainingPage.tsx` |
+| `GET /evaluations` | `fetchEvalResults` | `src/pages/admin/mlops/EvaluationPage.tsx`<br>`src/pages/admin/mlops/RegistryPage.tsx` |
+| `GET /integrations` | `fetchIntegrations` | `src/pages/admin/sysops/IntegrationPage.tsx` |
+| `GET /training/report` | `fetchTrainerReport` | `src/pages/admin/trainer/TrainerStatusPage.tsx` |
+
+화면이 아직 안 부르는 주소 0개.

@@ -1,4 +1,6 @@
-import type { MappingMode, MappingResult } from '@entities/mapping/model'
+import type { MappingRequest, MappingResult } from '@entities/mapping/model'
+
+export type { MappingRequest }
 import { extractAddresses, lookupCode, resolveAddress, resolveBatch } from '@fixtures/address'
 import { MAPPING_RESULT } from '@fixtures/mapping'
 import type { ApiResult } from './domains'
@@ -6,16 +8,6 @@ import type { ApiResult } from './domains'
 export type MappingApiOptions = { delayMs?: number | undefined }
 const wait = (ms: number): Promise<void> =>
   ms <= 0 ? Promise.resolve() : new Promise((r) => setTimeout(r, ms))
-
-export type MappingRequest = {
-  mode: MappingMode
-  /** 단일 주소·코드 역조회의 입력 */
-  query: string
-  /** 일괄 처리 입력 — 줄바꿈으로 구분 */
-  batchText: string
-  /** OCR 대상 문서 이름 */
-  documentName: string
-}
 
 export async function runMapping(
   req: MappingRequest,

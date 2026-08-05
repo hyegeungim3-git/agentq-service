@@ -69,3 +69,80 @@ describe('API 제안서와 코드', () => {
     expect(missing).toEqual([])
   })
 })
+
+/**
+ * 생성한 OpenAPI 명세가 제안서와 같은 것을 말하는지.
+ *
+ * 명세는 `npm run api:spec`이 만든다. 여기서 다시 만들지는 않는다 —
+ * 스키마 추출에 6초쯤 걸려서 단위 테스트를 그만큼 늦춘다.
+ * **최신인지**는 CI가 재생성 후 `git diff --exit-code`로 본다.
+ * 여기서는 파서 없이 볼 수 있는 것, 즉 **주소가 빠짐없이 들어갔는지**를 본다.
+ */
+const SPEC_TEXT = readFileSync(join(process.cwd(), 'docs/api/openapi.json'), 'utf8')
+const SPEC = JSON.parse(SPEC_TEXT) as {
+  paths: Record<string, Record<string, { operationId: string; 'x-clients'?: string[] }>>
+  components: { schemas: Record<string, unknown> }
+}
+
+/** 제안서 표에서 (메서드, 경로)만 뽑는다. 쿼리·multipart 표기는 떼어 낸다 */
+const docOps = [...DOC.matchAll(/^\| `([A-Z]+) ([^`]+?)` \| `([A-Za-z0-9_]+)` \|/gm)].map((m) => ({
+  method: (m[1] ?? '').toLowerCase(),
+  path: (m[2] ?? '').replace(' (multipart)', '').split('?')[0] ?? '',
+  fn: m[3] ?? '',
+}))
+
+describe('OpenAPI 명세', () => {
+  it('제안서의 모든 주소가 명세에 있다', () => {
+    const missing = docOps
+      .filter((o) => !SPEC.paths[o.path]?.[o.method])
+      .map((o) => `${o.method.toUpperCase()} ${o.path}`)
+    expect([...new Set(missing)], 'npm run api:spec 을 다시 돌려야 합니다').toEqual([])
+  })
+
+  it('명세의 모든 주소가 제안서에 있다', () => {
+    const inDoc = new Set(docOps.map((o) => `${o.method} ${o.path}`))
+    const extra: string[] = []
+    for (const [path, methods] of Object.entries(SPEC.paths)) {
+      for (const method of Object.keys(methods)) {
+        if (!inDoc.has(`${method} ${path}`)) extra.push(`${method.toUpperCase()} ${path}`)
+      }
+    }
+    expect(extra, '명세에만 있는 주소 — 제안서가 낡았습니다').toEqual([])
+  })
+
+  /* 같은 주소를 두 화면이 쓰면 둘 다 적혀 있어야 한다.
+     하나만 남기면 백엔드는 고칠 때 영향 범위를 놓친다 */
+  it('한 주소를 부르는 화면이 둘이면 둘 다 적는다', () => {
+    const byOp = new Map<string, string[]>()
+    for (const o of docOps) byOp.set(`${o.method} ${o.path}`, [...(byOp.get(`${o.method} ${o.path}`) ?? []), o.fn])
+    const shared = [...byOp.entries()].filter(([, fns]) => fns.length > 1)
+    expect(shared.length, '공유 자원이 하나는 있어야 이 경로가 산다').toBeGreaterThan(0)
+    for (const [key, fns] of shared) {
+      const [method, path] = key.split(' ') as [string, string]
+      const op = SPEC.paths[path]?.[method]
+      expect(op?.['x-clients'] ?? [op?.operationId], key).toEqual(fns)
+    }
+  })
+
+  /* 참조가 끊긴 명세는 Swagger에서 열리지도 않는다 —
+     받는 쪽에서 발견하기 전에 여기서 잡는다 */
+  it('명세의 모든 $ref가 실제 스키마를 가리킨다', () => {
+    const refs = [...SPEC_TEXT.matchAll(/"\$ref":\s*"#\/components\/schemas\/([^"]+)"/g)].map(
+      (m) => m[1] ?? '',
+    )
+    expect(refs.length).toBeGreaterThan(100)
+    const dangling = [...new Set(refs)].filter((r) => !(r in SPEC.components.schemas))
+    expect(dangling, '없는 스키마를 가리키는 참조').toEqual([])
+  })
+
+  /* 안 쓰는 스키마가 쌓이면 백엔드가 안 만들어도 될 것을 만든다 */
+  it('아무도 안 가리키는 스키마가 없다', () => {
+    const refs = new Set(
+      [...SPEC_TEXT.matchAll(/"\$ref":\s*"#\/components\/schemas\/([^"]+)"/g)].map(
+        (m) => m[1] ?? '',
+      ),
+    )
+    const orphans = Object.keys(SPEC.components.schemas).filter((n) => !refs.has(n))
+    expect(orphans, '어디서도 참조하지 않는 스키마').toEqual([])
+  })
+})

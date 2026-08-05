@@ -1,0 +1,7059 @@
+# 자동 생성물 — 손으로 고치지 마십시오.
+# 생성: node scripts/build-openapi.mjs
+# 원본: docs/API-PROPOSAL.md §2 표 + src/entities/*/model.ts
+openapi: "3.1.0"
+info:
+  title: AgentQ API (프론트 제안)
+  version: "0.1.0-proposal"
+  description: |-
+    이 명세는 **프론트가 제안한 것**이다. 백엔드가 다르게 정하면 그쪽을 따른다(DECISIONS.md D-010).
+    
+    - 스키마는 손으로 적지 않았다. `src/entities/*/model.ts`에서 뽑았고 그 파일이 정본이다.
+    - 인증·테넌시·권한은 아직 비어 있다. 프론트가 정할 일이 아니라서다 — API-PROPOSAL.md §5 참조.
+    - 재생성: `node scripts/build-openapi.mjs`
+servers:
+  -
+    url: /api
+    description: 미정 — 백엔드가 정한다
+paths:
+  /domains:
+    get:
+      operationId: fetchDomains
+      summary: GET /domains
+      description: → `Domain[]` (`entities/domain/model.ts`)
+      tags:
+        - domains
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Domain"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /domains/{id}:
+    get:
+      operationId: fetchDomain
+      summary: GET /domains/{id}
+      description: → `Domain`
+      tags:
+        - domains
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Domain"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /workspaces:
+    get:
+      operationId: fetchWorkspaces
+      summary: GET /workspaces
+      description: → `Workspace[]` (`entities/workspace/model.ts`)
+      tags:
+        - workspaces
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Workspace"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /notices:
+    get:
+      operationId: fetchNotices
+      summary: GET /notices
+      description: → `Notice[]` (`entities/notice/model.ts`)
+      tags:
+        - notices
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notice"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      x-clients:
+        - fetchNotices
+        - fetchManagedNotices
+    post:
+      operationId: saveNotice
+      summary: 공지 등록
+      description: 공지 등록
+      tags:
+        - notices
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /documents:
+    get:
+      operationId: fetchDocuments
+      summary: GET /documents
+      description: "`?kind=sop\\|report\\|certificate\\|minutes` → `BusinessDocument[]` (`entities/document/model.ts`)"
+      tags:
+        - documents
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BusinessDocument"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      operationId: uploadDocument
+      summary: 파일
+      description: 파일 → `BusinessDocument`
+      tags:
+        - documents
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessDocument"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+  /compliance/evidence:
+    get:
+      operationId: fetchEvidence
+      summary: "책무마다 **기록이 어디에 남는지** — '이행했다'와 '증명할 수 있다'는 다르다"
+      description: "→ `EvidenceItem[]` (`entities/evidence/model.ts`). 책무마다 **기록이 어디에 남는지** — '이행했다'와 '증명할 수 있다'는 다르다"
+      tags:
+        - compliance
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EvidenceItem"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /tools/servers:
+    get:
+      operationId: fetchMcpServers
+      summary: "**주소·토큰은 응답에 넣지 않는다** — §2-9와 같은 이유"
+      description: → `McpServer[]`. **주소·토큰은 응답에 넣지 않는다** — §2-9와 같은 이유
+      tags:
+        - tools
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/McpServer"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /volumes:
+    get:
+      operationId: fetchVolumes
+      summary: GET /volumes
+      description: → `Volume[]`
+      tags:
+        - volumes
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Volume"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /volumes/{id}:
+    delete:
+      operationId: releaseVolume
+      summary: 볼륨 비우기
+      description: 볼륨 비우기
+      tags:
+        - volumes
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /vector/collections:
+    get:
+      operationId: fetchCollections
+      summary: "**차원과 임베딩 모델을 함께** — 다르면 같은 검색에서 못 섞는다"
+      description: → `VectorCollection[]` (`entities/datainfra/model.ts`). **차원과 임베딩 모델을 함께** — 다르면 같은 검색에서 못 섞는다
+      tags:
+        - vector
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VectorCollection"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /ingest/sources:
+    get:
+      operationId: fetchIngestSources
+      summary: 마지막 실행 성공 여부와 **가져온 건수**를 함께 — 성공 표시만으로는 0건을 못 잡는다
+      description: → `IngestSource[]`. 마지막 실행 성공 여부와 **가져온 건수**를 함께 — 성공 표시만으로는 0건을 못 잡는다
+      tags:
+        - ingest
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/IngestSource"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /ingest/sources/{id}:run:
+    post:
+      operationId: runIngest
+      summary: 수동 수집
+      description: 수동 수집
+      tags:
+        - ingest
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /benchmarks:
+    get:
+      operationId: fetchBenchmarks
+      summary: "**업무 근접도를 함께** — 점수만 오면 위키 독해 잘하는 모델을 사내 QA용으로 고르게 된다"
+      description: → `Benchmark[]`. **업무 근접도(`relevance`)를 함께** — 점수만 오면 위키 독해 잘하는 모델을 사내 QA용으로 고르게 된다
+      tags:
+        - benchmarks
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Benchmark"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /benchmarks/runs:
+    get:
+      operationId: fetchBenchmarkRuns
+      summary: GET /benchmarks/runs
+      description: → `BenchmarkRun[]`
+      tags:
+        - benchmarks
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BenchmarkRun"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /apps/instances:
+    get:
+      operationId: fetchAppInstances
+      summary: 내려간 앱은 사유 필수
+      description: → `AppInstance[]` (`entities/appinst/model.ts`). 내려간 앱은 사유(`downReason`) 필수
+      tags:
+        - apps
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AppInstance"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /apps/instances/{id}:
+    patch:
+      operationId: setInstanceLive
+      summary: 앱 올리기·내리기
+      description: 앱 올리기·내리기
+      tags:
+        - apps
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /knowledge/pipeline-runs:
+    get:
+      operationId: fetchPipelineRuns
+      summary: "**단계별 들어온 수·나간 수·떨어진 사유**를 함께 — 최종 건수만 오면 고칠 곳을 못 찾는다"
+      description: → `PipelineRun[]`. **단계별 들어온 수·나간 수·떨어진 사유**를 함께 — 최종 건수만 오면 고칠 곳을 못 찾는다
+      tags:
+        - knowledge
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PipelineRun"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /agents/definitions:
+    get:
+      operationId: fetchAgentDefs
+      summary: "**단계와 사람 확인 지점을 함께** — 능력 배지만 오면 '확인 없이 나가는 에이전트'를 그릴 수 없다"
+      description: "→ `AgentDefinition[]` (`entities/agentdef/model.ts`). **단계와 사람 확인 지점을 함께** — 능력 배지만 오면 '확인 없이 나가는 에이전트'를 그릴 수 없다"
+      tags:
+        - agents
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentDefinition"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /agents/definitions/{id}:
+    put:
+      operationId: saveAgentDef
+      summary: 정의 변경 — 답이 달라지는 일이라 검토·되돌리기가 함께 필요하다
+      description: 정의 변경 — 답이 달라지는 일이라 검토·되돌리기가 함께 필요하다
+      tags:
+        - agents
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /workflows:
+    get:
+      operationId: fetchWorkflows
+      summary: "**탄 분기와 멈춘 노드를 함께** — 성공률만 오면 왜 실패했는지·안 타는 분기를 그릴 수 없다"
+      description: → `Workflow[]` (`entities/workflow/model.ts`). **탄 분기와 멈춘 노드를 함께** — 성공률만 오면 왜 실패했는지·안 타는 분기를 그릴 수 없다
+      tags:
+        - workflows
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Workflow"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /workflows/{id}:
+    patch:
+      operationId: setWorkflowEnabled
+      summary: 켜기·끄기
+      description: 켜기·끄기
+      tags:
+        - workflows
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /scenarios:
+    get:
+      operationId: fetchScenarioDefs
+      summary: 단계마다 어느 에이전트를 부르는지
+      description: → `ScenarioDefinition[]`. 단계마다 어느 에이전트를 부르는지
+      tags:
+        - scenarios
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScenarioDefinition"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /scenarios/{id}:
+    put:
+      operationId: saveScenario
+      summary: 시나리오 변경
+      description: 시나리오 변경
+      tags:
+        - scenarios
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /analysis/datasets:
+    get:
+      operationId: fetchDatasets
+      summary: 분석에 넣는 **데이터 파일**이다 — 학습·평가 데이터셋과 다른 자원
+      description: → `Dataset[]` (`entities/dataset/model.ts`). 분석에 넣는 **데이터 파일**이다 — 학습·평가 데이터셋(`GET /datasets`)과 다른 자원
+      tags:
+        - analysis
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dataset"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      operationId: uploadDataset
+      summary: 파일
+      description: 파일 → `Dataset` (`entities/dataset/model.ts`)
+      tags:
+        - analysis
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dataset"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+  /summaries:
+    post:
+      operationId: createSummary
+      summary: POST /summaries
+      description: "`SummaryRequest` → `SummaryResult` (`entities/summary/model.ts`)"
+      tags:
+        - summaries
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SummaryResult"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SummaryRequest"
+  /translations:
+    post:
+      operationId: createTranslation
+      summary: "+ 원문"
+      description: "`TranslationRequest` + 원문 → `TranslationResult` (`entities/translation/model.ts`)"
+      tags:
+        - translations
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TranslationResult"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TranslationRequest"
+  /reviews:
+    post:
+      operationId: createReview
+      summary: POST /reviews
+      description: "`ReviewRequest` → `ReviewResult` (`entities/review/model.ts`)"
+      tags:
+        - reviews
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewResult"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewRequest"
+  /reports:
+    post:
+      operationId: createReport
+      summary: POST /reports
+      description: "`ReportRequest` → `ReportResult` (`entities/report/model.ts`)"
+      tags:
+        - reports
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportResult"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportRequest"
+  /minutes:
+    post:
+      operationId: createMinutes
+      summary: POST /minutes
+      description: "`MeetingRequest` → `MeetingResult` (`entities/meeting/model.ts`)"
+      tags:
+        - minutes
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingResult"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MeetingRequest"
+  /regulations:search:
+    post:
+      operationId: askRegulation
+      summary: POST /regulations:search
+      description: "`RegulationRequest` → `RegulationAnswer` (`entities/regulation/model.ts`)"
+      tags:
+        - regulations:search
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegulationAnswer"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegulationRequest"
+  /knowledge-bases:
+    get:
+      operationId: fetchKnowledgeBases
+      summary: GET /knowledge-bases
+      description: → `KnowledgeBase[]` (`entities/knowledge/model.ts`)
+      tags:
+        - knowledge-bases
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KnowledgeBase"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /knowledge:search:
+    post:
+      operationId: searchKnowledge
+      summary: POST /knowledge:search
+      description: "`KnowledgeRequest` → `KnowledgeResult`"
+      tags:
+        - knowledge:search
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeResult"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KnowledgeRequest"
+  /ocr:recognize:
+    post:
+      operationId: recognizeDocument
+      summary: POST /ocr:recognize
+      description: "`OcrRequest` → `OcrResult` (`entities/ocr/model.ts`)"
+      tags:
+        - ocr:recognize
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OcrResult"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OcrRequest"
+  /queries:
+    post:
+      operationId: runQuery
+      summary: POST /queries
+      description: "`QueryRequest` → `QueryResult` (`entities/dataquery/model.ts`)"
+      tags:
+        - queries
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueryResult"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueryRequest"
+  /mapping:run:
+    post:
+      operationId: runMapping
+      summary: POST /mapping:run
+      description: "`MappingRequest` → `MappingResult` (`entities/mapping/model.ts`)"
+      tags:
+        - mapping:run
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MappingResult"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MappingRequest"
+  /analyses:
+    post:
+      operationId: analyzeData
+      summary: POST /analyses
+      description: "`AnalysisRequest` → `AnalysisResult` (`entities/analysis/model.ts`)"
+      tags:
+        - analyses
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisResult"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalysisRequest"
+  /safety-plans:
+    post:
+      operationId: createSafetyPlan
+      summary: POST /safety-plans
+      description: "`SafetyRequest` → `SafetyPlan` (`entities/safety/model.ts`)"
+      tags:
+        - safety-plans
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafetyPlan"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SafetyRequest"
+  /chat/messages:
+    post:
+      operationId: sendMessage
+      summary: 질문 문자열 
+      description: 질문 문자열 → `ChatMessage` (`entities/chat/model.ts`). 사업장별 지표를 묻는 질문이면 `map`(`entities/mapintel/model.ts`)이 함께 온다 — 별도 호출을 만들지 않은 이유는 §2-5
+      tags:
+        - chat
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatMessage"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /chat/faq:
+    get:
+      operationId: fetchFaq
+      summary: GET /chat/faq
+      description: → `FaqItem[]`
+      tags:
+        - chat
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FaqItem"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      x-clients:
+        - fetchFaq
+        - fetchManagedFaq
+  /metrics/live:
+    get:
+      operationId: fetchLiveMetrics
+      summary: — 실제로는 스트리밍/폴링이 맞다
+      description: → `LiveMetric[]` (`entities/metric/model.ts`) — 실제로는 스트리밍/폴링이 맞다. §2-3 참조
+      tags:
+        - metrics
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LiveMetric"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /signals:
+    get:
+      operationId: fetchSignals
+      summary: — 알림 센터·오늘의 브리핑이 함께 쓴다
+      description: → `WorkSignal[]` (`entities/signal/model.ts`) — 알림 센터·오늘의 브리핑이 함께 쓴다
+      tags:
+        - signals
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkSignal"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /infra/cluster:
+    get:
+      operationId: fetchCluster
+      summary: — 비율은 0~1
+      description: → `ClusterResource` (`entities/infra/model.ts`) — 비율은 0~1
+      tags:
+        - infra
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClusterResource"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /infra/nodes:
+    get:
+      operationId: fetchNodes
+      summary: GET /infra/nodes
+      description: → `NodeInfo[]`
+      tags:
+        - infra
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NodeInfo"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /infra/pods:
+    get:
+      operationId: fetchPods
+      summary: =\|\|\| 
+      description: "`window`=`1h`\\|`6h`\\|`24h`\\|`7d` → `PodInfo[]`. 구간은 **서버 질의 조건**이다 — §2-7"
+      tags:
+        - infra
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PodInfo"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: window
+          in: query
+          required: false
+          schema:
+            type: string
+  /infra/services:
+    get:
+      operationId: fetchServices
+      summary: 정상이 아니면 ·이 있어야 한다 — §2-7
+      description: → `ServiceStatus[]`. 정상이 아니면 `reason`·`action`이 있어야 한다 — §2-7
+      tags:
+        - infra
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceStatus"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /infra/gpus:
+    get:
+      operationId: fetchGpuNodes
+      summary: 과부하 판정은 화면이 한다(원시 값만 준다)
+      description: → `GpuNode[]`. 과부하 판정은 화면이 한다(원시 값만 준다)
+      tags:
+        - infra
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GpuNode"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /users:
+    get:
+      operationId: fetchUsers
+      summary: "**거르기는 서버가 한다** — §3-3"
+      description: → `PlatformUser[]` (`entities/user/model.ts`). **거르기는 서버가 한다** — §3-3
+      tags:
+        - users
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PlatformUser"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: keyword
+          in: query
+          required: false
+          schema:
+            type: string
+        -
+          name: role
+          in: query
+          required: false
+          schema:
+            type: string
+        -
+          name: state
+          in: query
+          required: false
+          schema:
+            type: string
+  /users/{id}:
+    patch:
+      operationId: updateUserState
+      summary: 상태 변경
+      description: 상태 변경. 인증·권한이 정해지기 전까지 화면은 실패를 그대로 알린다
+      tags:
+        - users
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /approvals:
+    get:
+      operationId: fetchApprovals
+      summary: 신청 사유가 없으면 (빈 문자열 금지)
+      description: → `ApprovalRequest[]`. 신청 사유가 없으면 `null`(빈 문자열 금지)
+      tags:
+        - approvals
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApprovalRequest"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /approvals/{id}:decide:
+    post:
+      operationId: decideApproval
+      summary: 승인·반려
+      description: 승인·반려
+      tags:
+        - approvals
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /audit/access:
+    get:
+      operationId: fetchAccessLogs
+      summary: 거부는 필수
+      description: → `AccessLogEntry[]`. 거부는 `deniedReason` 필수
+      tags:
+        - audit
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AccessLogEntry"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: denied
+          in: query
+          required: false
+          schema:
+            type: string
+        -
+          name: keyword
+          in: query
+          required: false
+          schema:
+            type: string
+  /audit/coverage:
+    get:
+      operationId: fetchLogGaps
+      summary: 로그에 **남지 않는 것** 목록
+      description: "→ 로그에 **남지 않는 것** 목록. 없으면 화면이 '여기 있는 게 전부'로 그리게 된다"
+      tags:
+        - audit
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /access-rules:
+    get:
+      operationId: fetchBlockRules
+      summary: 만료된 규칙도 함께 준다 — 화면이 만료를 가려서 말한다
+      description: → `BlockRule[]`. 만료된 규칙도 함께 준다 — 화면이 만료를 가려서 말한다
+      tags:
+        - access-rules
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BlockRule"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      operationId: createBlockRule
+      summary: 차단 규칙 추가
+      description: 차단 규칙 추가
+      tags:
+        - access-rules
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /llm/models:
+    get:
+      operationId: fetchModels
+      summary: 중지 모델은 필수
+      description: → `ModelEntry[]` (`entities/llmops/model.ts`). 중지 모델은 `stoppedReason` 필수
+      tags:
+        - llm
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ModelEntry"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /llm/models/{id}:
+    patch:
+      operationId: updateModelParams
+      summary: 온도 등 파라미터
+      description: 온도 등 파라미터. 서비스 전체 답변이 바뀌는 설정이다
+      tags:
+        - llm
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /llm/rerank-pipelines:
+    get:
+      operationId: fetchPipelines
+      summary: "**안 잰 효과는 ** — 0 금지, §2-8"
+      description: → `RerankPipeline[]`. **안 잰 효과는 `null`** — 0 금지, §2-8
+      tags:
+        - llm
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RerankPipeline"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /llm/guardrails:
+    get:
+      operationId: fetchGuardrails
+      summary: (껐을 때 통과하는 것) 필수
+      description: → `GuardrailRule[]`. `riskIfOff`(껐을 때 통과하는 것) 필수
+      tags:
+        - llm
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GuardrailRule"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /llm/guardrails/{id}:
+    patch:
+      operationId: toggleGuardrail
+      summary: 규칙 켜기·끄기
+      description: 규칙 켜기·끄기
+      tags:
+        - llm
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /llm/confidence-policy:
+    get:
+      operationId: fetchConfidencePolicy
+      summary: 임계값과 **아래일 때 하는 일**을 함께
+      description: → `ConfidencePolicy`. 임계값과 **아래일 때 하는 일**을 함께
+      tags:
+        - llm
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfidencePolicy"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /quality/reviews:
+    get:
+      operationId: fetchQualityReviews
+      summary: 판정에는 검토 의견을 함께
+      description: → `QualityReview[]`. 판정에는 검토 의견(`note`)을 함께
+      tags:
+        - quality
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QualityReview"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /analytics/usage:
+    get:
+      operationId: fetchUsageEntries
+      summary: "**질의 본문은 넣지 않는다** — §3-8"
+      description: → `UsageEntry[]` (`entities/analytics/model.ts`). **질의 본문은 넣지 않는다** — §3-8
+      tags:
+        - analytics
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UsageEntry"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: mode
+          in: query
+          required: false
+          schema:
+            type: string
+  /analytics/satisfaction:
+    get:
+      operationId: fetchSurvey
+      summary: 보낸 수와 답한 수를 함께 — 평균만 오면 표본을 알 수 없다
+      description: → `SatisfactionSurvey`. 보낸 수(`sent`)와 답한 수(`responded`)를 함께 — 평균만 오면 표본을 알 수 없다
+      tags:
+        - analytics
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SatisfactionSurvey"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /analytics/satisfaction:send:
+    post:
+      operationId: sendSurvey
+      summary: 조사 발송
+      description: 조사 발송
+      tags:
+        - analytics
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /analytics/stats:
+    get:
+      operationId: fetchUsageStats
+      summary: =\|\| 
+      description: "`window`=`7d`\\|`30d`\\|`quarter` → `UsageStats`. `avgSeconds`는 성공한 요청 기준, 제외된 `failedQueries`를 함께"
+      tags:
+        - analytics
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsageStats"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: window
+          in: query
+          required: false
+          schema:
+            type: string
+  /analytics/report-sections:
+    get:
+      operationId: fetchReportSections
+      summary: 만들 수 없는 항목도 이유와 함께 준다
+      description: → `ReportSection[]` (`entities/analytics/model.ts`). 만들 수 없는 항목도 이유와 함께 준다
+      tags:
+        - analytics
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/analytics_ReportSection"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /analytics/reports:
+    post:
+      operationId: buildReport
+      summary: 리포트 파일 생성
+      description: 리포트 파일 생성
+      tags:
+        - analytics
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /audit/logs:
+    get:
+      operationId: fetchOpLogs
+      summary: =\|\|\| 
+      description: "`kind`=`export`\\|`access`\\|`operation`\\|`query` → `OpLogEntry[]`. **접속 로그는 `/audit/access`와 같은 자원**이어야 한다"
+      tags:
+        - audit
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpLogEntry"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: kind
+          in: query
+          required: false
+          schema:
+            type: string
+  /audit/logs.csv:
+    get:
+      operationId: exportLogsCsv
+      summary: 서버가 파일을 만든다 — 화면에 보이는 것만 모으면 조회 조건 밖 기록이 빠진다
+      description: 서버가 파일을 만든다 — 화면에 보이는 것만 모으면 조회 조건 밖 기록이 빠진다
+      tags:
+        - audit
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: kind
+          in: query
+          required: false
+          schema:
+            type: string
+  /usage/buckets:
+    get:
+      operationId: fetchUsageBuckets
+      summary: 금액이 아니라 **토큰 수**로 준다(단가 미정)
+      description: → `UsageBucket[]`. 금액이 아니라 **토큰 수**로 준다(단가 미정)
+      tags:
+        - usage
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UsageBucket"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /integrations/hr:
+    get:
+      operationId: fetchHrSync
+      summary: "**처리 실패는 사유와 함께** — 퇴직이 밀리면 계정이 열려 있다"
+      description: → `HrSyncState` (`entities/sysops/model.ts`). **처리 실패는 사유와 함께** — 퇴직이 밀리면 계정이 열려 있다
+      tags:
+        - integrations
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HrSyncState"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /integrations/hr:sync:
+    post:
+      operationId: runHrSync
+      summary: 수동 동기화
+      description: 수동 동기화
+      tags:
+        - integrations
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /apis:
+    get:
+      operationId: fetchApis
+      summary: "**키 원문은 응답에 넣지 않는다** — §2-9"
+      description: → `ApiEntry[]`. **키 원문은 응답에 넣지 않는다** — §2-9
+      tags:
+        - apis
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApiEntry"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /apis/{id}/keys:
+    post:
+      operationId: reissueApiKey
+      summary: 재발급
+      description: 재발급. 키 원문은 이 응답에 **한 번만** 담고 이후 조회로는 못 본다
+      tags:
+        - apis
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /prompts:
+    get:
+      operationId: fetchPrompts
+      summary: 바꿨을 때의 영향을 함께
+      description: → `PromptEntry[]`. 바꿨을 때의 영향(`affects`)을 함께
+      tags:
+        - prompts
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PromptEntry"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /guardrails/hits:
+    get:
+      operationId: fetchGuardrailHits
+      summary: "**걸린 원문은 넣지 않는다** — 종류만"
+      description: → `GuardrailHit[]` (`entities/compliance/model.ts`). **걸린 원문은 넣지 않는다** — 종류만
+      tags:
+        - guardrails
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GuardrailHit"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /compliance/systems:
+    get:
+      operationId: fetchAiSystems
+      summary: 판정에는 근거와 운영 여부를 함께
+      description: → `AiSystem[]`. 판정에는 근거(`reason`)와 운영 여부(`inService`)를 함께
+      tags:
+        - compliance
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AiSystem"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /compliance/labeling:
+    get:
+      operationId: fetchLabelRules
+      summary: GET /compliance/labeling
+      description: → `LabelRule[]`
+      tags:
+        - compliance
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LabelRule"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /compliance/assessments:
+    get:
+      operationId: fetchAssessments
+      summary: 안 끝난 것은 무엇이 남았는지
+      description: → `Assessment[]`. 안 끝난 것은 무엇이 남았는지(`remaining`)
+      tags:
+        - compliance
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Assessment"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /knowledge/areas:
+    get:
+      operationId: fetchAreas
+      summary: "**등록 수와 검색 가능 수를 따로** — 하나만 오면 '못 찾는 문서'를 그릴 수 없다"
+      description: "→ `KnowledgeArea[]` (`entities/knowledgebase/model.ts`). **등록 수와 검색 가능 수를 따로** — 하나만 오면 '못 찾는 문서'를 그릴 수 없다"
+      tags:
+        - knowledge
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KnowledgeArea"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /knowledge/index:
+    get:
+      operationId: fetchIndexEntries
+      summary: 색인 안 된 문서는 사유 필수
+      description: → `IndexEntry[]`. 색인 안 된 문서는 사유(`reason`) 필수
+      tags:
+        - knowledge
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/IndexEntry"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: area
+          in: query
+          required: false
+          schema:
+            type: string
+  /knowledge/rag-config:
+    get:
+      operationId: fetchRagConfig
+      summary: 재색인 진행률을 함께
+      description: → `RagConfig`. 재색인 진행률(`reindexedRatio`)을 함께
+      tags:
+        - knowledge
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RagConfig"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /knowledge/areas/{id}:reindex:
+    post:
+      operationId: runReindex
+      summary: 재색인
+      description: 재색인
+      tags:
+        - knowledge
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /agents/ops:
+    get:
+      operationId: fetchAgentOps
+      summary: "**목록이 아니라 운영 정보만** — 카탈로그는 한 곳이어야 한다"
+      description: → `AgentOps[]` (`entities/agentops/model.ts`). **목록이 아니라 운영 정보만** — 카탈로그는 한 곳이어야 한다
+      tags:
+        - agents
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentOps"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /agents/{id}:
+    patch:
+      operationId: setAgentExposure
+      summary: 포털 노출 전환
+      description: 포털 노출 전환
+      tags:
+        - agents
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /apps:
+    get:
+      operationId: fetchAppSurfaces
+      summary: 못 여는 앱은 사유와 함께
+      description: → `AppSurface[]`. 못 여는 앱은 사유(`blockedReason`)와 함께
+      tags:
+        - apps
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AppSurface"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /apps/domains:
+    get:
+      operationId: fetchDomainExposure
+      summary: 포털의 선택 가능 여부와 **같은 기준**이어야 한다
+      description: → `DomainExposure[]`. 포털의 선택 가능 여부와 **같은 기준**이어야 한다
+      tags:
+        - apps
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DomainExposure"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /packs:
+    get:
+      operationId: fetchPacks
+      summary: "**포털의 선택 가능 여부와 같은 근거**여야 한다"
+      description: → `DomainPack[]` (`entities/packops/model.ts`). **포털의 선택 가능 여부와 같은 근거**여야 한다
+      tags:
+        - packs
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DomainPack"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      operationId: createPack
+      summary: 팩 생성
+      description: 팩 생성
+      tags:
+        - packs
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /tools:
+    get:
+      operationId: fetchTools
+      summary: 끊기면 못 도는 에이전트를 함께
+      description: → `ToolEntry[]`. 끊기면 못 도는 에이전트(`usedBy`)를 함께
+      tags:
+        - tools
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ToolEntry"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /deployments:
+    get:
+      operationId: fetchDeployments
+      summary: 검증·운영 버전을 모두 준다 — 화면이 미반영을 계산한다
+      description: → `Deployment[]`. 검증·운영 버전을 모두 준다 — 화면이 미반영을 계산한다
+      tags:
+        - deployments
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Deployment"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /deployments:promote:
+    post:
+      operationId: promote
+      summary: 운영 반영
+      description: 운영 반영
+      tags:
+        - deployments:promote
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /datasets:
+    get:
+      operationId: fetchDatasets
+      summary: 학습·평가 겸용 여부와 출처를 함께
+      description: → `Dataset[]` (`entities/mlops/model.ts`). 학습·평가 겸용 여부와 출처를 함께
+      tags:
+        - datasets
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/mlops_Dataset"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /devenv/workspaces:
+    get:
+      operationId: fetchWorkspaces
+      summary: GPU를 잡는 **개발 방**이다 — 포털의 업무 공간과 다른 자원
+      description: → `Workspace[]` (`entities/mlops/model.ts`). GPU를 잡는 **개발 방**이다 — 포털의 업무 공간(`GET /workspaces`)과 다른 자원. 마지막 계산 시각(`lastActiveAt`)이 있어야 유휴를 잰다
+      tags:
+        - devenv
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/mlops_Workspace"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /devenv/workspaces/{id}:release:
+    post:
+      operationId: releaseWorkspace
+      summary: 자원 회수
+      description: 자원 회수
+      tags:
+        - devenv
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+  /models/versions:
+    get:
+      operationId: fetchModelVersions
+      summary: "**계보**(·)를 함께 — 없으면 삭제 요청에 답할 수 없다"
+      description: → `ModelVersion[]`. **계보**(`trainJobId`·`datasetIds`)를 함께 — 없으면 삭제 요청에 답할 수 없다
+      tags:
+        - models
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ModelVersion"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /training/runs:
+    get:
+      operationId: fetchTrainRuns
+      summary: 트레이너 현황과 **같은 작업**의 상세다
+      description: → `TrainRun[]`. 트레이너 현황(`/training/report`)과 **같은 작업**의 상세다
+      tags:
+        - training
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrainRun"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /evaluations:
+    get:
+      operationId: fetchEvalResults
+      summary: "**학습셋과 겹쳤는지**를 서버가 판정해 준다"
+      description: → `EvalResult[]`. **학습셋과 겹쳤는지**(`trustworthy`)를 서버가 판정해 준다
+      tags:
+        - evaluations
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EvalResult"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /integrations:
+    get:
+      operationId: fetchIntegrations
+      summary: 끊기면 무엇이 멈추는지 필수
+      description: → `Integration[]`. 끊기면 무엇이 멈추는지(`impactIfDown`) 필수
+      tags:
+        - integrations
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Integration"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /training/report:
+    get:
+      operationId: fetchTrainerReport
+      summary: =\|\| 
+      description: "`window`=`day`\\|`week`\\|`month` → `TrainerReport`. 실패 작업에는 `note`(사유)가 있어야 한다"
+      tags:
+        - training
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainerReport"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: window
+          in: query
+          required: false
+          schema:
+            type: string
+components:
+  schemas:
+    AccessLogEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        at:
+          type: string
+        actor:
+          type: string
+        action:
+          type: string
+        target:
+          type: string
+        ip:
+          type: string
+        result:
+          $ref: "#/components/schemas/AccessResult"
+        deniedReason:
+          type:
+            - string
+            - "null"
+          description: 거부됐으면 왜인지. 허용이면 null
+      required:
+        - id
+        - at
+        - actor
+        - action
+        - target
+        - ip
+        - result
+        - deniedReason
+      additionalProperties: false
+    AccessResult:
+      type: string
+      enum:
+        - ok
+        - denied
+    ActionItem:
+      type: object
+      properties:
+        id:
+          type: string
+        task:
+          type: string
+        ownerId:
+          type:
+            - string
+            - "null"
+          description: 회의에서 정해지지 않았으면 null — 임의로 채우지 않는다
+        due:
+          type:
+            - string
+            - "null"
+          description: ISO 날짜. 미정이면 null
+      required:
+        - id
+        - task
+        - ownerId
+        - due
+      additionalProperties: false
+    AddressResolution:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/MappingStatus"
+        confidence:
+          type: number
+          description: "0~1"
+        roadAddress:
+          type:
+            - string
+            - "null"
+        jibunAddress:
+          type:
+            - string
+            - "null"
+        postalCode:
+          type:
+            - string
+            - "null"
+        legalCode:
+          type:
+            - string
+            - "null"
+          description: 법정동코드 10자리
+        basis:
+          type: array
+          items:
+            $ref: "#/components/schemas/MappingBasis"
+        alternatives:
+          type: array
+          items:
+            $ref: "#/components/schemas/Alternative"
+        blocker:
+          type:
+            - string
+            - "null"
+          description: 표준화하려면 무엇이 바뀌어야 하는지 (status가 none일 때)
+      required:
+        - status
+        - confidence
+        - roadAddress
+        - jibunAddress
+        - postalCode
+        - legalCode
+        - basis
+        - alternatives
+        - blocker
+      additionalProperties: false
+    AgendaCoverage:
+      type: object
+      properties:
+        "no":
+          type: number
+        topic:
+          type: string
+        decisionIds:
+          type: array
+          items:
+            type: string
+      required:
+        - "no"
+        - topic
+        - decisionIds
+      additionalProperties: false
+      description: 안건별 논의 여부 — 논의되지 않은 안건을 드러내는 것이 회의록의 실무 가치다
+    AgentDefinition:
+      type: object
+      properties:
+        agentId:
+          $ref: "#/components/schemas/AgentId"
+        code:
+          type: string
+        version:
+          type: string
+        purpose:
+          type: string
+        capabilities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Capability"
+        responseMode:
+          $ref: "#/components/schemas/ResponseMode"
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlowStep"
+        owner:
+          type: string
+      required:
+        - agentId
+        - code
+        - version
+        - purpose
+        - capabilities
+        - responseMode
+        - steps
+        - owner
+      additionalProperties: false
+    AgentId:
+      type: string
+      enum:
+        - chatbot
+        - report
+        - meeting
+        - knowledge
+        - internalreg
+        - ocr
+        - dbquery
+        - address
+        - dataanalysis
+        - summary
+        - translate
+        - review
+        - safety
+      description: |-
+        에이전트 카탈로그.
+        
+        13종을 옮기는 중이므로 **구현 상태를 데이터로 들고 있는다.** 아직 안 만든 것을 목록에서 빼면 "원래 없던 기능"처럼 보이고, 그냥 넣어 두면 눌렀을 때 아무 일도 안 나는 죽은 버튼이 된다. 둘 다 피하려고 상태를 명시한다 — 화면이 '준비 중'으로 표시하고 비활성화한다.
+    AgentOps:
+      type: object
+      properties:
+        agentId:
+          $ref: "#/components/schemas/AgentId"
+        modelId:
+          type: string
+          description: 쓰는 모델 id (`entities/llmops`의 모델)
+        modelName:
+          type: string
+        areaIds:
+          type: array
+          items:
+            type: string
+          description: 근거로 뒤지는 지식영역 id. 문서를 안 쓰면 빈 배열
+        runs7d:
+          type: number
+        failed7d:
+          type: number
+        owner:
+          type: string
+        exposed:
+          type: boolean
+          description: 사용자 포털에 열려 있는가
+      required:
+        - agentId
+        - modelId
+        - modelName
+        - areaIds
+        - runs7d
+        - failed7d
+        - owner
+        - exposed
+      additionalProperties: false
+    AiSystem:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        dept:
+          type: string
+        verdict:
+          $ref: "#/components/schemas/ImpactVerdict"
+        reason:
+          type: string
+          description: 왜 그렇게 판정했는지 — 판정만 있고 근거가 없으면 다시 판단할 수 없다
+        owner:
+          type: string
+        duties:
+          type: array
+          items:
+            $ref: "#/components/schemas/DutyKey"
+          description: 이행한 책무
+        inService:
+          type: boolean
+          description: 운영 중인가 — 검토 중인데 돌고 있으면 그 사실을 드러내야 한다
+      required:
+        - id
+        - name
+        - dept
+        - verdict
+        - reason
+        - owner
+        - duties
+        - inService
+      additionalProperties: false
+    Allocation:
+      type: object
+      properties:
+        label:
+          type: string
+        ratio:
+          type: number
+      required:
+        - label
+        - ratio
+      additionalProperties: false
+      description: 자원 배분 — 합이 1이 되지 않을 수 있다. 남는 몫이 곧 여유다
+    Alternative:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        confidence:
+          type: number
+        reason:
+          type: string
+          description: 왜 이게 1순위가 아닌지
+      required:
+        - code
+        - name
+        - confidence
+        - reason
+      additionalProperties: false
+    AnalysisKind:
+      type: string
+      enum:
+        - trend
+        - distribution
+      description: |-
+        공정 데이터 분석 모델.
+        
+        분석의 위험은 **일부 데이터로 낸 결론을 전체 결론처럼 말하는 것**이다. 로트 키가 없는 데이터가 29%인데 "불량률은 0.42%입니다"라고만 하면, 담당자는 그 수치가 전수 기준인 줄 안다.
+        
+        그래서 결과에 coverage(적용률)와 제외 사유를 함께 담는다.
+    AnalysisRequest:
+      type: object
+      properties:
+        datasetId:
+          type: string
+        kind:
+          $ref: "#/components/schemas/AnalysisKind"
+      required:
+        - datasetId
+        - kind
+      additionalProperties: false
+    AnalysisResult:
+      type: object
+      properties:
+        datasetId:
+          type: string
+        kind:
+          $ref: "#/components/schemas/AnalysisKind"
+        unit:
+          type: string
+          description: "실측값의 단위 — '%'·'℃'·'mm/s'. 데이터셋마다 다르므로 화면에 굳히지 않는다"
+        trend:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrendPoint"
+        distribution:
+          type: array
+          items:
+            $ref: "#/components/schemas/DistributionBar"
+        stats:
+          type: array
+          items:
+            $ref: "#/components/schemas/StatRow"
+        coverage:
+          type: number
+          description: 분석에 실제로 쓰인 데이터 비율 0~1
+        excludedReasons:
+          type: array
+          items:
+            type: string
+          description: 왜 나머지가 빠졌는지 — 감추면 부분 결론이 전체 결론으로 읽힌다
+        elapsedSeconds:
+          type: number
+      required:
+        - datasetId
+        - kind
+        - unit
+        - trend
+        - distribution
+        - stats
+        - coverage
+        - excludedReasons
+        - elapsedSeconds
+      additionalProperties: false
+    ApiEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        path:
+          type: string
+        version:
+          type: string
+        auth:
+          type: string
+        state:
+          $ref: "#/components/schemas/ApiState"
+        callsToday:
+          type: number
+        approvedOn:
+          type: string
+        note:
+          type:
+            - string
+            - "null"
+          description: 베타·중지면 왜인지
+      required:
+        - id
+        - name
+        - path
+        - version
+        - auth
+        - state
+        - callsToday
+        - approvedOn
+        - note
+      additionalProperties: false
+    ApiError:
+      type: object
+      required:
+        - code
+        - message
+      additionalProperties: false
+      description: 오류 본문. message는 사용자에게 그대로 보여 줄 수 있는 한국어 문장이어야 한다 — 화면이 다시 쓰지 않고 그대로 띄운다.
+      properties:
+        code:
+          type: string
+          description: 기계가 구분하는 코드. 목록은 백엔드가 정한다(§3-8)
+        message:
+          type: string
+    ApiState:
+      type: string
+      enum:
+        - active
+        - beta
+        - stopped
+    AppInstance:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        kind:
+          $ref: "#/components/schemas/AppKind"
+        live:
+          type: boolean
+          description: 지금 사용자에게 열려 있는가
+        downReason:
+          type:
+            - string
+            - "null"
+          description: 내려간 이유. 열려 있으면 null
+        owner:
+          type: string
+        group:
+          type: string
+        uses7d:
+          type: number
+          description: 최근 7일 사용 건수
+        createdOn:
+          type: string
+        areaIds:
+          type: array
+          items:
+            type: string
+          description: 이 앱이 기대는 지식영역 id
+      required:
+        - id
+        - title
+        - kind
+        - live
+        - downReason
+        - owner
+        - group
+        - uses7d
+        - createdOn
+        - areaIds
+      additionalProperties: false
+    AppKind:
+      type: string
+      enum:
+        - chat
+        - report
+        - analysis
+      description: |-
+        앱 인스턴스 · RAG 파이프라인.
+        
+        **애플리케이션 화면과 나누는 기준**: 저기는 '묶음'(사용자 포털·관리자·모바일), 여기는 사람들이 그 안에 만든 **개별 앱**이다. 묶음이 열려 있어도 개별 앱은 꺼져 있을 수 있다.
+        
+        **지식 관리 화면과 나누는 기준**: 저기는 결과(못 찾는 문서가 몇 건), 여기는 **어느 단계에서 떨어졌나**다. 결과만 보면 고칠 곳을 못 찾는다.
+    AppSurface:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        audience:
+          type: string
+        live:
+          type: boolean
+          description: 지금 열려 있는가
+        blockedReason:
+          type:
+            - string
+            - "null"
+          description: 못 여는 이유. 열려 있으면 null
+        includes:
+          type: array
+          items:
+            type: string
+          description: 이 앱이 여는 화면
+      required:
+        - id
+        - name
+        - audience
+        - live
+        - blockedReason
+        - includes
+      additionalProperties: false
+      description: 앱에 열어 준 것
+    ApprovalKind:
+      type: string
+      enum:
+        - signup
+        - role
+        - quota
+    ApprovalRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          $ref: "#/components/schemas/ApprovalKind"
+        applicant:
+          type: string
+        dept:
+          type: string
+        requestedAt:
+          type: string
+        detail:
+          type: string
+          description: 무엇을 요청했는가 — 사람이 읽고 판단할 근거
+        reason:
+          type:
+            - string
+            - "null"
+          description: 신청자가 적은 사유. 안 적었으면 null — 빈 문자열로 두면 적은 줄 안다
+      required:
+        - id
+        - kind
+        - applicant
+        - dept
+        - requestedAt
+        - detail
+        - reason
+      additionalProperties: false
+    Assessment:
+      type: object
+      properties:
+        id:
+          type: string
+        systemName:
+          type: string
+        status:
+          type: string
+          enum:
+            - done
+            - ongoing
+            - notStarted
+        dueOn:
+          type: string
+        completedOn:
+          type:
+            - string
+            - "null"
+        remaining:
+          type:
+            - string
+            - "null"
+          description: 안 끝났으면 무엇이 남았는지
+      required:
+        - id
+        - systemName
+        - status
+        - dueOn
+        - completedOn
+        - remaining
+      additionalProperties: false
+    AttendanceCheck:
+      type: object
+      properties:
+        spoke:
+          type: array
+          items:
+            type: string
+        silent:
+          type: array
+          items:
+            type: string
+          description: 명단에 있지만 발언 기록이 없는 사람
+        unlisted:
+          type: array
+          items:
+            type: string
+          description: 발언은 있는데 명단에 없는 사람
+      required:
+        - spoke
+        - silent
+        - unlisted
+      additionalProperties: false
+      description: 명단과 발언을 대조한 결과. 명단에 없는 발언자는 오인식이거나 기재되지 않은 참석자다 — 둘 다 확인해야 한다.
+    AttributeMatch:
+      type: object
+      properties:
+        label:
+          type: string
+        queryValue:
+          type: string
+          description: 검색 대상(신규 사양)의 값
+        candidateValue:
+          type: string
+          description: 후보 도면의 값
+        matched:
+          type: boolean
+      required:
+        - label
+        - queryValue
+        - candidateValue
+        - matched
+      additionalProperties: false
+      description: |-
+        지식 검색 모델.
+        
+        검색의 값어치는 순위가 아니라 **왜 이게 걸렸는가**와 **무엇이 빠졌는가**다. 유사도 92%만 보여 주면 담당자가 신뢰할 근거가 없고, 필터에 걸려 빠진 문서를 말하지 않으면 '없다'로 읽힌다 — 있는데 안 보여 준 것뿐인데.
+    BackTranslationCheck:
+      type: object
+      properties:
+        segmentId:
+          type: number
+        backText:
+          type: string
+          description: 번역문을 원문 언어로 되돌린 결과
+        similarity:
+          type: number
+          description: 원문과의 의미 일치도 0~1
+      required:
+        - segmentId
+        - backText
+        - similarity
+      additionalProperties: false
+    BatchAddressResult:
+      type: object
+      properties:
+        mode:
+          type: string
+          const: address-batch
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/BatchAddressRow"
+        elapsedSeconds:
+          type: number
+      required:
+        - mode
+        - rows
+        - elapsedSeconds
+      additionalProperties: false
+    BatchAddressRow:
+      type: object
+      properties:
+        id:
+          type: string
+        input:
+          type: string
+        resolved:
+          $ref: "#/components/schemas/AddressResolution"
+      required:
+        - id
+        - input
+        - resolved
+      additionalProperties: false
+    Benchmark:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        measures:
+          type: string
+          description: 무엇을 재는가
+        relevance:
+          type: string
+          enum:
+            - close
+            - partial
+            - far
+          description: 우리 업무와 얼마나 가까운가 — 화면이 이걸 먼저 말한다
+        relevanceNote:
+          type: string
+          description: 왜 그렇게 보는가
+      required:
+        - id
+        - name
+        - measures
+        - relevance
+        - relevanceNote
+      additionalProperties: false
+    BenchmarkRun:
+      type: object
+      properties:
+        id:
+          type: string
+        benchmarkId:
+          type: string
+        modelName:
+          type: string
+        modelVersion:
+          type: string
+        score:
+          type: number
+        samples:
+          type: number
+        elapsed:
+          type: string
+        state:
+          type: string
+          enum:
+            - done
+            - running
+            - failed
+        runOn:
+          type: string
+      required:
+        - id
+        - benchmarkId
+        - modelName
+        - modelVersion
+        - score
+        - samples
+        - elapsed
+        - state
+        - runOn
+      additionalProperties: false
+    BlockOutcome:
+      type: string
+      enum:
+        - blocked
+        - masked
+        - warned
+      description: |-
+        가드레일 차단 이력과 AI 기본법 대응.
+        
+        ⚠️ **이 화면들은 법적 판단을 내리지 않는다.** 고영향 AI 해당 여부는 사업자가 판단하고 필요하면 소관 부처에 확인한다. 화면은 그 판단과 근거를 **기록**할 뿐이다. 화면이 판정을 내리는 것처럼 보이면, 화면에 '비해당'이라고 떴다는 이유로 의무를 넘기게 된다.
+        
+        가드레일 규칙 자체(켜기·끄기)는 신뢰성 관리에서 다룬다. 여기는 **실제로 무엇이 걸렸는지**다. 같은 목록을 두 화면에 두면 어느 쪽이 진짜인지 알 수 없다.
+    BlockRule:
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+          enum:
+            - ip
+            - account
+        value:
+          type: string
+        reason:
+          type: string
+        until:
+          type:
+            - string
+            - "null"
+          description: 만료일. 무기한이면 null
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - kind
+        - value
+        - reason
+        - until
+        - createdBy
+        - createdAt
+      additionalProperties: false
+    BranchTaken:
+      type: object
+      properties:
+        nodeId:
+          type: string
+        branch:
+          type: string
+        count:
+          type: number
+      required:
+        - nodeId
+        - branch
+        - count
+      additionalProperties: false
+    BusinessDocument:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        kind:
+          $ref: "#/components/schemas/DocumentKind"
+        sizeBytes:
+          type: number
+          description: "바이트 원시값 — '2.1MB' 같은 표시 문자열로 굳히지 않는다"
+        text:
+          type: string
+          description: 추출된 본문. 실제로는 서버가 파싱해서 준다
+      required:
+        - id
+        - name
+        - kind
+        - sizeBytes
+        - text
+      additionalProperties: false
+    Capability:
+      type: string
+      enum:
+        - rag
+        - hitl
+        - a2a
+        - actionable
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          $ref: "#/components/schemas/ChatRole"
+        text:
+          type: string
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatSource"
+          description: assistant 메시지에만 있다. 빈 배열이면 근거 없는 답변이다.
+        confidence:
+          type:
+            - number
+            - "null"
+          description: "0~1. 근거가 없으면 null"
+        handoff:
+          anyOf:
+            -
+              type: object
+              properties:
+                agentLabel:
+                  type: string
+                reason:
+                  type: string
+              required:
+                - agentLabel
+                - reason
+              additionalProperties: false
+            -
+              type: "null"
+          description: 이 질문을 더 잘 다루는 에이전트가 있으면 안내한다
+        xai:
+          anyOf:
+            -
+              $ref: "#/components/schemas/Xai"
+            -
+              type: "null"
+          description: 판단 근거. 근거 없는 답변에는 없다
+        map:
+          anyOf:
+            -
+              $ref: "#/components/schemas/MapIntel"
+            -
+              type: "null"
+          description: 사업장별 지표를 묻는 질문이면 지도가 붙는다. 아니면 null
+      required:
+        - id
+        - role
+        - text
+        - sources
+        - confidence
+        - handoff
+        - xai
+        - map
+      additionalProperties: false
+    ChatRole:
+      type: string
+      enum:
+        - user
+        - assistant
+    ChatSource:
+      type: object
+      properties:
+        title:
+          type: string
+        locator:
+          type: string
+          description: "인용 위치 — '제23조 제2항' 처럼"
+        passage:
+          type:
+            - string
+            - "null"
+          description: 인용 원문. 출처만 대고 원문을 못 보여 주면 사용자는 확인할 방법이 없다. 찾지 못했으면 null — 못 찾았다는 사실을 감추지 않는다.
+        revisedOn:
+          type:
+            - string
+            - "null"
+          description: 규정이면 개정일. 문서면 null
+      required:
+        - title
+        - locator
+        - passage
+        - revisedOn
+      additionalProperties: false
+    Citation:
+      type: object
+      properties:
+        clause:
+          type: string
+          description: "규정 이름 + 조항 — '취업규칙 제23조 제2항'"
+        text:
+          type: string
+          description: 인용 원문. 요약이 아니라 그대로
+        revisedOn:
+          type: string
+          description: 최종 개정일 — 오래된 근거는 사람이 확인해야 한다
+      required:
+        - clause
+        - text
+        - revisedOn
+      additionalProperties: false
+    ClusterResource:
+      type: object
+      properties:
+        cpuRatio:
+          type: number
+        memoryRatio:
+          type: number
+        filesystemRatio:
+          type: number
+        gpuPowerWatt:
+          type: number
+          description: 평균 GPU 소비 전력(W)
+      required:
+        - cpuRatio
+        - memoryRatio
+        - filesystemRatio
+        - gpuPowerWatt
+      additionalProperties: false
+      description: 클러스터 자원 — 비율은 0~1
+    CodeLookupResult:
+      type: object
+      properties:
+        mode:
+          type: string
+          const: code-lookup
+        code:
+          type: string
+        found:
+          anyOf:
+            -
+              type: object
+              properties:
+                roadAddress:
+                  type: string
+                jibunAddress:
+                  type: string
+                legalCode:
+                  type: string
+                supersededBy:
+                  type:
+                    - string
+                    - "null"
+                  description: 폐지된 코드면 후속 코드를 알려 준다
+                note:
+                  type: string
+              required:
+                - roadAddress
+                - jibunAddress
+                - legalCode
+                - supersededBy
+                - note
+              additionalProperties: false
+            -
+              type: "null"
+          description: 못 찾으면 null — 없는 것을 있는 것처럼 만들지 않는다
+        status:
+          $ref: "#/components/schemas/MappingStatus"
+        blocker:
+          type:
+            - string
+            - "null"
+        elapsedSeconds:
+          type: number
+      required:
+        - mode
+        - code
+        - found
+        - status
+        - blocker
+        - elapsedSeconds
+      additionalProperties: false
+    CollectionState:
+      type: string
+      enum:
+        - active
+        - building
+        - stale
+      description: |-
+        벡터 DB · 자동 적재 · 벤치마크.
+        
+        세 화면 모두 인프라 수치라 `서버 미연결 — 예시 값` 배지를 단다.
+        
+        각 화면이 숨기면 안 되는 것:  ① 벡터 DB — **차원이 다른 컬렉션**은 같은 검색에서 비교할 수 없다. 임베딩     모델이 다르기 때문인데, 목록만 보면 그냥 나란한 컬렉션으로 보인다.  ② 자동 적재 — 스케줄이 '정상'인데 **마지막 수집이 실패**했을 수 있다.     스케줄은 돌고 있고 가져온 것만 0건이면 아무도 모른다.  ③ 벤치마크 — **점수가 높다고 우리 업무를 잘한다는 뜻이 아니다.** MTEB·KorQuAD는     공개 데이터로 잰 것이고, 사내 문서 QA는 다른 것이다.
+    ConfidencePolicy:
+      type: object
+      properties:
+        autoAnswerThreshold:
+          type: number
+        belowAction:
+          type: string
+          description: 임계값 아래일 때 하는 일
+      required:
+        - autoAnswerThreshold
+        - belowAction
+      additionalProperties: false
+      description: |-
+        자동 응답 임계값.
+        
+        이 값 아래면 사람이 확인하도록 넘긴다. 값만 보여 주면 무슨 뜻인지 알 수 없어 화면이 '넘겼을 때 어떻게 되는지'를 함께 말한다.
+    DataSource:
+      type: string
+      enum:
+        - equipment
+        - material
+        - production
+      description: |-
+        데이터 조회 모델.
+        
+        자연어를 SQL로 바꾸는 기능의 위험은 **말없이 가정하는 것**이다. "최근 설비"에서 '최근'을 몇 년으로 봤는지, 폐기 설비를 뺐는지 말하지 않으면 담당자는 틀린 수치를 맞다고 믿는다.
+        
+        그래서 결과에 세 가지를 함께 담는다:   ① 질의 조각 → 컬럼·연산자 대조   ② AI가 가정한 조건   ③ 변환하지 못한 표현
+    Dataset:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        format:
+          $ref: "#/components/schemas/DatasetFormat"
+        rows:
+          type: number
+          description: 데이터 행 수 — 헤더 제외
+        columns:
+          type: number
+        sizeBytes:
+          type: number
+        source:
+          type: string
+          description: 어느 시스템에서 나왔는지. 같은 지표라도 출처가 다르면 해석이 달라진다
+      required:
+        - id
+        - name
+        - format
+        - rows
+        - columns
+        - sizeBytes
+        - source
+      additionalProperties: false
+    DatasetFormat:
+      type: string
+      enum:
+        - csv
+        - xlsx
+      description: |-
+        분석 데이터셋 모델.
+        
+        공정 데이터 분석의 입력은 업무 문서가 아니다. 작업표준서 PDF를 골라 불량률 추이를 낼 수는 없다. 처음에는 문서 목록을 그대로 썼는데, 기존 데모와 대조하다 그 부조리가 드러났다 — 원래 입력은 `침탄로3호기_온도프로파일.csv (12,960행)` 같은 데이터 파일이다.
+        
+        ⚠️ 표시 문자열을 넣지 않는다. 행 수는 `12960`이고 `'12,960행'`은 화면이 만든다.
+    DatasetKind:
+      type: string
+      enum:
+        - train
+        - eval
+        - both
+      description: |-
+        데이터 · 개발 환경 · 모델 · 학습 · 평가.
+        
+        ⚠️ P4는 **전부 인프라 수치**다. 업무 로직이 없어 숫자 자체가 전부이므로 모든 화면이 `서버 미연결 — 예시 값` 배지를 단다(SCOPE-PLAN §3-7).
+        
+        이 구역에서 가장 위험한 것 둘:  ① **계보가 끊긴 모델** — 운영 중인데 무슨 데이터로 학습했는지 모른다.     개인정보 삭제 요청이 오면 어느 모델을 다시 학습해야 하는지 답할 수 없다.  ② **평가셋이 학습셋과 겹침** — 점수가 부풀려진다. 높은 점수를 보고 배포한다. 둘 다 오류가 나지 않으므로 화면이 말하지 않으면 아무도 모른다.
+    Decision:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        basis:
+          type:
+            - string
+            - "null"
+          description: 이 결정을 뒷받침하는 회의 자료. 자료를 첨부하지 않았으면 null — 발언만 듣고 정리한 결정과 문서 근거가 있는 결정은 무게가 다르다.
+      required:
+        - id
+        - text
+        - basis
+      additionalProperties: false
+    DeployStage:
+      type: string
+      enum:
+        - staging
+        - production
+    Deployment:
+      type: object
+      properties:
+        id:
+          type: string
+        target:
+          type: string
+        stage:
+          $ref: "#/components/schemas/DeployStage"
+        version:
+          type: string
+        deployedAt:
+          type: string
+        note:
+          type:
+            - string
+            - "null"
+          description: 검증과 운영의 버전이 다르면 그 사실을 드러내야 한다
+      required:
+        - id
+        - target
+        - stage
+        - version
+        - deployedAt
+        - note
+      additionalProperties: false
+    DistributionBar:
+      type: object
+      properties:
+        label:
+          type: string
+        count:
+          type: number
+      required:
+        - label
+        - count
+      additionalProperties: false
+    DocumentKind:
+      type: string
+      enum:
+        - sop
+        - report
+        - certificate
+        - minutes
+      description: |-
+        업무 문서 모델.
+        
+        요약·번역·사전검토·OCR이 모두 같은 문서를 입력으로 받는다. 요약 전용으로 두었다가 번역에서 같은 것이 필요해져 여기로 올렸다 — 처음부터 공통화하지 않고 **두 번째 사용처가 생겼을 때** 옮겼다(가이드 §4).
+    Domain:
+      type: object
+      additionalProperties: false
+      properties:
+        user:
+          $ref: "#/components/schemas/DomainUser"
+        docPrefix:
+          type: string
+          description: "문서번호 접두 (예: 'HBP') — 문서 생성 시 조합한다"
+        id:
+          type: string
+        orgName:
+          type: string
+          description: 조직 정식 명칭
+        orgShort:
+          type: string
+          description: 약칭 — 로고·문서번호 접두 등에 쓴다
+        sector:
+          $ref: "#/components/schemas/SectorCode"
+        brandColor:
+          $ref: "#/components/schemas/HexColor"
+        tagline:
+          type: string
+          description: 포털 화면의 한 줄 소개
+        status:
+          $ref: "#/components/schemas/DomainStatus"
+      required:
+        - brandColor
+        - docPrefix
+        - id
+        - orgName
+        - orgShort
+        - sector
+        - status
+        - tagline
+        - user
+    DomainExposure:
+      type: object
+      properties:
+        domainId:
+          type: string
+        orgName:
+          type: string
+        dataReady:
+          type: boolean
+          description: 업무 데이터가 준비됐는가
+        openAgents:
+          type: number
+          description: 열려 있는 에이전트 수
+        note:
+          type: string
+      required:
+        - domainId
+        - orgName
+        - dataReady
+        - openAgents
+        - note
+      additionalProperties: false
+    DomainPack:
+      type: object
+      properties:
+        domainId:
+          type: string
+        orgName:
+          type: string
+        sector:
+          type: string
+        filled:
+          type: array
+          items:
+            $ref: "#/components/schemas/PackItemKey"
+          description: 채워진 항목
+        usable:
+          type: boolean
+          description: 이 팩으로 포털에 들어갈 수 있는가
+      required:
+        - domainId
+        - orgName
+        - sector
+        - filled
+        - usable
+      additionalProperties: false
+    DomainStatus:
+      type: string
+      enum:
+        - ready
+        - planned
+      description: |-
+        이 발주처 전용 업무 데이터(문서 목록·용어·수치)가 준비됐는지.
+        
+        왜 타입에 있나: 준비되지 않은 발주처를 선택하게 두면 다른 발주처의 데이터가 그대로 보인다. 실제로 그랬다 — 공공(한국부동산원)을 골라도 요약할 문서 목록에 `프레스_작업표준서_SOP-PR-011.pdf`가 떴다. 고르는 행위에 의미가 없는데 의미가 있는 것처럼 보이는 화면이었다.
+        
+        목록에서 감추지 않고 상태를 표시한다 — 안 만든 것을 없는 것처럼 보이게 하지 않는다. 에이전트 카탈로그(`AgentDefinition.status`)와 같은 어법이다.
+    DomainUser:
+      type: object
+      properties:
+        name:
+          type: string
+        dept:
+          type: string
+        title:
+          type: string
+      required:
+        - name
+        - dept
+        - title
+      additionalProperties: false
+    DrawingHit:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 도면 번호
+        year:
+          type: number
+        attributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/AttributeMatch"
+        reusable:
+          type: array
+          items:
+            type: string
+          description: 재사용할 수 있는 요소
+      required:
+        - code
+        - year
+        - attributes
+        - reusable
+      additionalProperties: false
+    DutyKey:
+      type: string
+      enum:
+        - risk
+        - explain
+        - protect
+        - oversight
+        - record
+      description: 제34조 5개 책무
+    EvalResult:
+      type: object
+      properties:
+        id:
+          type: string
+        modelName:
+          type: string
+        modelVersion:
+          type: string
+        datasetId:
+          type: string
+        score:
+          type: number
+          description: "0~1"
+        metric:
+          type: string
+        evaluatedOn:
+          type: string
+        trustworthy:
+          type: boolean
+          description: 이 평가가 믿을 만한가 — 학습셋과 겹치면 false
+        caveat:
+          type:
+            - string
+            - "null"
+          description: 못 믿는 이유
+      required:
+        - id
+        - modelName
+        - modelVersion
+        - datasetId
+        - score
+        - metric
+        - evaluatedOn
+        - trustworthy
+        - caveat
+      additionalProperties: false
+    EvidenceItem:
+      type: object
+      properties:
+        duty:
+          $ref: "#/components/schemas/DutyKey"
+        what:
+          type: string
+          description: 무엇으로 증명하는가
+        store:
+          $ref: "#/components/schemas/EvidenceStore"
+        where:
+          type:
+            - string
+            - "null"
+          description: 어느 화면에서 볼 수 있는가. 없으면 null
+        note:
+          type: string
+          description: 지금 상태에 대한 설명
+      required:
+        - duty
+        - what
+        - store
+        - where
+        - note
+      additionalProperties: false
+    EvidenceStore:
+      type: string
+      enum:
+        - server
+        - browser
+        - none
+      description: 기록이 어디에 남는가
+    FaqCategory:
+      type: string
+      enum:
+        - standard
+        - labor
+        - quality
+        - security
+        - system
+      description: 자주 묻는 질문의 범주
+    FaqItem:
+      type: object
+      properties:
+        category:
+          $ref: "#/components/schemas/FaqCategory"
+        question:
+          type: string
+      required:
+        - category
+        - question
+      additionalProperties: false
+    FlowStep:
+      type: object
+      properties:
+        order:
+          type: number
+        name:
+          type: string
+        toolIds:
+          type: array
+          items:
+            type: string
+          description: 이 단계가 부르는 도구 id. 없으면 빈 배열
+        humanCheck:
+          type: boolean
+          description: 사람이 확인하는 지점인가
+      required:
+        - order
+        - name
+        - toolIds
+        - humanCheck
+      additionalProperties: false
+    FocusArea:
+      type: string
+      enum:
+        - conclusion
+        - figures
+        - legal
+        - schedule
+        - risk
+        - action
+      description: 요약에서 강조할 관점
+    GlossaryEntry:
+      type: object
+      properties:
+        source:
+          type: string
+        targets:
+          type: object
+          properties:
+            en:
+              type: string
+            ja:
+              type: string
+            zh:
+              type: string
+          required:
+            - en
+            - ja
+            - zh
+          additionalProperties: false
+          description: 목표 언어별 대응어. 하나만 두면 언어를 바꿔도 같은 말이 나온다
+        category:
+          type: string
+          enum:
+            - process
+            - material
+            - quality
+            - equipment
+          description: 용어 분류 — 화면이 라벨을 조회한다
+      required:
+        - source
+        - targets
+        - category
+      additionalProperties: false
+    GpuCard:
+      type: object
+      properties:
+        index:
+          type: number
+        utilRatio:
+          type: number
+        vramRatio:
+          type: number
+        celsius:
+          type: number
+        watt:
+          type: number
+      required:
+        - index
+        - utilRatio
+        - vramRatio
+        - celsius
+        - watt
+      additionalProperties: false
+    GpuNode:
+      type: object
+      properties:
+        name:
+          type: string
+        model:
+          type: string
+        vramGb:
+          type: number
+          description: 카드 1장의 VRAM(GB)
+        cards:
+          type: array
+          items:
+            $ref: "#/components/schemas/GpuCard"
+      required:
+        - name
+        - model
+        - vramGb
+        - cards
+      additionalProperties: false
+    GuardrailHit:
+      type: object
+      properties:
+        id:
+          type: string
+        at:
+          type: string
+        ruleId:
+          type: string
+        ruleName:
+          type: string
+        agentLabel:
+          type: string
+        actor:
+          type: string
+        outcome:
+          $ref: "#/components/schemas/BlockOutcome"
+        what:
+          type: string
+          description: 무엇이 걸렸는지 — 원문이 아니라 종류만
+        disputed:
+          type: boolean
+          description: 사용자가 이의를 제기했는가
+      required:
+        - id
+        - at
+        - ruleId
+        - ruleName
+        - agentLabel
+        - actor
+        - outcome
+        - what
+        - disputed
+      additionalProperties: false
+    GuardrailRule:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        enabled:
+          type: boolean
+        hits:
+          type: number
+          description: 최근 7일 적용 건수
+        riskIfOff:
+          type: string
+          description: 껐을 때 무엇이 통과하게 되는지 — 끄기 전에 알아야 한다
+      required:
+        - id
+        - name
+        - description
+        - enabled
+        - hits
+        - riskIfOff
+      additionalProperties: false
+    Hazard:
+      type: object
+      properties:
+        id:
+          type: string
+        step:
+          type: string
+          description: 작업 단계
+        cause:
+          type: string
+          description: 위험 요인
+        frequency:
+          type: number
+          description: 발생 빈도 1~5
+        severity:
+          type: number
+          description: 피해 강도 1~5
+        control:
+          type: string
+          description: 저감 대책
+        residual:
+          type: string
+          description: 대책 적용 후 남는 위험 — 0으로 만들 수 없다는 것을 드러낸다
+      required:
+        - id
+        - step
+        - cause
+        - frequency
+        - severity
+        - control
+        - residual
+      additionalProperties: false
+    HealthLevel:
+      type: string
+      enum:
+        - ok
+        - warn
+        - down
+      description: |-
+        관리자 대시보드가 다루는 것들 — 클러스터·서비스·GPU·학습 작업.
+        
+        ⚠️ **이 값들은 서버가 붙기 전까지 전부 예시다.** 다른 화면의 fixture는 업무 로직을 보여 주지만(요약이 어떻게 나오는가), 인프라 수치는 로직이 없다. 숫자 자체가 전부다. 그래서 지어낸 값을 실측처럼 그리면 **거짓 계기판**이 된다. 화면이 반드시 '서버 미연결 — 예시 값'을 먼저 말한다(SCOPE-PLAN §3-7).
+        
+        상태는 코드로 받는다. `'Healthy'` 같은 표시 문자열이나 색은 서버가 주지 않는다.
+    HexColor:
+      type: string
+      description: 브랜드 색 — 화면이 CSS 변수로 푼다. 여기서는 값만 보관한다.
+    HrChange:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        kind:
+          $ref: "#/components/schemas/HrChangeKind"
+        dept:
+          type: string
+        syncedOn:
+          type: string
+        effect:
+          type: string
+          description: 이 변경으로 계정에 무슨 일이 있었는가
+        failedReason:
+          type:
+            - string
+            - "null"
+          description: 처리에 실패했으면 이유. 성공이면 null
+      required:
+        - id
+        - name
+        - kind
+        - dept
+        - syncedOn
+        - effect
+        - failedReason
+      additionalProperties: false
+    HrChangeKind:
+      type: string
+      enum:
+        - join
+        - leave
+        - move
+        - concurrent
+        - absence
+      description: |-
+        HR 연계 · API · 외부 연동.
+        
+        ⚠️ **API 키는 이 모델에 없다.** 발급 시 한 번만 보여 주고 그 뒤로는 서버도 원문을 갖지 않는 것이 맞다. 관리 화면에 키를 늘어놓으면 화면을 여는 사람 모두가 모든 키를 갖게 된다 — 목록에 있으면 언젠가 캡처되고 공유된다.
+        
+        HR 동기화는 **계정을 만들고 없애는 일**이다. 퇴직 처리가 밀리면 접속이 열린 채로 남는다. 그래서 '몇 건 처리했다'가 아니라 **못 처리한 것과 밀린 시간**을 드러낸다.
+    HrSyncState:
+      type: object
+      properties:
+        connected:
+          type: boolean
+        lastSyncAt:
+          type: string
+        nextSyncAt:
+          type: string
+        totalUsers:
+          type: number
+        changes:
+          type: array
+          items:
+            $ref: "#/components/schemas/HrChange"
+      required:
+        - connected
+        - lastSyncAt
+        - nextSyncAt
+        - totalUsers
+        - changes
+      additionalProperties: false
+    ImpactVerdict:
+      type: string
+      enum:
+        - high
+        - reviewing
+        - notHigh
+      description: 고영향 AI 판정
+    IndexEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        areaId:
+          type: string
+        title:
+          type: string
+        state:
+          $ref: "#/components/schemas/IndexState"
+        reason:
+          type:
+            - string
+            - "null"
+          description: 색인되지 않았으면 왜인지. 색인됐으면 null
+        updatedOn:
+          type: string
+      required:
+        - id
+        - areaId
+        - title
+        - state
+        - reason
+        - updatedOn
+      additionalProperties: false
+    IndexState:
+      type: string
+      enum:
+        - indexed
+        - pending
+        - failed
+        - skipped
+      description: |-
+        지식 관리 — 지식영역·색인·검색 설정.
+        
+        ⚠️ 이 화면의 위험은 **목록에 있는데 검색에 안 잡히는 문서**다. 관리자는 '문서 240건 등록'을 보고 다 찾을 수 있다고 믿는데, 색인이 안 됐거나 실패한 문서는 사용자에게 '없다'고 답한다. 사용자는 그걸 구분할 방법이 없다.
+        
+        그래서 등록 건수와 **찾을 수 있는 건수를 따로 센다.**
+        
+        임베딩 모델을 바꾸면 전체 재색인이 필요하다. 안 하면 옛 벡터와 새 벡터가 섞여 검색이 조용히 나빠진다 — 오류가 안 나서 더 늦게 발견된다.
+    IngestMethod:
+      type: string
+      enum:
+        - edms
+        - openapi
+        - crawl
+        - upload
+    IngestSource:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        method:
+          $ref: "#/components/schemas/IngestMethod"
+        targetAreaId:
+          type: string
+        schedule:
+          type: string
+        lastRunAt:
+          type: string
+        lastOk:
+          type: boolean
+          description: 마지막 실행이 성공했는가
+        lastError:
+          type:
+            - string
+            - "null"
+          description: 실패했으면 이유
+        fetched:
+          type: number
+          description: 마지막 실행에서 새로 가져온 문서 수
+        total:
+          type: number
+          description: 지금까지 이 소스로 들어온 총 문서 수
+      required:
+        - id
+        - name
+        - method
+        - targetAreaId
+        - schedule
+        - lastRunAt
+        - lastOk
+        - lastError
+        - fetched
+        - total
+      additionalProperties: false
+    Integration:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        kind:
+          type: string
+        connected:
+          type: boolean
+        lastOkAt:
+          type: string
+        impactIfDown:
+          type: string
+          description: 끊겼으면 무엇이 멈추는지
+        downReason:
+          type:
+            - string
+            - "null"
+          description: 끊긴 이유. 정상이면 null
+      required:
+        - id
+        - name
+        - kind
+        - connected
+        - lastOkAt
+        - impactIfDown
+        - downReason
+      additionalProperties: false
+      description: 외부 시스템 연동
+    Keyword:
+      type: object
+      properties:
+        word:
+          type: string
+        weight:
+          type: number
+          description: "0~1 가중치. 퍼센트 변환은 화면이 한다"
+      required:
+        - word
+        - weight
+      additionalProperties: false
+    KnowledgeArea:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        purpose:
+          type: string
+        security:
+          $ref: "#/components/schemas/SecurityLevel"
+        registered:
+          type: number
+          description: 등록된 문서 수
+        searchable:
+          type: number
+          description: 실제로 검색에 잡히는 문서 수
+        lastIndexedAt:
+          type: string
+        staleCount:
+          type: number
+          description: 마지막 색인 뒤에 바뀐 문서 수 — 이 문서들은 옛 내용으로 답한다
+      required:
+        - id
+        - name
+        - purpose
+        - security
+        - registered
+        - searchable
+        - lastIndexedAt
+        - staleCount
+      additionalProperties: false
+    KnowledgeBase:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        docCount:
+          type: number
+        updatedAt:
+          type: string
+          description: "'YYYY-MM-DD'"
+      required:
+        - id
+        - name
+        - docCount
+        - updatedAt
+      additionalProperties: false
+    KnowledgeRequest:
+      type: object
+      properties:
+        query:
+          type: string
+        mode:
+          $ref: "#/components/schemas/SearchMode"
+        baseIds:
+          type: array
+          items:
+            type: string
+          description: 검색할 지식베이스 id들
+        security:
+          anyOf:
+            -
+              $ref: "#/components/schemas/SecurityLevel"
+            -
+              type: string
+              const: all
+          description: "'all'이면 전 등급, 아니면 그 등급만"
+        topK:
+          type: number
+      required:
+        - query
+        - mode
+        - baseIds
+        - security
+        - topK
+      additionalProperties: false
+    KnowledgeResult:
+      type: object
+      properties:
+        query:
+          type: string
+        mode:
+          $ref: "#/components/schemas/SearchMode"
+        indexedCount:
+          type: number
+          description: 고른 범위의 문서 수 — 얼마나 큰 모집단에서 찾았는지
+        hits:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchHit"
+        truncated:
+          type: number
+          description: 조건에 맞았지만 상위 N에 잘린 건수
+        excludedBySecurity:
+          type: number
+          description: "보안 등급 필터에 걸려 빠진 건수 — 감추면 '없다'로 읽힌다"
+        excludedByScope:
+          type: number
+          description: 검색 범위에서 뺀 지식베이스 때문에 못 본 건수
+        elapsedSeconds:
+          type: number
+      required:
+        - query
+        - mode
+        - indexedCount
+        - hits
+        - truncated
+        - excludedBySecurity
+        - excludedByScope
+        - elapsedSeconds
+      additionalProperties: false
+    LabelRule:
+      type: object
+      properties:
+        id:
+          type: string
+        target:
+          type: string
+        enabled:
+          type: boolean
+        how:
+          type: string
+          description: 어디에 어떻게 표시하는가
+      required:
+        - id
+        - target
+        - enabled
+        - how
+      additionalProperties: false
+    LanguageCode:
+      type: string
+      enum:
+        - ko
+        - en
+        - ja
+        - zh
+      description: |-
+        문서 번역 모델.
+        
+        제조 수출 문서(검사성적서·작업표준)를 대상으로 한다. 번역 자체보다
+        **용어집 일치**와 **역번역 검증**이 실무의 관심사다 — 규격 용어가 흔들리면 해외 고객 검수에서 반려된다.
+    LiveMetric:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        unit:
+          type: string
+        threshold:
+          type: number
+          description: 관리 기준 — 넘으면 조치가 필요하다
+        curve:
+          type: array
+          items:
+            type: number
+          description: 재생할 예시 곡선. 초 단위 간격으로 이어진다
+        stepSeconds:
+          type: number
+          description: 곡선 한 점이 나타내는 실제 시간(초)
+        source:
+          type: string
+      required:
+        - id
+        - label
+        - unit
+        - threshold
+        - curve
+        - stepSeconds
+        - source
+      additionalProperties: false
+    MapIntel:
+      type: object
+      properties:
+        metricLabel:
+          type: string
+        unit:
+          type: string
+        period:
+          type: string
+        lowerIsWorse:
+          type: boolean
+          description: 낮으면 조치가 필요한 지표인지 — 색과 문구의 방향이 반대가 된다
+        threshold:
+          type: number
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteMetric"
+      required:
+        - metricLabel
+        - unit
+        - period
+        - lowerIsWorse
+        - threshold
+        - sites
+      additionalProperties: false
+    MappingBasis:
+      type: object
+      properties:
+        label:
+          type: string
+        detail:
+          type: string
+      required:
+        - label
+        - detail
+      additionalProperties: false
+    MappingCandidate:
+      type: object
+      properties:
+        id:
+          type: string
+        source:
+          type: string
+          description: 원본 태그 — 현장에서 쓰던 표기
+        sourceSystem:
+          type: string
+        suggested:
+          type: string
+          description: "제안 표준 코드. 없으면 '-'"
+        standardName:
+          type: string
+        confidence:
+          type: number
+          description: "0~1"
+        status:
+          $ref: "#/components/schemas/MappingStatus"
+        basis:
+          type: array
+          items:
+            $ref: "#/components/schemas/MappingBasis"
+        alternatives:
+          type: array
+          items:
+            $ref: "#/components/schemas/Alternative"
+        blocker:
+          type:
+            - string
+            - "null"
+          description: 표준화하려면 무엇이 바뀌어야 하는지 (status가 none일 때)
+      required:
+        - id
+        - source
+        - sourceSystem
+        - suggested
+        - standardName
+        - confidence
+        - status
+        - basis
+        - alternatives
+        - blocker
+      additionalProperties: false
+    MappingMode:
+      type: string
+      enum:
+        - tags
+        - address-single
+        - address-batch
+        - address-ocr
+        - code-lookup
+      description: |-
+        처리 유형. 설비 태그와 주소는 다루는 대상이 다르지만
+        **판정 3분류(auto·review·none)는 그대로 공유한다** — 어디까지가 자동인지 나누는 것이 이 에이전트의 값어치이고, 그건 대상이 달라도 같다.
+    MappingRequest:
+      type: object
+      properties:
+        mode:
+          $ref: "#/components/schemas/MappingMode"
+        query:
+          type: string
+          description: 단일 주소·코드 역조회의 입력
+        batchText:
+          type: string
+          description: 일괄 처리 입력 — 줄바꿈으로 구분
+        documentName:
+          type: string
+          description: OCR 대상 문서 이름
+      required:
+        - mode
+        - query
+        - batchText
+        - documentName
+      additionalProperties: false
+      description: |-
+        표준화 요청.
+        
+        다른 에이전트의 요청 타입과 마찬가지로 **엔티티가 갖는다.** 경계 파일(`shared/api`)에 두면 계약 타입이 화면 코드와 같은 층에 섞이고, 명세를 뽑을 때 한 곳에서 못 찾는다 — 실제로 OpenAPI 생성이 이것만 놓쳤다.
+    MappingResult:
+      anyOf:
+        -
+          $ref: "#/components/schemas/TagMappingResult"
+        -
+          $ref: "#/components/schemas/SingleAddressResult"
+        -
+          $ref: "#/components/schemas/BatchAddressResult"
+        -
+          $ref: "#/components/schemas/OcrAddressResult"
+        -
+          $ref: "#/components/schemas/CodeLookupResult"
+    MappingStatus:
+      type: string
+      enum:
+        - auto
+        - review
+        - none
+      description: |-
+        기준정보 표준화 모델.
+        
+        이 화면의 값어치는 '자동으로 다 해 준다'가 아니라 **어디까지가 자동이고 어디부터 사람이 판단해야 하는지 나누는 것**이다.
+        
+        그래서 후보마다 판정 상태를 셋으로 나눈다:   auto   신뢰도가 높아 자동 확정 가능   review 근거는 있으나 사람이 골라야 함 (후보가 둘 이상이거나 단위 환산이 필요)   none   AI가 해결할 수 없음 — 설비 교체·양식 개선 같은 현장 조치가 필요
+        
+        none을 review에 섞으면 '검토만 하면 다 된다'는 착각을 만든다.
+    MaskEntry:
+      type: object
+      properties:
+        kind:
+          $ref: "#/components/schemas/PiiKind"
+        original:
+          type: string
+        masked:
+          type: string
+        lineIndex:
+          type: number
+          description: 몇 번째 줄에서 가렸는지
+      required:
+        - kind
+        - original
+        - masked
+        - lineIndex
+      additionalProperties: false
+    McpServer:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        toolIds:
+          type: array
+          items:
+            type: string
+          description: 이 서버가 제공하는 도구 id (`fixtures/packops`의 도구)
+        connected:
+          type: boolean
+        downReason:
+          type:
+            - string
+            - "null"
+          description: 끊겼으면 이유
+        lastSeenAt:
+          type: string
+          description: 마지막 응답 시각
+        external:
+          type: boolean
+          description: 사내인가 외부인가 — 밖으로 나가는 것은 따로 봐야 한다
+      required:
+        - id
+        - name
+        - toolIds
+        - connected
+        - downReason
+        - lastSeenAt
+        - external
+      additionalProperties: false
+    Measurement:
+      type: object
+      properties:
+        gain:
+          type:
+            - number
+            - "null"
+          description: 정확도 향상 비율(0~1). 아직 안 쟀으면 null
+        samples:
+          type:
+            - number
+            - "null"
+          description: 측정 표본 수. 안 쟀으면 null
+        measuredOn:
+          type:
+            - string
+            - "null"
+      required:
+        - gain
+        - samples
+        - measuredOn
+      additionalProperties: false
+      description: 효과 측정값 — 언제 무엇으로 쟀는지 없으면 숫자가 뜻을 잃는다
+    MeetingInputs:
+      type: object
+      properties:
+        title:
+          type: string
+        heldOn:
+          type: string
+        place:
+          type: string
+        attendees:
+          type: string
+          description: "한 줄에 한 명. '이름' 또는 '이름,부서'"
+        agenda:
+          type: string
+          description: 한 줄에 안건 하나
+      required:
+        - title
+        - heldOn
+        - place
+        - attendees
+        - agenda
+      additionalProperties: false
+      description: 사람이 채우는 칸. 비우면 녹음에서 추정하고, 추정했다고 표시한다
+    MeetingRequest:
+      type: object
+      properties:
+        documentId:
+          type: string
+        includeUtterances:
+          type: boolean
+          description: 발언 기록까지 포함할지 — 끄면 결정·조치만 남는다
+        referenceIds:
+          type: array
+          items:
+            type: string
+          description: 맥락으로 쓸 회의 자료 문서 id
+        inputs:
+          $ref: "#/components/schemas/MeetingInputs"
+      required:
+        - documentId
+        - includeUtterances
+        - referenceIds
+        - inputs
+      additionalProperties: false
+    MeetingResult:
+      type: object
+      properties:
+        documentId:
+          type: string
+        title:
+          type: string
+        heldOn:
+          type: string
+        place:
+          type: string
+        headerSource:
+          type: string
+          enum:
+            - input
+            - estimated
+          description: 기본 정보를 사람이 넣었는지, 녹음에서 추정했는지
+        references:
+          type: array
+          items:
+            type: string
+          description: 첨부한 회의 자료 이름 — 비면 발언에만 의존했다는 뜻이다
+        attendance:
+          anyOf:
+            -
+              $ref: "#/components/schemas/AttendanceCheck"
+            -
+              type: "null"
+          description: 참석자 명단을 넣지 않았으면 null
+        agendaCoverage:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgendaCoverage"
+          description: 안건을 넣지 않았으면 빈 배열
+        speakers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Speaker"
+        utterances:
+          type: array
+          items:
+            $ref: "#/components/schemas/Utterance"
+        decisions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Decision"
+        actionItems:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionItem"
+        elapsedSeconds:
+          type: number
+      required:
+        - documentId
+        - title
+        - heldOn
+        - place
+        - headerSource
+        - references
+        - attendance
+        - agendaCoverage
+        - speakers
+        - utterances
+        - decisions
+        - actionItems
+        - elapsedSeconds
+      additionalProperties: false
+    ModelEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        base:
+          type: string
+        version:
+          type: string
+        state:
+          $ref: "#/components/schemas/ModelState"
+        stoppedReason:
+          type:
+            - string
+            - "null"
+          description: 중지된 이유. 가동 중이면 null
+        temperature:
+          type: number
+        contextTokens:
+          type: number
+        purpose:
+          type: string
+        usedBy:
+          type: array
+          items:
+            type: string
+          description: 이 모델을 쓰는 업무
+        promptVersions:
+          type: number
+      required:
+        - id
+        - name
+        - base
+        - version
+        - state
+        - stoppedReason
+        - temperature
+        - contextTokens
+        - purpose
+        - usedBy
+        - promptVersions
+      additionalProperties: false
+    ModelStage:
+      type: string
+      enum:
+        - production
+        - staging
+        - archived
+    ModelState:
+      type: string
+      enum:
+        - running
+        - stopped
+      description: |-
+        LLM 운영 — 모델·신뢰성·답변 품질.
+        
+        이 구역의 위험은 **효과를 숫자로 적어 두면 검증된 것처럼 보인다**는 점이다. '정확도 +18.4%'는 언제 무엇으로 잰 것인지 없으면 아무 뜻이 없다. 그래서 측정 결과에는 잰 시점과 표본 수를 함께 두고, **아직 안 잰 것은 `null`로 둔다.** `0`이나 `'-'`로 두면 효과가 없는 것으로 읽히고, 평균에 섞이면 평균이 무너진다.
+    ModelVersion:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        stage:
+          $ref: "#/components/schemas/ModelStage"
+        trainJobId:
+          type:
+            - string
+            - "null"
+          description: 이 버전을 만든 학습 작업 id. 모르면 null
+        datasetIds:
+          type: array
+          items:
+            type: string
+          description: 학습에 쓴 데이터셋 id. 모르면 빈 배열
+        registeredOn:
+          type: string
+      required:
+        - id
+        - name
+        - version
+        - stage
+        - trainJobId
+        - datasetIds
+        - registeredOn
+      additionalProperties: false
+    NodeInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        instance:
+          type: string
+        os:
+          type: string
+        kernel:
+          type: string
+        cpuRatio:
+          type: number
+        memoryRatio:
+          type: number
+      required:
+        - name
+        - instance
+        - os
+        - kernel
+        - cpuRatio
+        - memoryRatio
+      additionalProperties: false
+    NodeKind:
+      type: string
+      enum:
+        - trigger
+        - agent
+        - branch
+        - tool
+        - review
+        - action
+      description: |-
+        워크플로우 — 조건 분기가 있는 멀티 에이전트 흐름.
+        
+        시나리오 빌더와 다르다. 시나리오는 **선형 릴레이**(1→2→3→4)이고, 워크플로우는 **분기가 있는 그래프**다(조건에 따라 다른 길로 간다).
+        
+        ⚠️ 분기가 있으면 **어느 길로 갔는지 모른 채 결과만 보게 된다.** 같은 입력에 다른 결과가 나와도 왜인지 알 수 없다. 그래서 실행 이력에 **탄 분기**를 남기고, 한 번도 안 탄 분기를 드러낸다 — 안 타는 분기는 죽은 길이거나 조건이 틀린 것이다.
+    Notice:
+      type: object
+      properties:
+        id:
+          type: string
+        level:
+          $ref: "#/components/schemas/NoticeLevel"
+        title:
+          type: string
+        postedOn:
+          type: string
+          description: "'YYYY-MM-DD'"
+        body:
+          type: string
+      required:
+        - id
+        - level
+        - title
+        - postedOn
+        - body
+      additionalProperties: false
+    NoticeLevel:
+      type: string
+      enum:
+        - notice
+        - important
+      description: |-
+        공지사항.
+        
+        이전 데모에는 사이드바 항목만 있고 목록이 없었다. 목록을 만들되
+        **읽지 않은 것이 몇 건인지**를 사이드바가 말하게 한다 — 그게 공지의 값어치다.
+    OcrAddressCandidate:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+          description: 문서에서 뽑아낸 원문
+        lineNo:
+          type: number
+        ocrConfidence:
+          type: number
+          description: OCR 자체 신뢰도 — 이게 낮으면 주소 표준화도 믿을 수 없다
+        resolved:
+          $ref: "#/components/schemas/AddressResolution"
+      required:
+        - id
+        - text
+        - lineNo
+        - ocrConfidence
+        - resolved
+      additionalProperties: false
+    OcrAddressResult:
+      type: object
+      properties:
+        mode:
+          type: string
+          const: address-ocr
+        documentName:
+          type: string
+        candidates:
+          type: array
+          items:
+            $ref: "#/components/schemas/OcrAddressCandidate"
+        elapsedSeconds:
+          type: number
+      required:
+        - mode
+        - documentName
+        - candidates
+        - elapsedSeconds
+      additionalProperties: false
+    OcrFormat:
+      type: string
+      enum:
+        - text
+        - markdown
+        - json
+      description: 내보내기 형식
+    OcrLanguage:
+      type: string
+      enum:
+        - ko
+        - ko-en
+        - en
+      description: 인식 언어. 문서와 맞지 않으면 그 문자 종류의 신뢰도가 떨어진다
+    OcrLine:
+      type: object
+      properties:
+        index:
+          type: number
+        text:
+          type: string
+        confidence:
+          type: number
+          description: "0~1"
+      required:
+        - index
+        - text
+        - confidence
+      additionalProperties: false
+    OcrMode:
+      type: string
+      enum:
+        - standard
+        - inspection
+      description: 처리 모드. 성적서 특화는 KS 검사 양식을 알고 있어 치수·공차를 항목으로 뽑는다
+    OcrRequest:
+      type: object
+      properties:
+        documentId:
+          type: string
+        maskPii:
+          type: boolean
+        language:
+          $ref: "#/components/schemas/OcrLanguage"
+        mode:
+          $ref: "#/components/schemas/OcrMode"
+        format:
+          $ref: "#/components/schemas/OcrFormat"
+        extractTables:
+          type: boolean
+        precisionNumbers:
+          type: boolean
+          description: 숫자·기호를 정밀하게 읽는다. 느려지는 대신 수치 줄의 신뢰도가 올라간다
+      required:
+        - documentId
+        - maskPii
+        - language
+        - mode
+        - format
+        - extractTables
+        - precisionNumbers
+      additionalProperties: false
+    OcrResult:
+      type: object
+      properties:
+        documentId:
+          type: string
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/OcrLine"
+        masks:
+          type: array
+          items:
+            $ref: "#/components/schemas/MaskEntry"
+          description: 마스킹을 켰을 때만 채워진다
+        table:
+          type: array
+          items:
+            $ref: "#/components/schemas/OcrTableRow"
+          description: 표 추출을 켰을 때만
+        specFields:
+          type: array
+          items:
+            $ref: "#/components/schemas/OcrSpecField"
+          description: 성적서 특화 모드에서만
+        exportText:
+          type: string
+          description: 고른 형식으로 내보낼 본문
+        notes:
+          type: array
+          items:
+            type: string
+          description: 설정 때문에 결과가 나빠졌으면 그 사실을 말한다. 신뢰도만 떨어뜨려 놓고 이유를 감추면 사용자는 스캔본을 탓한다.
+        elapsedSeconds:
+          type: number
+      required:
+        - documentId
+        - lines
+        - masks
+        - table
+        - specFields
+        - exportText
+        - notes
+        - elapsedSeconds
+      additionalProperties: false
+    OcrSpecField:
+      type: object
+      properties:
+        field:
+          type: string
+        value:
+          type: string
+        limit:
+          type: string
+        withinSpec:
+          type: boolean
+      required:
+        - field
+        - value
+        - limit
+        - withinSpec
+      additionalProperties: false
+      description: 규격 대비 판정까지 뽑은 항목 — 특화 모드에서만 나온다
+    OcrTableRow:
+      type: object
+      properties:
+        label:
+          type: string
+        value:
+          type: string
+      required:
+        - label
+        - value
+      additionalProperties: false
+    OpLogEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        at:
+          type: string
+        actor:
+          type: string
+        dept:
+          type: string
+        ip:
+          type: string
+        action:
+          type: string
+        detail:
+          type:
+            - string
+            - "null"
+          description: 무엇에 대해서인지. 없으면 null
+        sensitive:
+          type: boolean
+          description: 문서가 밖으로 나간 기록인가
+      required:
+        - id
+        - at
+        - actor
+        - dept
+        - ip
+        - action
+        - detail
+        - sensitive
+      additionalProperties: false
+    PackItemKey:
+      type: string
+      enum:
+        - documents
+        - agentContent
+        - scenarios
+        - mapIntel
+        - signals
+        - branding
+      description: |-
+        도메인 팩 · 도구/배포.
+        
+        **팩이 준비돼야 포털에서 고를 수 있다.** 애플리케이션 화면의 '발주처별 노출'과 같은 사실을 반대쪽에서 본다 — 저기는 결과(0종), 여기는 이유(무엇이 비었나).
+        
+        ⚠️ 채움 비율만 보여 주면 안 된다. '40% 준비'는 무엇을 더 해야 하는지 알려 주지 않는다. **비어 있는 항목을 이름으로** 말한다.
+        
+        도구는 끊겨도 서비스가 죽지 않는다 — 그 도구를 쓰는 에이전트만 조용히 못 돈다. 그래서 **끊기면 어떤 에이전트가 멈추는지**를 함께 둔다.
+    PiiKind:
+      type: string
+      enum:
+        - name
+        - phone
+        - address
+        - birth
+        - account
+      description: |-
+        문서 인식(OCR) 모델.
+        
+        OCR의 실무 관심사는 '텍스트가 나왔다'가 아니라 두 가지다.   ① 어디를 못 읽었는가 — 신뢰도가 낮은 줄을 숨기면 잘못된 값이 그대로 흘러간다   ② 개인정보를 가렸는가 — 가렸다고 말만 하면 안 되고 무엇을 가렸는지 남겨야 한다
+    PipelineRun:
+      type: object
+      properties:
+        id:
+          type: string
+        areaId:
+          type: string
+        areaName:
+          type: string
+        startedAt:
+          type: string
+        finishedAt:
+          type:
+            - string
+            - "null"
+        stages:
+          type: array
+          items:
+            $ref: "#/components/schemas/StageResult"
+      required:
+        - id
+        - areaId
+        - areaName
+        - startedAt
+        - finishedAt
+        - stages
+      additionalProperties: false
+    PipelineStage:
+      type: string
+      enum:
+        - collect
+        - extract
+        - chunk
+        - embed
+        - index
+      description: 색인 파이프라인 단계
+    PlatformUser:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        dept:
+          type: string
+        email:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserRole"
+        state:
+          $ref: "#/components/schemas/UserState"
+        lastSeenAt:
+          type:
+            - string
+            - "null"
+          description: 한 번도 접속하지 않았으면 null — 0으로 두면 오늘 접속한 것처럼 읽힌다
+        quota:
+          $ref: "#/components/schemas/Quota"
+      required:
+        - id
+        - name
+        - dept
+        - email
+        - role
+        - state
+        - lastSeenAt
+        - quota
+      additionalProperties: false
+    PodInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        namespace:
+          type: string
+        cpuMilli:
+          type: number
+          description: 밀리코어
+        memoryMib:
+          type: number
+          description: 메비바이트
+        phase:
+          $ref: "#/components/schemas/PodPhase"
+        restarts:
+          type: number
+          description: 재시작 횟수 — 0이 아니면 조용히 죽고 있다는 뜻이다
+      required:
+        - name
+        - namespace
+        - cpuMilli
+        - memoryMib
+        - phase
+        - restarts
+      additionalProperties: false
+    PodPhase:
+      type: string
+      enum:
+        - Running
+        - Completed
+        - Pending
+        - Failed
+    PromptEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        target:
+          type: string
+        version:
+          type: string
+        updatedOn:
+          type: string
+        purpose:
+          type: string
+          description: 무엇을 정하는 프롬프트인가
+        affects:
+          type: string
+          description: 바꿨을 때 무엇이 달라지는가
+      required:
+        - id
+        - target
+        - version
+        - updatedOn
+        - purpose
+        - affects
+      additionalProperties: false
+    QualityReview:
+      type: object
+      properties:
+        id:
+          type: string
+        agentLabel:
+          type: string
+        reviewedOn:
+          type: string
+        question:
+          type: string
+        answer:
+          type: string
+        confidence:
+          type: number
+        verdict:
+          $ref: "#/components/schemas/ReviewVerdict"
+        note:
+          type:
+            - string
+            - "null"
+          description: 검토자가 남긴 말. 안 남겼으면 null
+        reviewer:
+          type: string
+      required:
+        - id
+        - agentLabel
+        - reviewedOn
+        - question
+        - answer
+        - confidence
+        - verdict
+        - note
+        - reviewer
+      additionalProperties: false
+    QueryRequest:
+      type: object
+      properties:
+        source:
+          $ref: "#/components/schemas/DataSource"
+        question:
+          type: string
+      required:
+        - source
+        - question
+      additionalProperties: false
+    QueryResult:
+      type: object
+      properties:
+        source:
+          $ref: "#/components/schemas/DataSource"
+        sql:
+          type: string
+        columns:
+          type: array
+          items:
+            $ref: "#/components/schemas/TableColumn"
+        rows:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type:
+                - string
+                - number
+        terms:
+          type: array
+          items:
+            $ref: "#/components/schemas/QueryTerm"
+          description: 질의 해석 근거
+        assumptions:
+          type: array
+          items:
+            type: string
+          description: 질의에 없어 AI가 채운 조건 — 감추면 틀린 수치를 맞다고 믿는다
+        unmapped:
+          type: array
+          items:
+            type: string
+          description: SQL로 바꾸지 못한 표현 — 못 한 것을 못 했다고 말한다
+        cautions:
+          type: array
+          items:
+            type: string
+          description: 결과 해석 시 주의
+        elapsedSeconds:
+          type: number
+      required:
+        - source
+        - sql
+        - columns
+        - rows
+        - terms
+        - assumptions
+        - unmapped
+        - cautions
+        - elapsedSeconds
+      additionalProperties: false
+    QueryTerm:
+      type: object
+      properties:
+        phrase:
+          type: string
+          description: 사용자가 쓴 표현
+        column:
+          type: string
+        operator:
+          type: string
+        value:
+          type: string
+      required:
+        - phrase
+        - column
+        - operator
+        - value
+      additionalProperties: false
+    Quota:
+      type: object
+      properties:
+        limit:
+          type:
+            - number
+            - "null"
+          description: 월 요청 한도. 무제한이면 null
+        used:
+          type: number
+        countedAt:
+          type: string
+          description: 집계 기준 시각
+      required:
+        - limit
+        - used
+        - countedAt
+      additionalProperties: false
+      description: 기간당 한도. 서버가 집계 시각을 함께 준다 — 언제 기준인지 모르면 숫자를 못 믿는다
+    RagConfig:
+      type: object
+      properties:
+        embeddingModel:
+          type: string
+        chunkSize:
+          type: number
+          description: 청크 길이(글자)
+        chunkOverlap:
+          type: number
+        searchMode:
+          $ref: "#/components/schemas/SearchMode"
+        topK:
+          type: number
+        reindexedRatio:
+          type: number
+          description: 이 설정으로 색인된 비율(0~1). 1이 아니면 옛 설정으로 색인된 문서가 섞여 있다
+      required:
+        - embeddingModel
+        - chunkSize
+        - chunkOverlap
+        - searchMode
+        - topK
+        - reindexedRatio
+      additionalProperties: false
+    RegulationAnswer:
+      type: object
+      properties:
+        question:
+          type: string
+        answer:
+          type: string
+        citations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Citation"
+        related:
+          type: array
+          items:
+            type: string
+          description: 관련은 있으나 직접 근거는 아닌 조항
+        elapsedSeconds:
+          type: number
+      required:
+        - question
+        - answer
+        - citations
+        - related
+        - elapsedSeconds
+      additionalProperties: false
+    RegulationCategory:
+      type: string
+      enum:
+        - labor
+        - purchase
+        - safety
+        - security
+      description: |-
+        내규·규정 조회 모델.
+        
+        규정 조회의 값어치는 답변 문장이 아니라 **어느 조항에 근거했는가**다. 근거 없는 답은 실무에서 쓸 수 없으므로, 인용 없는 답변이 나오지 않도록 결과에 citations를 필수로 둔다.
+    RegulationRequest:
+      type: object
+      properties:
+        question:
+          type: string
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegulationCategory"
+      required:
+        - question
+        - categories
+      additionalProperties: false
+    RegulationSet:
+      type: string
+      enum:
+        - labor
+        - purchase
+        - safety
+        - quality
+        - security
+      description: 대조할 규정 묶음
+    ReportInputs:
+      type: object
+      properties:
+        department:
+          type: string
+        period:
+          type: string
+        achievements:
+          type: string
+        nextPlan:
+          type: string
+        remarks:
+          type: string
+      required:
+        - department
+        - period
+        - achievements
+        - nextPlan
+        - remarks
+      additionalProperties: false
+      description: 사람이 채우는 칸
+    ReportLength:
+      type: string
+      enum:
+        - short
+        - standard
+        - long
+      description: 분량. 어디까지 담는가
+    ReportRequest:
+      type: object
+      properties:
+        documentId:
+          type: string
+        type:
+          $ref: "#/components/schemas/ReportType"
+        tone:
+          $ref: "#/components/schemas/ReportTone"
+        length:
+          $ref: "#/components/schemas/ReportLength"
+        inputs:
+          $ref: "#/components/schemas/ReportInputs"
+      required:
+        - documentId
+        - type
+        - tone
+        - length
+        - inputs
+      additionalProperties: false
+    ReportResult:
+      type: object
+      properties:
+        documentId:
+          type: string
+        type:
+          $ref: "#/components/schemas/ReportType"
+        tone:
+          $ref: "#/components/schemas/ReportTone"
+        length:
+          $ref: "#/components/schemas/ReportLength"
+        docNo:
+          type: string
+        department:
+          type: string
+        period:
+          type: string
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportSection"
+        pendingFields:
+          type: array
+          items:
+            type: string
+          description: 사람이 반드시 확인해야 하는 칸 — 자동 생성이 닿지 못한 곳을 감추지 않는다
+        elapsedSeconds:
+          type: number
+      required:
+        - documentId
+        - type
+        - tone
+        - length
+        - docNo
+        - department
+        - period
+        - sections
+        - pendingFields
+        - elapsedSeconds
+      additionalProperties: false
+    ReportSection:
+      type: object
+      properties:
+        heading:
+          type: string
+        body:
+          type: string
+        source:
+          type: string
+          description: "이 절이 어디서 왔는지. 자동 생성이면 데이터 출처, 사람이 넣었으면 '직접 입력'. 출처 없는 수치는 검증할 수 없으므로 빈 값을 허용하지 않는다 — 채우지 못한 칸은 절로 만들지 않고 `pendingFields`에 남긴다."
+      required:
+        - heading
+        - body
+        - source
+      additionalProperties: false
+    ReportTone:
+      type: string
+      enum:
+        - formal
+        - brief
+        - detailed
+      description: 문체. 같은 사실을 어떤 모양으로 쓰는가
+    ReportType:
+      type: string
+      enum:
+        - weekly
+        - monthly
+        - inspection
+        - quality
+        - incident
+      description: |-
+        표준 보고서 작성 모델.
+        
+        보고서는 '문장을 잘 쓰는 것'이 아니라 **정해진 양식의 칸을 근거 있는 값으로 채우는 것**이다. 그래서 결과는 자유 텍스트가 아니라 절(section) 배열이고, 각 절은 어느 데이터에서 왔는지(source)를 달고 있다.
+        
+        사람이 직접 넣어야 하는 칸(주요 실적·다음 계획·특이 사항)은 비워 두면 자동으로 채우지 않고 '확인 필요'로 남긴다. 그럴듯한 문장으로 메우면 결재선에서 그게 실적인 줄 안다.
+    RerankPipeline:
+      type: object
+      properties:
+        id:
+          type: string
+        agentLabel:
+          type: string
+        model:
+          type: string
+        topK:
+          type: number
+        threshold:
+          type: number
+        enabled:
+          type: boolean
+        measurement:
+          $ref: "#/components/schemas/Measurement"
+      required:
+        - id
+        - agentLabel
+        - model
+        - topK
+        - threshold
+        - enabled
+        - measurement
+      additionalProperties: false
+    ResponseMode:
+      type: string
+      enum:
+        - grounded
+        - direct
+      description: 결과를 어떻게 내놓는가
+    ReviewRequest:
+      type: object
+      properties:
+        documentId:
+          type: string
+        regulationSets:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegulationSet"
+      required:
+        - documentId
+        - regulationSets
+      additionalProperties: false
+    ReviewResult:
+      type: object
+      properties:
+        documentId:
+          type: string
+        violations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Violation"
+        checkedClauses:
+          type: number
+          description: 대조한 조항 수 — 얼마나 훑었는지
+        elapsedSeconds:
+          type: number
+      required:
+        - documentId
+        - violations
+        - checkedClauses
+        - elapsedSeconds
+      additionalProperties: false
+    ReviewVerdict:
+      type: string
+      enum:
+        - accurate
+        - needsFix
+        - hallucination
+    SafetyPlan:
+      type: object
+      properties:
+        documentId:
+          type: string
+        taskName:
+          type: string
+        hazards:
+          type: array
+          items:
+            $ref: "#/components/schemas/Hazard"
+        references:
+          type: array
+          items:
+            type: string
+          description: 근거 법령·사내 규정
+        elapsedSeconds:
+          type: number
+      required:
+        - documentId
+        - taskName
+        - hazards
+        - references
+        - elapsedSeconds
+      additionalProperties: false
+    SafetyRequest:
+      type: object
+      properties:
+        documentId:
+          type: string
+        crewSize:
+          type: number
+          description: 작업 인원 — 2인 미만이면 일부 대책이 성립하지 않는다
+      required:
+        - documentId
+        - crewSize
+      additionalProperties: false
+    SatisfactionSurvey:
+      type: object
+      properties:
+        sent:
+          type: number
+          description: 조사를 보낸 사람 수
+        responded:
+          type: number
+          description: 답한 사람 수
+        distribution:
+          type: array
+          items:
+            type: number
+          description: "1~5점 각각의 건수 (index 0 = 1점)"
+        trend:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+              value:
+                type: number
+            required:
+              - date
+              - value
+            additionalProperties: false
+          description: 날짜별 평균
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/SurveyComment"
+      required:
+        - sent
+        - responded
+        - distribution
+        - trend
+        - comments
+      additionalProperties: false
+    ScenarioDefinition:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        trigger:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScenarioStep"
+        output:
+          type: string
+          description: 결과로 나오는 것
+        owner:
+          type: string
+        enabled:
+          type: boolean
+      required:
+        - id
+        - title
+        - trigger
+        - steps
+        - output
+        - owner
+        - enabled
+      additionalProperties: false
+    ScenarioStep:
+      type: object
+      properties:
+        order:
+          type: number
+        agentId:
+          $ref: "#/components/schemas/AgentId"
+        what:
+          type: string
+      required:
+        - order
+        - agentId
+        - what
+      additionalProperties: false
+    SearchHit:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        baseId:
+          type: string
+        security:
+          $ref: "#/components/schemas/SecurityLevel"
+        snippet:
+          type: string
+          description: 본문 발췌 — 전문 검색이면 일치한 말이 들어 있는 문장이다
+        score:
+          type: number
+          description: "0~1"
+        matchedTerms:
+          type: array
+          items:
+            type: string
+          description: 왜 걸렸는지. 전문 검색은 정확히 일치한 말, 시맨틱은 이어진 개념
+        drawing:
+          $ref: "#/components/schemas/DrawingHit"
+          description: 도면이면 속성 대조까지 준다
+      required:
+        - id
+        - title
+        - baseId
+        - security
+        - snippet
+        - score
+        - matchedTerms
+      additionalProperties: false
+    SearchMode:
+      type: string
+      enum:
+        - semantic
+        - fulltext
+      description: 검색 방식. 찾는 것도, 보여 주는 근거도 다르다
+    SectorCode:
+      type: string
+      enum:
+        - public
+        - manufacturing
+        - civic
+        - medical
+      description: 발주처를 대표하는 분야. 화면에 표시할 라벨은 이 코드로 조회한다.
+    SecurityLevel:
+      type: string
+      enum:
+        - public
+        - internal
+        - confidential
+      description: 문서 보안 등급
+    ServiceStatus:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+        level:
+          $ref: "#/components/schemas/HealthLevel"
+        uptimeHours:
+          type: number
+        reason:
+          type:
+            - string
+            - "null"
+          description: 정상이 아니면 왜 그런지. 정상이면 null
+        action:
+          type:
+            - string
+            - "null"
+          description: 사람이 무엇을 해야 하는지. 조치가 필요 없으면 null
+      required:
+        - id
+        - name
+        - role
+        - level
+        - uptimeHours
+        - reason
+        - action
+      additionalProperties: false
+    Severity:
+      type: string
+      enum:
+        - high
+        - medium
+        - low
+      description: |-
+        문서 사전 검토 모델.
+        
+        기안문을 사규와 대조해 위반 소지를 찾는다. 실무의 관심사는 '몇 점인가'가 아니라 **어느 조항에 걸렸고 무엇을 고쳐야 하는가**다. 그래서 점수는 저장하지 않고 위반 목록에서 파생한다.
+    SignalLink:
+      anyOf:
+        -
+          type: object
+          properties:
+            kind:
+              type: string
+              const: agent
+            agentId:
+              $ref: "#/components/schemas/AgentId"
+            label:
+              type: string
+          required:
+            - kind
+            - agentId
+            - label
+          additionalProperties: false
+        -
+          type: object
+          properties:
+            kind:
+              type: string
+              const: scenario
+            label:
+              type: string
+          required:
+            - kind
+            - label
+          additionalProperties: false
+        -
+          type: "null"
+      description: 이 신호를 처리할 화면 — 없으면 안내만 하고 끝난다
+    SignalSeverity:
+      type: string
+      enum:
+        - action
+        - watch
+        - info
+    SingleAddressResult:
+      type: object
+      properties:
+        mode:
+          type: string
+          const: address-single
+        input:
+          type: string
+        resolved:
+          $ref: "#/components/schemas/AddressResolution"
+        elapsedSeconds:
+          type: number
+      required:
+        - mode
+        - input
+        - resolved
+        - elapsedSeconds
+      additionalProperties: false
+    SiteMetric:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        region:
+          type: string
+        col:
+          type: number
+          description: 격자 배치 (col, row) — 지리 좌표가 아니다
+        row:
+          type: number
+        value:
+          type:
+            - number
+            - "null"
+          description: 값이 없으면 null. 0과 구분해야 한다
+        trend:
+          type: array
+          items:
+            type: number
+          description: 최근 추이. 값이 없으면 빈 배열
+        missingReason:
+          type:
+            - string
+            - "null"
+          description: 값이 없는 이유
+      required:
+        - id
+        - name
+        - region
+        - col
+        - row
+        - value
+        - trend
+        - missingReason
+      additionalProperties: false
+      description: |-
+        지도 인텔리전스 모델 — 사업장별 지표를 한눈에.
+        
+        ⚠️ 지리 좌표가 아니라 **배치 도식**이다. 실제 지도 위에 찍으면 위치가 맞아야 하는데 그 데이터가 없다. 격자 위치만 두고 화면이 '도식'이라고 말한다. 지도처럼 보이는데 위치가 틀리면 그게 제일 위험하다.
+        
+        값이 없는 사업장을 빼지 않는다. 빼면 '전 사업장이 이렇다'로 읽힌다 — 빈칸으로 두고 왜 없는지 말한다.
+    Speaker:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        dept:
+          type: string
+      required:
+        - id
+        - name
+        - dept
+      additionalProperties: false
+      description: |-
+        회의록 작성 모델.
+        
+        회의록의 값어치는 '누가 무엇을 언제까지 하기로 했는가'다. 그래서 발언 기록보다
+        **결정 사항과 조치 항목**을 1급으로 둔다. 담당자나 기한이 비면 비었다고 드러낸다 — 그 빈칸이 회의에서 안 정해진 것이기 때문이다.
+    StageResult:
+      type: object
+      properties:
+        stage:
+          $ref: "#/components/schemas/PipelineStage"
+        incoming:
+          type: number
+          description: 이 단계에 들어온 문서 수
+        out:
+          type: number
+          description: 다음 단계로 넘어간 수
+        drops:
+          type: array
+          items:
+            type: object
+            properties:
+              reason:
+                type: string
+              count:
+                type: number
+            required:
+              - reason
+              - count
+            additionalProperties: false
+          description: 여기서 떨어진 이유별 건수
+      required:
+        - stage
+        - incoming
+        - out
+        - drops
+      additionalProperties: false
+    StatRow:
+      type: object
+      properties:
+        metric:
+          type: string
+        value:
+          type: string
+        change:
+          type:
+            - string
+            - "null"
+          description: 전기 대비 변화. 없으면 null
+        status:
+          type: string
+          enum:
+            - good
+            - watch
+            - bad
+      required:
+        - metric
+        - value
+        - change
+        - status
+      additionalProperties: false
+    StatWindow:
+      type: string
+      enum:
+        - "7d"
+        - "30d"
+        - quarter
+    SummaryRequest:
+      type: object
+      properties:
+        documentId:
+          type: string
+        style:
+          $ref: "#/components/schemas/SummaryStyle"
+        targetLength:
+          $ref: "#/components/schemas/TargetLength"
+        focusAreas:
+          type: array
+          items:
+            $ref: "#/components/schemas/FocusArea"
+      required:
+        - documentId
+        - style
+        - targetLength
+        - focusAreas
+      additionalProperties: false
+    SummaryResult:
+      type: object
+      properties:
+        documentId:
+          type: string
+        style:
+          $ref: "#/components/schemas/SummaryStyle"
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/SummarySection"
+        keywords:
+          type: array
+          items:
+            $ref: "#/components/schemas/Keyword"
+        stats:
+          $ref: "#/components/schemas/SummaryStats"
+      required:
+        - documentId
+        - style
+        - sections
+        - keywords
+        - stats
+      additionalProperties: false
+    SummarySection:
+      type: object
+      properties:
+        heading:
+          type: string
+        body:
+          type: string
+      required:
+        - heading
+        - body
+      additionalProperties: false
+    SummaryStats:
+      type: object
+      properties:
+        sourceChars:
+          type: number
+        summaryChars:
+          type: number
+        sectionCount:
+          type: number
+        elapsedSeconds:
+          type: number
+          description: 초 단위 처리 시간
+      required:
+        - sourceChars
+        - summaryChars
+        - sectionCount
+        - elapsedSeconds
+      additionalProperties: false
+    SummaryStyle:
+      type: string
+      enum:
+        - brief
+        - detailed
+        - bullet
+        - table
+      description: 요약 방식. 한국어 라벨은 화면이 조회한다.
+    SurveyComment:
+      type: object
+      properties:
+        id:
+          type: string
+        userName:
+          type: string
+        dept:
+          type: string
+        rating:
+          type: number
+        text:
+          type: string
+        at:
+          type: string
+      required:
+        - id
+        - userName
+        - dept
+        - rating
+        - text
+        - at
+      additionalProperties: false
+    TableColumn:
+      type: object
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        numeric:
+          type: boolean
+          description: 숫자 컬럼은 오른쪽 정렬하고 차트 축으로 쓸 수 있다
+      required:
+        - key
+        - label
+        - numeric
+      additionalProperties: false
+    TagMappingResult:
+      type: object
+      properties:
+        mode:
+          type: string
+          const: tags
+        totalTags:
+          type: number
+          description: 수집된 전체 태그 수
+        standardized:
+          type: number
+          description: 이미 표준화된 수
+        candidates:
+          type: array
+          items:
+            $ref: "#/components/schemas/MappingCandidate"
+        reasons:
+          type: array
+          items:
+            $ref: "#/components/schemas/UnmatchedReason"
+        autoConfirmable:
+          type: number
+          description: 자동 확정 가능한 전체 건수 — 화면의 후보 목록은 이 중 일부를 보여 주는 예시다. 예시 행 수로 표준화율을 계산하면 4,820개 모집단에서 아무 변화가 없다.
+        namingPattern:
+          type: string
+          description: 표준 명명규칙
+        namingExample:
+          type: string
+        elapsedSeconds:
+          type: number
+      required:
+        - mode
+        - totalTags
+        - standardized
+        - candidates
+        - reasons
+        - autoConfirmable
+        - namingPattern
+        - namingExample
+        - elapsedSeconds
+      additionalProperties: false
+    TargetLength:
+      type: number
+      enum:
+        - 100
+        - 300
+        - 500
+        - 1000
+      description: "목표 분량 — 글자 수 원시값. '300자' 같은 문자열로 굳히지 않는다."
+    ToolEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        kind:
+          $ref: "#/components/schemas/ToolKind"
+        connected:
+          type: boolean
+          description: 실제로 붙어 있는가. 정의만 있고 안 붙은 것과 구분한다
+        usedBy:
+          type: array
+          items:
+            type: string
+          description: 이 도구를 쓰는 에이전트 이름
+        downReason:
+          type:
+            - string
+            - "null"
+          description: 끊겼으면 왜인지
+        calls7d:
+          type: number
+      required:
+        - id
+        - name
+        - kind
+        - connected
+        - usedBy
+        - downReason
+        - calls7d
+      additionalProperties: false
+    ToolKind:
+      type: string
+      enum:
+        - search
+        - db
+        - file
+        - external
+    TrainJob:
+      type: object
+      properties:
+        id:
+          type: string
+        model:
+          type: string
+        kind:
+          type: string
+        startedAt:
+          type: string
+        state:
+          $ref: "#/components/schemas/TrainJobState"
+        note:
+          type:
+            - string
+            - "null"
+          description: 실패한 작업은 왜 실패했는지 말해야 한다 — 건수만 세면 손쓸 수 없다
+      required:
+        - id
+        - model
+        - kind
+        - startedAt
+        - state
+        - note
+      additionalProperties: false
+    TrainJobState:
+      type: string
+      enum:
+        - running
+        - done
+        - failed
+        - queued
+    TrainKind:
+      type: string
+      enum:
+        - llm
+        - vlm
+        - embedding
+        - rerank
+      description: 학습 유형 — 이전 데모는 메뉴 넷으로 나눠 뒀다. 표 모양이 같아 필터로 둔다
+    TrainRun:
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          $ref: "#/components/schemas/TrainKind"
+        config:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              value:
+                type: string
+            required:
+              - label
+              - value
+            additionalProperties: false
+          description: 유형마다 다른 설정 — 무엇으로 돌렸는지 없으면 재현할 수 없다
+        model:
+          type: string
+        method:
+          type: string
+        datasetIds:
+          type: array
+          items:
+            type: string
+        startedAt:
+          type: string
+        state:
+          type: string
+          enum:
+            - running
+            - done
+            - failed
+        note:
+          type:
+            - string
+            - "null"
+          description: 실패했으면 사유
+        gpuHours:
+          type: number
+      required:
+        - id
+        - kind
+        - config
+        - model
+        - method
+        - datasetIds
+        - startedAt
+        - state
+        - note
+        - gpuHours
+      additionalProperties: false
+    TrainWindow:
+      type: string
+      enum:
+        - day
+        - week
+        - month
+      description: 학습 집계 구간
+    TrainerReport:
+      type: object
+      properties:
+        window:
+          $ref: "#/components/schemas/TrainWindow"
+        done:
+          type: number
+        failed:
+          type: number
+        queued:
+          type: number
+        allocations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Allocation"
+        jobs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrainJob"
+      required:
+        - window
+        - done
+        - failed
+        - queued
+        - allocations
+        - jobs
+      additionalProperties: false
+    TranslationRequest:
+      type: object
+      properties:
+        documentId:
+          type: string
+        source:
+          $ref: "#/components/schemas/TranslationSource"
+        from:
+          $ref: "#/components/schemas/LanguageCode"
+        to:
+          $ref: "#/components/schemas/LanguageCode"
+        tone:
+          $ref: "#/components/schemas/TranslationTone"
+        useGlossary:
+          type: boolean
+        withSummary:
+          type: boolean
+          description: 번역과 함께 요약까지
+      required:
+        - documentId
+        - source
+        - from
+        - to
+        - tone
+        - useGlossary
+        - withSummary
+      additionalProperties: false
+    TranslationResult:
+      type: object
+      properties:
+        documentId:
+          type: string
+        source:
+          $ref: "#/components/schemas/TranslationSource"
+        from:
+          $ref: "#/components/schemas/LanguageCode"
+        to:
+          $ref: "#/components/schemas/LanguageCode"
+        segments:
+          type: array
+          items:
+            $ref: "#/components/schemas/TranslationSegment"
+        untranslated:
+          type: number
+          description: 번역하지 못한 문장 수 — 감추면 번역이 다 된 줄 안다
+        glossaryUsed:
+          type: array
+          items:
+            $ref: "#/components/schemas/GlossaryEntry"
+        backChecks:
+          type: array
+          items:
+            $ref: "#/components/schemas/BackTranslationCheck"
+        summary:
+          type:
+            - string
+            - "null"
+          description: 번역+요약을 켰을 때만 채워진다
+        elapsedSeconds:
+          type: number
+      required:
+        - documentId
+        - source
+        - from
+        - to
+        - segments
+        - untranslated
+        - glossaryUsed
+        - backChecks
+        - summary
+        - elapsedSeconds
+      additionalProperties: false
+    TranslationSegment:
+      type: object
+      properties:
+        id:
+          type: number
+        source:
+          type: string
+        target:
+          type: string
+        appliedTerms:
+          type: array
+          items:
+            type: string
+          description: 이 문장에서 실제로 적용된 용어집 항목
+        confidence:
+          type: number
+          description: "0~1. 낮으면 사람이 봐야 한다"
+        translated:
+          type: boolean
+          description: 번역이 된 문장인가. 직접 입력한 임의 문장은 엔진 없이 번역할 수 없다 — 그럴듯한 결과를 만드는 대신 안 됐다고 표시한다.
+      required:
+        - id
+        - source
+        - target
+        - appliedTerms
+        - confidence
+        - translated
+      additionalProperties: false
+    TranslationSource:
+      type: string
+      enum:
+        - document
+        - text
+      description: 원문을 어디서 받는가
+    TranslationTone:
+      type: string
+      enum:
+        - technical
+        - business
+        - plain
+    TrendPoint:
+      type: object
+      properties:
+        period:
+          type: string
+          description: x축 라벨 (기간)
+        value:
+          type: number
+          description: 실측값
+        limit:
+          type: number
+          description: 관리 기준선 — 차트에 함께 그린다
+      required:
+        - period
+        - value
+        - limit
+      additionalProperties: false
+    UnmatchedReason:
+      type: object
+      properties:
+        label:
+          type: string
+        count:
+          type: number
+        aiSolvable:
+          type: boolean
+          description: AI가 처리 가능한지 — 불가한 것을 가능한 것처럼 세면 계획이 어긋난다
+        action:
+          type: string
+      required:
+        - label
+        - count
+        - aiSolvable
+        - action
+      additionalProperties: false
+    UsageBucket:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        used:
+          type: number
+          description: 이번 달 소비 토큰
+        limit:
+          type:
+            - number
+            - "null"
+          description: 월 한도. 없으면 null
+      required:
+        - id
+        - label
+        - used
+        - limit
+      additionalProperties: false
+      description: 소비량 — 한도 대비 얼마나 썼는지
+    UsageEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        at:
+          type: string
+        userName:
+          type: string
+        dept:
+          type: string
+        mode:
+          $ref: "#/components/schemas/UsageMode"
+        tokens:
+          type: number
+        rating:
+          type:
+            - number
+            - "null"
+          description: 사용자가 만족도를 남겼으면 1~5. 안 남겼으면 null
+        reported:
+          type: boolean
+          description: 오류로 신고된 건
+      required:
+        - id
+        - at
+        - userName
+        - dept
+        - mode
+        - tokens
+        - rating
+        - reported
+      additionalProperties: false
+    UsageMode:
+      type: string
+      enum:
+        - general
+        - review
+        - translate
+        - report
+        - agent
+        - secure
+      description: |-
+        서비스 분석 — 이용 이력·만족도·통계·리포트.
+        
+        이 구역의 위험은 **표본이 무엇인지 밝히지 않는 것**이다. '평균 만족도 4.2점'은 누가 답한 4.2인지 없으면 뜻이 없다. 응답률이 68%면 그 4.2는 답한 사람만의 평균이고, 답하지 않은 32%는 아무 말도 하지 않았다.
+        
+        ⚠️ **질의 본문은 여기 없다.** 접근 로그 화면이 '챗봇 질문 본문은 남기지 않는다'고 말하고 있으므로 이 화면도 같아야 한다. 두 화면이 다른 말을 하면 어느 쪽이 사실인지 알 수 없다. 보관 여부는 백엔드가 정한다(API-PROPOSAL §3).
+    UsageStats:
+      type: object
+      properties:
+        window:
+          $ref: "#/components/schemas/StatWindow"
+        totalQueries:
+          type: number
+        activeUsers:
+          type: number
+        avgSeconds:
+          type: number
+          description: 초 단위. 성공한 요청만 센 값이다
+        failedQueries:
+          type: number
+          description: 실패해서 평균에서 빠진 건수
+        daily:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+              queries:
+                type: number
+              users:
+                type: number
+            required:
+              - date
+              - queries
+              - users
+            additionalProperties: false
+        byMode:
+          type: array
+          items:
+            type: object
+            properties:
+              mode:
+                $ref: "#/components/schemas/UsageMode"
+              queries:
+                type: number
+            required:
+              - mode
+              - queries
+            additionalProperties: false
+      required:
+        - window
+        - totalQueries
+        - activeUsers
+        - avgSeconds
+        - failedQueries
+        - daily
+        - byMode
+      additionalProperties: false
+    UserRole:
+      type: string
+      enum:
+        - member
+        - manager
+        - admin
+      description: |-
+        플랫폼 사용자 — 계정·승인·할당량·접근 기록·차단.
+        
+        ⚠️ **권한 규칙은 프론트가 정하지 않는다**(SCOPE-PLAN §4, API-PROPOSAL §3). 누가 무엇을 할 수 있는지는 서버가 판정해 `permissions`로 내려 주고, 화면은 그 값을 그리기만 한다. 화면에 규칙을 하드코딩하면 서버 규칙과 어긋나는 순간 **화면에서는 되는데 서버가 막는** 상태가 된다.
+        
+        상태·역할은 코드로 받는다. 표시 문자열과 색은 화면이 정한다.
+    UserState:
+      type: string
+      enum:
+        - active
+        - suspended
+        - pending
+    Utterance:
+      type: object
+      properties:
+        speakerId:
+          type: string
+        atSeconds:
+          type: number
+          description: "회의 시작 기준 초 — '00:03:12' 같은 표시 문자열로 굳히지 않는다"
+        text:
+          type: string
+      required:
+        - speakerId
+        - atSeconds
+        - text
+      additionalProperties: false
+    VectorCollection:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        areaId:
+          type:
+            - string
+            - "null"
+          description: 이 컬렉션이 담는 지식영역 id. 안 붙어 있으면 null
+        vectors:
+          type: number
+        dimensions:
+          type: number
+          description: 임베딩 차원 — 다르면 같은 검색에서 비교할 수 없다
+        embeddingModel:
+          type: string
+        state:
+          $ref: "#/components/schemas/CollectionState"
+        updatedOn:
+          type: string
+        latencyMs:
+          type: number
+          description: 평균 조회 지연(ms)
+      required:
+        - id
+        - name
+        - areaId
+        - vectors
+        - dimensions
+        - embeddingModel
+        - state
+        - updatedOn
+        - latencyMs
+      additionalProperties: false
+    Violation:
+      type: object
+      properties:
+        id:
+          type: string
+        clause:
+          type: string
+          description: 걸린 조항 — 근거 없는 지적은 실무에서 무시된다
+        severity:
+          $ref: "#/components/schemas/Severity"
+        type:
+          type: string
+          description: 위반 유형 한 줄
+        detail:
+          type: string
+          description: 무엇이 문제인지
+        action:
+          type: string
+          description: 무엇을 하면 되는지 — 조치가 없으면 검토 결과가 아니라 잔소리다
+      required:
+        - id
+        - clause
+        - severity
+        - type
+        - detail
+        - action
+      additionalProperties: false
+    Volume:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        usedGb:
+          type: number
+          description: 기가바이트
+        capacityGb:
+          type: number
+        users:
+          type: array
+          items:
+            type: string
+          description: 이 볼륨을 쓰는 작업 공간 소유자
+        lastWriteAt:
+          type: string
+        idleDays:
+          type: number
+          description: 며칠째 아무도 안 썼는가
+      required:
+        - id
+        - name
+        - usedGb
+        - capacityGb
+        - users
+        - lastWriteAt
+        - idleDays
+      additionalProperties: false
+    WorkSignal:
+      type: object
+      properties:
+        id:
+          type: string
+        at:
+          type: string
+          description: "'MM-DD HH:mm' 로 표시할 원시 시각 (ISO)"
+        title:
+          type: string
+        detail:
+          type: string
+        severity:
+          $ref: "#/components/schemas/SignalSeverity"
+        source:
+          type: string
+          description: 무엇이 이 신호를 만들었는지 — 근거 없는 알림은 확인할 방법이 없다
+        link:
+          $ref: "#/components/schemas/SignalLink"
+      required:
+        - id
+        - at
+        - title
+        - detail
+        - severity
+        - source
+        - link
+      additionalProperties: false
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        purpose:
+          type: string
+        enabled:
+          type: boolean
+        owner:
+          type: string
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkflowNode"
+        runs24h:
+          type: number
+        failed24h:
+          type: number
+        failedAt:
+          type: array
+          items:
+            type: object
+            properties:
+              nodeId:
+                type: string
+              count:
+                type: number
+              reason:
+                type: string
+            required:
+              - nodeId
+              - count
+              - reason
+            additionalProperties: false
+          description: 실패한 실행이 어느 노드에서 멈췄는지
+        taken:
+          type: array
+          items:
+            $ref: "#/components/schemas/BranchTaken"
+          description: 분기별로 몇 번 탔는지
+      required:
+        - id
+        - name
+        - purpose
+        - enabled
+        - owner
+        - nodes
+        - runs24h
+        - failed24h
+        - failedAt
+        - taken
+      additionalProperties: false
+    WorkflowNode:
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          $ref: "#/components/schemas/NodeKind"
+        label:
+          type: string
+        branches:
+          type: array
+          items:
+            type: string
+          description: 분기 노드면 갈래 이름들. 아니면 빈 배열
+      required:
+        - id
+        - kind
+        - label
+        - branches
+      additionalProperties: false
+    Workspace:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        purpose:
+          type: string
+          description: 무슨 일을 하는 방인지 — 이름만으로는 구분이 안 된다
+      required:
+        - id
+        - name
+        - purpose
+      additionalProperties: false
+      description: |-
+        워크스페이스 — 대화를 업무 단위로 나눈다.
+        
+        이전 데모에는 사이드바에 이름만 있고 눌러도 아무 일이 없었다. 이름만 옮기면 기능이 있는 것처럼 보이기만 하므로, **대화를 실제로 나누게** 만든다. 고른 워크스페이스의 대화만 목록에 남는다.
+    Xai:
+      type: object
+      properties:
+        factors:
+          type: array
+          items:
+            $ref: "#/components/schemas/XaiFactor"
+        caveat:
+          type: string
+          description: 이 답변만으로 결정하면 안 되는 이유
+      required:
+        - factors
+        - caveat
+      additionalProperties: false
+    XaiFactor:
+      type: object
+      properties:
+        label:
+          type: string
+        weight:
+          type: number
+          description: "0~1. 합이 1이 되게 쓴다"
+        detail:
+          type: string
+      required:
+        - label
+        - weight
+        - detail
+      additionalProperties: false
+      description: |-
+        판단 근거 — '왜 이 답변인가'.
+        
+        신뢰도 94%만 보여 주면 무엇을 보고 94%인지 알 수 없다. 무엇이 얼마나 기여했는지 나누고, **이 답변으로 결정하기 전에 사람이 확인할 것**을 함께 적는다.
+    analytics_ReportSection:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        available:
+          type: boolean
+          description: 서버 없이도 지금 값을 만들 수 있는가
+        unavailableReason:
+          type:
+            - string
+            - "null"
+          description: 못 만들면 왜인지
+      required:
+        - id
+        - label
+        - available
+        - unavailableReason
+      additionalProperties: false
+      description: 리포트에 넣을 항목
+    mlops_Dataset:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        kind:
+          $ref: "#/components/schemas/DatasetKind"
+        rows:
+          type: number
+        hasPii:
+          type: boolean
+          description: 개인정보가 들어 있는가
+        piiNote:
+          type:
+            - string
+            - "null"
+          description: 개인정보 처리 상태. 없으면 null
+        license:
+          type:
+            - string
+            - "null"
+          description: 출처·라이선스. 확인 안 됐으면 null
+        registeredOn:
+          type: string
+      required:
+        - id
+        - name
+        - kind
+        - rows
+        - hasPii
+        - piiNote
+        - license
+        - registeredOn
+      additionalProperties: false
+    mlops_Workspace:
+      type: object
+      properties:
+        id:
+          type: string
+        owner:
+          type: string
+        purpose:
+          type: string
+        gpuCount:
+          type: number
+        lastActiveAt:
+          type: string
+          description: 마지막으로 실제 계산이 돈 시각
+        idleDays:
+          type: number
+          description: 며칠째 놀고 있는가. 쓰고 있으면 0
+      required:
+        - id
+        - owner
+        - purpose
+        - gpuCount
+        - lastActiveAt
+        - idleDays
+      additionalProperties: false

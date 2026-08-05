@@ -87,11 +87,10 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `PATCH /workflows/{id}` | `setWorkflowEnabled` | 켜기·끄기 |
 | `GET /scenarios` | `fetchScenarioDefs` | → `ScenarioDefinition[]`. 단계마다 어느 에이전트를 부르는지 |
 | `PUT /scenarios/{id}` | `saveScenario` | 시나리오 변경 |
-| `GET /datasets` | `fetchDatasets` | → `Dataset[]` (`entities/dataset/model.ts`) |
-| `POST /datasets (multipart)` | `uploadDataset` | 파일 → `Dataset` |
+| `GET /analysis/datasets` | `fetchDatasets` | → `Dataset[]` (`entities/dataset/model.ts`). 분석에 넣는 **데이터 파일**이다 — 학습·평가 데이터셋(`GET /datasets`)과 다른 자원 |
+| `POST /analysis/datasets (multipart)` | `uploadDataset` | 파일 → `Dataset` (`entities/dataset/model.ts`) |
 | `POST /summaries` | `createSummary` | `SummaryRequest` → `SummaryResult` (`entities/summary/model.ts`) |
 | `POST /translations` | `createTranslation` | `TranslationRequest` + 원문 → `TranslationResult` (`entities/translation/model.ts`) |
-| `GET /glossary` | `fetchGlossary` | → `GlossaryEntry[]` |
 | `POST /reviews` | `createReview` | `ReviewRequest` → `ReviewResult` (`entities/review/model.ts`) |
 | `POST /reports` | `createReport` | `ReportRequest` → `ReportResult` (`entities/report/model.ts`) |
 | `POST /minutes` | `createMinutes` | `MeetingRequest` → `MeetingResult` (`entities/meeting/model.ts`) |
@@ -131,13 +130,13 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /analytics/satisfaction` | `fetchSurvey` | → `SatisfactionSurvey`. 보낸 수(`sent`)와 답한 수(`responded`)를 함께 — 평균만 오면 표본을 알 수 없다 |
 | `POST /analytics/satisfaction:send` | `sendSurvey` | 조사 발송 |
 | `GET /analytics/stats?window=` | `fetchUsageStats` | `window`=`7d`\|`30d`\|`quarter` → `UsageStats`. `avgSeconds`는 성공한 요청 기준, 제외된 `failedQueries`를 함께 |
-| `GET /analytics/report-sections` | `fetchReportSections` | → `ReportSection[]`. 만들 수 없는 항목도 이유와 함께 준다 |
+| `GET /analytics/report-sections` | `fetchReportSections` | → `ReportSection[]` (`entities/analytics/model.ts`). 만들 수 없는 항목도 이유와 함께 준다 |
 | `POST /analytics/reports` | `buildReport` | 리포트 파일 생성 |
 | `GET /audit/logs?kind=` | `fetchOpLogs` | `kind`=`export`\|`access`\|`operation`\|`query` → `OpLogEntry[]`. **접속 로그는 `/audit/access`와 같은 자원**이어야 한다 |
 | `GET /audit/logs.csv?kind=` | `exportLogsCsv` | 서버가 파일을 만든다 — 화면에 보이는 것만 모으면 조회 조건 밖 기록이 빠진다 |
 | `GET /usage/buckets` | `fetchUsageBuckets` | → `UsageBucket[]`. 금액이 아니라 **토큰 수**로 준다(단가 미정) |
-| `GET /notices` | `fetchManagedNotices` | 관리자와 포털이 **같은 엔드포인트**를 쓴다 — 따로 두면 고쳐도 포털에 안 나온다 |
-| `GET /chat/faq` | `fetchManagedFaq` | 위와 같은 이유로 포털과 같은 자원 |
+| `GET /notices` | `fetchManagedNotices` | → `Notice[]` (`entities/notice/model.ts`). 관리자와 포털이 **같은 엔드포인트**를 쓴다 — 따로 두면 고쳐도 포털에 안 나온다 |
+| `GET /chat/faq` | `fetchManagedFaq` | → `FaqItem[]` (`entities/chat/model.ts`). 위와 같은 이유로 포털과 같은 자원 |
 | `POST /notices` | `saveNotice` | 공지 등록 |
 | `GET /integrations/hr` | `fetchHrSync` | → `HrSyncState` (`entities/sysops/model.ts`). **처리 실패는 사유와 함께** — 퇴직이 밀리면 계정이 열려 있다 |
 | `POST /integrations/hr:sync` | `runHrSync` | 수동 동기화 |
@@ -162,8 +161,8 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /deployments` | `fetchDeployments` | → `Deployment[]`. 검증·운영 버전을 모두 준다 — 화면이 미반영을 계산한다 |
 | `POST /deployments:promote` | `promote` | 운영 반영 |
 | `GET /datasets` | `fetchDatasets` | → `Dataset[]` (`entities/mlops/model.ts`). 학습·평가 겸용 여부와 출처를 함께 |
-| `GET /workspaces` | `fetchWorkspaces` | → `Workspace[]`. 마지막 계산 시각(`lastActiveAt`)이 있어야 유휴를 잰다 |
-| `POST /workspaces/{id}:release` | `releaseWorkspace` | 자원 회수 |
+| `GET /devenv/workspaces` | `fetchWorkspaces` | → `Workspace[]` (`entities/mlops/model.ts`). GPU를 잡는 **개발 방**이다 — 포털의 업무 공간(`GET /workspaces`)과 다른 자원. 마지막 계산 시각(`lastActiveAt`)이 있어야 유휴를 잰다 |
+| `POST /devenv/workspaces/{id}:release` | `releaseWorkspace` | 자원 회수 |
 | `GET /models/versions` | `fetchModelVersions` | → `ModelVersion[]`. **계보**(`trainJobId`·`datasetIds`)를 함께 — 없으면 삭제 요청에 답할 수 없다 |
 | `GET /training/runs` | `fetchTrainRuns` | → `TrainRun[]`. 트레이너 현황(`/training/report`)과 **같은 작업**의 상세다 |
 | `GET /evaluations` | `fetchEvalResults` | → `EvalResult[]`. **학습셋과 겹쳤는지**(`trustworthy`)를 서버가 판정해 준다 |
@@ -263,22 +262,70 @@ API 키·토큰 원문은 **조회 응답에 넣지 않기를 요청한다.** �
 같은 이유로 응답 어디에도 비밀번호·시크릿을 넣지 않는다. 지금 fixture에도 두지 않았고,
 테스트가 그것을 확인한다.
 
-## 3. 백엔드가 정해 주어야 하는 것
+## 3. 결정 요청 8건
 
-프론트가 정하면 안 되는 것들이라 비워 둔다. **추측으로 채우지 않았다.**
+프론트가 정하면 안 되는 것들이다. **추측으로 채우지 않았다.**
+다만 비워 두기만 하면 회신이 늦으므로, 각 항목에 **프론트 권장안**과
+**안 정하면 생기는 일**을 붙였다. 권장안대로 가면 "그대로 갑니다" 한 줄로 끝난다.
 
-1. **인증** — 방식(세션/토큰), 갱신, 만료 시 화면 동작
-2. **테넌시** — 발주처(도메인) 구분을 경로로 할지(`/domains/{id}/documents`) 헤더로 할지
-3. **권한** — 문서 보안 등급(`일반/내부/대외비`)별 접근 규칙. 지금 지식 검색은 클라이언트 필터인데,
-   실제로는 **서버가 걸러야 한다**. 거른 건수는 응답으로 알려 주기를 요청한다
-   (`excludedBySecurity` — 없으면 사용자는 '없다'와 '안 보여 준다'를 구분할 수 없다)
-4. **감사 로그** — 누가 무엇을 조회·생성했는지 기록 범위
-5. **파일 보관** — 업로드본 보관 기간, 삭제 요청 경로
-6. **동시성·상한** — 분당 요청 수, 대용량 파일 동시 업로드
-7. **질의 본문 보관 여부** — 접근 로그와 이용 이력 두 화면이 지금은 '본문을 남기지
-   않는다'로 통일돼 있다(이전 데모는 이용 이력에 본문을 그대로 보여 줬다). 남기기로
-   정하면 보관 기간·열람 권한·마스킹 범위가 함께 필요하다. 프론트가 정할 일이 아니라 비워 둔다.
-8. **오류 코드 체계** — 위 `code` 값의 목록
+각 항목의 형식: 질문 / 권장 / 안 정하면 / 정해지면 프론트가 하는 일
+
+---
+
+**3-1. 인증** — 세션인가 토큰인가, 갱신은 어떻게, 만료되면 화면은 무엇을 하나
+
+- **권장**: `Authorization: Bearer` + 짧은 액세스 토큰 + 리프레시. 401이면 화면이 로그인으로 보낸다
+- **안 정하면**: 상태 변경(`PATCH`·`POST`)이 전부 막힌다. 지금 화면은 **실패를 그대로 알린다**
+  (D-009) — "저장되지 않았습니다"라고 말하고 값을 되돌린다. 성공한 척하지 않는다
+- **정해지면**: `shared/api`에 헤더 주입 한 곳 추가. 화면은 손대지 않는다
+
+**3-2. 테넌시** — 발주처 구분을 경로로(`/domains/{id}/documents`) 할지 헤더로 할지
+
+- **권장**: 헤더(`X-Domain-Id`). 경로에 넣으면 98개 주소가 전부 길어지고,
+  발주처가 하나뿐인 배포에서도 경로에 늘 껴 있어야 한다
+- **안 정하면**: 발주처가 둘 이상이 되는 순간 문서·지표가 섞인다. 지금은 팩이 하나뿐이라 안 드러난다
+- **정해지면**: 헤더면 `shared/api` 한 곳, 경로면 98개 주소를 다시 적는다. **헤더 쪽이 훨씬 싸다**
+
+**3-3. 권한 — 보안 등급별 접근** (`일반`/`내부`/`대외비`)
+
+- **권장**: **서버가 거른다.** 그리고 **거른 건수를 응답에 담는다**(`excludedBySecurity`)
+- **안 정하면**: 지금 지식 검색은 클라이언트 필터다 — 응답에 대외비가 실려 오고 화면이 숨긴다.
+  네트워크 탭을 열면 다 보인다. 이건 화면으로 못 고친다
+- **정해지면**: 클라이언트 필터를 지운다. 건수 필드가 없으면 사용자는
+  **'없다'와 '안 보여 준다'를 구분할 수 없다** — 그래서 필드를 함께 요청한다
+
+**3-4. 감사 로그 범위** — 누구의 무엇을 남기나
+
+- **권장**: 조회·생성·설정 변경 3종. 관리자 화면(`감사 추적`)은 이미 '기록이 어디에 남는지'를
+  `server`/`browser`/`none`으로 구분해 그린다
+- **안 정하면**: `none`인 책무가 남는다. 화면은 그것을 **'이행했지만 증명할 수 없음'**으로 표시한다
+- **정해지면**: `GET /compliance/evidence`의 `store` 값이 실제 값이 된다
+
+**3-5. 파일 보관** — 업로드본 보관 기간과 삭제 경로
+
+- **권장**: 처리 후 30일, `DELETE /documents/{id}`
+- **안 정하면**: 업로드는 지금도 **실패만 반환한다**(D-009). 지어낸 성공을 보여 주지 않는다
+- **정해지면**: `uploadDocument`·`uploadDataset` 두 함수만 바꾼다
+
+**3-6. 동시성·상한** — 분당 요청 수, 대용량 파일 동시 업로드
+
+- **권장**: 사용자당 분당 60, 업로드 동시 2건. 초과는 `429` + `retryAfterSeconds`
+- **안 정하면**: 화면이 재시도 간격을 임의로 정하게 된다 — 서버가 더 힘들어진다
+- **정해지면**: `429`를 오류 문구로 그대로 띄우고, 값이 있으면 그만큼 기다린다
+
+**3-7. 질의 본문 보관 여부** — 사용자가 무엇을 물었는지 저장하나
+
+- **권장**: **저장하지 않는다.** 지금 접근 로그·이용 이력 두 화면이 그 전제로 통일돼 있다
+  (이전 데모는 이용 이력에 본문을 그대로 보여 줬다)
+- **안 정하면**: 두 화면이 서로 다른 말을 하게 된다
+- **정해지면(저장하기로)**: 보관 기간·열람 권한·마스킹 범위가 **함께** 필요하다.
+  셋 중 하나라도 없으면 화면을 만들 수 없다
+
+**3-8. 오류 코드 체계** — `ApiError.code` 목록
+
+- **권장**: `<자원>_<사유>` 대문자 스네이크(`DOCUMENT_NOT_FOUND`). `message`는 한국어 문장
+- **안 정하면**: 화면이 `message`만 띄운다. 재시도 가능·불가를 구분할 수 없다
+- **정해지면**: 재시도 가능한 코드만 '다시 시도' 버튼을 붙인다
 
 ## 4. 이 문서가 코드와 갈라지지 않게 하는 법
 
@@ -292,5 +339,56 @@ API 키·토큰 원문은 **조회 응답에 넣지 않기를 요청한다.** �
 
 - 표시에 적힌 엔드포인트가 **이 문서에 없으면 실패**
 - 이 문서에 적힌 함수 이름이 **코드에 없으면 실패**
+- 이 문서의 주소가 **`docs/api/openapi.json`에 없으면 실패**(그 반대도)
 
 문서만 고치거나 코드만 고치면 테스트가 깨진다. 둘을 함께 고치는 것이 정상 경로다.
+
+CI는 여기에 더해 `npm run api:spec`을 다시 돌리고 `git diff --exit-code`를 본다 —
+타입만 고치고 명세를 다시 안 만들면 **백엔드가 받는 파일이 조용히 낡기** 때문이다.
+
+## 5. 함께 보내는 것
+
+| 파일 | 무엇 | 어떻게 만들었나 |
+|---|---|---|
+| `docs/API-PROPOSAL.md` | 이 문서 — 왜 이 필드가 필요한지 | 사람이 씀 |
+| `docs/api/openapi.yaml` | OpenAPI 3.1 명세(사람이 읽는 쪽) | `npm run api:spec` |
+| `docs/api/openapi.json` | 같은 명세(도구·검사가 읽는 쪽) | 〃 |
+| `docs/api/USAGE.md` | **주소별 사용처** — 이걸 바꾸면 어느 화면이 깨지나 | 〃 |
+
+명세의 스키마는 손으로 적지 않았다. `src/entities/<도메인>/model.ts`에서 뽑았고
+**그 파일이 정본**이다. 한국어 주석도 그대로 `description`에 실린다.
+
+Swagger UI·Postman·코드 생성기에 `openapi.yaml`을 그대로 넣으면 된다.
+인증·서버 주소는 비어 있다 — §3-1, §3-2가 정해지면 채운다.
+
+### 명세를 만들면서 드러난 것
+
+문서로만 있을 때는 안 보이던 것이 기계로 뽑으니 나왔다.
+
+| 발견 | 무엇이 문제였나 | 어떻게 했나 |
+|---|---|---|
+| `GET /datasets`가 둘 | 분석에 넣는 **데이터 파일**과 학습·평가 **데이터셋**이 같은 주소를 쓰고 있었다. 응답 형태가 서로 다르다 | 분석 쪽을 `/analysis/datasets`로 나눔 |
+| `GET /workspaces`가 둘 | 포털의 **업무 공간**과 GPU를 잡는 **개발 방**이 같은 주소였다 | 개발 쪽을 `/devenv/workspaces`로 나눔 |
+| `MappingRequest`가 딴 곳에 | 요청 타입 13개 중 12개는 엔티티에 있는데 이것만 경계 파일에 있었다 | 엔티티로 옮김 |
+| `GET /glossary`를 **아무도 안 부름** | 만들어 뒀지만 화면이 쓰지 않았다. 번역 결과에 적용 용어가 이미 실려 온다 | 제안에서 뺌 — 안 만들어도 된다 |
+
+지금 제안하는 주소 중 **화면이 안 부르는 것은 0개**다(`docs/api/USAGE.md` 마지막 줄).
+
+## 6. 붙이는 순서
+
+한 번에 다 붙일 필요가 없다. `shared/api`의 함수를 하나씩 바꾸면 그 화면만 실서비스가 된다.
+**화면 코드는 손대지 않는다** — 그게 이 경계를 둔 이유다.
+
+| 단계 | 붙이는 것 | 살아나는 화면 | 먼저 필요한 결정 |
+|---|---|---|---|
+| 1 | `/domains`·`/workspaces`·`/notices`·`/chat/faq`·`/documents` | 포털 진입, 사이드바, 공지, 문서 목록 | §3-2 테넌시 |
+| 2 | `/chat/messages`·`/knowledge:search`·`/regulations:search` | 챗봇·지식 검색·규정 조회 (제품의 핵심) | §3-3 권한(서버 필터) |
+| 3 | 에이전트 실행 9종(`/summaries`·`/translations`·…) | 에이전트 13종 | §3-5 파일 보관, §3-6 상한 |
+| 4 | 관리자 조회 계열(`/infra/*`·`/users`·`/analytics/*`·…) | 관리자 44화면 | §3-1 인증, §3-4 감사 |
+| 5 | 상태 변경(`PATCH`·`POST … :action`) | 승인·차단·배포 등 실제로 바꾸는 것 | §3-1 인증 필수 |
+
+**1·2단계만 붙어도 사용자 포털이 실제로 돕니다.** 관리자는 그 뒤여도 된다 —
+지금은 모든 인프라 수치에 `서버 미연결 — 예시 값` 배지가 붙어 있어 거짓으로 읽히지 않는다.
+
+상태 변경(5단계)을 마지막에 둔 이유: 인증이 없으면 누가 눌렀는지 모른 채 값이 바뀐다.
+그때까지 화면은 **실패를 그대로 알린다**(D-009).

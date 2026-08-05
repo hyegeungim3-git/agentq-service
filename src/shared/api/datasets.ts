@@ -6,7 +6,9 @@ import { DATASETS } from '@fixtures/datasets'
 import type { ApiResult } from './domains'
 
 export function fetchDatasets(): Promise<ApiResult<Dataset[]>> {
-  // TODO(api-미확정): GET /datasets 로 교체. 제거 조건 = API 명세 확정.
+  /* 학습·평가 데이터셋(`shared/api/mlops`)과 **다른 자원**이다. 이름이 같아 한때
+     같은 주소를 제안했는데, 응답 형태가 서로 달라 명세를 만들 때 충돌했다. */
+  // TODO(api-미확정): GET /analysis/datasets 로 교체. 제거 조건 = API 명세 확정.
   return Promise.resolve({ ok: true, data: DATASETS })
 }
 
@@ -17,7 +19,7 @@ export function fetchDatasets(): Promise<ApiResult<Dataset[]>> {
  * CSV는 브라우저도 읽을 수 있지만, 행·열 수와 결측 비율은 서버가 집계해야 하고
  * 그것을 지어내면 화면에 표시되는 적용률이 거짓이 된다.
  *
- * TODO(api-미확정): POST /datasets (multipart) 로 교체.
+ * TODO(api-미확정): POST /analysis/datasets (multipart) 로 교체.
  *   제거 조건 = 업로드 엔드포인트·집계 응답 형식 확정.
  */
 export function uploadDataset(file: File): Promise<ApiResult<Dataset>> {

@@ -1,5 +1,5 @@
-import type { GlossaryEntry, TranslationRequest, TranslationResult } from '@entities/translation/model'
-import { GLOSSARY, simulateTranslation } from '@fixtures/translation'
+import type { TranslationRequest, TranslationResult } from '@entities/translation/model'
+import { simulateTranslation } from '@fixtures/translation'
 import type { ApiResult } from './domains'
 
 export type TranslationApiOptions = { delayMs?: number | undefined }
@@ -7,10 +7,13 @@ export type TranslationApiOptions = { delayMs?: number | undefined }
 const wait = (ms: number): Promise<void> =>
   ms <= 0 ? Promise.resolve() : new Promise((r) => setTimeout(r, ms))
 
-export function fetchGlossary(): Promise<ApiResult<GlossaryEntry[]>> {
-  // TODO(api-미확정): GET /glossary 로 교체. 제거 조건 = API 명세 확정.
-  return Promise.resolve({ ok: true, data: GLOSSARY })
-}
+/*
+ * 용어집 단독 조회는 두지 않는다.
+ *
+ * 만들어 뒀지만 **아무 화면도 부르지 않았다**(사용처 지도가 잡았다).
+ * 번역 결과에 적용된 용어(`glossaryUsed`)가 이미 실려 오기 때문이다.
+ * 안 쓰는 주소를 제안서에 남기면 백엔드가 안 만들어도 될 것을 만든다.
+ */
 
 export async function createTranslation(
   req: TranslationRequest,
