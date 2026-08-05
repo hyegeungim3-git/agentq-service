@@ -21,7 +21,7 @@ import type {
   ReportType,
 } from '@entities/report/model'
 
-type BaseSection = {
+export type BaseSection = {
   heading: string
   /** 단문에도 남는 핵심 절인가 */
   core: boolean
@@ -34,7 +34,7 @@ type BaseSection = {
   source: string
 }
 
-type BaseReport = {
+export type BaseReport = {
   docNo: string
   department: string
   period: string
@@ -44,7 +44,7 @@ type BaseReport = {
   elapsedSeconds: number
 }
 
-const BASE: Record<ReportType, BaseReport> = {
+export const REPORT_BASE: Record<ReportType, BaseReport> = {
   weekly: {
     docNo: 'HBP-생산기술-2026-041',
     department: '생산기술팀',
@@ -242,9 +242,20 @@ const USER_FIELDS = [
   { key: 'remarks', heading: '특이 사항' },
 ] as const
 
-/** 설정을 반영한 보고서 — 서버가 붙으면 이 함수가 사라진다 */
-export function simulateReport(req: ReportRequest): ReportResult {
-  const base = BASE[req.type]
+/**
+ * 설정을 반영한 보고서를 만드는 함수를 찍어 낸다 — 서버가 붙으면 함께 사라진다.
+ *
+ * 바탕(문서번호·부서·절)을 밖에서 받는다. 안에 못박아 두면 발주처를 바꿔도
+ * 제조 부서·제조 실적이 그대로 나온다.
+ */
+export function makeReportSimulator(
+  base0: Record<ReportType, BaseReport>,
+): (req: ReportRequest) => ReportResult {
+  return (req) => simulateWith(base0, req)
+}
+
+function simulateWith(base0: Record<ReportType, BaseReport>, req: ReportRequest): ReportResult {
+  const base = base0[req.type]
   const picked = keep(base.sections, req.length)
 
   const auto: ReportSection[] = picked.map((s) => ({
@@ -291,3 +302,5 @@ export function simulateReport(req: ReportRequest): ReportResult {
     elapsedSeconds: Math.round((base.elapsedSeconds + extra) * 10) / 10,
   }
 }
+
+export const simulateReport = makeReportSimulator(REPORT_BASE)

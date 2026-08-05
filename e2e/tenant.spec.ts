@@ -72,7 +72,7 @@ test('도입 전 에이전트를 준비 중과 구분해 말한다', async ({ pa
   /* 도입 전 카드의 접근성 이름에는 사유가 붙는다('회의록 작성 — 이 발주처 도입 전').
      보조기기가 이유를 읽을 수 있어야 해서다 — 그래서 정확히 같은 이름으로 찾지 않는다 */
   await expect(page.getByRole('button', { name: '문서 요약', exact: true })).toBeEnabled()
-  await expect(page.getByRole('button', { name: /^회의록 작성/ })).toBeDisabled()
+  await expect(page.getByRole('button', { name: /^수출 문서 번역/ })).toBeDisabled()
   await expect(page.getByText('도입 전').first()).toBeVisible()
 })
 
@@ -147,7 +147,26 @@ test('공공 문서 인식은 공공 서식을 읽는다', async ({ page }) => {
 test('도입 전 에이전트는 목록에서 막혀 있다', async ({ page }) => {
   await enter(page, /한국부동산원/)
   await openTab(page, /^에이전트/)
-  for (const name of [/^수출 문서 번역/, /^표준 보고서 작성/, /^회의록 작성/, /^기준정보 표준화/]) {
+  for (const name of [/^수출 문서 번역/, /^기준정보 표준화/]) {
     await expect(page.getByRole('button', { name })).toBeDisabled()
   }
+})
+
+test('공공 보고서·회의록이 공공 내용으로 나온다', async ({ page }) => {
+  await enter(page, /한국부동산원/)
+  await openTab(page, /^에이전트/)
+  await page.getByRole('button', { name: '표준 보고서 작성', exact: true }).click()
+  await page.getByRole('button', { name: '보고서 생성' }).click()
+  const report = page.getByRole('region', { name: /보고/ })
+  await expect(report).toBeVisible({ timeout: 10_000 })
+  await expect(report).toContainText('KREA-부동산공시처')
+  await expect(report).not.toContainText('HBP-생산기술')
+
+  await openTab(page, /^에이전트/)
+  await page.getByRole('button', { name: '회의록 작성', exact: true }).click()
+  await page.getByRole('button', { name: '회의록 작성' }).click()
+  const minutes = page.getByRole('region', { name: /심의회/ })
+  await expect(minutes).toBeVisible({ timeout: 10_000 })
+  await expect(minutes).toContainText('윤서경')
+  await expect(minutes).not.toContainText('박태윤')
 })

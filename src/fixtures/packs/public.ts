@@ -11,7 +11,14 @@ import type { AgentId } from '@entities/agent/model'
 import { PUBLIC_WORKSPACES, PUBLIC_NOTICES, PUBLIC_SIGNALS, PUBLIC_APPEAL_QUEUE, PUBLIC_DATASETS } from '../public/basics'
 import { PUBLIC_CHAT, PUBLIC_CHAT_UNKNOWN, PUBLIC_FAQ } from '../public/chat'
 import { PUBLIC_ANALYSES } from '../public/analysis'
+import {
+  PUBLIC_AGENDA_SAMPLE,
+  PUBLIC_ATTENDEE_SAMPLE,
+  simulatePublicMinutes,
+} from '../public/meeting'
 import { simulatePublicOcr } from '../public/ocr'
+import { PUBLIC_REPORT_BASE } from '../public/report'
+import { makeReportSimulator } from '../report'
 import { PUBLIC_QUERY_RESULTS, PUBLIC_QUERY_SOURCES } from '../public/dataquery'
 import { PUBLIC_DOCUMENTS } from '../public/documents'
 import { PUBLIC_CORPUS, PUBLIC_KNOWLEDGE_BASES, PUBLIC_REFERENCE_SPEC } from '../public/knowledge'
@@ -31,7 +38,7 @@ import { PUBLIC_SUMMARIES } from '../public/summary'
 import type { DomainPackData } from '../packs'
 
 /** 1단계 도입 — 업무 데이터가 갖춰진 것부터 */
-const ADOPTED: AgentId[] = ['chatbot', 'knowledge', 'internalreg', 'summary', 'review', 'dbquery', 'dataanalysis', 'safety', 'ocr']
+const ADOPTED: AgentId[] = ['chatbot', 'knowledge', 'internalreg', 'summary', 'review', 'dbquery', 'dataanalysis', 'safety', 'ocr', 'report', 'meeting']
 
 export const PUBLIC_PACK: DomainPackData = {
   agents: ADOPTED,
@@ -65,9 +72,13 @@ export const PUBLIC_PACK: DomainPackData = {
   },
   /* 도입한 것만 준다. 없는 것은 경계가 '아직 도입하지 않았습니다'라고 답한다 —
      빈 함수를 끼워 넣으면 눌렀을 때 빈 결과가 나오고, 그게 더 나쁘다 */
-  simulate: { ocr: simulatePublicOcr },
-  /* 회의·번역·주소 예시는 그 에이전트를 도입할 때 함께 채운다 */
-  samples: {},
+  simulate: {
+    ocr: simulatePublicOcr,
+    report: makeReportSimulator(PUBLIC_REPORT_BASE),
+    meeting: simulatePublicMinutes,
+  },
+  /* 번역·주소 예시는 그 에이전트를 도입할 때 함께 채운다 */
+  samples: { attendees: PUBLIC_ATTENDEE_SAMPLE, agenda: PUBLIC_AGENDA_SAMPLE },
   /* 릴레이가 부르는 표준화·보고서가 아직 도입 전이라 카드를 두지 않는다.
      띄워 두면 눌러도 아무 일 없는 버튼이 된다 */
   scenario: null,

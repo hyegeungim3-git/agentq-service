@@ -7,7 +7,7 @@
  */
 import type { MeetingRequest, MeetingResult } from '@entities/meeting/model'
 
-const BASE = {
+export const MEETING_BASE = {
   title: '3월 3주 공정회의',
   heldOn: '2026-03-20',
   place: '창원본사 3층 회의실',
@@ -76,7 +76,7 @@ const BASE = {
  * 회의 자료가 뒷받침하는 결정.
  * 자료를 붙이지 않으면 근거가 없는 것이고, 그건 감출 일이 아니라 표시할 일이다.
  */
-const BASIS_BY_REFERENCE: Record<string, { decisionId: string; cite: string }[]> = {
+export const MEETING_BASIS: Record<string, { decisionId: string; cite: string }[]> = {
   'doc-press-sop': [
     { decisionId: 'd-1', cite: '프레스_작업표준서_SOP-PR-011.pdf 제5장 이상 대응' },
     { decisionId: 'd-2', cite: '프레스_작업표준서_SOP-PR-011.pdf 제3장 금형 교체' },
@@ -86,7 +86,7 @@ const BASIS_BY_REFERENCE: Record<string, { decisionId: string; cite: string }[]>
   ],
 }
 
-const REFERENCE_NAME: Record<string, string> = {
+export const MEETING_REFERENCE_NAME: Record<string, string> = {
   'doc-press-sop': '프레스_작업표준서_SOP-PR-011.pdf',
   'doc-quality-report': '2026년_1분기_품질동향조사.pdf',
   'doc-inspection-cert': '수입검사성적서_SPCC-2211.pdf',
@@ -105,8 +105,26 @@ const lines = (text: string): string[] =>
 /** '이름,부서' 또는 '이름' */
 const attendeeName = (line: string): string => (line.split(',')[0] ?? '').trim()
 
-/** 설정을 반영한 회의록 — 서버가 붙으면 이 함수가 사라진다 */
-export function simulateMinutes(req: MeetingRequest): MeetingResult {
+/**
+ * 설정을 반영한 회의록을 만드는 함수를 찍어 낸다 — 서버가 붙으면 함께 사라진다.
+ *
+ * 회의 내용·참조 자료를 밖에서 받는다. 안에 못박으면 발주처를 바꿔도
+ * 제조 회의의 발언자와 결정이 그대로 나온다.
+ */
+export type MeetingCorpus = {
+  base: typeof MEETING_BASE
+  basisByReference: Record<string, { decisionId: string; cite: string }[]>
+  referenceName: Record<string, string>
+}
+
+export function makeMeetingSimulator(c: MeetingCorpus): (req: MeetingRequest) => MeetingResult {
+  return (req) => simulateWith(c, req)
+}
+
+function simulateWith(c: MeetingCorpus, req: MeetingRequest): MeetingResult {
+  const BASE = c.base
+  const BASIS_BY_REFERENCE = c.basisByReference
+  const REFERENCE_NAME = c.referenceName
   const cites = new Map<string, string>()
   for (const id of req.referenceIds) {
     for (const b of BASIS_BY_REFERENCE[id] ?? []) cites.set(b.decisionId, b.cite)
@@ -158,3 +176,11 @@ export function simulateMinutes(req: MeetingRequest): MeetingResult {
       Math.round((BASE.elapsedSeconds + req.referenceIds.length * 1.4 + agendaCoverage.length * 0.3) * 10) / 10,
   }
 }
+
+export const MEETING_CORPUS: MeetingCorpus = {
+  base: MEETING_BASE,
+  basisByReference: MEETING_BASIS,
+  referenceName: MEETING_REFERENCE_NAME,
+}
+
+export const simulateMinutes = makeMeetingSimulator(MEETING_CORPUS)
