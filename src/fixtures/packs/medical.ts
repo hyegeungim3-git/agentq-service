@@ -34,6 +34,8 @@ import { MEDICAL_CHAT, MEDICAL_CHAT_UNKNOWN, MEDICAL_FAQ } from '../medical/chat
 import { MEDICAL_DOCUMENTS } from '../medical/documents'
 import { MEDICAL_AGENT_DEFS, MEDICAL_SCENARIO_DEFS } from '../medical/agentdef'
 import { MEDICAL_MCP_SERVERS, MEDICAL_TOOLS } from '../medical/tools'
+import { MEDICAL_AREAS, MEDICAL_INDEX_ENTRIES } from '../medical/knowledgebase'
+import { MEDICAL_AGENT_OPS } from '../medical/agentops'
 import {
   MEDICAL_DATASETS,
   MEDICAL_ER_CENSUS,
@@ -106,4 +108,7 @@ export const MEDICAL_PACK: DomainPackData = {
   scenarioDefs: MEDICAL_SCENARIO_DEFS,
   tools: MEDICAL_TOOLS,
   mcpServers: MEDICAL_MCP_SERVERS,
+  knowledgeAreas: MEDICAL_AREAS,
+  indexEntries: MEDICAL_INDEX_ENTRIES,
+  agentOps: MEDICAL_AGENT_OPS,
 }

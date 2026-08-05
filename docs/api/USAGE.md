@@ -7,7 +7,7 @@
 
 | 주소 | 클라이언트 함수 | 쓰는 곳 |
 |---|---|---|
-| `GET /domains` | `fetchDomains` | `src/pages/admin/agentdef/FlowBuilderPage.tsx`<br>`src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/admin/packops/ToolDeployPage.tsx`<br>`src/pages/portal/PortalPage.tsx` |
+| `GET /domains` | `fetchDomains` | `src/pages/admin/agentdef/FlowBuilderPage.tsx`<br>`src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/admin/agentops/AgentOpsPage.tsx`<br>`src/pages/admin/knowledge/KnowledgeBasePage.tsx`<br>`src/pages/admin/packops/ToolDeployPage.tsx`<br>`src/pages/portal/PortalPage.tsx` |
 | `GET /domains/{id}` | `fetchDomain` | `src/App.tsx` |
 | `GET /workspaces` | `fetchWorkspaces` | `src/App.tsx` |
 | `GET /notices` | `fetchNotices` | `src/App.tsx`<br>`src/pages/notices/NoticesPage.tsx` |

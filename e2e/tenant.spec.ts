@@ -288,3 +288,33 @@ test('연동 도구 패널이 발주처마다 다르다', async ({ page }) => {
   await expect(page.getByText('청구 자료 조회')).toBeVisible()
   await expect(page.getByText('MES 조회')).toHaveCount(0)
 })
+
+/**
+ * '답변 근거 > 지식 영역'도 그 발주처 것인가.
+ *
+ * 도구를 옮기고 배포본을 보다 찾았다 — 병원 대화 화면에 `작업표준·공정 문서`,
+ * `설비 대장·정비 이력`이 떠 있었다. 지식 영역이 플랫폼에 하나뿐이었기 때문이다.
+ */
+test('답변 근거의 지식 영역이 발주처마다 다르다', async ({ page }) => {
+  const openAreas = async () => {
+    if ((page.viewportSize()?.width ?? 0) < 1280) {
+      await openTab(page, /^일반/)
+      await page.getByRole('button', { name: '답변 근거' }).click()
+    }
+    await page.getByRole('button', { name: '지식 영역' }).click()
+  }
+
+  /* 좁은 화면에서는 패널이 오버레이라 화면 전체가 아니라 패널을 본다 */
+  const panel = page.getByRole('complementary', { name: '답변 근거' })
+
+  await enter(page, /한빛정밀/)
+  await openAreas()
+  await expect(panel).toContainText('설비 대장·정비 이력')
+
+  await enter(page, /새빛대학교병원/)
+  await openAreas()
+  await expect(panel).toContainText('심사지침·급여 기준')
+  for (const word of ['설비 대장·정비 이력', '작업표준·공정 문서', '협력사 공유 문서']) {
+    await expect(panel).not.toContainText(word)
+  }
+})

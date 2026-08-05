@@ -705,3 +705,15 @@ test('도구·배포에서 발주처를 바꾸면 도구가 바뀌고 배포는 
   await expect(page.getByLabel('발주처')).toHaveCount(0)
   await expect(page.getByText(/검증에만 올라가 있고 운영에 안 나간 버전/)).toBeVisible()
 })
+
+/* 지식 영역도 발주처 데이터 — 관리자는 어느 발주처를 보는지 말해야 한다 */
+test('지식 관리에서 발주처를 바꾸면 영역이 바뀐다', async ({ page }) => {
+  await enterAdmin(page)
+  const nav = await adminNav(page)
+  await nav.getByRole('button', { name: '지식 관리' }).click()
+  await expect(page.getByText('작업표준·공정 문서')).toBeVisible()
+
+  await page.getByLabel('발주처').selectOption({ label: '한성시청 (행정)' })
+  await expect(page.getByText('재난·안전 매뉴얼')).toBeVisible()
+  await expect(page.getByText('작업표준·공정 문서')).toHaveCount(0)
+})

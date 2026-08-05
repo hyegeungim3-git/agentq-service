@@ -4,6 +4,8 @@ import { byFailure, failureRatio, unused } from '@entities/agentops/model'
 import { hasGap, missing } from '@entities/knowledgebase/model'
 import { fetchAgentOps, setAgentExposure } from '@shared/api/agentops'
 import { fetchAreas } from '@shared/api/knowledgebase'
+import { fetchDomains } from '@shared/api/domains'
+import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
 import { useRemote } from '@features/remote/useRemote'
 
 /**
@@ -25,8 +27,12 @@ const pct = (r: number): string => `${(r * 100).toFixed(1)}%`
 
 export function AgentOpsPage() {
   const [failure, setFailure] = useState<string | null>(null)
-  const ops = useRemote(fetchAgentOps, [])
-  const areas = useRemote(fetchAreas, [])
+  const domains = useRemote(fetchDomains, [])
+  const ready = domains.kind === 'ready' ? domains.data.filter((d) => d.status === 'ready') : []
+  const [picked, setPicked] = useState<string | null>(null)
+  const domainId = picked ?? ready[0]?.id ?? null
+  const ops = useRemote(() => fetchAgentOps(domainId), [domainId])
+  const areas = useRemote(() => fetchAreas(domainId), [domainId])
 
   const toggle = (id: string, next: boolean) => {
     void setAgentExposure(id, next).then((res) => {
@@ -41,6 +47,13 @@ export function AgentOpsPage() {
         사용자 포털에 열려 있는 에이전트 {AGENTS.length}종입니다 — 포털이 그리는 목록과 같은
         카탈로그입니다.
       </p>
+
+      <DomainSelect
+        domains={ready}
+        value={domainId}
+        onChange={setPicked}
+        note="운영 실적도 기대는 지식 영역도 발주처마다 다릅니다."
+      />
 
       {failure && (
         <p role="alert" className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">

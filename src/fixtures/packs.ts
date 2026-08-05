@@ -13,6 +13,7 @@
  * 채워 넣으면 그게 바로 이전 데모의 사고다.
  */
 import type { AgentId } from '@entities/agent/model'
+import type { AgentOps } from '@entities/agentops/model'
 import type { AgentDefinition, ScenarioDefinition } from '@entities/agentdef/model'
 import type { McpServer } from '@entities/evidence/model'
 import type { ToolSpec } from '@entities/packops/model'
@@ -22,6 +23,7 @@ import type { BusinessDocument } from '@entities/document/model'
 import type { DataSourceOption, QueryResult } from '@entities/dataquery/model'
 import type { Dataset } from '@entities/dataset/model'
 import type { KnowledgeBase } from '@entities/knowledge/model'
+import type { IndexEntry, KnowledgeArea } from '@entities/knowledgebase/model'
 import type { MapIntel } from '@entities/mapintel/model'
 import type { LiveMetric } from '@entities/metric/model'
 import type { MeetingRequest, MeetingResult } from '@entities/meeting/model'
@@ -152,6 +154,26 @@ export type DomainPackData = {
   tools: ToolSpec[]
   /** 그 도구를 주는 서버. 도구 id로 이어지므로 같은 팩 안에서 짝이 맞아야 한다 */
   mcpServers: McpServer[]
+  /**
+   * 지식 영역 — **색인과 권한의 단위.**
+   *
+   * 검색 묶음(`knowledgeBases`)과 축이 다르다. 저기는 지식 검색이 무엇을 뒤지는가,
+   * 여기는 그게 실제로 찾아지는가와 누가 볼 수 있는가다. 대화 화면의 '답변 근거'와
+   * 관리자 지식 관리가 이것을 읽는다.
+   *
+   * 하나만 두었더니 병원 대화 화면에 `작업표준·공정 문서`·`설비 대장·정비 이력`이 떴다.
+   */
+  knowledgeAreas: KnowledgeArea[]
+  /** 등록됐는데 검색에 안 잡히는 문서. `areaId`가 위 영역과 짝이 맞아야 한다 */
+  indexEntries: IndexEntry[]
+  /**
+   * 에이전트 운영 실적 — 얼마나 돌았고 얼마나 실패했나.
+   *
+   * `areaIds`가 **이 팩의 지식 영역**을 가리켜야 '기대는 영역에 못 찾는 문서가
+   * 있다'는 판정이 성립한다. 다른 발주처의 영역 id를 들고 있으면 판정이 조용히
+   * 빈 값이 되고, 화면은 '빈틈 없음'이라고 말하게 된다.
+   */
+  agentOps: AgentOps[]
 }
 
 /* 팩은 자기 모듈에서 자기 것만 만든다 — 서로를 참조하지 않는다 */

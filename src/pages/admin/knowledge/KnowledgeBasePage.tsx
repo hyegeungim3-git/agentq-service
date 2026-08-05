@@ -10,6 +10,8 @@ import {
   type IndexState,
 } from '@entities/knowledgebase/model'
 import { fetchAreas, fetchIndexEntries, fetchRagConfig, runReindex } from '@shared/api/knowledgebase'
+import { fetchDomains } from '@shared/api/domains'
+import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
 import { useRemote } from '@features/remote/useRemote'
 
 /**
@@ -46,8 +48,12 @@ export function KnowledgeBasePage() {
   /* 'all'도 문자열이라 별도 타입을 만들지 않는다 */
   const [areaId, setAreaId] = useState('all')
   const [failure, setFailure] = useState<string | null>(null)
-  const areas = useRemote(fetchAreas, [])
-  const entries = useRemote(() => fetchIndexEntries(areaId), [areaId])
+  const domains = useRemote(fetchDomains, [])
+  const ready = domains.kind === 'ready' ? domains.data.filter((d) => d.status === 'ready') : []
+  const [picked, setPicked] = useState<string | null>(null)
+  const domainId = picked ?? ready[0]?.id ?? null
+  const areas = useRemote(() => fetchAreas(domainId), [domainId])
+  const entries = useRemote(() => fetchIndexEntries(areaId, domainId), [areaId, domainId])
   const config = useRemote(fetchRagConfig, [])
 
   const reindex = (id: string) => {
@@ -63,6 +69,13 @@ export function KnowledgeBasePage() {
         챗봇과 지식 검색이 뒤지는 문서들입니다. 못 찾는 문서가 <b>어느 단계에서 떨어졌는지</b>는{' '}
         <b>RAG 파이프라인</b>에서 봅니다.
       </p>
+
+      <DomainSelect
+        domains={ready}
+        value={domainId}
+        onChange={setPicked}
+        note="지식 영역은 발주처마다 다릅니다. 색인 설정(임베딩 모델·청크)은 플랫폼 것이라 함께 바뀌지 않습니다."
+      />
 
       {failure && (
         <p role="alert" className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">

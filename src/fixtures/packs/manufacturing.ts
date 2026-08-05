@@ -9,6 +9,8 @@ import { AGENTS } from '@entities/agent/model'
 import { AGENT_DEFS, SCENARIO_DEFS } from '../agentdef'
 import { TOOLS } from '../packops'
 import { MCP_SERVERS } from '../evidence'
+import { AREAS, INDEX_ENTRIES } from '../knowledgebase'
+import { AGENT_OPS } from '../agentops'
 import { ANALYSIS_RESULTS } from '../analysis'
 import { HAZARDS_CREW_1, HAZARDS_CREW_2, SAFETY_REFERENCES } from '../safety'
 import { CHAT_ENTRIES, CHAT_UNKNOWN, FAQ_ITEMS } from '../chat'
@@ -83,4 +85,7 @@ export const MANUFACTURING_PACK: DomainPackData = {
   scenarioDefs: SCENARIO_DEFS,
   tools: TOOLS,
   mcpServers: MCP_SERVERS,
+  knowledgeAreas: AREAS,
+  indexEntries: INDEX_ENTRIES,
+  agentOps: AGENT_OPS,
 }

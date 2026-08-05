@@ -1,5 +1,7 @@
 import type { AgentOps, AppSurface, DomainExposure } from '@entities/agentops/model'
-import { AGENT_OPS, APP_SURFACES } from '@fixtures/agentops'
+import { APP_SURFACES } from '@fixtures/agentops'
+import type { DomainPackData } from '@fixtures/packs'
+import { withPack, withPackOf } from './pack'
 import { DOMAIN_FIXTURES } from '@fixtures/domains'
 import { packStatuses } from '@fixtures/packs'
 import type { ApiResult } from './domains'
@@ -12,9 +14,14 @@ import type { ApiResult } from './domains'
  * 목록을 두 곳에서 주면 관리자와 포털이 서로 다른 에이전트를 보게 된다.
  */
 
-export function fetchAgentOps(): Promise<ApiResult<AgentOps[]>> {
+/**
+ * 운영 실적은 **발주처마다 다르다.** 실적도, 어느 지식 영역에 기대는지도.
+ * 포털은 지금 발주처, 관리자는 고른 발주처다(§3-2-1).
+ */
+export function fetchAgentOps(domainId?: string | null): Promise<ApiResult<AgentOps[]>> {
   // TODO(api-미확정): GET /agents/ops 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
-  return Promise.resolve({ ok: true, data: AGENT_OPS })
+  const read = (p: DomainPackData): AgentOps[] => p.agentOps
+  return domainId === undefined ? withPack(read) : withPackOf(domainId, read)
 }
 
 export function setAgentExposure(agentId: string, exposed: boolean): Promise<ApiResult<never>> {

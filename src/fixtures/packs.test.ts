@@ -119,6 +119,39 @@ describe('발주처 팩 누수', () => {
     }
   })
 
+  /**
+   * 지식 영역도 팩으로 들어왔다. **색인 항목과 운영 실적이 같은 팩의 영역을
+   * 가리켜야** 한다.
+   *
+   * 안 맞으면 '기대는 영역에 못 찾는 문서가 있다'는 판정이 조용히 빈 값이 되고,
+   * 화면은 '빈틈 없음'이라고 말한다 — 틀린 안심을 준다.
+   */
+  it('색인 항목과 운영 실적이 그 팩의 지식 영역을 가리킨다', () => {
+    for (const id of PACKED_DOMAIN_IDS) {
+      const pack = packOf(id)
+      if (!pack) throw new Error(`${id} 팩이 없다`)
+      const have = new Set(pack.knowledgeAreas.map((a) => a.id))
+      expect(
+        [...new Set(pack.indexEntries.map((e) => e.areaId).filter((x) => !have.has(x)))],
+        `${id}: 없는 영역의 색인 항목`,
+      ).toEqual([])
+      expect(
+        [...new Set(pack.agentOps.flatMap((o) => o.areaIds).filter((x) => !have.has(x)))],
+        `${id}: 없는 영역에 기대는 에이전트`,
+      ).toEqual([])
+    }
+  })
+
+  /* 운영 실적도 도입한 것만 있어야 한다 — 안 산 에이전트가 돌 리 없다 */
+  it('운영 실적은 도입한 에이전트만 다룬다', () => {
+    for (const id of PACKED_DOMAIN_IDS) {
+      const pack = packOf(id)
+      if (!pack) throw new Error(`${id} 팩이 없다`)
+      const extra = pack.agentOps.map((o) => o.agentId).filter((x) => !pack.agents.includes(x))
+      expect(extra, `${id}: 도입 전인데 실적이 있다`).toEqual([])
+    }
+  })
+
   /* 표시만 있고 내용이 없으면 화면이 빈칸을 그린다 */
   it('팩마다 자기 말이 실제로 들어 있다', () => {
     for (const id of PACKED_DOMAIN_IDS) {
