@@ -1,6 +1,7 @@
 import type { RegulationAnswer, RegulationRequest } from '@entities/regulation/model'
-import { NO_MATCH_ANSWER, REGULATION_ENTRIES } from '@fixtures/regulation'
+import { NO_MATCH_ANSWER } from '@fixtures/regulation'
 import type { ApiResult } from './domains'
+import { currentPack } from './pack'
 
 export type RegulationApiOptions = { delayMs?: number | undefined }
 const wait = (ms: number): Promise<void> =>
@@ -17,7 +18,10 @@ export async function askRegulation(
   if (!q) return { ok: false, error: '질문을 입력하세요.' }
   if (req.categories.length === 0) return { ok: false, error: '조회할 규정 분류를 1개 이상 선택하세요.' }
 
-  const hit = REGULATION_ENTRIES.find(
+  const pack = currentPack()
+  if (!pack) return { ok: false, error: '이 발주처의 업무 데이터가 아직 없습니다.' }
+
+  const hit = pack.regulations.find(
     (e) =>
       e.keywords.some((k) => q.includes(k)) &&
       e.categories.some((c) => req.categories.includes(c)),

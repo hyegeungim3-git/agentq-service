@@ -1,6 +1,6 @@
 import type { ChatMessage, FaqItem } from '@entities/chat/model'
-import { CHAT_ENTRIES, CHAT_UNKNOWN, FAQ_ITEMS } from '@fixtures/chat'
 import type { ApiResult } from './domains'
+import { currentPack, withPack } from './pack'
 
 export type ChatApiOptions = { delayMs?: number | undefined }
 const wait = (ms: number): Promise<void> =>
@@ -18,15 +18,18 @@ export async function sendMessage(
   const q = text.trim()
   if (!q) return { ok: false, error: '질문을 입력하세요.' }
 
-  const hit = CHAT_ENTRIES.find((e) => e.keywords.some((k) => q.includes(k)))
-  const reply = hit ? hit.reply : CHAT_UNKNOWN
+  const pack = currentPack()
+  if (!pack) return { ok: false, error: '이 발주처의 업무 데이터가 아직 없습니다.' }
+
+  const hit = pack.chat.find((e) => e.keywords.some((k) => q.includes(k)))
+  const reply = hit ? hit.reply : pack.chatUnknown
   return { ok: true, data: { id: nextId(), role: 'assistant', ...reply } }
 }
 
 /** 자주 묻는 질문 목록 — 범주는 화면이 거른다 */
 export function fetchFaq(): Promise<ApiResult<FaqItem[]>> {
   // TODO(api-미확정): GET /chat/faq 로 교체. 제거 조건 = API 명세 확정.
-  return Promise.resolve({ ok: true, data: FAQ_ITEMS })
+  return withPack((p) => p.faq)
 }
 
 export function makeUserMessage(text: string): ChatMessage {

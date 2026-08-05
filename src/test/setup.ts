@@ -6,3 +6,13 @@ import '@testing-library/jest-dom/vitest'
 if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {}
 }
+
+/* 화면 테스트는 페이지를 단독으로 그린다 — 앱을 거치지 않으니 발주처가 안 정해진다.
+   실제 앱에서는 발주처를 고른 뒤에만 이 화면들에 닿으므로, 그 상태를 여기서 만든다.
+   이 줄이 없으면 모든 화면이 '이 발주처의 업무 데이터가 없습니다'를 그린다. */
+import { setActiveDomain } from '@shared/api/tenant'
+import { beforeEach } from 'vitest'
+
+beforeEach(() => {
+  setActiveDomain('manufacturing')
+})

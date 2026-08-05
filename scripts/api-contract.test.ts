@@ -32,8 +32,13 @@ const matchAll = (text: string, re: RegExp): string[] =>
   [...text.matchAll(new RegExp(re.source, 'g'))].map((m) => m[1] ?? '')
 
 describe('API 제안서와 코드', () => {
+  /* 주소가 아니라 **경계 안에서만 쓰는 도우미**다. 서버가 붙으면 없어지거나
+     테넌시 헤더 주입으로 바뀐다 — 백엔드에 요청할 것이 없으므로 표에 없다 */
+  const NOT_ENDPOINTS = ['pack.ts', 'tenant.ts']
+
   it('fixture를 쓰는 경계 함수에는 교체 표시가 있다', () => {
     const missing = sources
+      .filter((s) => !NOT_ENDPOINTS.includes(s.file))
       .filter((s) => s.text.includes('@fixtures/') && !s.text.includes('TODO(api-미확정)'))
       .map((s) => s.file)
     expect(missing).toEqual([])
@@ -60,8 +65,9 @@ describe('API 제안서와 코드', () => {
   /* 서버를 부르는 함수인데 표에서 빠지면 계약에서 누락된다 */
   it('서버를 부르는 함수가 제안서 표에 빠짐없이 있다', () => {
     // 서버를 부르지 않는 클라이언트 전용 함수는 제외한다
-    const CLIENT_ONLY = ['makeUserMessage']
+    const CLIENT_ONLY = ['makeUserMessage', 'withPack', 'currentPack', 'setActiveDomain', 'activeDomain']
     const serverFns = sources
+      .filter((s) => !NOT_ENDPOINTS.includes(s.file))
       .filter((s) => s.text.includes('@fixtures/'))
       .flatMap((s) => matchAll(s.text, EXPORTED))
       .filter((fn) => !CLIENT_ONLY.includes(fn))

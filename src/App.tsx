@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type { AgentId } from '@entities/agent/model'
 import type { Domain } from '@entities/domain/model'
 import { fetchDomain } from '@shared/api/domains'
+import { setActiveDomain } from '@shared/api/tenant'
 import { useConversations } from '@features/conversations/useConversations'
 import { unreadNotices, type Notice } from '@entities/notice/model'
 import type { Workspace } from '@entities/workspace/model'
@@ -99,13 +100,18 @@ const READ_KEY = 'agentq.readNotices.v1'
    실제로는 로그인 사용자 정보에서 온다(API 제안서 §3 인증). */
 const ADMIN = { name: '운영 담당자', org: 'AgentQ 플랫폼' }
 
-const shell = (domainId: string, tab: ShellTab): View => ({
-  name: 'shell',
-  domainId,
-  tab,
-  agentId: null,
-  scenario: false,
-})
+/**
+ * 셸로 들어간다.
+ *
+ * 여기서 **발주처를 경계에 꽂는다.** 화면이 요청마다 발주처를 넘기는 대신
+ * `shared/api`가 그 값을 들고 있다(제안서 §3-2의 헤더 방식과 같다).
+ * 렌더나 effect에서 꽂으면 안 된다 — 자식 effect가 부모보다 먼저 돌아서
+ * **아직 발주처가 안 정해진 채로 데이터를 부른다.**
+ */
+const shell = (domainId: string, tab: ShellTab): View => {
+  setActiveDomain(domainId)
+  return { name: 'shell', domainId, tab, agentId: null, scenario: false }
+}
 
 export default function App() {
   const [view, setView] = useState<View>({ name: 'portal' })
@@ -126,7 +132,12 @@ export default function App() {
     () => readJson<string[]>(READ_KEY, (v): v is string[] => Array.isArray(v)) ?? [],
   )
 
+  const domainId = view.name === 'shell' ? view.domainId : null
+
+  /* 발주처가 정해진 뒤에만 부른다. 예전에는 마운트 시 한 번([]) 불렀는데,
+     그때는 아직 어느 발주처인지 모르는 상태였다 — 팩이 하나뿐이라 안 드러났을 뿐이다 */
   useEffect(() => {
+    if (!domainId) return
     let alive = true
     void fetchWorkspaces().then((res) => {
       if (!alive || !res.ok) return
@@ -145,7 +156,7 @@ export default function App() {
     return () => {
       alive = false
     }
-  }, [])
+  }, [domainId])
 
   const markRead = useCallback((ids: string[]) => {
     setReadIds((prev) => {
@@ -160,7 +171,6 @@ export default function App() {
   const conv = useConversations(workspaceId)
   const prefs = usePrefs()
 
-  const domainId = view.name === 'shell' ? view.domainId : null
 
   useEffect(() => {
     if (!domainId) return
@@ -179,7 +189,10 @@ export default function App() {
     return (
       <PortalPage
         onSelect={(id) => setView(shell(id, 'general'))}
-        onAdmin={() => setView({ name: 'admin', menuId: 'system' })}
+        onAdmin={() => {
+          setActiveDomain(null)
+          setView({ name: 'admin', menuId: 'system' })
+        }}
       />
     )
   }

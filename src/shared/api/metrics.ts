@@ -1,6 +1,6 @@
 import type { LiveMetric } from '@entities/metric/model'
-import { PRESS_VIBRATION } from '@fixtures/metrics'
 import type { ApiResult } from './domains'
+import { withPack } from './pack'
 
 /**
  * 라이브 지표.
@@ -10,5 +10,5 @@ import type { ApiResult } from './domains'
  */
 export function fetchLiveMetrics(): Promise<ApiResult<LiveMetric[]>> {
   // TODO(api-미확정): GET /metrics/live 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
-  return Promise.resolve({ ok: true, data: [PRESS_VIBRATION] })
+  return withPack((p) => [p.liveMetric])
 }
