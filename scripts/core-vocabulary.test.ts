@@ -40,6 +40,10 @@ const INDUSTRY_WORDS = [
   /* 의료 */ '요양급여',
   '병상',
   '새빛',
+  /* 지도·라이브 지표 카드에서 실제로 새어 나갔던 말 —
+     '사업장별 병상 가동률', '보전 진단을 받으십시오'가 병원 화면에 떴다 */
+  '사업장',
+  '보전 진단',
 ]
 
 const DIRS = ['src/entities', 'src/features', 'src/pages', 'src/widgets']

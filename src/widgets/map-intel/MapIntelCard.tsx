@@ -1,4 +1,5 @@
 import { useId, useState } from 'react'
+import { topicParticle } from '@shared/lib/korean'
 import {
   averageValue,
   intensity,
@@ -18,11 +19,17 @@ import {
  * 값이 없는 사업장을 빼지 않는다 — 빼면 남은 것이 전부인 줄 알게 된다.
  * 빈칸으로 그리고 왜 없는지 말한다. 평균도 값이 있는 곳만 센 것이라고 밝힌다.
  *
- * 색만으로 알리지 않는다. 기준 미달은 색과 함께 테두리·라벨로도 표시한다.
+ * 색만으로 알리지 않는다. 조치가 필요한 칸은 색과 함께 테두리·라벨로도 표시한다.
+ *
+ * ⚠️ 라벨은 **지표 방향에 따라 뒤집힌다.** '미달'로만 적어 두면 기준을 넘어서
+ * 문제인 지표(병상 가동률·민원 접수)에 뜻이 정반대인 말이 붙는다.
  */
 
 const COLS = 3
 const ROWS = 3
+
+/** 조치가 필요한 상태를 뭐라고 부르는가 — 방향이 반대면 말도 반대다 */
+const attentionLabel = (m: MapIntel): string => (m.lowerIsWorse ? '기준 미달' : '기준 초과')
 
 function Sparkline({ trend, low }: { trend: number[]; low: boolean }) {
   if (trend.length < 2) return null
@@ -98,7 +105,7 @@ function Tile({
         <span className="text-[11px] font-bold text-slate-400">값 없음</span>
       )}
       {attention && (
-        <span className="text-[10px] font-bold text-rose-700">기준 미달</span>
+        <span className="text-[10px] font-bold text-rose-700">{attentionLabel(map)}</span>
       )}
     </button>
   )
@@ -120,7 +127,7 @@ export function MapIntelCard({ map }: { map: MapIntel }) {
     >
       <div className="flex flex-wrap items-center gap-2">
         <h3 id={headingId} className="text-sm font-black text-slate-900">
-          사업장별 {map.metricLabel}
+          {map.siteLabel}별 {map.metricLabel}
         </h3>
         {/* 지리 좌표가 아니라는 사실을 그림보다 먼저 */}
         <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">
@@ -175,7 +182,7 @@ export function MapIntelCard({ map }: { map: MapIntel }) {
 
       <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
         <div className="rounded-lg bg-slate-50 p-2">
-          <dt className="text-[10px] font-bold text-slate-500">수집 사업장</dt>
+          <dt className="text-[10px] font-bold text-slate-500">수집 {map.siteLabel}</dt>
           <dd className="text-sm font-black text-slate-900">
             {has.length} / {map.sites.length}
           </dd>
@@ -185,7 +192,7 @@ export function MapIntelCard({ map }: { map: MapIntel }) {
           <dd className="text-sm font-black text-slate-900">{avg === null ? '—' : avg.toFixed(1)}</dd>
         </div>
         <div className="rounded-lg bg-rose-50 p-2">
-          <dt className="text-[10px] font-bold text-rose-700">기준 미달</dt>
+          <dt className="text-[10px] font-bold text-rose-700">{attentionLabel(map)}</dt>
           <dd className="text-sm font-black text-rose-800">{attention.length}곳</dd>
         </div>
       </dl>
@@ -194,7 +201,8 @@ export function MapIntelCard({ map }: { map: MapIntel }) {
       {missing.length > 0 && (
         <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
           <p className="text-xs font-bold text-amber-900">
-            {missing.length}개 사업장은 값이 없어 평균에서 빠졌습니다 — 전사 평균이 아닙니다
+            {missing.length}개 {map.siteLabel}
+            {topicParticle(map.siteLabel)} 값이 없어 평균에서 빠졌습니다 — 전체 평균이 아닙니다
           </p>
           <ul className="mt-1 space-y-0.5">
             {missing.map((s) => (

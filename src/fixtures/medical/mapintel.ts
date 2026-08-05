@@ -11,6 +11,7 @@
 import type { MapIntel } from '@entities/mapintel/model'
 
 export const MEDICAL_BED_USAGE: MapIntel = {
+  siteLabel: '진료과',
   metricLabel: '병상 가동률',
   unit: '%',
   period: '2026년 1분기',

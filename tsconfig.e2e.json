@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.e2e.tsbuildinfo",
+    "target": "es2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "skipLibCheck": true,
+
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "noEmit": true,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
+  },
+  /*
+   * E2E 스펙은 **어느 프로젝트에도 들어 있지 않았다.**
+   *
+   * `tsconfig.app.json`은 `src`만, `tsconfig.node.json`은 `vite.config.ts`와
+   * `scripts/`만 본다. 그래서 `npm run typecheck`가 스펙을 한 번도 검사하지 않았고,
+   * 스펙의 타입 오류는 CI에서 **E2E를 돌려야만** 드러났다.
+   *
+   * 그러면 '접근성 step이 빨간 것 = 접근성 위반'이라는 말이 성립하지 않는다 —
+   * 스펙에 타입 오류가 하나 있어도 같은 색으로 빨개지기 때문이다.
+   * 여기서 먼저 잡으면 그 말이 사실이 된다.
+   *
+   * `DOM`을 넣는 이유: 스펙이 `page.evaluate()` 안에서 브라우저 API를 쓴다.
+   * 브라우저에서 도는 코드라 `src`와 같은 엄격도를 건다.
+   */
+  "include": ["e2e/**/*.ts", "playwright.config.ts"]
+}

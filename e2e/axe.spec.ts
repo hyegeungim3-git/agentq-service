@@ -12,6 +12,10 @@ import { openTab } from './shell'
  *
  * ⚠️ **새 화면을 만들면 여기 목록에도 추가해야 한다.** 안 그러면 안 본 화면이
  * 통과한 화면처럼 보인다.
+ *
+ * ⚠️ 이 검사가 실제로 훑는 것은 포털·대화·허브·에이전트 5종·보안·관리 홈·
+ * 관리자 메뉴 4개다. **관리자 화면은 44종, 에이전트는 13종이므로 전수가 아니다.**
+ * '접근성 통과'라고 읽지 말 것 — '여기 적힌 화면에서 규칙 위반이 없다'는 뜻이다.
  */
 
 const RULES = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
@@ -75,22 +79,41 @@ test('규칙 엔진이 아는 위반이 없다 — 관리자 @a11y', async ({ pa
 
   await page.goto('./')
   await page.getByRole('button', { name: /관리자 시스템/ }).click()
-  const nav = page.getByRole('navigation', { name: '관리자 메뉴' })
-  if (!(await nav.isVisible().catch(() => false))) {
-    await page.getByRole('button', { name: '메뉴 열기' }).click()
+
+  /* 좁은 화면에서는 메뉴가 오버레이라 **한 번 고르면 닫힌다.** 매번 다시 연다 —
+     처음엔 한 번만 열고 넷을 돌렸더니 모바일에서 셋을 조용히 건너뛰고 있었다 */
+  const openNav = async () => {
+    const nav = page.getByRole('navigation', { name: '관리자 메뉴' })
+    if (!(await nav.isVisible().catch(() => false))) {
+      await page.getByRole('button', { name: '메뉴 열기' }).click()
+    }
+    await expect(nav).toBeVisible()
+    return nav
   }
-  await expect(nav).toBeVisible()
+
+  await openNav()
   all.push(...(await scan(page, '관리 홈')))
 
-  for (const menu of ['에이전트', '지식 관리', '도구 · 배포', '시나리오 빌더']) {
+  /* ⚠️ 못 찾은 메뉴를 `continue`로 넘기면 **안 본 화면이 통과한 화면처럼 보인다.**
+     이 저장소가 이름 검사에서 이미 밟은 함정이라, 못 찾은 것을 모아 함께 실패시킨다 */
+  const unreachable: string[] = []
+  /* '시나리오 빌더'는 '에이전트'의 하위 메뉴라 부모를 연 직후에만 보인다.
+     다른 그룹을 먼저 열면 접혀서 사라진다 — 순서가 곧 도달 가능성이다.
+     (처음엔 맨 뒤에 뒀다가 위 검사에 걸렸다. 그 전까지는 조용히 건너뛰고 있었다) */
+  for (const menu of ['에이전트', '시나리오 빌더', '지식 관리', '도구 · 배포']) {
+    const nav = await openNav()
     const b = nav.getByRole('button', { name: menu })
-    if (!(await b.count())) continue
+    if (!(await b.count())) {
+      unreachable.push(menu)
+      continue
+    }
     await b.first().click()
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     all.push(...(await scan(page, `관리자 · ${menu}`)))
   }
 
   console.log(JSON.stringify(all, null, 1))
+  expect(unreachable, '메뉴를 못 찾아 안 본 화면 — 통과로 세면 안 된다').toEqual([])
   expect(all).toEqual([])
 })
 

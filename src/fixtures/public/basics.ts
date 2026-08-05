@@ -105,6 +105,7 @@ export const PUBLIC_APPEAL_QUEUE: LiveMetric = {
   id: 'm-reb-appeal-queue',
   label: '이의신청 처리 대기',
   unit: '건',
+  overAdvice: '처리 기한이 임박한 건부터 배정하고, 필요하면 검토 인력을 늘리십시오.',
   threshold: 20,
   stepSeconds: 60,
   curve: [12, 13, 15, 16, 18, 19, 21, 23, 24, 26],

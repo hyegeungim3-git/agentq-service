@@ -40,8 +40,11 @@ jobs:
       # 로그를 열어야 어느 쪽인지 알 수 있다 — step 이름이 그 답을 대신한다.
       #
       # 잡(job)으로 나누지 않은 이유: 실측으로 접근성 20건은 10초, 기능 274건은
-      # 58초다. 잡을 나누면 checkout·npm ci·build·preview·브라우저 설치가 한 번
+      # 58초다. 잡을 나누면 checkout·npm ci·브라우저 설치(가장 비싼 부분)가 한 번
       # 더 돌아 2~3분이 늘어난다. 10초를 병렬로 벌자고 3분을 더 쓰는 셈이다.
+      #
+      # 얻지 못하는 것도 적어 둔다: PR 체크 목록에는 잡 이름만 뜨므로 이 방식으로는
+      # '접근성'을 독립 필수 체크로 걸 수 없다. 그게 필요해지면 그때 잡으로 나눈다.
       #
       # 두 step의 `--grep`과 `--grep-invert`는 **같은 태그**를 쓴다. 그래서 어떤
       # 테스트도 양쪽에서 다 빠질 수 없다 — 태그를 안 붙인 새 테스트는 기능 쪽으로
@@ -64,12 +67,23 @@ jobs:
       # **'안 봄'**이 된다 — 그런데 화면에는 빨간 verify 하나만 남아서
       # 안 본 것이 안 보인다. 이 저장소가 가장 싫어하는 상태다.
       # 앞 step이 실패해도 돌리고, 결과는 그대로 잡의 성패에 반영된다.
+      # 앞 step이 죽으면 preview 서버가 남아 5180을 쥐고 있을 수 있다
+      # (`reuseExistingServer`는 CI에서 false + `--strictPort`). 그대로 두면
+      # 접근성 결과 대신 '포트 사용 중' 오류가 떠서, 빨간 이유를 화면에서
+      # 바로 알자는 목적이 정면으로 깨진다. 돌리기 전에 치운다.
+      - name: 남은 preview 서버 정리
+        if: always()
+        run: command -v fuser >/dev/null && fuser -k 5180/tcp || true
+
       - name: E2E — 접근성 (axe · 훑기 · 낭독기 재료)
         if: always()
         run: npm run e2e:a11y
 
-      # verify가 만든 dist를 그대로 배포한다 — 다시 빌드하면 검증한 것과
-      # 다른 산출물이 나갈 수 있다.
+      # ⚠️ 여기 올리는 dist는 위 build step의 산출물이 **아니다.**
+      # playwright의 webServer가 CI에서 `npm run build && npm run preview`로
+      # 다시 빌드해 덮어쓴다(playwright.config.ts). vite 출력은 내용 해시라
+      # 결과는 같지만, '검사한 그 바이트를 배포한다'고 적어 두면 사실이 아니다.
+      # 지금은 마지막 빌드를 배포하고, 그게 마지막 E2E가 검사한 것과 같다.
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         with:

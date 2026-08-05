@@ -14,6 +14,7 @@ export const PRESS_VIBRATION: LiveMetric = {
   id: 'm-prs-c03-vib',
   label: 'PRS-C03 진동 RMS',
   unit: 'mm/s',
+  overAdvice: '운전을 계속하지 말고 보전 진단을 받으십시오.',
   threshold: 3.5,
   /* 1분 간격 관측값 — 3.1에서 시작해 4.2까지.
      간격을 크게 잡으면 1배속에서 아무 움직임도 안 보인다.

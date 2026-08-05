@@ -11,6 +11,7 @@
 import type { MapIntel } from '@entities/mapintel/model'
 
 export const SITE_UTILIZATION: MapIntel = {
+  siteLabel: '사업장',
   metricLabel: '설비 가동률',
   unit: '%',
   period: '2026-07-01 ~ 2026-07-12',

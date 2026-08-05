@@ -48,7 +48,7 @@ export function LiveMetricCard({ metric }: { metric: LiveMetric }) {
       {/* 색만으로 알리지 않는다 */}
       <p className={`mt-2 text-sm font-bold ${m.over ? 'text-rose-800' : 'text-slate-600'}`}>
         {m.over
-          ? `관리 기준 ${metric.threshold}${metric.unit}를 넘었습니다. 운전을 계속하지 말고 보전 진단을 받으십시오.`
+          ? `관리 기준 ${metric.threshold}${metric.unit}를 넘었습니다. ${metric.overAdvice}`
           : '관리 기준 이내입니다.'}
       </p>
 

@@ -6638,6 +6638,10 @@
             "type": "number",
             "description": "관리 기준 — 넘으면 조치가 필요하다"
           },
+          "overAdvice": {
+            "type": "string",
+            "description": "넘었을 때 무엇을 하라고 할 것인가.\n\n코어에 '운전을 계속하지 말고 보전 진단을 받으십시오'를 박아 뒀더니 병원 응급실 지표에도 그 문장이 떴다. 조치는 발주처 업무의 말이다."
+          },
           "curve": {
             "type": "array",
             "items": {
@@ -6658,6 +6662,7 @@
           "label",
           "unit",
           "threshold",
+          "overAdvice",
           "curve",
           "stepSeconds",
           "source"
@@ -6667,6 +6672,10 @@
       "MapIntel": {
         "type": "object",
         "properties": {
+          "siteLabel": {
+            "type": "string",
+            "description": "무엇을 늘어놓는가 — 공장은 사업장, 병원은 진료과, 시청은 행정동이다.\n\n코어에 '사업장'을 박아 뒀더니 병원 화면에 `사업장별 병상 가동률`이 떴다. 지도는 발주처마다 다른 것을 세는 그림이라 세는 단위도 발주처가 정한다."
+          },
           "metricLabel": {
             "type": "string"
           },
@@ -6691,6 +6700,7 @@
           }
         },
         "required": [
+          "siteLabel",
           "metricLabel",
           "unit",
           "period",

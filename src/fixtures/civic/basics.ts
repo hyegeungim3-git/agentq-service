@@ -105,6 +105,7 @@ export const CIVIC_CIVIL_QUEUE: LiveMetric = {
   id: 'm-hsc-civil-queue',
   label: '민원 처리 대기',
   unit: '건',
+  overAdvice: '하천 산책로와 지하차도 통제를 검토하고 상황실에 보고하십시오.',
   threshold: 60,
   stepSeconds: 60,
   curve: [41, 44, 48, 52, 55, 58, 62, 66, 69, 73],

@@ -13,6 +13,7 @@
 import type { MapIntel } from '@entities/mapintel/model'
 
 export const LAND_PRICE_CHANGE: MapIntel = {
+  siteLabel: '시도',
   metricLabel: '표준지 공시지가 변동률',
   unit: '%',
   period: '2026년 공시 (기준일 2026-01-01)',

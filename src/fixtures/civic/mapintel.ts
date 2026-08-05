@@ -15,6 +15,7 @@
 import type { MapIntel } from '@entities/mapintel/model'
 
 export const CIVIC_COMPLAINT_RATE: MapIntel = {
+  siteLabel: '행정동',
   metricLabel: '인구 1천 명당 민원 접수',
   unit: '건',
   period: '2026년 1분기',

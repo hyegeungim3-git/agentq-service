@@ -25,6 +25,13 @@ export type SiteMetric = {
 }
 
 export type MapIntel = {
+  /**
+   * 무엇을 늘어놓는가 — 공장은 사업장, 병원은 진료과, 시청은 행정동이다.
+   *
+   * 코어에 '사업장'을 박아 뒀더니 병원 화면에 `사업장별 병상 가동률`이 떴다.
+   * 지도는 발주처마다 다른 것을 세는 그림이라 세는 단위도 발주처가 정한다.
+   */
+  siteLabel: string
   metricLabel: string
   unit: string
   period: string

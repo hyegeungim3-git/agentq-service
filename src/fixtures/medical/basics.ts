@@ -107,6 +107,7 @@ export const MEDICAL_ER_CENSUS: LiveMetric = {
   id: 'm-suh-er-census',
   label: '응급의료센터 재실 환자',
   unit: '명',
+  overAdvice: '입원 대기 병상 조정을 검토하고 응급의료센터 책임자에게 알리십시오.',
   threshold: 40,
   stepSeconds: 60,
   curve: [28, 30, 33, 35, 37, 39, 42, 45, 47, 50],

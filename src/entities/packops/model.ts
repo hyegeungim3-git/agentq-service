@@ -23,7 +23,7 @@ export const PACK_ITEM_LABEL: Record<PackItemKey, string> = {
   documents: '업무 문서',
   agentContent: '에이전트 콘텐츠',
   scenarios: '복합 업무 시나리오',
-  mapIntel: '사업장 지표',
+  mapIntel: '지역·조직별 지표',
   signals: '알림·브리핑',
   branding: '조직 정보·브랜드',
 }
