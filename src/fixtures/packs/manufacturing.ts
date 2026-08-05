@@ -8,7 +8,7 @@
 import { CHAT_ENTRIES, CHAT_UNKNOWN, FAQ_ITEMS } from '../chat'
 import { DATASETS } from '../datasets'
 import { DOCUMENTS } from '../documents'
-import { KNOWLEDGE_BASES } from '../knowledge'
+import { CORPUS, KNOWLEDGE_BASES, REFERENCE_SPEC } from '../knowledge'
 import { SITE_UTILIZATION } from '../mapintel'
 import { PRESS_VIBRATION } from '../metrics'
 import { NOTICES } from '../notices'
@@ -29,6 +29,8 @@ export const MANUFACTURING_PACK: DomainPackData = {
   mapIntel: SITE_UTILIZATION,
   knowledgeBases: KNOWLEDGE_BASES,
   knowledgeExamples: ['브래킷 굽힘 금형', '진동 관리 기준', '절삭유 농도', '버 과다'],
+  knowledgeReferenceSpec: REFERENCE_SPEC,
+  knowledgeCorpus: CORPUS,
   datasets: DATASETS,
   regulations: REGULATION_ENTRIES,
 }

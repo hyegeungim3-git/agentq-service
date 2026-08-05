@@ -38,6 +38,21 @@ export type KnowledgeBase = {
   updatedAt: string
 }
 
+/**
+ * 검색 화면이 그리는 데 필요한 맥락.
+ *
+ * 예시 질의와 '무엇과 견주는가'(진행 중인 사양)는 **발주처마다 다르다.**
+ * 예전에는 화면이 fixture에서 직접 가져왔는데, 그러면 발주처를 바꿔도
+ * 제조 사양이 그대로 남는다 — 화면이 fixture를 아는 것 자체가 문제였다.
+ */
+export type KnowledgeContext = {
+  bases: KnowledgeBase[]
+  /** 검색어 예시 칩 */
+  examples: string[]
+  /** 도면 후보를 무엇과 견주는지 — 화면이 밝혀야 한다 */
+  referenceSpec: string
+}
+
 export type SearchHit = {
   id: string
   title: string

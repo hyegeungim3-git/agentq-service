@@ -7,7 +7,7 @@ import type {
   TopKStep,
 } from '@entities/knowledge/model'
 import {
-  fetchKnowledgeBases,
+  fetchKnowledgeContext,
   searchKnowledge,
   type KnowledgeApiOptions,
 } from '@shared/api/knowledge'
@@ -29,6 +29,9 @@ export type SearchPhase =
 
 export function useKnowledge(opts: KnowledgeOptions = {}) {
   const [bases, setBases] = useState<KnowledgeBase[]>([])
+  /* 예시 질의와 '무엇과 견주는가'도 발주처마다 다르다 — 화면이 fixture를 직접 읽지 않는다 */
+  const [examples, setExamples] = useState<string[]>([])
+  const [referenceSpec, setReferenceSpec] = useState('')
   const [baseIds, setBaseIds] = useState<string[]>([])
   const [query, setQuery] = useState('')
   const [mode, setMode] = useState<SearchMode>('semantic')
@@ -38,15 +41,17 @@ export function useKnowledge(opts: KnowledgeOptions = {}) {
 
   useEffect(() => {
     let alive = true
-    void fetchKnowledgeBases().then((res) => {
+    void fetchKnowledgeContext().then((res) => {
       if (!alive) return
       if (!res.ok) {
         setPhase({ kind: 'basesError', message: res.error })
         return
       }
-      setBases(res.data)
+      setBases(res.data.bases)
+      setExamples(res.data.examples)
+      setReferenceSpec(res.data.referenceSpec)
       // 기본은 전 범위 — 좁히는 것은 사용자의 선택이다
-      setBaseIds(res.data.map((b) => b.id))
+      setBaseIds(res.data.bases.map((b) => b.id))
       setPhase({ kind: 'ready' })
     })
     return () => {
@@ -69,6 +74,8 @@ export function useKnowledge(opts: KnowledgeOptions = {}) {
 
   return {
     bases,
+    examples,
+    referenceSpec,
     baseIds,
     toggleBase,
     query,

@@ -817,9 +817,9 @@ paths:
               $ref: "#/components/schemas/RegulationRequest"
   /knowledge-bases:
     get:
-      operationId: fetchKnowledgeBases
-      summary: GET /knowledge-bases
-      description: → `KnowledgeBase[]` (`entities/knowledge/model.ts`)
+      operationId: fetchKnowledgeContext
+      summary: 범위 목록만이 아니라 **예시 질의와 견주는 사양**을 함께 — 발주처마다 다르다
+      description: → `KnowledgeContext` (`entities/knowledge/model.ts`). 범위 목록만이 아니라 **예시 질의와 견주는 사양**을 함께 — 발주처마다 다르다
       tags:
         - knowledge-bases
       responses:
@@ -828,9 +828,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/KnowledgeBase"
+                $ref: "#/components/schemas/KnowledgeContext"
         default:
           description: 오류
           content:
@@ -4294,6 +4292,30 @@ components:
         - docCount
         - updatedAt
       additionalProperties: false
+    KnowledgeContext:
+      type: object
+      properties:
+        bases:
+          type: array
+          items:
+            $ref: "#/components/schemas/KnowledgeBase"
+        examples:
+          type: array
+          items:
+            type: string
+          description: 검색어 예시 칩
+        referenceSpec:
+          type: string
+          description: 도면 후보를 무엇과 견주는지 — 화면이 밝혀야 한다
+      required:
+        - bases
+        - examples
+        - referenceSpec
+      additionalProperties: false
+      description: |-
+        검색 화면이 그리는 데 필요한 맥락.
+        
+        예시 질의와 '무엇과 견주는가'(진행 중인 사양)는 **발주처마다 다르다.** 예전에는 화면이 fixture에서 직접 가져왔는데, 그러면 발주처를 바꿔도 제조 사양이 그대로 남는다 — 화면이 fixture를 아는 것 자체가 문제였다.
     KnowledgeRequest:
       type: object
       properties:

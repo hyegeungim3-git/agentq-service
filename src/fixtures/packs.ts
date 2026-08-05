@@ -22,6 +22,7 @@ import type { Notice } from '@entities/notice/model'
 import type { WorkSignal } from '@entities/signal/model'
 import type { Workspace } from '@entities/workspace/model'
 import type { ChatEntry } from './chat'
+import type { CorpusItem } from './knowledge'
 import type { RegulationEntry } from './regulation'
 
 /**
@@ -45,6 +46,10 @@ export type DomainPackData = {
   knowledgeBases: KnowledgeBase[]
   /** 지식 검색 예시 질의 — 화면이 칩으로 보여 준다 */
   knowledgeExamples: string[]
+  /** 도면 후보를 무엇과 견주는가 */
+  knowledgeReferenceSpec: string
+  /** 검색 엔진이 훑을 문서 — 발주처마다 다르다 */
+  knowledgeCorpus: CorpusItem[]
   /** 분석에 넣는 데이터 파일 */
   datasets: Dataset[]
   regulations: RegulationEntry[]

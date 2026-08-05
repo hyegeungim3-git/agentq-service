@@ -11,12 +11,9 @@ import {
   type KnowledgeResult,
   type SearchHit,
 } from '@entities/knowledge/model'
-import { REFERENCE_SPEC } from '@fixtures/knowledge'
 import { useKnowledge, type KnowledgeOptions } from '@features/knowledge/useKnowledge'
 import { AgentPageHeader, ResultSection } from '@widgets/agent-shell/AgentShell'
 import { Play } from 'lucide-react'
-
-const EXAMPLES = ['브래킷 굽힘 금형', '진동 관리 기준', '절삭유 농도', '버 과다']
 
 export function KnowledgePage({
   onBack,
@@ -72,7 +69,7 @@ export function KnowledgePage({
                 className="mt-2 min-h-11 w-full rounded-lg border border-slate-300 px-3 text-sm focus-visible:outline-2 focus-visible:outline-slate-900"
               />
               <div className="mt-2 flex flex-wrap gap-2">
-                {EXAMPLES.map((e) => (
+                {k.examples.map((e) => (
                   <button
                     key={e}
                     type="button"
@@ -223,7 +220,7 @@ export function KnowledgePage({
               </div>
             )}
 
-            {k.phase.kind === 'done' && <SearchResultView result={k.phase.result} baseName={baseName} />}
+            {k.phase.kind === 'done' && <SearchResultView result={k.phase.result} baseName={baseName} referenceSpec={k.referenceSpec} />}
           </div>
         )}
       </div>
@@ -234,9 +231,11 @@ export function KnowledgePage({
 function SearchResultView({
   result,
   baseName,
+  referenceSpec,
 }: {
   result: KnowledgeResult
   baseName: (id: string) => string
+  referenceSpec: string
 }) {
   const hidden = hasHiddenByFilter(result)
 
@@ -287,13 +286,21 @@ function SearchResultView({
       </ResultSection>
 
       {result.hits.map((hit) => (
-        <HitCard key={hit.id} hit={hit} baseName={baseName} />
+        <HitCard key={hit.id} hit={hit} baseName={baseName} referenceSpec={referenceSpec} />
       ))}
     </>
   )
 }
 
-function HitCard({ hit, baseName }: { hit: SearchHit; baseName: (id: string) => string }) {
+function HitCard({
+  hit,
+  baseName,
+  referenceSpec,
+}: {
+  hit: SearchHit
+  baseName: (id: string) => string
+  referenceSpec: string
+}) {
   return (
     <section
       aria-labelledby={`hit-${hit.id}`}
@@ -324,7 +331,7 @@ function HitCard({ hit, baseName }: { hit: SearchHit; baseName: (id: string) => 
       {hit.drawing && (
         <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
           <p className="text-xs font-bold text-slate-600">
-            {REFERENCE_SPEC} 사양 대비 · 속성{' '}
+            {referenceSpec} 사양 대비 · 속성{' '}
             {hit.drawing.attributes.filter((a) => a.matched).length}/{hit.drawing.attributes.length} 일치 (
             {Math.round(matchRatio(hit.drawing) * 100)}%)
           </p>

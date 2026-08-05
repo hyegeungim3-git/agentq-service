@@ -95,7 +95,7 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `POST /reports` | `createReport` | `ReportRequest` → `ReportResult` (`entities/report/model.ts`) |
 | `POST /minutes` | `createMinutes` | `MeetingRequest` → `MeetingResult` (`entities/meeting/model.ts`) |
 | `POST /regulations:search` | `askRegulation` | `RegulationRequest` → `RegulationAnswer` (`entities/regulation/model.ts`) |
-| `GET /knowledge-bases` | `fetchKnowledgeBases` | → `KnowledgeBase[]` (`entities/knowledge/model.ts`) |
+| `GET /knowledge-bases` | `fetchKnowledgeContext` | → `KnowledgeContext` (`entities/knowledge/model.ts`). 범위 목록만이 아니라 **예시 질의와 견주는 사양**을 함께 — 발주처마다 다르다 |
 | `POST /knowledge:search` | `searchKnowledge` | `KnowledgeRequest` → `KnowledgeResult` |
 | `POST /ocr:recognize` | `recognizeDocument` | `OcrRequest` → `OcrResult` (`entities/ocr/model.ts`) |
 | `POST /queries` | `runQuery` | `QueryRequest` → `QueryResult` (`entities/dataquery/model.ts`) |

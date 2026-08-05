@@ -32,7 +32,7 @@ export const KNOWLEDGE_BASES: KnowledgeBase[] = [
 /** 진행 중인 신규 사양 — 도면 후보를 무엇과 견주는지 화면이 밝혀야 한다 */
 export const REFERENCE_SPEC = '신규 브래킷 M-318'
 
-type CorpusItem = Omit<SearchHit, 'score' | 'matchedTerms'> & {
+export type CorpusItem = Omit<SearchHit, 'score' | 'matchedTerms'> & {
   /** 전문 검색이 훑는 본문 */
   body: string
   /** 시맨틱 검색이 잇는 개념 — 말이 달라도 걸린다 */
@@ -41,7 +41,7 @@ type CorpusItem = Omit<SearchHit, 'score' | 'matchedTerms'> & {
   weight: number
 }
 
-const CORPUS: CorpusItem[] = [
+export const CORPUS: CorpusItem[] = [
   {
     id: 'kn-hbm-2211',
     title: 'HBM-2211 브래킷 굽힘 금형 (SPCC 2.0T)',
@@ -219,13 +219,19 @@ function semanticMatch(item: CorpusItem, ts: string[]): string[] {
 }
 
 /** 설정을 반영한 검색 결과 — 서버가 붙으면 이 함수가 사라진다 */
-export function simulateSearch(req: KnowledgeRequest): KnowledgeResult {
+/**
+ * 검색 엔진 대역.
+ *
+ * 코퍼스를 **인자로 받는다.** 기본값을 두면 발주처를 바꿔도 제조 도면이 그대로
+ * 걸린다 — 조용한 대체가 이 저장소가 없애려는 것이다.
+ */
+export function simulateSearch(req: KnowledgeRequest, corpus: CorpusItem[]): KnowledgeResult {
   const ts = terms(req.query)
   const inScope = (i: CorpusItem) => req.baseIds.includes(i.baseId)
   const inSecurity = (s: SecurityLevel) => req.security === 'all' || req.security === s
 
   type Scored = { item: CorpusItem; matched: string[] }
-  const scoredAll: Scored[] = CORPUS.map((item) => ({
+  const scoredAll: Scored[] = corpus.map((item) => ({
     item,
     matched: req.mode === 'fulltext' ? fulltextMatch(item, ts) : semanticMatch(item, ts),
   })).filter((s) => s.matched.length > 0)

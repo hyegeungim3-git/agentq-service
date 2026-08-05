@@ -39,7 +39,7 @@
 | `POST /reports` | `createReport` | `src/features/orchestration/useOrchestration.ts`<br>`src/features/report/useReport.ts` |
 | `POST /minutes` | `createMinutes` | `src/features/meeting/useMeeting.ts` |
 | `POST /regulations:search` | `askRegulation` | `src/features/regulation/useRegulation.ts` |
-| `GET /knowledge-bases` | `fetchKnowledgeBases` | `src/features/knowledge/useKnowledge.ts` |
+| `GET /knowledge-bases` | `fetchKnowledgeContext` | `src/features/knowledge/useKnowledge.ts` |
 | `POST /knowledge:search` | `searchKnowledge` | `src/features/knowledge/useKnowledge.ts` |
 | `POST /ocr:recognize` | `recognizeDocument` | `src/features/ocr/useOcr.ts`<br>`src/features/orchestration/useOrchestration.ts` |
 | `POST /queries` | `runQuery` | `src/features/dataquery/useDataQuery.ts`<br>`src/features/orchestration/useOrchestration.ts` |
