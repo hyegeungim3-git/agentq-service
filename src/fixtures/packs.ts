@@ -125,12 +125,14 @@ export type DomainPackData = {
 /* 팩은 자기 모듈에서 자기 것만 만든다 — 서로를 참조하지 않는다 */
 import { CIVIC_PACK } from './packs/civic'
 import { MANUFACTURING_PACK } from './packs/manufacturing'
+import { MEDICAL_PACK } from './packs/medical'
 import { PUBLIC_PACK } from './packs/public'
 
 const PACKS: Record<string, DomainPackData> = {
   manufacturing: MANUFACTURING_PACK,
   public: PUBLIC_PACK,
   civic: CIVIC_PACK,
+  medical: MEDICAL_PACK,
 }
 
 /** 이 발주처의 업무 데이터. 없으면 null — 부르는 쪽이 그 사실을 말해야 한다 */
@@ -141,3 +143,34 @@ export function packOf(domainId: string | null): DomainPackData | null {
 
 /** 업무 데이터가 갖춰진 발주처 id 목록 — 포털의 선택 가능 여부와 같은 근거다 */
 export const PACKED_DOMAIN_IDS: string[] = Object.keys(PACKS)
+
+/**
+ * 관리자 화면이 쓰는 팩 현황 — **여기서 뽑는다.**
+ *
+ * 예전에는 관리자 쪽에 따로 표를 두고 있었다. 네 번째 발주처를 열자
+ * 포털은 넷이 열렸는데 관리자는 '업무 데이터 없음'이라고 말하는 상태가 됐다.
+ * 같은 사실을 두 곳에 두면 반드시 갈라진다 — 그래서 파생으로 바꿨다.
+ */
+export type PackStatus = {
+  domainId: string
+  filled: string[]
+  usable: boolean
+  agentCount: number
+}
+
+export function packStatuses(): PackStatus[] {
+  return Object.entries(PACKS).map(([domainId, pack]) => ({
+    domainId,
+    /* 실제로 채워진 것만 센다. 팩에 값이 있으면 채워진 것이다 */
+    filled: [
+      pack.documents.length > 0 ? 'documents' : '',
+      pack.summaries && Object.keys(pack.summaries).length > 0 ? 'agentContent' : '',
+      pack.scenario ? 'scenarios' : '',
+      pack.mapIntel.sites.length > 0 ? 'mapIntel' : '',
+      pack.signals.length > 0 ? 'signals' : '',
+      pack.workspaces.length > 0 ? 'branding' : '',
+    ].filter(Boolean),
+    usable: true,
+    agentCount: pack.agents.length,
+  }))
+}

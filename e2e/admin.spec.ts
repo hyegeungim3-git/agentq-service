@@ -431,31 +431,46 @@ test.describe('관리자 셸', () => {
     await expect(page.getByRole('row').nth(1)).toContainText('안전관리계획 수립')
   })
 
-  /* 관리자에서만 열려 있는 것처럼 보이면 안 된다 */
+  /* 관리자에서만 열려 있는 것처럼 보이면 안 된다.
+     예전에는 포털의 '준비 중' 안내와 관리자의 0종을 각각 확인했는데, 팩이 늘자
+     두 숫자를 손으로 맞춰야 했다. 지금은 **두 화면이 같은 말을 하는지**만 본다 */
   test('애플리케이션의 발주처 노출이 포털과 같은 기준이다', async ({ page }) => {
     await page.goto('./')
-    // 포털에서 고를 수 없는 곳이 있는지 먼저 본다
-    await expect(page.getByText(/업무 데이터가 준비된 발주처만 선택할 수 있습니다/)).toBeVisible()
+    const openInPortal = await page
+      .getByRole('button', { name: /생성형 AI 플랫폼/ })
+      .evaluateAll((els) => els.filter((e) => !(e as HTMLButtonElement).disabled).length)
 
     await page.getByRole('button', { name: /관리자 시스템/ }).click()
     const nav = await adminNav(page)
     await nav.getByRole('button', { name: '애플리케이션' }).click()
     await expect(page.getByText(/여기서만 열려 있는 것처럼 보이면/)).toBeVisible()
     await expect(page.getByText(/인증 방식이 정해지지 않아 열 수 없습니다/)).toBeVisible()
-    await expect(page.getByText('0종')).toHaveCount(3)
+
+    // 포털에서 고를 수 있는 수와 관리자에서 '데이터 준비됨'인 수가 같아야 한다
+    const readyInAdmin = await page.getByText('준비됨', { exact: true }).count()
+    expect(readyInAdmin).toBe(openInPortal)
   })
 
 
-  /* 저기는 결과(0종), 여기는 이유(무엇이 비었나) */
-  test('도메인 팩 스튜디오가 포털에서 못 고르는 이유를 항목으로 말한다', async ({ page }) => {
-    await enterAdmin(page)
+  /* 저기는 결과(열린 종수), 여기는 이유(무엇이 비었나).
+     ⚠️ 네 발주처가 전부 채워져서 '빈 항목' 경로를 밟을 실제 데이터가 없어졌다.
+     그 렌더 경로는 단위 테스트가 값을 주입해 지킨다(`PackOpsPages.test.tsx`).
+     여기서는 **팩 수가 포털과 맞는지**를 본다 — 두 화면이 갈라지지 않게. */
+  test('도메인 팩 스튜디오가 포털과 같은 팩 수를 말한다', async ({ page }) => {
+    await page.goto('./')
+    const openInPortal = await page
+      .getByRole('button', { name: /생성형 AI 플랫폼/ })
+      .evaluateAll((els) => els.filter((e) => !(e as HTMLButtonElement).disabled).length)
+
+    await page.getByRole('button', { name: /관리자 시스템/ }).click()
     const nav = await adminNav(page)
     await nav.getByRole('button', { name: '도메인 팩 스튜디오' }).click()
-    await expect(page.getByText(/업무 문서 없음\(필수\)/).first()).toBeVisible()
-    await expect(
-      page.getByText(/이게 없으면 다른 발주처의 자료가 그대로 보입니다/).first(),
-    ).toBeVisible()
     await expect(page.getByText(/이름만으로는 팩이 되지 않습니다/)).toBeVisible()
+
+    // 같은 문구가 팩 배지에도 있어 지표 카드(dt)로 좁힌다
+    const dt = page.locator('dt', { hasText: '포털에서 선택 가능' })
+    await expect(dt).toHaveCount(1)
+    await expect(dt.locator('xpath=following-sibling::dd[1]')).toHaveText(`${openInPortal}개`)
   })
 
   /* 도구는 끊겨도 서비스가 죽지 않아 더 늦게 발견된다 */

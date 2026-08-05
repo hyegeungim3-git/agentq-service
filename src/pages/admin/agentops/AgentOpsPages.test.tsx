@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { AgentOpsPage } from './AgentOpsPage'
+import { DOMAIN_FIXTURES } from '@fixtures/domains'
+import { PACKED_DOMAIN_IDS } from '@fixtures/packs'
 import { AppSurfacePage } from './AppSurfacePage'
 import { AGENTS } from '@entities/agent/model'
 import { byFailure, failureRatio, unused } from '@entities/agentops/model'
@@ -72,7 +74,9 @@ describe('애플리케이션', () => {
     render(<AppSurfacePage />)
     expect(await screen.findByText(/여기서만 열려 있는 것처럼 보이면/)).toBeInTheDocument()
     expect(screen.getByText('한빛정밀')).toBeInTheDocument()
-    expect(screen.getAllByText('0종')).toHaveLength(3)
+    /* 숫자를 손으로 적지 않는다 — 팩이 없는 발주처만 0종이다 */
+    const noPack = DOMAIN_FIXTURES.filter((d) => !PACKED_DOMAIN_IDS.includes(d.id))
+    expect(screen.queryAllByText('0종')).toHaveLength(noPack.length)
   })
 })
 

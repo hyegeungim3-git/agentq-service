@@ -8,7 +8,7 @@
  * **한 번도 안 쓴 에이전트를 넣었다.** 0건을 '문제 없음'으로 읽으면 안 된다 —
  * 아무도 안 쓰는 화면을 계속 운영하고 있다는 뜻이다.
  */
-import type { AgentOps, AppSurface, DomainExposure } from '@entities/agentops/model'
+import type { AgentOps, AppSurface } from '@entities/agentops/model'
 
 const GPT = { modelId: 'm-gpt-oss', modelName: 'GPT-OSS-120B' }
 const LLAMA = { modelId: 'm-llama-kor', modelName: 'Llama-3-Kor-Instruct' }
@@ -74,10 +74,8 @@ export const APP_SURFACES: AppSurface[] = [
   },
 ]
 
-/** 발주처별 노출 — 포털의 '업무 데이터 준비 중'과 같은 사실이다 */
-export const DOMAIN_EXPOSURE: DomainExposure[] = [
-  { domainId: 'manufacturing', orgName: '한빛정밀', dataReady: true, openAgents: 13, note: '업무 데이터가 준비돼 전 기능이 열려 있습니다.' },
-  { domainId: 'public', orgName: '공공기관', dataReady: false, openAgents: 0, note: '업무 데이터가 없어 포털에서 고를 수 없습니다.' },
-  { domainId: 'finance', orgName: '금융', dataReady: false, openAgents: 0, note: '업무 데이터가 없어 포털에서 고를 수 없습니다.' },
-  { domainId: 'healthcare', orgName: '의료', dataReady: false, openAgents: 0, note: '업무 데이터가 없어 포털에서 고를 수 없습니다.' },
-]
+/*
+ * 발주처별 노출은 여기 없다. 손으로 적어 뒀더니 포털이 네 발주처를 여는데
+ * 관리자만 "데이터 없음 3곳"이라고 말했다 — 같은 사실을 두 곳에 적으면 갈라진다.
+ * 이제 `shared/api/agentops.ts`가 팩 레지스트리에서 유도한다.
+ */

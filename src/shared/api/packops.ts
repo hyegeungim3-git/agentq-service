@@ -1,5 +1,8 @@
 import type { Deployment, DomainPack, ToolEntry } from '@entities/packops/model'
-import { DEPLOYMENTS, PACKS, TOOLS } from '@fixtures/packops'
+import { DEPLOYMENTS, TOOLS } from '@fixtures/packops'
+import { DOMAIN_FIXTURES } from '@fixtures/domains'
+import { packStatuses } from '@fixtures/packs'
+import { sectorLabel } from '@entities/domain/model'
 import type { ApiResult } from './domains'
 
 /**
@@ -10,8 +13,21 @@ import type { ApiResult } from './domains'
  */
 
 export function fetchPacks(): Promise<ApiResult<DomainPack[]>> {
+  /* 팩 현황도 레지스트리에서 뽑는다 — 노출 현황과 같은 근거여야 한다.
+     예전에는 여기에 표를 따로 뒀고, 네 번째 발주처를 열자 갈라졌다. */
   // TODO(api-미확정): GET /packs 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
-  return Promise.resolve({ ok: true, data: PACKS })
+  const byId = new Map(packStatuses().map((p) => [p.domainId, p]))
+  const data: DomainPack[] = DOMAIN_FIXTURES.map((d) => {
+    const pack = byId.get(d.id)
+    return {
+      domainId: d.id,
+      orgName: d.orgName,
+      sector: sectorLabel(d.sector),
+      filled: (pack?.filled ?? []) as DomainPack['filled'],
+      usable: pack !== undefined,
+    }
+  })
+  return Promise.resolve({ ok: true, data })
 }
 
 export function createPack(orgName: string): Promise<ApiResult<never>> {

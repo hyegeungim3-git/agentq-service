@@ -14,7 +14,9 @@ import { openSidebar, openTab } from './shell'
 
 /** 그 발주처에만 있어야 하는 말 */
 const HANBIT = ['프레스', '금형', 'PRS-C03']
-const REB = ['표준지', '공시지가', '이의신청']
+/* ⚠️ 업무 용어는 도메인 사이에 공유된다. '이의신청'은 공시에도 심사에도 있어
+   네 번째 발주처를 넣자 오탐이 났다 — 마커는 그 발주처에서만 쓰는 좁은 말로 고른다 */
+const REB = ['표준지', '공시지가', '괴리율']
 
 const enter = async (page: import('@playwright/test').Page, org: RegExp) => {
   await page.goto('./')
@@ -191,6 +193,7 @@ test('세 발주처가 서로 다른 색·문서·에이전트를 쓴다', async
     [/한빛정밀/, 'rgb(15, 118, 110)', '프레스_작업표준서_SOP-PR-011.pdf'],
     [/한국부동산원/, 'rgb(0, 48, 135)', '표준지공시지가_조사지침_2026.pdf'],
     [/한성시청/, 'rgb(22, 101, 52)', '민원사무_처리지침_2026.pdf'],
+    [/새빛대학교병원/, 'rgb(124, 58, 237)', '진료비청구_심사지침_2026.pdf'],
   ]
   for (const [org, color, doc] of cases) {
     await enter(page, org)
@@ -203,6 +206,30 @@ test('세 발주처가 서로 다른 색·문서·에이전트를 쓴다', async
     await page.getByRole('button', { name: '문서 요약', exact: true }).click()
     await expect(page.getByText(doc)).toBeVisible()
   }
+})
+
+test('의료 포털에 앞선 세 발주처의 말이 없다', async ({ page }) => {
+  await enter(page, /새빛대학교병원/)
+  await expect(page.getByRole('heading', { name: '업무 챗봇' })).toBeVisible()
+  await page.waitForTimeout(800)
+  const body = await bodyText(page)
+  expect(
+    [...HANBIT, ...REB, '옥외광고', '강변동'].filter((w) => body.includes(w)),
+    '의료 화면에 다른 발주처의 말이 보인다',
+  ).toEqual([])
+  await expect(page.getByText('응급의료센터 가동률 92.1%')).toBeVisible()
+})
+
+test('의료 에이전트가 의료 결과를 낸다', async ({ page }) => {
+  await enter(page, /새빛대학교병원/)
+  await openTab(page, /^에이전트/)
+  await page.getByRole('button', { name: '문서 사전 검토', exact: true }).click()
+  await expect(page.getByText('청구 심사지침')).toBeVisible()
+  await page.getByRole('button', { name: '사전 검토 시작' }).click()
+  const result = page.getByRole('region', { name: /검토 결과/ })
+  await expect(result).toBeVisible({ timeout: 10_000 })
+  await expect(result).toContainText('진료기록 근거 없이 기준 초과 산정')
+  await expect(result).not.toContainText('표준지')
 })
 
 test('행정 에이전트가 행정 결과를 낸다', async ({ page }) => {

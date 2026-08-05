@@ -57,7 +57,7 @@ export const DOMAIN_FIXTURES: Domain[] = [
     sector: 'medical',
     brandColor: '#7C3AED',
     tagline: '의료 업무 생성형 AI 플랫폼',
-    status: 'planned',
+    status: 'ready',
     docPrefix: 'SUH',
     user: { name: '서지은', dept: '적정진료관리실', title: '대리' },
   },

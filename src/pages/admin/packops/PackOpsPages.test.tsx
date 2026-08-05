@@ -3,18 +3,33 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { PackStudioPage } from './PackStudioPage'
 import { ToolDeployPage } from './ToolDeployPage'
-import { blockedAgents, meetsMinimum, packMissing, pendingPromotion } from '@entities/packops/model'
-import { DEPLOYMENTS, PACKS, TOOLS } from '@fixtures/packops'
-import { DOMAIN_EXPOSURE } from '@fixtures/agentops'
+import {
+  blockedAgents,
+  meetsMinimum,
+  packMissing,
+  pendingPromotion,
+  type DomainPack,
+} from '@entities/packops/model'
+import { DEPLOYMENTS, TOOLS } from '@fixtures/packops'
+import { DOMAIN_FIXTURES } from '@fixtures/domains'
+import { PACKED_DOMAIN_IDS } from '@fixtures/packs'
+import { fetchPacks } from '@shared/api/packops'
+import { fetchDomainExposure } from '@shared/api/agentops'
+
+/* 기대값을 손으로 적지 않는다. 발주처를 추가할 때마다 숫자를 고쳐야 하면
+   결국 테스트를 숫자에 맞추게 되고, 그러면 아무것도 안 지킨다 */
+const NO_PACK = DOMAIN_FIXTURES.filter((d) => !PACKED_DOMAIN_IDS.includes(d.id))
 
 describe('도메인 팩 스튜디오', () => {
   /* 비율만 보여 주면 무엇을 더 해야 하는지 알 수 없다 */
   it('빈 항목을 이름으로 말하고 필수는 따로 표시한다', async () => {
     render(<PackStudioPage />)
-    // 문서가 없는 팩이 셋이라 모두 같은 배지를 단다
-    expect(await screen.findAllByText(/업무 문서 없음\(필수\)/)).toHaveLength(3)
-    // 필수 항목이 빈 팩 셋이 각각 같은 이유를 단다
-    expect(screen.getAllByText(/이게 없으면 다른 발주처의 자료가 그대로 보입니다/)).toHaveLength(3)
+    await screen.findByRole('list', { name: '발주처 팩' })
+    // 팩이 없는 발주처만 필수 항목 배지를 단다
+    expect(screen.queryAllByText(/업무 문서 없음\(필수\)/)).toHaveLength(NO_PACK.length)
+    expect(screen.queryAllByText(/이게 없으면 다른 발주처의 자료가 그대로 보입니다/)).toHaveLength(
+      NO_PACK.length,
+    )
   })
 
   /* 무엇을 먼저 해야 하는지 알려면 순서가 중요하다 */
@@ -25,22 +40,33 @@ describe('도메인 팩 스튜디오', () => {
     const packs = within(list)
       .getAllByRole('listitem')
       .filter((el) => el.parentElement === list)
-    expect(packs[0]).toHaveTextContent('한빛정밀')
-    expect(packs[1]).toHaveTextContent('공공기관')
+    // 팩이 있는 것이 먼저, 없는 것이 뒤
+    const packed = DOMAIN_FIXTURES.filter((d) => PACKED_DOMAIN_IDS.includes(d.id))
+    expect(packs[0]).toHaveTextContent(packed[0]?.orgName ?? '')
+    if (NO_PACK.length > 0) {
+      expect(packs[packs.length - 1]).toHaveTextContent(NO_PACK[NO_PACK.length - 1]?.orgName ?? '')
+    }
   })
 
   it('포털에서 선택 가능한 팩 수를 센다', async () => {
     render(<PackStudioPage />)
     const dt = await screen.findByText('포털에서 선택 가능', { selector: 'dt' })
-    expect(dt.nextElementSibling).toHaveTextContent('1개')
+    expect(dt.nextElementSibling).toHaveTextContent(`${PACKED_DOMAIN_IDS.length}개`)
   })
 
   /* 애플리케이션 화면과 같은 사실을 반대쪽에서 본다 */
-  it('팩 상태와 발주처 노출이 어긋나지 않는다', () => {
-    for (const p of PACKS) {
-      const exposure = DOMAIN_EXPOSURE.find((d) => d.domainId === p.domainId)
-      expect(exposure, p.domainId).toBeDefined()
-      expect(exposure?.dataReady, p.domainId).toBe(p.usable)
+  it('팩 상태와 발주처 노출이 어긋나지 않는다', async () => {
+    /* 예전에는 두 fixture를 비교했는데, 네 번째 발주처를 열자 한쪽만 바뀌어
+       포털은 열렸는데 관리자는 '데이터 없음'이라고 말했다. 지금은 둘 다
+       같은 레지스트리에서 나오므로 **경계 응답끼리** 대조한다 */
+    const packs = await fetchPacks()
+    const exposure = await fetchDomainExposure()
+    expect(packs.ok && exposure.ok).toBe(true)
+    if (!packs.ok || !exposure.ok) return
+    for (const p of packs.data) {
+      const e = exposure.data.find((x) => x.domainId === p.domainId)
+      expect(e, p.domainId).toBeDefined()
+      expect(e?.dataReady, p.domainId).toBe(p.usable)
     }
   })
 
@@ -96,15 +122,24 @@ describe('도구 · 배포', () => {
 })
 
 describe('판정', () => {
+  /* 판정 함수는 데이터가 아니라 규칙이다 — 팩이 늘어도 안 깨지게 값을 만들어 넣는다 */
+  const pack = (filled: DomainPack['filled']): DomainPack => ({
+    domainId: 'x',
+    orgName: '예시',
+    sector: '예시',
+    filled,
+    usable: filled.length > 0,
+  })
+
   it('필수 항목이 없으면 최소 조건을 못 채운다', () => {
-    const pub = PACKS.find((p) => p.domainId === 'public')
-    expect(meetsMinimum(pub as NonNullable<typeof pub>)).toBe(false)
-    expect(packMissing(pub as NonNullable<typeof pub>)).toContain('documents')
+    const empty = pack([])
+    expect(meetsMinimum(empty)).toBe(false)
+    expect(packMissing(empty)).toContain('documents')
   })
 
   it('다 채운 팩은 빈 항목이 없다', () => {
-    const mfg = PACKS.find((p) => p.domainId === 'manufacturing')
-    expect(packMissing(mfg as NonNullable<typeof mfg>)).toEqual([])
+    const full = pack(['documents', 'agentContent', 'scenarios', 'mapIntel', 'signals', 'branding'])
+    expect(packMissing(full)).toEqual([])
   })
 
   it('끊긴 도구를 쓰는 에이전트를 중복 없이 모은다', () => {

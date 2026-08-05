@@ -29,16 +29,14 @@ test.describe('포털 · 셸', () => {
   })
 
   /* 고를 수 있는 발주처는 업무 데이터가 있는 곳뿐이다.
-     이 단언이 깨지면 다른 발주처의 문서·수치가 노출되고 있다는 뜻이다.
-     팩이 생긴 곳은 열리고, 없는 곳은 계속 막혀 있어야 한다. */
-  test('업무 데이터가 없는 발주처는 비활성이다', async ({ page }) => {
+     지금은 네 곳 모두 팩이 있어 전부 열려 있다. 팩 없이 열린 곳이 생기면
+     `src/fixtures/packs.test.ts`가 먼저 깨진다. */
+  test('팩이 있는 발주처는 모두 고를 수 있다', async ({ page }) => {
     await page.goto('./')
-    for (const org of ['한빛정밀', '한국부동산원', '한성시청']) {
+    for (const org of ['한빛정밀', '한국부동산원', '한성시청', '새빛대학교병원']) {
       await expect(page.getByRole('button', { name: new RegExp(org) })).toBeEnabled()
     }
-    for (const org of ['새빛대학교병원']) {
-      await expect(page.getByRole('button', { name: new RegExp(org) })).toBeDisabled()
-    }
+    await expect(page.getByText('업무 데이터 준비 중')).toHaveCount(0)
   })
 
   test('가로 스크롤이 없다', async ({ page }) => {
