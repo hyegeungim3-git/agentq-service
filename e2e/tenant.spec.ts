@@ -170,3 +170,49 @@ test('공공 보고서·회의록이 공공 내용으로 나온다', async ({ pa
   await expect(minutes).toContainText('윤서경')
   await expect(minutes).not.toContainText('박태윤')
 })
+
+/* 세 번째 발주처 — 팩 구조가 실제로 반복 가능한지 본다 */
+
+test('행정 포털에 앞선 두 발주처의 말이 없다', async ({ page }) => {
+  await enter(page, /한성시청/)
+  await expect(page.getByRole('heading', { name: '업무 챗봇' })).toBeVisible()
+  await page.waitForTimeout(800)
+  const body = await bodyText(page)
+  expect(
+    [...HANBIT, ...REB].filter((w) => body.includes(w)),
+    '행정 화면에 다른 발주처의 말이 보인다',
+  ).toEqual([])
+  // 빈 화면도 '다른 발주처 말이 없다'를 통과하므로 자기 말이 실제로 나오는지 함께 본다
+  await expect(page.getByText('법정 기한 도과 민원 118건')).toBeVisible()
+})
+
+test('세 발주처가 서로 다른 색·문서·에이전트를 쓴다', async ({ page }) => {
+  const cases: [RegExp, string, string][] = [
+    [/한빛정밀/, 'rgb(15, 118, 110)', '프레스_작업표준서_SOP-PR-011.pdf'],
+    [/한국부동산원/, 'rgb(0, 48, 135)', '표준지공시지가_조사지침_2026.pdf'],
+    [/한성시청/, 'rgb(22, 101, 52)', '민원사무_처리지침_2026.pdf'],
+  ]
+  for (const [org, color, doc] of cases) {
+    await enter(page, org)
+    const nav = await openSidebar(page)
+    await expect(nav.getByRole('button', { name: /^일반/ }).first()).toHaveCSS(
+      'background-color',
+      color,
+    )
+    await openTab(page, /^에이전트/)
+    await page.getByRole('button', { name: '문서 요약', exact: true }).click()
+    await expect(page.getByText(doc)).toBeVisible()
+  }
+})
+
+test('행정 에이전트가 행정 결과를 낸다', async ({ page }) => {
+  await enter(page, /한성시청/)
+  await openTab(page, /^에이전트/)
+  await page.getByRole('button', { name: '문서 사전 검토', exact: true }).click()
+  await expect(page.getByText('민원사무 처리지침')).toBeVisible()
+  await page.getByRole('button', { name: '사전 검토 시작' }).click()
+  const result = page.getByRole('region', { name: /검토 결과/ })
+  await expect(result).toBeVisible({ timeout: 10_000 })
+  await expect(result).toContainText('연장 통지 없이 기한 도과')
+  await expect(result).not.toContainText('표준지')
+})

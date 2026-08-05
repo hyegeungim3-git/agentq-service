@@ -123,12 +123,14 @@ export type DomainPackData = {
 }
 
 /* 팩은 자기 모듈에서 자기 것만 만든다 — 서로를 참조하지 않는다 */
+import { CIVIC_PACK } from './packs/civic'
 import { MANUFACTURING_PACK } from './packs/manufacturing'
 import { PUBLIC_PACK } from './packs/public'
 
 const PACKS: Record<string, DomainPackData> = {
   manufacturing: MANUFACTURING_PACK,
   public: PUBLIC_PACK,
+  civic: CIVIC_PACK,
 }
 
 /** 이 발주처의 업무 데이터. 없으면 null — 부르는 쪽이 그 사실을 말해야 한다 */

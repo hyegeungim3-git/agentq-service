@@ -46,7 +46,7 @@ export const DOMAIN_FIXTURES: Domain[] = [
     sector: 'civic',
     brandColor: '#166534',
     tagline: '스마트행정 생성형 AI 플랫폼',
-    status: 'planned',
+    status: 'ready',
     docPrefix: 'HSC',
     user: { name: '이서연', dept: '민원여권과', title: '주무관' },
   },

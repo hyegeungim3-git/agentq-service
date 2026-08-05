@@ -31,11 +31,11 @@ describe('PortalPage', () => {
 
   /* 업무 데이터가 없는 발주처를 열면 다른 발주처의 문서·수치가 그대로 보인다.
      실제로 공공을 골라도 제조 문서 목록이 떴다. 고를 수 없게 막고 이유를 표시한다.
-     ⚠️ 공공은 팩이 생겨 열렸다(2026-08-05) — 아직 팩이 없는 곳으로 바꿨다.
+     ⚠️ 공공·행정은 팩이 생겨 열렸다(2026-08-05) — 아직 팩이 없는 곳으로 바꿨다.
      팩과 상태가 어긋나는지는 `scripts/pack-leak.test.ts`가 따로 지킨다. */
   it('업무 데이터가 준비되지 않은 발주처는 선택할 수 없다', async () => {
     render(<PortalPage onSelect={() => {}} onAdmin={() => {}} />)
-    const btn = await screen.findByRole('button', { name: /한성시청/ })
+    const btn = await screen.findByRole('button', { name: /새빛대학교병원/ })
     expect(btn).toBeDisabled()
     expect(btn).toHaveTextContent('업무 데이터 준비 중')
   })
@@ -43,7 +43,7 @@ describe('PortalPage', () => {
   it('준비되지 않은 발주처는 눌러도 열리지 않는다', async () => {
     const onSelect = vi.fn()
     render(<PortalPage onSelect={onSelect} onAdmin={() => {}} />)
-    await userEvent.click(await screen.findByRole('button', { name: /한성시청/ }))
+    await userEvent.click(await screen.findByRole('button', { name: /새빛대학교병원/ }))
     expect(onSelect).not.toHaveBeenCalled()
   })
 

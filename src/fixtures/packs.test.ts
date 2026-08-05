@@ -19,6 +19,7 @@ import { PACKED_DOMAIN_IDS, packOf } from './packs'
 const MARKERS: Record<string, string[]> = {
   manufacturing: ['프레스', '금형', '침탄로', '한빛정밀', 'SOP-PR-011', 'PRS-C03'],
   public: ['표준지', '공시지가', '이의신청', '한국부동산원', 'RTMS', '실거래'],
+  civic: ['민원', '옥외광고', '행정동', '한성시', '강변동', '계고'],
 }
 
 const textOf = (id: string): string => JSON.stringify(packOf(id))

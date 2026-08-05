@@ -33,10 +33,10 @@ test.describe('포털 · 셸', () => {
      팩이 생긴 곳은 열리고, 없는 곳은 계속 막혀 있어야 한다. */
   test('업무 데이터가 없는 발주처는 비활성이다', async ({ page }) => {
     await page.goto('./')
-    for (const org of ['한빛정밀', '한국부동산원']) {
+    for (const org of ['한빛정밀', '한국부동산원', '한성시청']) {
       await expect(page.getByRole('button', { name: new RegExp(org) })).toBeEnabled()
     }
-    for (const org of ['한성시청', '새빛대학교병원']) {
+    for (const org of ['새빛대학교병원']) {
       await expect(page.getByRole('button', { name: new RegExp(org) })).toBeDisabled()
     }
   })
