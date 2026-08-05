@@ -1,13 +1,13 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   EMPTY_MEETING_INPUTS,
   type MeetingInputs,
   type MeetingResult,
 } from '@entities/meeting/model'
-import { AGENDA_SAMPLE, ATTENDEE_SAMPLE } from '@fixtures/meeting'
 import { createMinutes, type MeetingApiOptions } from '@shared/api/meeting'
 import { AUDIO_UPLOAD } from '@entities/upload/model'
 import { useAgentRun } from '@features/agent-run/useAgentRun'
+import { fetchSamples } from '@shared/api/pack'
 
 export type MeetingOptions = MeetingApiOptions
 
@@ -24,11 +24,24 @@ export const REFERENCE_CHOICES = [
 export function useMeeting(opts: MeetingOptions = {}) {
   const [includeUtterances, setIncludeUtterances] = useState(true)
   const [referenceIds, setReferenceIds] = useState<string[]>([])
-  const [inputs, setInputs] = useState<MeetingInputs>({
-    ...EMPTY_MEETING_INPUTS,
-    attendees: ATTENDEE_SAMPLE,
-    agenda: AGENDA_SAMPLE,
-  })
+  const [inputs, setInputs] = useState<MeetingInputs>(EMPTY_MEETING_INPUTS)
+
+  /* 참석자·안건 예시도 발주처 것이다. 예전에는 훅이 fixture에서 직접 가져왔고,
+     그러면 발주처를 바꿔도 제조 사람 이름이 입력창에 남는다 */
+  useEffect(() => {
+    let alive = true
+    void fetchSamples().then((res) => {
+      if (!alive || !res.ok) return
+      setInputs((prev) => ({
+        ...prev,
+        attendees: prev.attendees || (res.data.attendees ?? ''),
+        agenda: prev.agenda || (res.data.agenda ?? ''),
+      }))
+    })
+    return () => {
+      alive = false
+    }
+  }, [])
 
   const setInput = useCallback((key: keyof MeetingInputs, value: string) => {
     setInputs((prev) => ({ ...prev, [key]: value }))

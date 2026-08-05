@@ -24,3 +24,15 @@ export function withPack<T>(read: (pack: DomainPackData) => T): Promise<ApiResul
 export function currentPack(): DomainPackData | null {
   return packOf(activeDomain())
 }
+
+/**
+ * 화면이 미리 채워 두는 예시 입력.
+ *
+ * 예전에는 화면·훅이 fixture에서 직접 가져왔다(회의 참석자, 번역 원문, 주소 목록).
+ * 그러면 발주처를 바꿔도 제조 사람 이름이 입력창에 남는다 — 지식 검색에서 이미
+ * 밟은 함정이라 같은 방식으로 막는다.
+ */
+export function fetchSamples(): Promise<ApiResult<DomainPackData['samples']>> {
+  // TODO(api-미확정): GET /samples 로 교체. 제거 조건 = 백엔드가 테넌시(§3-2)를 확정.
+  return withPack((p) => p.samples)
+}

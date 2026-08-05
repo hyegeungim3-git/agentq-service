@@ -1,7 +1,7 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { MappingMode, MappingResult, MappingStatus } from '@entities/mapping/model'
-import { BATCH_SAMPLE } from '@fixtures/address'
 import { runMapping, type MappingApiOptions } from '@shared/api/mapping'
+import { fetchSamples } from '@shared/api/pack'
 
 /**
  * 기준정보 표준화는 문서 선택도 질문 입력도 아니라 '수집 결과를 훑고
@@ -23,7 +23,19 @@ export function useMapping(opts: MappingOptions = {}) {
   const [mode, setModeState] = useState<MappingMode>('tags')
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
   const [query, setQuery] = useState('')
-  const [batchText, setBatchText] = useState(BATCH_SAMPLE)
+  const [batchText, setBatchText] = useState('')
+
+  /* 일괄 처리 예시 주소도 발주처 것이다 */
+  useEffect(() => {
+    let alive = true
+    void fetchSamples().then((res) => {
+      if (!alive || !res.ok) return
+      setBatchText((prev) => prev || (res.data.addressBatch ?? ''))
+    })
+    return () => {
+      alive = false
+    }
+  }, [])
   const [filter, setFilter] = useState<MappingStatus | 'all'>('all')
   /** 사용자가 확정한 후보 id — 확정은 사람이 누른 것만 반영한다 */
   const [applied, setApplied] = useState<Set<string>>(new Set())

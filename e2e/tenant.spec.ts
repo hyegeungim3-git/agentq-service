@@ -130,3 +130,24 @@ test('공공 데이터 조회는 공공 소스를 쓴다', async ({ page }) => {
   // 말없이 가정하지 않는다 — 공공에서도 같은 값어치가 살아 있어야 한다
   await expect(basis).toContainText('처리 기한 30일의 70%')
 })
+
+test('공공 문서 인식은 공공 서식을 읽는다', async ({ page }) => {
+  await enter(page, /한국부동산원/)
+  await openTab(page, /^에이전트/)
+  await page.getByRole('button', { name: '문서 인식(OCR)', exact: true }).click()
+  await page.getByRole('button', { name: '문서 인식' }).click()
+  const result = page.getByRole('region', { name: /인식 결과/ })
+  await expect(result).toBeVisible({ timeout: 10_000 })
+  await expect(result).toContainText('표준지공시지가 이의신청서')
+  await expect(result).not.toContainText('수입검사 성적서')
+})
+
+/* 도입 안 한 에이전트는 눌러도 못 들어간다. 억지로 들어가더라도
+   경계가 '도입하지 않았습니다'라고 답해야 한다 — 빈 결과를 주면 더 나쁘다 */
+test('도입 전 에이전트는 목록에서 막혀 있다', async ({ page }) => {
+  await enter(page, /한국부동산원/)
+  await openTab(page, /^에이전트/)
+  for (const name of [/^수출 문서 번역/, /^표준 보고서 작성/, /^회의록 작성/, /^기준정보 표준화/]) {
+    await expect(page.getByRole('button', { name })).toBeDisabled()
+  }
+})

@@ -1,5 +1,5 @@
 import type { TranslationRequest, TranslationResult } from '@entities/translation/model'
-import { simulateTranslation } from '@fixtures/translation'
+import { currentPack } from './pack'
 import type { ApiResult } from './domains'
 
 export type TranslationApiOptions = { delayMs?: number | undefined }
@@ -29,5 +29,9 @@ export async function createTranslation(
   /* 방향은 문장 사전을, 용어집 토글은 적용 흔적과 신뢰도를,
      요약 옵션은 요약 절을 바꾼다. 직접 입력은 사전에 없는 문장을 그대로 드러낸다.
      TODO(api-미확정): POST /translations 로 교체. 제거 조건 = 번역 엔진·응답 형식 확정. */
-  return { ok: true, data: simulateTranslation(req, text) }
+  const pack = currentPack()
+  if (!pack) return { ok: false, error: '이 발주처의 업무 데이터가 아직 없습니다.' }
+  const sim = pack.simulate.translate
+  if (!sim) return { ok: false, error: '이 발주처는 이 에이전트를 아직 도입하지 않았습니다.' }
+  return { ok: true, data: sim(req, text) }
 }

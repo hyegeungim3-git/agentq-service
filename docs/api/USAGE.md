@@ -52,6 +52,7 @@
 | `POST /chat/messages` | `sendMessage` | `src/features/chat/useChat.ts` |
 | `GET /chat/faq` | `fetchFaq` | `src/features/chat/useChat.ts` |
 | `GET /metrics/live` | `fetchLiveMetrics` | `src/App.tsx` |
+| `GET /samples` | `fetchSamples` | `src/features/mapping/useMapping.ts`<br>`src/features/meeting/useMeeting.ts`<br>`src/features/translate/useTranslate.ts` |
 | `GET /signals` | `fetchSignals` | `src/App.tsx` |
 | `GET /infra/cluster` | `fetchCluster` | `src/pages/admin/system/SystemStatusPage.tsx` |
 | `GET /infra/nodes` | `fetchNodes` | `src/pages/admin/system/SystemStatusPage.tsx` |

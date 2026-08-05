@@ -13,6 +13,7 @@
  * 채워 넣으면 그게 바로 이전 데모의 사고다.
  */
 import type { AgentId } from '@entities/agent/model'
+import type { AnalysisKind, AnalysisResult } from '@entities/analysis/model'
 import type { ChatMessage, FaqItem } from '@entities/chat/model'
 import type { BusinessDocument } from '@entities/document/model'
 import type { DataSourceOption, QueryResult } from '@entities/dataquery/model'
@@ -20,8 +21,13 @@ import type { Dataset } from '@entities/dataset/model'
 import type { KnowledgeBase } from '@entities/knowledge/model'
 import type { MapIntel } from '@entities/mapintel/model'
 import type { LiveMetric } from '@entities/metric/model'
+import type { MeetingRequest, MeetingResult } from '@entities/meeting/model'
 import type { Notice } from '@entities/notice/model'
+import type { OcrRequest, OcrResult } from '@entities/ocr/model'
+import type { ReportRequest, ReportResult } from '@entities/report/model'
+import type { TranslationRequest, TranslationResult } from '@entities/translation/model'
 import type { RegulationSetOption, Violation } from '@entities/review/model'
+import type { Hazard } from '@entities/safety/model'
 import type { WorkSignal } from '@entities/signal/model'
 import type { SummaryResult, SummaryStyle } from '@entities/summary/model'
 import type { Workspace } from '@entities/workspace/model'
@@ -77,6 +83,36 @@ export type DomainPackData = {
   querySources: DataSourceOption[]
   /** 소스별 조회 결과 */
   queryResults: Record<string, QueryResult>
+  /** 데이터셋별·유형별 분석 결과 */
+  analyses: Record<string, Record<AnalysisKind, AnalysisResult>>
+  /** 위험성평가 — 인원에 따라 성립하지 않는 대책이 있다 */
+  safety: {
+    /** 무슨 작업을 평가하는가 — 경계에 박아 두면 발주처를 바꿔도 안 바뀐다 */
+    taskName: string
+    hazardsCrew1: Hazard[]
+    hazardsCrew2: Hazard[]
+    references: string[]
+  }
+  /**
+   * 서버가 할 일의 대역.
+   *
+   * 요약·검토처럼 표만 있으면 되는 것은 위에 데이터로 뒀지만, 인식·번역·보고서·
+   * 회의록은 **입력에 따라 결과를 만들어 내야** 한다. 그 계산이 발주처마다 다르므로
+   * 함수째로 팩이 갖는다 — 실제 서버가 붙으면 통째로 사라지는 자리다.
+   */
+  simulate: {
+    ocr?: (req: OcrRequest) => OcrResult
+    report?: (req: ReportRequest) => ReportResult
+    meeting?: (req: MeetingRequest) => MeetingResult
+    translate?: (req: TranslationRequest, text: string) => TranslationResult
+  }
+  /** 화면이 미리 채워 두는 예시 입력 — 이것도 발주처 것이다 */
+  samples: {
+    attendees?: string
+    agenda?: string
+    translationSource?: Record<'ko' | 'en', string>
+    addressBatch?: string
+  }
   /**
    * 복합 업무 시나리오 소개. 없으면 허브에 카드를 그리지 않는다.
    *

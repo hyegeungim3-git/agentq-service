@@ -108,6 +108,7 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `POST /chat/messages` | `sendMessage` | 질문 문자열 → `ChatMessage` (`entities/chat/model.ts`). 사업장별 지표를 묻는 질문이면 `map`(`entities/mapintel/model.ts`)이 함께 온다 — 별도 호출을 만들지 않은 이유는 §2-5 |
 | `GET /chat/faq` | `fetchFaq` | → `FaqItem[]` |
 | `GET /metrics/live` | `fetchLiveMetrics` | → `LiveMetric[]` (`entities/metric/model.ts`) — 실제로는 스트리밍/폴링이 맞다. §2-3 참조 |
+| `GET /samples` | `fetchSamples` | → 화면이 미리 채워 두는 예시 입력(회의 참석자·번역 원문·주소 목록). **발주처마다 다르다** — 화면이 fixture를 직접 읽던 자리다 |
 | `GET /signals` | `fetchSignals` | → `WorkSignal[]` (`entities/signal/model.ts`) — 알림 센터·오늘의 브리핑이 함께 쓴다 |
 | `GET /infra/cluster` | `fetchCluster` | → `ClusterResource` (`entities/infra/model.ts`) — 비율은 0~1 |
 | `GET /infra/nodes` | `fetchNodes` | → `NodeInfo[]` |

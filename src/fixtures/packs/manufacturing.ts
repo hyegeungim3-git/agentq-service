@@ -6,6 +6,8 @@
  * 테스트 20여 개가 함께 깨지고, 옮기는 김에 내용이 조금씩 바뀐다.
  */
 import { AGENTS } from '@entities/agent/model'
+import { ANALYSIS_RESULTS } from '../analysis'
+import { HAZARDS_CREW_1, HAZARDS_CREW_2, SAFETY_REFERENCES } from '../safety'
 import { CHAT_ENTRIES, CHAT_UNKNOWN, FAQ_ITEMS } from '../chat'
 import { DATA_SOURCES, QUERY_RESULTS } from '../dataquery'
 import { DATASETS } from '../datasets'
@@ -17,6 +19,11 @@ import { NOTICES } from '../notices'
 import { REGULATION_ENTRIES } from '../regulation'
 import { SIGNALS } from '../signals'
 import { CLAUSE_COUNT, REVIEW_SETS, VIOLATIONS_BY_SET } from '../review'
+import { AGENDA_SAMPLE, ATTENDEE_SAMPLE, simulateMinutes } from '../meeting'
+import { simulateOcr } from '../ocr'
+import { simulateReport } from '../report'
+import { SAMPLE_SOURCE, simulateTranslation } from '../translation'
+import { BATCH_SAMPLE } from '../address'
 import { SUMMARY_RESULTS } from '../summary'
 import { WORKSPACES } from '../workspaces'
 import type { DomainPackData } from '../packs'
@@ -45,6 +52,25 @@ export const MANUFACTURING_PACK: DomainPackData = {
   clauseCountBySet: CLAUSE_COUNT,
   querySources: DATA_SOURCES,
   queryResults: QUERY_RESULTS,
+  analyses: ANALYSIS_RESULTS,
+  safety: {
+    taskName: '프레스 금형 교체 작업',
+    hazardsCrew1: HAZARDS_CREW_1,
+    hazardsCrew2: HAZARDS_CREW_2,
+    references: SAFETY_REFERENCES,
+  },
+  simulate: {
+    ocr: simulateOcr,
+    report: simulateReport,
+    meeting: simulateMinutes,
+    translate: simulateTranslation,
+  },
+  samples: {
+    attendees: ATTENDEE_SAMPLE,
+    agenda: AGENDA_SAMPLE,
+    translationSource: SAMPLE_SOURCE,
+    addressBatch: BATCH_SAMPLE,
+  },
   scenario: {
     title: '수입검사 성적서 접수 처리',
     summary: '성적서 1건이 인식 → 주소 표준화 → 이력 조회 → 보고서 초안까지 이어집니다.',

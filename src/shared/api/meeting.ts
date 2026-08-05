@@ -1,5 +1,5 @@
 import type { MeetingRequest, MeetingResult } from '@entities/meeting/model'
-import { simulateMinutes } from '@fixtures/meeting'
+import { currentPack } from './pack'
 import type { ApiResult } from './domains'
 
 export type MeetingApiOptions = { delayMs?: number | undefined }
@@ -14,5 +14,9 @@ export async function createMinutes(
   /* 회의 자료는 결정에 근거를 붙이고, 참석자 명단은 발언과 대조되고,
      안건은 논의 여부로 갈린다. 발언 기록 토글도 결과를 실제로 바꾼다.
      TODO(api-미확정): POST /minutes 로 교체. 제거 조건 = STT·생성 모델 응답 형식 확정. */
-  return { ok: true, data: simulateMinutes(req) }
+  const pack = currentPack()
+  if (!pack) return { ok: false, error: '이 발주처의 업무 데이터가 아직 없습니다.' }
+  const sim = pack.simulate.meeting
+  if (!sim) return { ok: false, error: '이 발주처는 이 에이전트를 아직 도입하지 않았습니다.' }
+  return { ok: true, data: sim(req) }
 }

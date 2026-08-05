@@ -23,7 +23,7 @@ import type {
 } from '@entities/ocr/model'
 
 /** 시뮬레이션에 필요한 줄 속성 — 서버가 붙으면 함께 사라진다 */
-type OcrBaseLine = OcrLine & {
+export type OcrBaseLine = OcrLine & {
   /** 이 줄에 섞인 문자 종류. 인식 언어와 맞지 않으면 신뢰도가 떨어진다 */
   script: 'ko' | 'en' | 'mixed'
   /** 숫자·기호가 판정을 좌우하는 줄 */
@@ -32,6 +32,18 @@ type OcrBaseLine = OcrLine & {
   tableRow?: OcrTableRow
   /** 성적서 특화 모드에서 규격 대비 판정까지 뽑히는 항목 */
   spec?: OcrSpecField
+  /** 마스킹을 켰을 때 이 줄이 어떻게 바뀌는가. 없으면 그대로 */
+  maskedText?: string
+  /** 마스킹을 켰을 때 표의 값이 어떻게 바뀌는가 */
+  maskedTableValue?: string
+}
+
+/** 인식 대상 문서 한 벌 — 발주처마다 다르다 */
+export type OcrCorpus = {
+  /** 내보내기 제목 */
+  title: string
+  lines: OcrBaseLine[]
+  masks: MaskEntry[]
 }
 
 const BASE: OcrBaseLine[] = [
@@ -51,6 +63,8 @@ const BASE: OcrBaseLine[] = [
     script: 'ko',
     numeric: false,
     tableRow: { label: '담당자', value: '정하늘 / 010-4821-7734' },
+    maskedText: '담당자: 정○○  연락처: 010-****-7734',
+    maskedTableValue: '정○○ / 010-****-7734',
   },
   {
     index: 3,
@@ -110,9 +124,6 @@ export const OCR_MASKS: MaskEntry[] = [
   { kind: 'phone', original: '010-4821-7734', masked: '010-****-7734', lineIndex: 2 },
 ]
 
-const MASKED_LINE_2 = '담당자: 정○○  연락처: 010-****-7734'
-const MASKED_TABLE_2 = '정○○ / 010-****-7734'
-
 const round2 = (n: number): number => Math.round(n * 100) / 100
 
 /**
@@ -127,6 +138,7 @@ function languagePenalty(script: OcrBaseLine['script'], language: OcrRequest['la
 
 function buildExport(
   format: OcrFormat,
+  title: string,
   lines: OcrLine[],
   table: OcrTableRow[],
   specs: OcrSpecField[],
@@ -136,7 +148,7 @@ function buildExport(
     const tbl = table.length
       ? `\n\n| 항목 | 값 |\n| --- | --- |\n${table.map((r) => `| ${r.label} | ${r.value} |`).join('\n')}`
       : ''
-    return `# 수입검사 성적서\n\n${body}${tbl}`
+    return `# ${title}\n\n${body}${tbl}`
   }
   if (format === 'json') {
     return JSON.stringify(
@@ -152,18 +164,27 @@ function buildExport(
   return lines.map((l) => l.text).join('\n')
 }
 
-/** 설정을 반영한 인식 결과를 만든다 — 서버가 붙으면 이 함수가 사라진다 */
-export function simulateOcr(req: OcrRequest): OcrResult {
+/**
+ * 설정을 반영한 인식 결과를 만드는 함수를 찍어 낸다 — 서버가 붙으면 함께 사라진다.
+ *
+ * 문서(코퍼스)를 밖에서 받는다. 안에 못박아 두면 발주처를 바꿔도 제조 성적서가
+ * 그대로 인식된다 — 검색 코퍼스에서 이미 밟은 함정이다.
+ */
+export function makeOcrSimulator(corpus: OcrCorpus): (req: OcrRequest) => OcrResult {
+  return (req) => simulateWith(corpus, req)
+}
+
+function simulateWith(corpus: OcrCorpus, req: OcrRequest): OcrResult {
   const notes: string[] = []
   let degraded = 0
 
-  const lines: OcrLine[] = BASE.map((b) => {
+  const lines: OcrLine[] = corpus.lines.map((b) => {
     const penalty = languagePenalty(b.script, req.language)
     if (penalty < 1) degraded += 1
     let c = b.confidence * penalty
     // 정밀 인식은 수치 줄만 끌어올린다. 가장 흐린 줄은 그래도 기준을 못 넘는다
     if (req.precisionNumbers && b.numeric) c = Math.min(0.99, c + 0.13)
-    const text = req.maskPii && b.index === 2 ? MASKED_LINE_2 : b.text
+    const text = req.maskPii && b.maskedText ? b.maskedText : b.text
     return { index: b.index, text, confidence: round2(c) }
   })
 
@@ -182,18 +203,18 @@ export function simulateOcr(req: OcrRequest): OcrResult {
   }
 
   const table: OcrTableRow[] = req.extractTables
-    ? BASE.flatMap((b) => {
+    ? corpus.lines.flatMap((b) => {
         if (!b.tableRow) return []
         const row =
-          req.maskPii && b.index === 2
-            ? { label: b.tableRow.label, value: MASKED_TABLE_2 }
+          req.maskPii && b.maskedTableValue
+            ? { label: b.tableRow.label, value: b.maskedTableValue }
             : b.tableRow
         return [row]
       })
     : []
 
   const specFields: OcrSpecField[] =
-    req.mode === 'inspection' ? BASE.flatMap((b) => (b.spec ? [b.spec] : [])) : []
+    req.mode === 'inspection' ? corpus.lines.flatMap((b) => (b.spec ? [b.spec] : [])) : []
 
   // 더 많이 시킬수록 더 오래 걸린다
   const elapsedSeconds = round2(
@@ -206,11 +227,16 @@ export function simulateOcr(req: OcrRequest): OcrResult {
   return {
     documentId: req.documentId,
     lines,
-    masks: req.maskPii ? OCR_MASKS : [],
+    masks: req.maskPii ? corpus.masks : [],
     table,
     specFields,
-    exportText: buildExport(req.format, lines, table, specFields),
+    exportText: buildExport(req.format, corpus.title, lines, table, specFields),
     notes,
     elapsedSeconds,
   }
 }
+
+/** 제조(한빛정밀)가 인식하는 문서 */
+export const OCR_CORPUS: OcrCorpus = { title: '수입검사 성적서', lines: BASE, masks: OCR_MASKS }
+
+export const simulateOcr = makeOcrSimulator(OCR_CORPUS)

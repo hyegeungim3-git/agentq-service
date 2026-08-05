@@ -1771,6 +1771,38 @@
         }
       }
     },
+    "/samples": {
+      "get": {
+        "operationId": "fetchSamples",
+        "summary": "화면이 미리 채워 두는 예시 입력(회의 참석자·번역 원문·주소 목록)",
+        "description": "→ 화면이 미리 채워 두는 예시 입력(회의 참석자·번역 원문·주소 목록). **발주처마다 다르다** — 화면이 fixture를 직접 읽던 자리다",
+        "tags": [
+          "samples"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "응답 형태 미정 — 제안서 본문 참조"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/signals": {
       "get": {
         "operationId": "fetchSignals",
