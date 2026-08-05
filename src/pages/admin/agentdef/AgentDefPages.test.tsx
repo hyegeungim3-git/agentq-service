@@ -14,16 +14,48 @@ import {
 import { AGENT_DEFS, SCENARIO_DEFS } from '@fixtures/agentdef'
 import { TOOLS } from '@fixtures/packops'
 
+/** 화면이 발주처를 고르므로 테스트도 고른다 — 콤보박스 하나뿐이다 */
+async function pick(orgName: string) {
+  const select = await screen.findByLabelText('발주처')
+  await userEvent.selectOptions(select, screen.getByRole('option', { name: new RegExp(orgName) }))
+}
+
 describe('태스크플로우 빌더', () => {
-  /* 목록을 따로 가지면 '관리자에는 있는데 포털에는 없는 에이전트'가 생긴다 */
-  it('정의가 카탈로그 전 항목을 덮는다', () => {
-    expect(AGENT_DEFS).toHaveLength(AGENTS.length)
+  /* 목록을 따로 가지면 '관리자에는 있는데 포털에는 없는 에이전트'가 생긴다.
+     도입 목록과의 짝 맞춤은 팩 검사(`fixtures/packs.test.ts`)가 본다 */
+  it('정의가 카탈로그를 벗어나지 않는다', () => {
     for (const d of AGENT_DEFS) {
       expect(
         AGENTS.some((a) => a.id === d.agentId),
         d.agentId,
       ).toBe(true)
     }
+  })
+
+  /**
+   * **이 화면의 숫자가 발주처마다 달라야 한다.**
+   *
+   * 정의를 코어에 하나만 두었을 때는 어느 발주처를 봐도 같은 값이 나왔다 —
+   * 그래서 병원 허브에 `설비 상태 조회`가 떴다. 값이 실제로 갈리는지 본다.
+   */
+  it('발주처를 바꾸면 단계와 판정이 그 발주처 것으로 바뀐다', async () => {
+    render(<FlowBuilderPage />)
+    expect(await screen.findByText(/사람 확인 없이 실행되는 에이전트 1종/)).toBeInTheDocument()
+
+    await pick('새빛대학교병원')
+    /* 병원만 실행형에 확인 지점을 걸어 두었다 */
+    expect(await screen.findByText(/사람 확인 없이 실행되는 에이전트 없음/)).toBeInTheDocument()
+
+    const list = await screen.findByRole('list', { name: '에이전트 정의' })
+    const safety = within(list)
+      .getAllByRole('listitem')
+      .filter((el) => el.parentElement === list)
+      .find((el) => el.textContent?.includes('안전관리계획 수립'))
+    await userEvent.click(
+      within(safety as HTMLElement).getByRole('button', { name: '단계 보기' }),
+    )
+    expect(screen.getByText(/환자안전 담당 확인/)).toBeInTheDocument()
+    expect(screen.queryByText(/설비 상태 조회/)).not.toBeInTheDocument()
   })
 
   /* 능력 배지를 나열만 하면 많을수록 좋아 보인다 */
@@ -84,6 +116,20 @@ describe('시나리오 빌더', () => {
     render(<ScenarioBuilderPage />)
     expect(await screen.findByText('사규 개정 영향 검토')).toBeInTheDocument()
     expect(screen.getByText('꺼짐')).toBeInTheDocument()
+  })
+
+  /**
+   * 포털에 릴레이 카드가 없는 이유를 관리자도 같은 말로 해야 한다.
+   *
+   * 카탈로그에는 있으니 '없는 에이전트'로는 안 걸린다 — **안 산 것**이다.
+   */
+  it('도입하지 않은 에이전트를 부르는 시나리오를 못 도는 것으로 표시한다', async () => {
+    render(<ScenarioBuilderPage />)
+    await pick('새빛대학교병원')
+    expect(
+      await screen.findByText(/이 발주처가 도입하지 않은 에이전트를 부릅니다\(기준정보 표준화\)/),
+    ).toBeInTheDocument()
+    expect((await screen.findAllByText(/도입 전/)).length).toBeGreaterThan(0)
   })
 
   it('시나리오 저장은 성공한 척하지 않는다', async () => {

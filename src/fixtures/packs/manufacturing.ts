@@ -6,6 +6,7 @@
  * 테스트 20여 개가 함께 깨지고, 옮기는 김에 내용이 조금씩 바뀐다.
  */
 import { AGENTS } from '@entities/agent/model'
+import { AGENT_DEFS, SCENARIO_DEFS } from '../agentdef'
 import { ANALYSIS_RESULTS } from '../analysis'
 import { HAZARDS_CREW_1, HAZARDS_CREW_2, SAFETY_REFERENCES } from '../safety'
 import { CHAT_ENTRIES, CHAT_UNKNOWN, FAQ_ITEMS } from '../chat'
@@ -75,4 +76,7 @@ export const MANUFACTURING_PACK: DomainPackData = {
     title: '수입검사 성적서 접수 처리',
     summary: '성적서 1건이 인식 → 주소 표준화 → 이력 조회 → 보고서 초안까지 이어집니다.',
   },
+  /* 제조는 기본 팩이라 정의도 fixtures 루트에 있다 — 다른 팩은 자기 폴더에 둔다 */
+  agentDefs: AGENT_DEFS,
+  scenarioDefs: SCENARIO_DEFS,
 }

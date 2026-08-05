@@ -21,6 +21,7 @@ import { PUBLIC_REPORT_BASE } from '../public/report'
 import { makeReportSimulator } from '../report'
 import { PUBLIC_QUERY_RESULTS, PUBLIC_QUERY_SOURCES } from '../public/dataquery'
 import { PUBLIC_DOCUMENTS } from '../public/documents'
+import { PUBLIC_AGENT_DEFS, PUBLIC_SCENARIO_DEFS } from '../public/agentdef'
 import { PUBLIC_CORPUS, PUBLIC_KNOWLEDGE_BASES, PUBLIC_REFERENCE_SPEC } from '../public/knowledge'
 import { LAND_PRICE_CHANGE } from '../public/mapintel'
 import { PUBLIC_REGULATIONS } from '../public/regulation'
@@ -82,4 +83,6 @@ export const PUBLIC_PACK: DomainPackData = {
   /* 릴레이가 부르는 표준화·보고서가 아직 도입 전이라 카드를 두지 않는다.
      띄워 두면 눌러도 아무 일 없는 버튼이 된다 */
   scenario: null,
+  agentDefs: PUBLIC_AGENT_DEFS,
+  scenarioDefs: PUBLIC_SCENARIO_DEFS,
 }

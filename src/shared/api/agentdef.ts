@@ -1,8 +1,8 @@
 import type { AgentDefinition, ScenarioDefinition } from '@entities/agentdef/model'
-import { AGENT_DEFS, SCENARIO_DEFS } from '@fixtures/agentdef'
 import type { AgentId } from '@entities/agent/model'
 import type { ApiResult } from './domains'
-import { withPack } from './pack'
+import type { DomainPackData } from '@fixtures/packs'
+import { withPack, withPackOf } from './pack'
 
 /**
  * 에이전트 정의 · 시나리오 정의의 데이터 경계.
@@ -12,11 +12,15 @@ import { withPack } from './pack'
  *
  * 정의 응답에 **단계와 사람 확인 지점**을 함께 달라고 요청한다. 능력 배지만
  * 오면 화면이 '확인 없이 나가는 에이전트'를 그릴 수 없다.
+ *
+ * ⚠️ 정의는 **발주처마다 다르다.** 단계 이름이 그 발주처의 업무 용어이고 담당도
+ * 그 발주처 부서다. 하나만 두었더니 병원 허브에 `설비 상태 조회`가 떴다.
+ * 그래서 발주처를 인자로 받는다 — 관리자는 고른 발주처를, 포털은 지금 발주처를 넘긴다.
  */
 
-export function fetchAgentDefs(): Promise<ApiResult<AgentDefinition[]>> {
+export function fetchAgentDefs(domainId: string | null): Promise<ApiResult<AgentDefinition[]>> {
   // TODO(api-미확정): GET /agents/definitions 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
-  return Promise.resolve({ ok: true, data: AGENT_DEFS })
+  return withPackOf(domainId, (p) => p.agentDefs)
 }
 
 export function saveAgentDef(agentId: string): Promise<ApiResult<never>> {
@@ -29,9 +33,9 @@ export function saveAgentDef(agentId: string): Promise<ApiResult<never>> {
   })
 }
 
-export function fetchScenarioDefs(): Promise<ApiResult<ScenarioDefinition[]>> {
+export function fetchScenarioDefs(domainId: string | null): Promise<ApiResult<ScenarioDefinition[]>> {
   // TODO(api-미확정): GET /scenarios 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
-  return Promise.resolve({ ok: true, data: SCENARIO_DEFS })
+  return withPackOf(domainId, (p) => p.scenarioDefs)
 }
 
 export function saveScenario(id: string): Promise<ApiResult<never>> {
@@ -56,7 +60,9 @@ export type AdoptionInfo = {
   scenario: { title: string; summary: string } | null
 }
 
-export function fetchAdoptedAgents(): Promise<ApiResult<AdoptionInfo>> {
+export function fetchAdoptedAgents(domainId?: string | null): Promise<ApiResult<AdoptionInfo>> {
   // TODO(api-미확정): GET /agents/adopted 로 교체. 제거 조건 = 백엔드가 테넌시(§3-2)를 확정.
-  return withPack((p) => ({ agents: p.agents, scenario: p.scenario }))
+  const read = (p: DomainPackData): AdoptionInfo => ({ agents: p.agents, scenario: p.scenario })
+  /* 인자를 안 주면 지금 발주처(포털), 주면 그 발주처(관리자) */
+  return domainId === undefined ? withPack(read) : withPackOf(domainId, read)
 }

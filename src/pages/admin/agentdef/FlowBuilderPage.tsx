@@ -10,7 +10,9 @@ import {
   noHumanCheck,
 } from '@entities/agentdef/model'
 import { fetchAgentDefs, saveAgentDef } from '@shared/api/agentdef'
+import { fetchDomains } from '@shared/api/domains'
 import { useRemote } from '@features/remote/useRemote'
+import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
 import { TOOLS } from '@fixtures/packops'
 
 /**
@@ -23,12 +25,22 @@ import { TOOLS } from '@fixtures/packops'
  * 사람 확인 없이 결과가 그대로 나가는 것이고, 그중에서도 **실행형인데 확인이
  * 없는 것**이다 — 답을 내놓는 데서 끝나지 않고 무언가를 실제로 한다.
  * 그래서 그것부터 먼저 말한다.
+ *
+ * ⚠️ 정의는 **발주처마다 다르다.** 단계 이름이 그 발주처의 업무 용어이고 담당도
+ * 그 발주처 부서다. 그래서 어느 발주처의 정의를 보는지 먼저 고른다 —
+ * 안 고르면 아무 발주처의 것이나 보여 주게 된다.
  */
 
 export function FlowBuilderPage() {
   const [failure, setFailure] = useState<string | null>(null)
   const [openId, setOpenId] = useState<string | null>(null)
-  const state = useRemote(fetchAgentDefs, [])
+  /* 목록을 여기서 들고 첫 항목을 기본값으로 쓴다 — effect로 초기값을 넣으면
+     첫 렌더에 '발주처 없음' 오류가 한 번 스쳐 지나간다 */
+  const domains = useRemote(fetchDomains, [])
+  const ready = domains.kind === 'ready' ? domains.data.filter((d) => d.status === 'ready') : []
+  const [picked, setPicked] = useState<string | null>(null)
+  const domainId = picked ?? ready[0]?.id ?? null
+  const state = useRemote(() => fetchAgentDefs(domainId), [domainId])
 
   const save = (id: string) => {
     void saveAgentDef(id).then((res) => {
@@ -47,6 +59,13 @@ export function FlowBuilderPage() {
         <b>AI 서비스 &gt; 에이전트</b>에서 봅니다 — 같은 카탈로그를 정의와 운영 두 각도로
         나눠 본 것입니다.
       </p>
+
+      <DomainSelect
+        domains={ready}
+        value={domainId}
+        onChange={setPicked}
+        note="정의는 발주처마다 다릅니다 — 단계 이름이 그 발주처의 업무 용어이고 담당도 그 발주처 부서입니다."
+      />
 
       {failure && (
         <p role="alert" className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">
@@ -67,6 +86,15 @@ export function FlowBuilderPage() {
           const name = (id: string) => AGENTS.find((a) => a.id === id)?.name ?? id
           return (
             <>
+              {/* 0을 안 보여 주면 '없다'와 '안 쟀다'를 구분할 수 없다.
+                  실제로 발주처마다 갈린다 — 병원만 실행형에 확인 지점을 걸어 두었다 */}
+              {acting.length === 0 && (
+                <p className="mt-4 max-w-3xl rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900">
+                  사람 확인 없이 실행되는 에이전트 없음 — 이 발주처는 실행형 에이전트에 확인 지점을
+                  두었습니다.
+                </p>
+              )}
+
               {/* 답을 내놓는 데서 끝나지 않고 무언가를 실제로 한다 */}
               {acting.length > 0 && (
                 <div className="mt-4 max-w-3xl rounded-xl border border-rose-200 bg-rose-50 p-4">

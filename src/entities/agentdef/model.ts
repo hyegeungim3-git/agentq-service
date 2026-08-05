@@ -91,6 +91,17 @@ export function unknownAgents(s: ScenarioDefinition, known: AgentId[]): AgentId[
   return s.steps.map((x) => x.agentId).filter((id) => !known.includes(id))
 }
 
+/**
+ * 시나리오가 부르는 에이전트 중 **이 발주처가 도입하지 않은 것.**
+ *
+ * 카탈로그에는 있으니 `unknownAgents`로는 안 걸린다. 그런데 그 발주처에는
+ * 안 들어와 있어서 시나리오는 거기서 멈춘다 — 포털에 릴레이 카드가 없는 이유와
+ * 같은 사실이다. 관리자와 포털이 다른 말을 하지 않게 여기서도 판정한다.
+ */
+export function notAdopted(s: ScenarioDefinition, adopted: AgentId[]): AgentId[] {
+  return s.steps.map((x) => x.agentId).filter((id) => !adopted.includes(id))
+}
+
 /** 끊긴 도구를 쓰는 에이전트가 시나리오에 끼어 있는가 */
 export function blockedBy(
   s: ScenarioDefinition,

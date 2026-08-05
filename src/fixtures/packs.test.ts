@@ -24,7 +24,18 @@ import { PACKED_DOMAIN_IDS, packOf } from './packs'
  * '늑대야'를 외치고, 그러면 사람이 검사를 끄게 된다.
  */
 const MARKERS: Record<string, string[]> = {
-  manufacturing: ['프레스', '금형', '침탄로', '한빛정밀', 'SOP-PR-011', 'PRS-C03'],
+  manufacturing: [
+    '프레스',
+    '금형',
+    '침탄로',
+    '한빛정밀',
+    'SOP-PR-011',
+    'PRS-C03',
+    /* 에이전트 정의가 팩으로 들어오면서 추가한 것 — 병원 허브에 떠 있던 말들이다 */
+    'MES',
+    '생산기술팀',
+    '설비보전팀',
+  ],
   public: ['표준지', '공시지가', '한국부동산원', 'RTMS', '실거래', '괴리율'],
   civic: ['민원', '옥외광고', '행정동', '한성시', '강변동', '계고'],
   medical: ['삭감', '병상', '진료과', '요양급여', '응급의료센터', '새빛'],
@@ -57,6 +68,27 @@ describe('발주처 팩 누수', () => {
       }
     }
     expect(leaks).toEqual([])
+  })
+
+  /**
+   * 정의가 팩으로 들어온 뒤 생긴 짝 맞춤.
+   *
+   * 도입 안 한 에이전트의 정의가 들어 있으면 허브가 **못 쓰는 카드에 단계를**
+   * 그린다. 반대로 도입했는데 정의가 없으면 카드가 이름만 남는다.
+   */
+  it('에이전트 정의는 그 발주처가 도입한 것만 다룬다', () => {
+    for (const id of PACKED_DOMAIN_IDS) {
+      const pack = packOf(id)
+      if (!pack) throw new Error(`${id} 팩이 없다`)
+      const defIds = pack.agentDefs.map((d) => d.agentId)
+      expect(defIds.filter((x) => !pack.agents.includes(x)), `${id}: 도입 전인데 정의가 있다`).toEqual(
+        [],
+      )
+      expect(
+        pack.agents.filter((x) => !defIds.includes(x)),
+        `${id}: 도입했는데 정의가 없다 — 카드가 이름만 남는다`,
+      ).toEqual([])
+    }
   })
 
   /* 표시만 있고 내용이 없으면 화면이 빈칸을 그린다 */

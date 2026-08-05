@@ -30,6 +30,7 @@ import {
 } from '../civic/docagents'
 import { CIVIC_CHAT, CIVIC_CHAT_UNKNOWN, CIVIC_FAQ } from '../civic/chat'
 import { CIVIC_DOCUMENTS } from '../civic/documents'
+import { CIVIC_AGENT_DEFS, CIVIC_SCENARIO_DEFS } from '../civic/agentdef'
 import {
   CIVIC_CIVIL_QUEUE,
   CIVIC_DATASETS,
@@ -98,4 +99,6 @@ export const CIVIC_PACK: DomainPackData = {
   samples: { attendees: CIVIC_ATTENDEE_SAMPLE, agenda: CIVIC_AGENDA_SAMPLE },
   /* 릴레이가 부르는 표준화·번역이 도입 전이라 카드를 두지 않는다 */
   scenario: null,
+  agentDefs: CIVIC_AGENT_DEFS,
+  scenarioDefs: CIVIC_SCENARIO_DEFS,
 }

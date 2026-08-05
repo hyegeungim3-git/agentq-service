@@ -243,3 +243,23 @@ test('행정 에이전트가 행정 결과를 낸다', async ({ page }) => {
   await expect(result).toContainText('연장 통지 없이 기한 도과')
   await expect(result).not.toContainText('표준지')
 })
+
+/**
+ * 허브 카드의 **단계**가 그 발주처 것인가.
+ *
+ * 배포본을 눈으로 보다 찾은 결함이다 — 병원 허브의 '데이터 조회' 카드에
+ * `MES 조회`, '데이터 분석'에 `센서 이력 결합`, '안전관리계획 수립'에
+ * `설비 상태 조회`가 떠 있었다. 정의가 코어에 하나뿐이었기 때문이다.
+ */
+test('허브 카드의 단계가 발주처마다 다르다', async ({ page }) => {
+  await enter(page, /한빛정밀/)
+  await openTab(page, /^에이전트/)
+  await expect(page.getByText('MES 조회').first()).toBeVisible()
+
+  await enter(page, /새빛대학교병원/)
+  await openTab(page, /^에이전트/)
+  await expect(page.getByText('점검·운영 자료 조회').first()).toBeVisible()
+  for (const word of ['MES 조회', '센서 이력 결합', '설비 상태 조회']) {
+    await expect(page.getByText(word)).toHaveCount(0)
+  }
+})

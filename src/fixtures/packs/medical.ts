@@ -32,6 +32,7 @@ import {
 } from '../medical/docagents'
 import { MEDICAL_CHAT, MEDICAL_CHAT_UNKNOWN, MEDICAL_FAQ } from '../medical/chat'
 import { MEDICAL_DOCUMENTS } from '../medical/documents'
+import { MEDICAL_AGENT_DEFS, MEDICAL_SCENARIO_DEFS } from '../medical/agentdef'
 import {
   MEDICAL_DATASETS,
   MEDICAL_ER_CENSUS,
@@ -100,4 +101,6 @@ export const MEDICAL_PACK: DomainPackData = {
   samples: { attendees: MEDICAL_ATTENDEE_SAMPLE, agenda: MEDICAL_AGENDA_SAMPLE },
   /* 릴레이가 부르는 표준화·번역이 도입 전이라 카드를 두지 않는다 */
   scenario: null,
+  agentDefs: MEDICAL_AGENT_DEFS,
+  scenarioDefs: MEDICAL_SCENARIO_DEFS,
 }

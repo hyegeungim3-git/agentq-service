@@ -7,7 +7,7 @@
 
 | 주소 | 클라이언트 함수 | 쓰는 곳 |
 |---|---|---|
-| `GET /domains` | `fetchDomains` | `src/pages/portal/PortalPage.tsx` |
+| `GET /domains` | `fetchDomains` | `src/pages/admin/agentdef/FlowBuilderPage.tsx`<br>`src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/portal/PortalPage.tsx` |
 | `GET /domains/{id}` | `fetchDomain` | `src/App.tsx` |
 | `GET /workspaces` | `fetchWorkspaces` | `src/App.tsx` |
 | `GET /notices` | `fetchNotices` | `src/App.tsx`<br>`src/pages/notices/NoticesPage.tsx` |
@@ -26,7 +26,7 @@
 | `PATCH /apps/instances/{id}` | `setInstanceLive` | `src/pages/admin/appinst/AppInstancePage.tsx` |
 | `GET /knowledge/pipeline-runs` | `fetchPipelineRuns` | `src/pages/admin/appinst/PipelinePage.tsx` |
 | `GET /agents/definitions` | `fetchAgentDefs` | `src/pages/admin/agentdef/FlowBuilderPage.tsx`<br>`src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/hub/HubPage.tsx` |
-| `GET /agents/adopted` | `fetchAdoptedAgents` | `src/pages/hub/HubPage.tsx` |
+| `GET /agents/adopted` | `fetchAdoptedAgents` | `src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/hub/HubPage.tsx` |
 | `PUT /agents/definitions/{id}` | `saveAgentDef` | `src/pages/admin/agentdef/FlowBuilderPage.tsx` |
 | `GET /workflows` | `fetchWorkflows` | `src/pages/admin/agentdef/WorkflowPage.tsx` |
 | `PATCH /workflows/{id}` | `setWorkflowEnabled` | `src/pages/admin/agentdef/WorkflowPage.tsx` |

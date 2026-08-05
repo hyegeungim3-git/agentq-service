@@ -13,6 +13,7 @@
  * 채워 넣으면 그게 바로 이전 데모의 사고다.
  */
 import type { AgentId } from '@entities/agent/model'
+import type { AgentDefinition, ScenarioDefinition } from '@entities/agentdef/model'
 import type { AnalysisKind, AnalysisResult } from '@entities/analysis/model'
 import type { ChatMessage, FaqItem } from '@entities/chat/model'
 import type { BusinessDocument } from '@entities/document/model'
@@ -120,6 +121,24 @@ export type DomainPackData = {
    * 띄우면 눌러도 아무 일 없는 버튼이 된다.
    */
   scenario: { title: string; summary: string } | null
+  /**
+   * 이 발주처의 에이전트가 **무엇을 하도록 정해 놓았나** — 단계·담당·사람 확인 지점.
+   *
+   * 코어에 하나만 두었더니 병원 허브 카드에 `MES 조회`·`센서 이력 결합`·
+   * `설비 상태 조회`가 떴다. 단계 이름은 그 발주처의 업무 용어이고 담당도
+   * 그 발주처 부서다 — 발주처 데이터다.
+   *
+   * 도입한 에이전트만 넣는다. 도입 전이면 정의도 없다(카드가 단계를 안 그린다).
+   */
+  agentDefs: AgentDefinition[]
+  /**
+   * 여러 에이전트를 잇는 복합 업무 정의(관리자 시나리오 빌더).
+   *
+   * 포털의 릴레이 카드(`scenario`)와 다른 축이다 — 여기는 **정의해 둔 것**이고
+   * 저기는 **지금 돌릴 수 있는 것**이다. 정의는 있는데 도입 안 한 에이전트를
+   * 부르면 못 돈다는 사실을 관리자 화면이 말한다.
+   */
+  scenarioDefs: ScenarioDefinition[]
 }
 
 /* 팩은 자기 모듈에서 자기 것만 만든다 — 서로를 참조하지 않는다 */

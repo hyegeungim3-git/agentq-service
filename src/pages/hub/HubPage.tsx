@@ -43,7 +43,7 @@ export function HubPage({
 }) {
   const total = agents.length
   const ready = agents.filter((a) => a.status === 'ready').length
-  const defs = useRemote(fetchAgentDefs, [])
+  const defs = useRemote(() => fetchAgentDefs(domain.id), [domain.id])
   /* 이 발주처가 도입한 에이전트. 못 받았으면 아무것도 막지 않는다 —
      목록을 잘못 잠그는 것보다 그대로 두는 편이 덜 위험하다 */
   const adopted = useRemote(fetchAdoptedAgents, [domain.id])
