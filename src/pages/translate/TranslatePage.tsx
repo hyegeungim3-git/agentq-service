@@ -17,7 +17,7 @@ export function TranslatePage({ onBack, apiOptions }: { onBack?: () => void; api
 
   return (
     <AgentShell<TranslationResult>
-      title="수출 문서 번역 에이전트"
+      title="문서 번역 에이전트"
       agentId="translate"
       desc="용어집을 적용해 번역하고, 역번역으로 의미가 틀어진 문장을 찾아 줍니다."
       onBack={onBack}

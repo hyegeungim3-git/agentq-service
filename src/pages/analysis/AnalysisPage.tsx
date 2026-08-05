@@ -37,7 +37,7 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
 
   return (
     <AgentShell<AnalysisResult>
-      title="공정 데이터 분석 에이전트"
+      title="데이터 분석 에이전트"
       agentId="dataanalysis"
       desc="추이와 분포를 차트로 보여 주고, 분석에 쓰이지 못한 데이터를 함께 밝힙니다."
       onBack={onBack}

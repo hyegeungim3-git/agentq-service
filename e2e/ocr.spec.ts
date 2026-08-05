@@ -150,7 +150,7 @@ test.describe('번역 — 방향·직접 입력·요약', () => {
     await page.goto('./')
     await page.getByRole('button', { name: /한빛정밀/ }).click()
     await openTab(page, /^에이전트/)
-    await page.getByRole('button', { name: /수출 문서 번역/ }).click()
+    await page.getByRole('button', { name: /문서 번역/ }).click()
   }
 
   /* 목표 언어를 바꿔도 같은 문장이 나오면 그 선택은 장식이다 */
