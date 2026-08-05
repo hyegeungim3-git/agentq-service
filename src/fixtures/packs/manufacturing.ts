@@ -7,6 +7,7 @@
  */
 import { AGENTS } from '@entities/agent/model'
 import { CHAT_ENTRIES, CHAT_UNKNOWN, FAQ_ITEMS } from '../chat'
+import { DATA_SOURCES, QUERY_RESULTS } from '../dataquery'
 import { DATASETS } from '../datasets'
 import { DOCUMENTS } from '../documents'
 import { CORPUS, KNOWLEDGE_BASES, REFERENCE_SPEC } from '../knowledge'
@@ -15,6 +16,7 @@ import { PRESS_VIBRATION } from '../metrics'
 import { NOTICES } from '../notices'
 import { REGULATION_ENTRIES } from '../regulation'
 import { SIGNALS } from '../signals'
+import { CLAUSE_COUNT, REVIEW_SETS, VIOLATIONS_BY_SET } from '../review'
 import { SUMMARY_RESULTS } from '../summary'
 import { WORKSPACES } from '../workspaces'
 import type { DomainPackData } from '../packs'
@@ -38,6 +40,11 @@ export const MANUFACTURING_PACK: DomainPackData = {
   datasets: DATASETS,
   regulations: REGULATION_ENTRIES,
   summaries: SUMMARY_RESULTS,
+  reviewSets: REVIEW_SETS,
+  violationsBySet: VIOLATIONS_BY_SET,
+  clauseCountBySet: CLAUSE_COUNT,
+  querySources: DATA_SOURCES,
+  queryResults: QUERY_RESULTS,
   scenario: {
     title: '수입검사 성적서 접수 처리',
     summary: '성적서 1건이 인식 → 주소 표준화 → 이력 조회 → 보고서 초안까지 이어집니다.',

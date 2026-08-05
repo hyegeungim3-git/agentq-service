@@ -7,9 +7,16 @@
  * assumptions와 unmapped를 일부러 채웠다 — 자연어 조회의 위험은
  * '말없이 가정하는 것'이고, 그걸 보여 주는 화면이 이 에이전트의 값어치다.
  */
-import type { DataSource, QueryResult } from '@entities/dataquery/model'
+import type { DataSourceOption, QueryResult } from '@entities/dataquery/model'
 
-export const QUERY_RESULTS: Record<DataSource, QueryResult> = {
+/** 이 발주처가 조회하는 데이터 소스 */
+export const DATA_SOURCES: DataSourceOption[] = [
+  { code: 'equipment', label: '설비 대장', sample: '창원본사 최근 설비 중 진동 높은 순으로 보여줘' },
+  { code: 'material', label: '자재 재고', sample: 'SUS 자재 재고 부족한 순으로 보여줘' },
+  { code: 'production', label: '생산 실적', sample: '지난주 CNC 3라인 생산 실적 알려줘' },
+]
+
+export const QUERY_RESULTS: Record<string, QueryResult> = {
   equipment: {
     source: 'equipment',
     elapsedSeconds: 1.9,

@@ -9,7 +9,21 @@
  *   ① 질의 조각 → 컬럼·연산자 대조   ② AI가 가정한 조건   ③ 변환하지 못한 표현
  */
 
-export type DataSource = 'equipment' | 'material' | 'production'
+/**
+ * 조회할 데이터 소스.
+ *
+ * 코드도 이름도 **발주처가 정한다.** 예전에는 '설비 대장·자재 재고·생산 실적'을
+ * 여기 못박아 뒀는데, 그건 제조 전용이었다 — 두 번째 발주처를 열자 드러났다.
+ */
+export type DataSource = string
+
+/** 화면이 고를 수 있는 데이터 소스 */
+export type DataSourceOption = {
+  code: DataSource
+  label: string
+  /** 예시 질의 — 빈 입력창만 두면 무엇을 물어야 할지 모른다. 이것도 발주처마다 다르다 */
+  sample: string
+}
 
 export type QueryTerm = {
   /** 사용자가 쓴 표현 */
@@ -46,13 +60,4 @@ export type QueryRequest = {
   source: DataSource
   question: string
 }
-
-const SOURCE_LABEL: Record<DataSource, string> = {
-  equipment: '설비 대장',
-  material: '자재 재고',
-  production: '생산 실적',
-}
-
-export const DATA_SOURCES = Object.keys(SOURCE_LABEL) as DataSource[]
-export const sourceLabel = (s: DataSource): string => SOURCE_LABEL[s]
 

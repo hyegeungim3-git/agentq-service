@@ -1,9 +1,7 @@
 import {
-  REGULATION_SETS,
   canSubmit,
   complianceScore,
   countBySeverity,
-  regulationLabel,
   severityLabel,
   type ReviewResult,
   type Severity,
@@ -45,18 +43,18 @@ export function ReviewPage({ onBack, apiOptions }: { onBack?: () => void; apiOpt
         <fieldset>
           <legend className="sr-only">대조할 규정 선택</legend>
           <div className="grid gap-2 sm:grid-cols-2">
-            {REGULATION_SETS.map((set) => (
+            {r.sets.map((set) => (
               <label
-                key={set}
+                key={set.code}
                 className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft"
               >
                 <input
                   type="checkbox"
-                  checked={r.regulationSets.includes(set)}
-                  onChange={() => r.toggleSet(set)}
+                  checked={r.regulationSets.includes(set.code)}
+                  onChange={() => r.toggleSet(set.code)}
                   className="size-4"
                 />
-                <span className="text-sm font-bold text-slate-800">{regulationLabel(set)}</span>
+                <span className="text-sm font-bold text-slate-800">{set.label}</span>
               </label>
             ))}
           </div>

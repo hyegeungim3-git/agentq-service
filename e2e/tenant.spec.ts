@@ -84,3 +84,49 @@ test('발주처 색이 실제로 바뀐다', async ({ page }) => {
     'rgb(0, 48, 135)',
   )
 })
+
+/**
+ * 도입한 에이전트가 **그 발주처의 결과**를 낸다.
+ *
+ * 목록만 바뀌고 결과가 제조 것이면 갈아끼운 게 아니다 — 옵션·결과까지 본다.
+ */
+test('공공에서 문서 요약이 공공 문서로 돈다', async ({ page }) => {
+  await enter(page, /한국부동산원/)
+  await openTab(page, /^에이전트/)
+  await page.getByRole('button', { name: '문서 요약', exact: true }).click()
+  await page.getByRole('button', { name: '요약 생성' }).click()
+  const result = page.getByRole('region', { name: /요약 결과/ })
+  await expect(result).toBeVisible({ timeout: 10_000 })
+  await expect(result).toContainText('이의신청')
+  await expect(result).not.toContainText('금형')
+})
+
+test('공공 사전 검토는 공공 규정 묶음을 대조한다', async ({ page }) => {
+  await enter(page, /한국부동산원/)
+  await openTab(page, /^에이전트/)
+  await page.getByRole('button', { name: '문서 사전 검토', exact: true }).click()
+  // 묶음 이름도 발주처가 정한다 — '품질경영매뉴얼'은 제조 전용이었다
+  await expect(page.getByText('표준지 조사지침')).toBeVisible()
+  await expect(page.getByText('품질경영매뉴얼')).toHaveCount(0)
+
+  await page.getByRole('button', { name: '사전 검토 시작' }).click()
+  const result = page.getByRole('region', { name: /검토 결과/ })
+  await expect(result).toBeVisible({ timeout: 10_000 })
+  await expect(result).toContainText('이용상황 변동 사유 미기재')
+  // 심각도 높음이 남아 있으면 상신을 권하지 않는다 — 그 경로가 공공에서도 살아야 한다
+  await expect(result).toContainText('결재 상신을 권하지 않습니다')
+})
+
+test('공공 데이터 조회는 공공 소스를 쓴다', async ({ page }) => {
+  await enter(page, /한국부동산원/)
+  await openTab(page, /^에이전트/)
+  await page.getByRole('button', { name: '데이터 조회', exact: true }).click()
+  await expect(page.getByRole('radio', { name: '이의신청 대장' })).toBeVisible()
+  await expect(page.getByText('설비 대장')).toHaveCount(0)
+
+  await page.getByRole('button', { name: '조회 실행' }).click()
+  const basis = page.getByRole('region', { name: '질의 해석 근거' })
+  await expect(basis).toBeVisible({ timeout: 10_000 })
+  // 말없이 가정하지 않는다 — 공공에서도 같은 값어치가 살아 있어야 한다
+  await expect(basis).toContainText('처리 기한 30일의 70%')
+})

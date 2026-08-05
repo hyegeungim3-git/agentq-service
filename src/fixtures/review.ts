@@ -4,10 +4,19 @@
  * 대조할 규정을 바꾸면 걸리는 위반이 달라져야 한다 — 무엇을 고르든 같은 결과가
  * 나오면 규정 선택이 장식이 된다. 그래서 위반마다 어느 규정 묶음 소속인지 둔다.
  */
-import type { RegulationSet, Violation } from '@entities/review/model'
+import type { RegulationSetOption, Violation } from '@entities/review/model'
 
 /** 규정 묶음별 위반. 실제로는 서버가 대조해서 준다. */
-export const VIOLATIONS_BY_SET: Record<RegulationSet, Violation[]> = {
+/** 이 발주처가 대조하는 규정 묶음. 이름은 발주처 것이다 */
+export const REVIEW_SETS: RegulationSetOption[] = [
+  { code: 'labor', label: '취업규칙·복무규정' },
+  { code: 'purchase', label: '구매·계약 규정' },
+  { code: 'safety', label: '안전보건관리규정' },
+  { code: 'quality', label: '품질경영매뉴얼' },
+  { code: 'security', label: '보안정책·개인정보' },
+]
+
+export const VIOLATIONS_BY_SET: Record<string, Violation[]> = {
   labor: [
     {
       id: 'v-labor-1',
@@ -80,7 +89,7 @@ export const VIOLATIONS_BY_SET: Record<RegulationSet, Violation[]> = {
 }
 
 /** 규정 묶음별 대조 조항 수 — 얼마나 훑었는지 보여 준다 */
-export const CLAUSE_COUNT: Record<RegulationSet, number> = {
+export const CLAUSE_COUNT: Record<string, number> = {
   labor: 42,
   purchase: 28,
   safety: 35,

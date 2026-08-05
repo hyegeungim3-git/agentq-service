@@ -36,6 +36,7 @@
 | `POST /analysis/datasets` | `uploadDataset` | `src/features/analysis/useAnalysis.ts` |
 | `POST /summaries` | `createSummary` | `src/features/summarize/useSummarize.ts` |
 | `POST /translations` | `createTranslation` | `src/features/translate/useTranslate.ts` |
+| `GET /reviews/regulation-sets` | `fetchReviewSets` | `src/features/review/useReview.ts` |
 | `POST /reviews` | `createReview` | `src/features/review/useReview.ts` |
 | `POST /reports` | `createReport` | `src/features/orchestration/useOrchestration.ts`<br>`src/features/report/useReport.ts` |
 | `POST /minutes` | `createMinutes` | `src/features/meeting/useMeeting.ts` |
@@ -43,6 +44,7 @@
 | `GET /knowledge-bases` | `fetchKnowledgeContext` | `src/features/knowledge/useKnowledge.ts` |
 | `POST /knowledge:search` | `searchKnowledge` | `src/features/knowledge/useKnowledge.ts` |
 | `POST /ocr:recognize` | `recognizeDocument` | `src/features/ocr/useOcr.ts`<br>`src/features/orchestration/useOrchestration.ts` |
+| `GET /queries/sources` | `fetchQuerySources` | `src/features/dataquery/useDataQuery.ts` |
 | `POST /queries` | `runQuery` | `src/features/dataquery/useDataQuery.ts`<br>`src/features/orchestration/useOrchestration.ts` |
 | `POST /mapping:run` | `runMapping` | `src/features/mapping/useMapping.ts`<br>`src/features/orchestration/useOrchestration.ts` |
 | `POST /analyses` | `analyzeData` | `src/features/analysis/useAnalysis.ts` |

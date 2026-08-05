@@ -8,8 +8,20 @@
 
 export type Severity = 'high' | 'medium' | 'low'
 
-/** 대조할 규정 묶음 */
-export type RegulationSet = 'labor' | 'purchase' | 'safety' | 'quality' | 'security'
+/**
+ * 대조할 규정 묶음.
+ *
+ * 코드는 **발주처가 정한다.** 예전에는 다섯 개를 여기 못박아 두고 라벨까지 들고
+ * 있었는데, 그 라벨이 '품질경영매뉴얼'처럼 제조 전용이었다 — 두 번째 발주처를
+ * 열자마자 드러났다. 이름은 팩이 주고, 여기서는 **묶음이 있다는 사실**만 다룬다.
+ */
+export type RegulationSet = string
+
+/** 화면이 고를 수 있는 규정 묶음 — 발주처마다 다르다 */
+export type RegulationSetOption = {
+  code: RegulationSet
+  label: string
+}
 
 export type Violation = {
   id: string
@@ -45,19 +57,9 @@ const SEVERITY_LABEL: Record<Severity, string> = {
   low: '낮음',
 }
 
-const REGULATION_LABEL: Record<RegulationSet, string> = {
-  labor: '취업규칙·복무규정',
-  purchase: '구매·계약 규정',
-  safety: '안전보건관리규정',
-  quality: '품질경영매뉴얼',
-  security: '보안정책·개인정보',
-}
-
 export const SEVERITIES = Object.keys(SEVERITY_LABEL) as Severity[]
-export const REGULATION_SETS = Object.keys(REGULATION_LABEL) as RegulationSet[]
 
 export const severityLabel = (s: Severity): string => SEVERITY_LABEL[s]
-export const regulationLabel = (r: RegulationSet): string => REGULATION_LABEL[r]
 
 /** 심각도별 감점 — 규칙을 한 곳에 둔다 */
 const PENALTY: Record<Severity, number> = { high: 20, medium: 10, low: 5 }

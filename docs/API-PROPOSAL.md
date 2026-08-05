@@ -92,6 +92,7 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `POST /analysis/datasets (multipart)` | `uploadDataset` | 파일 → `Dataset` (`entities/dataset/model.ts`) |
 | `POST /summaries` | `createSummary` | `SummaryRequest` → `SummaryResult` (`entities/summary/model.ts`) |
 | `POST /translations` | `createTranslation` | `TranslationRequest` + 원문 → `TranslationResult` (`entities/translation/model.ts`) |
+| `GET /reviews/regulation-sets` | `fetchReviewSets` | → `RegulationSetOption[]` (`entities/review/model.ts`). **묶음 이름도 발주처가 정한다** — '품질경영매뉴얼'은 제조 전용이었다 |
 | `POST /reviews` | `createReview` | `ReviewRequest` → `ReviewResult` (`entities/review/model.ts`) |
 | `POST /reports` | `createReport` | `ReportRequest` → `ReportResult` (`entities/report/model.ts`) |
 | `POST /minutes` | `createMinutes` | `MeetingRequest` → `MeetingResult` (`entities/meeting/model.ts`) |
@@ -99,6 +100,7 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /knowledge-bases` | `fetchKnowledgeContext` | → `KnowledgeContext` (`entities/knowledge/model.ts`). 범위 목록만이 아니라 **예시 질의와 견주는 사양**을 함께 — 발주처마다 다르다 |
 | `POST /knowledge:search` | `searchKnowledge` | `KnowledgeRequest` → `KnowledgeResult` |
 | `POST /ocr:recognize` | `recognizeDocument` | `OcrRequest` → `OcrResult` (`entities/ocr/model.ts`) |
+| `GET /queries/sources` | `fetchQuerySources` | → `DataSourceOption[]` (`entities/dataquery/model.ts`). **소스 이름도 예시 질의도 발주처가 정한다** |
 | `POST /queries` | `runQuery` | `QueryRequest` → `QueryResult` (`entities/dataquery/model.ts`) |
 | `POST /mapping:run` | `runMapping` | `MappingRequest` → `MappingResult` (`entities/mapping/model.ts`) |
 | `POST /analyses` | `analyzeData` | `AnalysisRequest` → `AnalysisResult` (`entities/analysis/model.ts`) |

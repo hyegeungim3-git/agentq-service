@@ -15,11 +15,13 @@
 import type { AgentId } from '@entities/agent/model'
 import type { ChatMessage, FaqItem } from '@entities/chat/model'
 import type { BusinessDocument } from '@entities/document/model'
+import type { DataSourceOption, QueryResult } from '@entities/dataquery/model'
 import type { Dataset } from '@entities/dataset/model'
 import type { KnowledgeBase } from '@entities/knowledge/model'
 import type { MapIntel } from '@entities/mapintel/model'
 import type { LiveMetric } from '@entities/metric/model'
 import type { Notice } from '@entities/notice/model'
+import type { RegulationSetOption, Violation } from '@entities/review/model'
 import type { WorkSignal } from '@entities/signal/model'
 import type { SummaryResult, SummaryStyle } from '@entities/summary/model'
 import type { Workspace } from '@entities/workspace/model'
@@ -65,6 +67,16 @@ export type DomainPackData = {
   regulations: RegulationEntry[]
   /** 문서별·방식별 요약 결과 */
   summaries: Record<string, Record<SummaryStyle, SummaryResult>>
+  /** 사전 검토가 대조할 규정 묶음 — 이름도 발주처가 정한다 */
+  reviewSets: RegulationSetOption[]
+  /** 묶음별 위반. 고른 묶음이 결과를 실제로 바꿔야 체크박스가 장식이 아니다 */
+  violationsBySet: Record<string, Violation[]>
+  /** 묶음별 조항 수 — 얼마나 훑었는지 */
+  clauseCountBySet: Record<string, number>
+  /** 조회할 데이터 소스 — 이름도 예시 질의도 발주처가 정한다 */
+  querySources: DataSourceOption[]
+  /** 소스별 조회 결과 */
+  queryResults: Record<string, QueryResult>
   /**
    * 복합 업무 시나리오 소개. 없으면 허브에 카드를 그리지 않는다.
    *

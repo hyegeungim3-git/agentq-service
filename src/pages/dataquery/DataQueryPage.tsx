@@ -1,4 +1,4 @@
-import { DATA_SOURCES, sourceLabel, type QueryResult } from '@entities/dataquery/model'
+import type { QueryResult } from '@entities/dataquery/model'
 import { useDataQuery, type DataQueryOptions } from '@features/dataquery/useDataQuery'
 import { AgentPageHeader, ResultSection } from '@widgets/agent-shell/AgentShell'
 import { Play } from 'lucide-react'
@@ -34,20 +34,20 @@ export function DataQueryPage({
             <fieldset>
               <legend className="text-sm font-black text-slate-900">1 · 데이터 소스</legend>
               <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                {DATA_SOURCES.map((s) => (
+                {q.sources.map((s) => (
                   <label
-                    key={s}
+                    key={s.code}
                     className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft"
                   >
                     <input
                       type="radio"
                       name="source"
-                      value={s}
-                      checked={q.source === s}
-                      onChange={() => q.changeSource(s)}
+                      value={s.code}
+                      checked={q.source === s.code}
+                      onChange={() => q.changeSource(s.code)}
                       className="size-4"
                     />
-                    <span className="text-sm font-bold text-slate-800">{sourceLabel(s)}</span>
+                    <span className="text-sm font-bold text-slate-800">{s.label}</span>
                   </label>
                 ))}
               </div>
@@ -95,19 +95,26 @@ export function DataQueryPage({
             </div>
           )}
 
-          {q.phase.kind === 'done' && <QueryResultView result={q.phase.result} />}
+          {q.phase.kind === 'done' && (
+            <QueryResultView
+              result={q.phase.result}
+              sourceLabel={
+                q.sources.find((s) => s.code === q.source)?.label ?? q.phase.result.source
+              }
+            />
+          )}
         </div>
       </div>
     </main>
   )
 }
 
-function QueryResultView({ result }: { result: QueryResult }) {
+function QueryResultView({ result, sourceLabel }: { result: QueryResult; sourceLabel: string }) {
   return (
     <>
       <ResultSection
         id="query-rows"
-        title={`조회 결과 — ${sourceLabel(result.source)} ${result.rows.length}건`}
+        title={`조회 결과 — ${sourceLabel} ${result.rows.length}건`}
         stats={[
           ['조회 건수', `${result.rows.length}건`],
           ['소요', `${result.elapsedSeconds}초`],

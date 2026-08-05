@@ -31,9 +31,10 @@ describe('DataQueryPage', () => {
     expect(basis).toHaveTextContent('install_year')
   })
 
+  /* 소스 목록은 발주처(팩)에서 온다 — 첫 렌더에는 아직 없다 */
   it('소스를 바꾸면 예시 질의와 결과가 함께 바뀐다', async () => {
     setup()
-    await userEvent.click(screen.getByRole('radio', { name: '자재 재고' }))
+    await userEvent.click(await screen.findByRole('radio', { name: '자재 재고' }))
     expect(screen.getByLabelText(/무엇을 조회할까요/)).toHaveValue('SUS 자재 재고 부족한 순으로 보여줘')
 
     await userEvent.click(screen.getByRole('button', { name: '조회 실행' }))
@@ -42,6 +43,7 @@ describe('DataQueryPage', () => {
 
   it('질의가 비면 실행할 수 없다', async () => {
     setup()
+    await screen.findByRole('radio', { name: '설비 대장' })
     await userEvent.clear(screen.getByLabelText(/무엇을 조회할까요/))
     expect(screen.getByRole('button', { name: '조회 실행' })).toBeDisabled()
   })

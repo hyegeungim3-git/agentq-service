@@ -3,9 +3,7 @@ import {
   canSubmit,
   complianceScore,
   countBySeverity,
-  regulationLabel,
   severityLabel,
-  REGULATION_SETS,
   SEVERITIES,
   type Violation,
 } from './model'
@@ -62,7 +60,6 @@ describe('라벨 매핑', () => {
   it('모든 심각도에 라벨이 있다', () => {
     for (const s of SEVERITIES) expect(severityLabel(s)).toBeTruthy()
   })
-  it('모든 규정 묶음에 라벨이 있다', () => {
-    for (const r of REGULATION_SETS) expect(regulationLabel(r)).toBeTruthy()
-  })
+  /* 규정 묶음 라벨은 이제 발주처(팩)가 준다 — 여기가 아니라
+     `src/fixtures/packs.test.ts`가 '팩마다 묶음이 있는지'를 본다 */
 })
