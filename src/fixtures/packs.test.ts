@@ -152,6 +152,45 @@ describe('발주처 팩 누수', () => {
     }
   })
 
+  /**
+   * 릴레이가 **실제로 돌 수 있는가.**
+   *
+   * 소개(`scenario`)만 있고 실행 설정(`relay`)이 없으면 눌러도 아무 일 없는
+   * 버튼이 된다. 부르는 문서·조회 소스가 그 팩에 없어도 마찬가지다 —
+   * 릴레이가 중간에 실패하고, 사용자는 눌러 봐야 안다.
+   */
+  it('릴레이는 소개와 실행 설정이 함께 있고 그 팩의 것을 부른다', () => {
+    for (const id of PACKED_DOMAIN_IDS) {
+      const pack = packOf(id)
+      if (!pack) throw new Error(`${id} 팩이 없다`)
+      expect(Boolean(pack.scenario), `${id}: 소개와 실행 설정이 짝이 아니다`).toBe(
+        Boolean(pack.relay),
+      )
+      if (!pack.relay) continue
+
+      const docs = pack.documents.map((d) => d.id)
+      expect(docs, `${id}: 릴레이가 부르는 인식 대상 문서가 팩에 없다`).toContain(
+        pack.relay.ocr.documentId,
+      )
+      expect(docs, `${id}: 릴레이가 부르는 보고서 대상 문서가 팩에 없다`).toContain(
+        pack.relay.report.documentId,
+      )
+      expect(
+        pack.querySources.map((s) => s.code),
+        `${id}: 릴레이가 부르는 조회 소스가 팩에 없다`,
+      ).toContain(pack.relay.query.source)
+      expect(pack.mapping.modes, `${id}: 릴레이가 안 쓰는 처리 유형을 부른다`).toContain(
+        pack.relay.mapping.mode,
+      )
+      /* 릴레이가 부르는 에이전트를 안 샀으면 거기서 멈춘다 */
+      for (const st of pack.relay.scenario.steps) {
+        expect(pack.agents, `${id}: 릴레이가 도입 안 한 ${st.agentId}를 부른다`).toContain(
+          st.agentId,
+        )
+      }
+    }
+  })
+
   /* 표시만 있고 내용이 없으면 화면이 빈칸을 그린다 */
   it('팩마다 자기 말이 실제로 들어 있다', () => {
     for (const id of PACKED_DOMAIN_IDS) {

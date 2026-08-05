@@ -45,13 +45,12 @@ const INDUSTRY_WORDS = [
 const DIRS = ['src/entities', 'src/features', 'src/pages', 'src/widgets']
 
 /**
- * 알면서 남겨 둔 곳.
+ * 알면서 남겨 둔 곳 — **지금은 없다.**
  *
- * 복합 업무 릴레이는 아직 제조 이야기 하나로 고정돼 있다. 다른 발주처에는
- * 릴레이 카드 자체를 안 그리므로 화면에 나가지는 않는다 — 발주처별 릴레이를
- * 만들면 이 줄이 사라진다. **예외를 여기 적어 두는 것이 기록이다.**
+ * 한때 복합 업무 릴레이가 제조 이야기 하나로 고정돼 여기 있었다.
+ * 릴레이를 발주처별로 만들면서 사라졌다. 예외를 늘리지 말고 줄이는 쪽으로 쓴다.
  */
-const KNOWN = ['src/features/orchestration/useOrchestration.ts']
+const KNOWN: string[] = []
 
 function sources(dir: string): string[] {
   const out: string[] = []

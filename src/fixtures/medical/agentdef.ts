@@ -147,7 +147,7 @@ export const MEDICAL_AGENT_DEFS: AgentDefinition[] = [
   },
 ]
 
-/** 1번은 도입하지 않은 에이전트를 부른다 — 포털에 릴레이 카드가 없는 이유다 */
+/** 1번은 포털의 릴레이 카드와 같은 일이다 — 관리자와 포털이 같은 이야기를 해야 한다 */
 export const MEDICAL_SCENARIO_DEFS: ScenarioDefinition[] = [
   {
     id: 'sc-med-1',

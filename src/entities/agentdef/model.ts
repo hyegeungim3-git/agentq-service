@@ -95,8 +95,8 @@ export function unknownAgents(s: ScenarioDefinition, known: AgentId[]): AgentId[
  * 시나리오가 부르는 에이전트 중 **이 발주처가 도입하지 않은 것.**
  *
  * 카탈로그에는 있으니 `unknownAgents`로는 안 걸린다. 그런데 그 발주처에는
- * 안 들어와 있어서 시나리오는 거기서 멈춘다 — 포털에 릴레이 카드가 없는 이유와
- * 같은 사실이다. 관리자와 포털이 다른 말을 하지 않게 여기서도 판정한다.
+ * 안 들어와 있어서 시나리오는 거기서 멈춘다. 지금은 네 발주처가 13종을 모두
+ * 도입해 걸리는 것이 없지만, 도입 목록에서 하나만 빼도 다시 걸린다.
  */
 export function notAdopted(s: ScenarioDefinition, adopted: AgentId[]): AgentId[] {
   return s.steps.map((x) => x.agentId).filter((id) => !adopted.includes(id))

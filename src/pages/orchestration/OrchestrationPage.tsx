@@ -25,8 +25,8 @@ export function OrchestrationPage({
   apiOptions?: OrchestrationOptions
 }) {
   const o = useOrchestration(apiOptions ?? {})
+  const scenario = o.scenario
   const busy = o.phase.kind === 'running'
-  const finished = isComplete(o.outcomes, o.scenario.steps)
   const reviews = totalReviewPoints(o.outcomes)
 
   const statusOf = (i: number): StepStatus => {
@@ -36,12 +36,29 @@ export function OrchestrationPage({
     return 'pending'
   }
 
+  /* 릴레이가 없는 발주처는 카드를 안 그리므로 여기 올 일이 없다.
+     그래도 억지로 들어왔을 때 빈 화면을 주지 않는다 — 왜 없는지 말한다 */
+  if (!scenario) {
+    return (
+      <main className="min-h-dvh bg-slate-50 px-4 py-8">
+        <div className="mx-auto w-full max-w-3xl">
+          <p role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            이 발주처에는 복합 업무 릴레이가 아직 없습니다. 어느 서류가 어느 순서로 도는지
+            정해져야 만들 수 있습니다.
+          </p>
+        </div>
+      </main>
+    )
+  }
+
+  const finished = isComplete(o.outcomes, scenario.steps)
+
   return (
     <main className="min-h-dvh bg-slate-50 px-4 py-8">
       <div className="mx-auto w-full max-w-3xl">
         <AgentPageHeader
           icon={Workflow}
-          title={o.scenario.title}
+          title={scenario.title}
           desc={
             <>
               요청 하나가 여러 에이전트를 거쳐 산출물까지 갑니다. 중간에 사람이 봐야 할 것을 모아 마지막에
@@ -54,9 +71,9 @@ export function OrchestrationPage({
         <div className="space-y-5">
           <section className="rounded-xl border border-slate-200 bg-white p-5">
             <p className="text-xs font-bold text-slate-600">시작 조건</p>
-            <p className="mt-1 text-sm text-slate-800">{o.scenario.trigger}</p>
+            <p className="mt-1 text-sm text-slate-800">{scenario.trigger}</p>
             <p className="mt-3 text-xs font-bold text-slate-600">산출물</p>
-            <p className="mt-1 text-sm text-slate-800">{o.scenario.deliverable}</p>
+            <p className="mt-1 text-sm text-slate-800">{scenario.deliverable}</p>
           </section>
 
           <div className="flex flex-wrap gap-3">
@@ -104,7 +121,7 @@ export function OrchestrationPage({
           )}
 
           <ol className="space-y-3">
-            {o.scenario.steps.map((step, i) => (
+            {scenario.steps.map((step, i) => (
               <li key={step.id}>
                 <StepCard step={step} index={i} status={statusOf(i)} outcome={o.outcomes[i] ?? null} />
               </li>

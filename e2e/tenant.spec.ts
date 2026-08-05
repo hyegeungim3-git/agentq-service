@@ -344,3 +344,25 @@ test('번역이 발주처 문서와 용어집으로 나온다', async ({ page })
     await expect(result).not.toContainText(word)
   }
 })
+
+/**
+ * 릴레이가 **발주처마다 다른 이야기로 완주하는가.**
+ *
+ * 한때 릴레이는 제조 이야기 하나로 고정돼 있어 나머지 세 발주처는 카드를
+ * 그리지 못했다. 병원은 2단계가 아예 다르다 — 주소가 아니라 청구 항목 코드다.
+ */
+test('릴레이가 발주처마다 자기 이야기로 완주한다', async ({ page }) => {
+  await enter(page, /새빛대학교병원/)
+  await openTab(page, /^에이전트/)
+  await page.getByRole('button', { name: /청구 보류 건 회신 처리/ }).click()
+
+  await expect(page.getByText('진료과 회신 서식 1건이 도착했습니다.')).toBeVisible()
+  await expect(page.getByText('항목 코드 표준화')).toBeVisible()
+  for (const word of ['성적서', '공급업체', '설비 이력']) {
+    await expect(page.getByText(word)).toHaveCount(0)
+  }
+
+  await page.getByRole('button', { name: '릴레이 실행' }).click()
+  await expect(page.getByText(/사람이 확인해야 하는 지점/)).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByText(/SUH-/).first()).toBeVisible()
+})

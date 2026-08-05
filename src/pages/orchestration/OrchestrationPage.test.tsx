@@ -50,7 +50,7 @@ describe('OrchestrationPage', () => {
     await screen.findByText(/HBP-보전-2026-102/)
     // OCR: 신뢰도 낮은 줄, 주소: 표준화 못 한 건, 보고서: 미기재 칸
     expect(screen.getByText(/번째 줄 신뢰도 \d+% — 원본 대조 필요/)).toBeInTheDocument()
-    expect(screen.getByText(/OCR 신뢰도가 낮아 표준화하지 못함/)).toBeInTheDocument()
+    expect(screen.getByText(/인식 신뢰도가 낮아 표준화하지 못함/)).toBeInTheDocument()
     expect(screen.getByText(/보고서 미기재 — 재발 방지 대책/)).toBeInTheDocument()
   })
 

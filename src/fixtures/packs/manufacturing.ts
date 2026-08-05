@@ -6,6 +6,7 @@
  * 테스트 20여 개가 함께 깨지고, 옮기는 김에 내용이 조금씩 바뀐다.
  */
 import { AGENTS } from '@entities/agent/model'
+import { INSPECTION_SCENARIO } from '../orchestration'
 import { AGENT_DEFS, SCENARIO_DEFS } from '../agentdef'
 import { TOOLS } from '../packops'
 import { MCP_SERVERS } from '../evidence'
@@ -79,8 +80,14 @@ export const MANUFACTURING_PACK: DomainPackData = {
     addressBatch: BATCH_SAMPLE,
   },
   scenario: {
-    title: '수입검사 성적서 접수 처리',
     summary: '성적서 1건이 인식 → 주소 표준화 → 이력 조회 → 보고서 초안까지 이어집니다.',
+  },
+  relay: {
+    scenario: INSPECTION_SCENARIO,
+    ocr: { documentId: 'doc-inspection-cert', mode: 'inspection' },
+    mapping: { mode: 'address-ocr', documentName: '수입검사성적서_SPCC-2211.pdf' },
+    query: { source: 'equipment', question: '창원본사 최근 도입 설비를 진동 높은 순으로' },
+    report: { documentId: 'doc-inspection-cert', type: 'incident' },
   },
   /* 제조는 기본 팩이라 정의도 fixtures 루트에 있다 — 다른 팩은 자기 폴더에 둔다 */
   agentDefs: AGENT_DEFS,

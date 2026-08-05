@@ -26,6 +26,9 @@ import type { KnowledgeBase } from '@entities/knowledge/model'
 import type { IndexEntry, KnowledgeArea } from '@entities/knowledgebase/model'
 import type { MapIntel } from '@entities/mapintel/model'
 import type { MappingMode, TagMappingResult } from '@entities/mapping/model'
+import type { Scenario } from '@entities/orchestration/model'
+import type { OcrMode } from '@entities/ocr/model'
+import type { ReportType } from '@entities/report/model'
 import type { AddressCorpus } from './address'
 import type { LiveMetric } from '@entities/metric/model'
 import type { MeetingRequest, MeetingResult } from '@entities/meeting/model'
@@ -121,12 +124,31 @@ export type DomainPackData = {
     addressBatch?: string
   }
   /**
-   * 복합 업무 시나리오 소개. 없으면 허브에 카드를 그리지 않는다.
+   * 허브 카드에 쓰는 **한 줄 소개.** 없으면 카드를 그리지 않는다.
    *
-   * 릴레이는 에이전트 여러 개가 다 있어야 돈다 — 도입 전인 발주처에 카드를
-   * 띄우면 눌러도 아무 일 없는 버튼이 된다.
+   * ⚠️ 제목은 여기 없다 — `relay.scenario.title`에서 온다. 두 곳에 적어 두면
+   * 카드와 화면이 다른 제목을 말하게 된다.
    */
-  scenario: { title: string; summary: string } | null
+  scenario: { summary: string } | null
+  /**
+   * 릴레이가 **무엇을 어떤 인자로 부르는가.**
+   *
+   * 릴레이 구조(인식 → 표준화 → 조회 → 보고)는 코어가 갖고, 부르는 값과
+   * 단계 이름은 발주처가 준다. 코어에 하나만 두었더니 릴레이가 제조 이야기
+   * 하나로 고정돼 나머지 세 발주처는 카드를 못 그렸다.
+   *
+   * `scenario`가 있으면 이것도 있어야 한다 — 소개만 있고 못 도는 카드는
+   * 눌러도 아무 일 없는 버튼이 된다.
+   */
+  relay: {
+    /** 화면이 그리는 서사 — 제목·트리거·산출물·4단계 라벨 */
+    scenario: Scenario
+    ocr: { documentId: string; mode: OcrMode }
+    /** 주소를 안 푸는 발주처는 태그·코드 매핑으로 돈다 */
+    mapping: { mode: MappingMode; documentName: string }
+    query: { source: string; question: string }
+    report: { documentId: string; type: ReportType }
+  } | null
   /**
    * 이 발주처의 에이전트가 **무엇을 하도록 정해 놓았나** — 단계·담당·사람 확인 지점.
    *

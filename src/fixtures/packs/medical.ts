@@ -11,6 +11,7 @@
  * **13종을 모두 도입했다.** 번역 말뭉치와 표준화 대장까지 갖췄다.
  */
 import type { AgentId } from '@entities/agent/model'
+import { MEDICAL_RELAY_SCENARIO } from '../medical/relay'
 import {
   MEDICAL_ANALYSES,
   MEDICAL_CLAUSE_COUNT,
@@ -108,9 +109,17 @@ export const MEDICAL_PACK: DomainPackData = {
     meeting: simulateMedicalMinutes,
   },
   samples: { translationSource: sampleSourceOf(MEDICAL_TRANSLATION), attendees: MEDICAL_ATTENDEE_SAMPLE, agenda: MEDICAL_AGENDA_SAMPLE },
-  /* 릴레이 흐름 자체가 아직 제조 이야기로 고정돼 있어 카드를 두지 않는다.
-     정의는 관리자 시나리오 빌더에 있다 */
-  scenario: null,
+  scenario: {
+    summary: '회신 서식 1건이 인식 → 항목 코드 표준화 → 조정 이력 조회 → 점검 보고 초안까지 이어집니다.',
+  },
+  relay: {
+    scenario: MEDICAL_RELAY_SCENARIO,
+    ocr: { documentId: 'doc-suh-precheck', mode: 'inspection' },
+    /* 병원은 주소가 아니라 청구 항목 코드를 푼다 */
+    mapping: { mode: 'tags', documentName: '' },
+    query: { source: 'claim', question: '회신 안 온 보류 건 진료과별로 보여줘' },
+    report: { documentId: 'doc-suh-precheck', type: 'inspection' },
+  },
   agentDefs: MEDICAL_AGENT_DEFS,
   scenarioDefs: MEDICAL_SCENARIO_DEFS,
   tools: MEDICAL_TOOLS,

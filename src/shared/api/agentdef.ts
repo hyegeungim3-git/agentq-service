@@ -62,7 +62,12 @@ export type AdoptionInfo = {
 
 export function fetchAdoptedAgents(domainId?: string | null): Promise<ApiResult<AdoptionInfo>> {
   // TODO(api-미확정): GET /agents/adopted 로 교체. 제거 조건 = 백엔드가 테넌시(§3-2)를 확정.
-  const read = (p: DomainPackData): AdoptionInfo => ({ agents: p.agents, scenario: p.scenario })
+  /* 카드 제목은 릴레이가 실제로 그리는 제목과 같아야 한다 — 두 곳에 안 적는다 */
+  const read = (p: DomainPackData): AdoptionInfo => ({
+    agents: p.agents,
+    scenario:
+      p.scenario && p.relay ? { title: p.relay.scenario.title, summary: p.scenario.summary } : null,
+  })
   /* 인자를 안 주면 지금 발주처(포털), 주면 그 발주처(관리자) */
   return domainId === undefined ? withPack(read) : withPackOf(domainId, read)
 }

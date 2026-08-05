@@ -8,6 +8,7 @@
  * 세계관은 2026년 3월, 표준지 공시지가 조사·검증 시즌이다.
  */
 import type { AgentId } from '@entities/agent/model'
+import { PUBLIC_RELAY_SCENARIO } from '../public/relay'
 import { PUBLIC_WORKSPACES, PUBLIC_NOTICES, PUBLIC_SIGNALS, PUBLIC_APPEAL_QUEUE, PUBLIC_DATASETS } from '../public/basics'
 import { PUBLIC_CHAT, PUBLIC_CHAT_UNKNOWN, PUBLIC_FAQ } from '../public/chat'
 import { PUBLIC_ANALYSES } from '../public/analysis'
@@ -87,9 +88,16 @@ export const PUBLIC_PACK: DomainPackData = {
   },
   /* 번역·주소 예시는 그 에이전트를 도입할 때 함께 채운다 */
   samples: { translationSource: sampleSourceOf(PUBLIC_TRANSLATION), attendees: PUBLIC_ATTENDEE_SAMPLE, agenda: PUBLIC_AGENDA_SAMPLE },
-  /* 릴레이 흐름 자체가 아직 제조 이야기로 고정돼 있어 카드를 두지 않는다.
-     정의는 관리자 시나리오 빌더에 있다 */
-  scenario: null,
+  scenario: {
+    summary: '신청서 1건이 인식 → 소재지 표준화 → 조사 이력 조회 → 검토 보고 초안까지 이어집니다.',
+  },
+  relay: {
+    scenario: PUBLIC_RELAY_SCENARIO,
+    ocr: { documentId: 'doc-reb-verify', mode: 'inspection' },
+    mapping: { mode: 'address-ocr', documentName: '표준지공시지가_이의신청서_2026-0417.pdf' },
+    query: { source: 'appeal', question: '처리 기한 임박한 이의신청 보여줘' },
+    report: { documentId: 'doc-reb-verify', type: 'inspection' },
+  },
   agentDefs: PUBLIC_AGENT_DEFS,
   scenarioDefs: PUBLIC_SCENARIO_DEFS,
   tools: PUBLIC_TOOLS,

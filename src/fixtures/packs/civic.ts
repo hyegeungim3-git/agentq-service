@@ -9,6 +9,7 @@
  * 공공과 같은 이유(4개 언어 대역 데이터 / 신규 설계)다.
  */
 import type { AgentId } from '@entities/agent/model'
+import { CIVIC_RELAY_SCENARIO } from '../civic/relay'
 import {
   CIVIC_ANALYSES,
   CIVIC_CLAUSE_COUNT,
@@ -106,9 +107,16 @@ export const CIVIC_PACK: DomainPackData = {
     meeting: simulateCivicMinutes,
   },
   samples: { translationSource: sampleSourceOf(CIVIC_TRANSLATION), attendees: CIVIC_ATTENDEE_SAMPLE, agenda: CIVIC_AGENDA_SAMPLE },
-  /* 릴레이 흐름 자체가 아직 제조 이야기로 고정돼 있어 카드를 두지 않는다.
-     정의는 관리자 시나리오 빌더에 있다 */
-  scenario: null,
+  scenario: {
+    summary: '신고서 1건이 인식 → 위치 표준화 → 점검 이력 조회 → 처리 공문 초안까지 이어집니다.',
+  },
+  relay: {
+    scenario: CIVIC_RELAY_SCENARIO,
+    ocr: { documentId: 'doc-hsc-adcheck', mode: 'inspection' },
+    mapping: { mode: 'address-ocr', documentName: '옥외광고물_표시신고서_2026-0812.pdf' },
+    query: { source: 'ad', question: '안전 기준 미달 광고물 보여줘' },
+    report: { documentId: 'doc-hsc-adcheck', type: 'inspection' },
+  },
   agentDefs: CIVIC_AGENT_DEFS,
   scenarioDefs: CIVIC_SCENARIO_DEFS,
   tools: CIVIC_TOOLS,
