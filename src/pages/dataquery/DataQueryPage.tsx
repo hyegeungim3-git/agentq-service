@@ -120,7 +120,7 @@ function QueryResultView({ result, sourceLabel }: { result: QueryResult; sourceL
           ['소요', `${result.elapsedSeconds}초`],
         ]}
       >
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0}>
           <table className="w-full min-w-[30rem] text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
@@ -155,7 +155,7 @@ function QueryResultView({ result, sourceLabel }: { result: QueryResult; sourceL
         title="질의 해석 근거"
         notice="AI가 생성한 조회입니다. 수치를 인용하기 전 가정과 주의 사항을 확인하십시오."
       >
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0}>
           <table className="w-full min-w-[26rem] text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
@@ -202,7 +202,7 @@ function QueryResultView({ result, sourceLabel }: { result: QueryResult; sourceL
 
         <details className="mt-4">
           <summary className="cursor-pointer text-xs font-bold text-slate-600">생성된 SQL 보기</summary>
-          <pre className="mt-2 overflow-x-auto rounded-lg bg-slate-900 p-3 text-xs leading-relaxed text-slate-100">
+          <pre tabIndex={0} className="mt-2 overflow-x-auto rounded-lg bg-slate-900 p-3 text-xs leading-relaxed text-slate-100">
             {result.sql}
           </pre>
         </details>

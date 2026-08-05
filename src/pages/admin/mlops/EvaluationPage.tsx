@@ -71,7 +71,7 @@ export function EvaluationPage() {
                 <h2 id="ranked" className="text-sm font-black text-slate-900">
                   믿을 수 있는 결과 {ranked.length}건
                 </h2>
-                <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" tabIndex={0}>
                   <table className="w-full min-w-[44rem] text-left text-xs">
                     <thead className="bg-slate-50 text-[11px] text-slate-500">
                       <tr>

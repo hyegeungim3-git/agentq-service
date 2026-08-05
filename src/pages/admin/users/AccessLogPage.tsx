@@ -70,7 +70,7 @@ export function AccessLogPage() {
                   <span className="ml-1 font-bold text-rose-700">· 거부 {denied.length}건</span>
                 )}
               </p>
-              <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+              <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" tabIndex={0}>
                 <table className="w-full min-w-[48rem] text-left text-xs">
                   <thead className="bg-slate-50 text-[11px] text-slate-500">
                     <tr>

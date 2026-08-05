@@ -79,7 +79,7 @@ export function ApiPromptPage() {
             화면은 캡처되고 공유됩니다. 키를 잃어버렸으면 재발급하십시오 — 쓰던 키는 그때 죽습니다.
           </p>
 
-          <div className="mt-3 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+          <div className="mt-3 overflow-x-auto rounded-xl border border-slate-200 bg-white" tabIndex={0}>
             <table className="w-full min-w-[48rem] text-left text-xs">
               <thead className="bg-slate-50 text-[11px] text-slate-500">
                 <tr>

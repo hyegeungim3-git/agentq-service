@@ -336,7 +336,7 @@ function HitCard({
             {hit.drawing.attributes.filter((a) => a.matched).length}/{hit.drawing.attributes.length} 일치 (
             {Math.round(matchRatio(hit.drawing) * 100)}%)
           </p>
-          <div className="mt-2 overflow-x-auto">
+          <div className="mt-2 overflow-x-auto" tabIndex={0}>
             <table className="w-full min-w-[22rem] text-sm">
               <caption className="sr-only">{hit.drawing.code} 속성 대조</caption>
               <thead>

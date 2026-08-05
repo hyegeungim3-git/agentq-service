@@ -619,7 +619,7 @@ function TagResultView({
         <h2 id="map-reasons" className="text-sm font-black text-slate-900">
           미매칭 사유
         </h2>
-        <div className="mt-3 overflow-x-auto">
+        <div className="mt-3 overflow-x-auto" tabIndex={0}>
           <table className="w-full min-w-[28rem] text-sm">
             <caption className="sr-only">미매칭 사유</caption>
             <thead>

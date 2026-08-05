@@ -45,7 +45,7 @@ export function QuotaPage() {
                 {countedAt && <p className="text-xs text-slate-400">집계 기준 {countedAt}</p>}
               </div>
 
-              <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+              <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" tabIndex={0}>
                 <table className="w-full min-w-[42rem] text-left text-xs">
                   <thead className="bg-slate-50 text-[11px] text-slate-500">
                     <tr>

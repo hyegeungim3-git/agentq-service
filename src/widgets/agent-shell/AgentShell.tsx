@@ -185,8 +185,15 @@ export function AgentShell<R>({
               )}
             </div>
 
+            {/* 알림 자리는 **처음부터 있어야 한다.** 상태가 바뀔 때 비로소 만들어지는
+                라이브 리전은 낭독기가 첫 변화를 놓치는 경우가 있다.
+                자리는 늘 두고 내용만 채운다 */}
+            <p role="status" aria-live="polite" className="sr-only">
+              {busy ? runningMessage : ''}
+            </p>
+
             {busy && (
-              <div role="status" aria-live="polite" className="rounded-xl border border-slate-200 bg-white p-5">
+              <div className="rounded-xl border border-slate-200 bg-white p-5">
                 <p className="text-sm font-bold text-slate-700">{runningMessage}</p>
                 <div className="mt-3 space-y-2">
                   {[0, 1, 2].map((i) => (

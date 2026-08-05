@@ -75,7 +75,7 @@ export function ContentPage() {
           <p className="text-xs text-slate-600">
             {notices.data.length}건 · 사용자 포털 사이드바의 <b>공지사항</b>에 그대로 나옵니다
           </p>
-          <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+          <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" tabIndex={0}>
             <table className="w-full min-w-[38rem] text-left text-xs">
               <thead className="bg-slate-50 text-[11px] text-slate-500">
                 <tr>

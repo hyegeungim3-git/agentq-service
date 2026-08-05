@@ -248,7 +248,7 @@ export function MeetingPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
               )}
 
               <h3 className="mt-5 text-sm font-bold text-slate-800">조치 항목</h3>
-              <div className="mt-2 overflow-x-auto">
+              <div className="mt-2 overflow-x-auto" tabIndex={0}>
                 <table className="w-full min-w-[28rem] text-sm">
                   <thead>
                     <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
