@@ -65,7 +65,8 @@ export function KnowledgePage({
                 type="search"
                 value={k.query}
                 onChange={(e) => k.setQuery(e.target.value)}
-                placeholder="예) 브래킷 굽힘 금형"
+                /* 예시는 발주처가 준다 — 코어에 박아 두면 병원 화면에도 '금형'이 뜬다 */
+                placeholder={k.examples[0] ? `예) ${k.examples[0]}` : '찾을 내용을 입력하세요'}
                 className="mt-2 min-h-11 w-full rounded-lg border border-slate-300 px-3 text-sm focus-visible:outline-2 focus-visible:outline-slate-900"
               />
               <div className="mt-2 flex flex-wrap gap-2">

@@ -105,7 +105,7 @@ export function ChatPage({
         {c.messages.length === 0 && !c.pending && (
           <div className="rounded-xl border border-slate-200 bg-white p-5">
             <p className="text-sm text-slate-600">
-              사내 규정·작업표준을 근거로 답변합니다. 근거를 찾지 못하면 지어내지 않고 모른다고 답합니다.
+              사내 규정과 업무 문서를 근거로 답변합니다. 근거를 찾지 못하면 지어내지 않고 모른다고 답합니다.
             </p>
             <p className="mt-2 text-xs text-slate-500">아래 자주 묻는 질문에서 골라 물어볼 수 있습니다.</p>
           </div>

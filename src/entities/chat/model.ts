@@ -34,8 +34,9 @@ export type FaqItem = {
   question: string
 }
 
+/* 업종 말을 쓰지 않는다 — '작업표준'은 공장의 말이라 병원 화면에도 떴다 */
 const FAQ_CATEGORY_LABEL: Record<FaqCategory, string> = {
-  standard: '작업표준',
+  standard: '업무기준',
   labor: '복무규정',
   quality: '품질',
   security: '보안',

@@ -89,7 +89,7 @@ describe('ChatPage', () => {
       const faq = await screen.findByRole('region', { name: '자주 묻는 질문' })
       expect(faq).toHaveTextContent('출장 여비 기준 알려줘')
 
-      await userEvent.click(screen.getByRole('radio', { name: '작업표준' }))
+      await userEvent.click(screen.getByRole('radio', { name: '업무기준' }))
       expect(faq).toHaveTextContent('초품 검사는 언제 실시하나요?')
       expect(faq).not.toHaveTextContent('출장 여비 기준 알려줘')
     })

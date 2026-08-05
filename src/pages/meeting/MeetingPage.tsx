@@ -6,7 +6,7 @@ import {
   type MeetingInputs,
   type MeetingResult,
 } from '@entities/meeting/model'
-import { REFERENCE_CHOICES, useMeeting, type MeetingOptions } from '@features/meeting/useMeeting'
+import { useMeeting, type MeetingOptions } from '@features/meeting/useMeeting'
 import { AgentShell, ResultSection } from '@widgets/agent-shell/AgentShell'
 
 /* 부모 안에서 정의하지 않는다 — 매 렌더 새 타입이 되어 리마운트되고,
@@ -84,7 +84,7 @@ export function MeetingPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
               붙이면 결정 사항에 근거 조항을 답니다. 없으면 발언에만 의존했다고 표시합니다.
             </p>
             <ul className="space-y-2">
-              {REFERENCE_CHOICES.map((r) => (
+              {m.references.map((r) => (
                 <li key={r.id}>
                   <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand-soft">
                     <input

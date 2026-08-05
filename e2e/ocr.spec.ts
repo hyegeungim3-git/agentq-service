@@ -120,7 +120,7 @@ test.describe('챗봇 — FAQ·출처 원문', () => {
     const faq = page.getByRole('region', { name: '자주 묻는 질문' })
     await expect(faq).toContainText('출장 여비 기준 알려줘')
     // 라디오는 sr-only라 사용자와 같은 방식으로 라벨을 누른다
-    await page.locator('label').filter({ hasText: /^작업표준$/ }).click()
+    await page.locator('label').filter({ hasText: /^업무기준$/ }).click()
     await expect(faq).not.toContainText('출장 여비 기준 알려줘')
 
     await page.getByRole('button', { name: /초품 검사는 언제 실시하나요/ }).click()
