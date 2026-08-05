@@ -94,12 +94,12 @@ export function ApiPromptPage() {
               <tbody>
                 {apis.data.map((a) => (
                   <tr key={a.id} className="border-t border-slate-100">
-                    <td className="px-3 py-2">
+                    <th scope="row" className="px-3 py-2 text-left">
                       <span className="font-bold text-slate-800">{a.name}</span>
                       <span className="ml-1 text-slate-400">{a.version}</span>
                       {/* 베타·중지는 왜인지 말한다 */}
                       {a.note && <span className="mt-0.5 block text-[11px] text-amber-800">{a.note}</span>}
-                    </td>
+                    </th>
                     <td className="px-3 py-2 font-mono text-[11px] text-slate-600">{a.path}</td>
                     <td className="px-3 py-2 text-slate-600">{a.auth}</td>
                     <td className="px-3 py-2">

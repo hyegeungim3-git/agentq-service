@@ -266,7 +266,7 @@ export function MeetingPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
                   <tbody>
                     {res.actionItems.map((a) => (
                       <tr key={a.id} className="border-b border-slate-100 last:border-0">
-                        <td className="py-2 pr-3 text-slate-700">{a.task}</td>
+                        <th scope="row" className="py-2 pr-3 text-slate-700 text-left">{a.task}</th>
                         {/* 회의에서 안 정해진 것을 채우지 않는다 — 비었으면 비었다고 쓴다 */}
                         <td className={`py-2 pr-3 ${a.ownerId ? 'text-slate-700' : 'font-bold text-amber-700'}`}>
                           {speakerName(res.speakers, a.ownerId)}

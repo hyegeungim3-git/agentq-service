@@ -233,7 +233,7 @@ export function OcrPage({ onBack, apiOptions }: { onBack?: () => void; apiOption
                     <tbody>
                       {res.table.map((r) => (
                         <tr key={r.label} className="border-b border-slate-100 last:border-0">
-                          <td className="py-2 pr-3 text-slate-600">{r.label}</td>
+                          <th scope="row" className="py-2 pr-3 text-slate-600 text-left">{r.label}</th>
                           <td className="py-2 text-slate-800">{r.value}</td>
                         </tr>
                       ))}

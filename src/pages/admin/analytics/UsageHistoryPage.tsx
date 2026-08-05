@@ -117,7 +117,7 @@ export function UsageHistoryPage() {
                   <tbody>
                     {[...reported, ...state.data.filter((e) => !e.reported)].map((e) => (
                       <tr key={e.id} className="border-t border-slate-100">
-                        <td className="px-3 py-2 tabular-nums text-slate-600">{e.at}</td>
+                        <th scope="row" className="px-3 py-2 tabular-nums text-slate-600 text-left">{e.at}</th>
                         <td className="px-3 py-2">
                           <span className="font-bold text-slate-800">{e.userName}</span>
                           <span className="ml-1 text-slate-500">{e.dept}</span>

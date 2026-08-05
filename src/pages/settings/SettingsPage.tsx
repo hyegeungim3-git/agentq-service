@@ -18,7 +18,10 @@ export function SettingsPage({ store }: { store: PrefsStore }) {
   const lang = prefs.uiLang
 
   return (
-    <main className="mx-auto w-full max-w-2xl p-4 sm:p-6">
+    /* 이 화면만은 전부 화면 틀 문자열이다 — 셸이 본문에 걸어 둔 `lang="ko"`를 여기서
+       되돌린다. 안 되돌리면 English를 골라 놓고도 영어 문장이 한국어로 표시돼
+       낭독기가 한국어 음성으로 영어를 읽는다 */
+    <main lang={lang} className="mx-auto w-full max-w-2xl p-4 sm:p-6">
       <h1 className="text-lg font-black text-slate-900">{t(lang, 'settings.title')}</h1>
       {/* 계정 설정이 아니라는 사실을 항목보다 먼저 */}
       <p className="mt-1 text-sm text-slate-600">{t(lang, 'settings.lead')}</p>

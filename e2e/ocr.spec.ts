@@ -189,7 +189,7 @@ test.describe('복합 업무 오케스트레이션', () => {
     await page.getByRole('button', { name: '릴레이 실행' }).click()
 
     await expect(page.getByText(/HBP-보전-2026-102 초안 작성/)).toBeVisible({ timeout: 30_000 })
-    await expect(page.getByText(/사람이 확인해야 하는 지점이 \d+건 남았습니다/)).toBeVisible()
+    await expect(page.getByText(/사람이 확인해야 하는 지점이 \d+건 남았습니다/).last()).toBeVisible()
     await expect(page.getByText(/인식 신뢰도가 낮아 표준화하지 못함/)).toBeVisible()
   })
 })

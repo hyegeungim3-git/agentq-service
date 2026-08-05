@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import {
   formatSignalTime,
   signalSeverityLabel,
@@ -47,13 +47,18 @@ export function SignalBell({
     }
   }, [open])
 
+  const summaryId = useId()
+
   return (
     <div ref={boxRef} className="relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        aria-label={`업무 알림 ${signals.length}건${actionCount > 0 ? `, 처리 필요 ${actionCount}건` : ''}`}
+        /* 이름은 **보이는 글자('알림')로 시작한다** — 음성 조작 사용자가 화면에 보이는
+           대로 '알림 클릭'이라고 말할 수 있어야 한다(WCAG 2.5.3). 건수는 팝업이 다시
+           말하므로 여기서는 처리할 것만 덧붙인다 */
+        aria-label={actionCount > 0 ? `알림, 처리 필요 ${actionCount}건` : '알림'}
         className="min-h-11 rounded-lg border border-slate-200 px-3 text-sm font-bold text-slate-700 hover:bg-slate-50"
       >
         알림
@@ -64,13 +69,17 @@ export function SignalBell({
         )}
       </button>
 
+      {/* 영역 이름을 따로 짓지 않는다. 지어 주면 버튼 이름 → 영역 이름 → 첫 줄까지
+          같은 문장을 세 번 듣게 된다. 첫 줄이 곧 이름 노릇을 한다 */}
       {open && (
         <div
           role="region"
-          aria-label="업무 알림"
+          /* 신호 제목·본문·출처가 전부 그 조직의 한국어 원문이다 */
+          lang="ko"
+          aria-labelledby={summaryId}
           className="absolute right-0 z-50 mt-1 w-[22rem] max-w-[calc(100vw-2rem)] rounded-xl border border-slate-200 bg-white p-3 shadow-lg"
         >
-          <p className="px-1 text-xs font-bold text-slate-600">
+          <p id={summaryId} className="px-1 text-xs font-bold text-slate-600">
             업무 알림 {signals.length}건 · 처리 필요 {actionCount}건
           </p>
           {signals.length === 0 ? (

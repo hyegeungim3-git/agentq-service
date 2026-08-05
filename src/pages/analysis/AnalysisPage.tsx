@@ -129,7 +129,7 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
                     {res.kind === 'trend'
                       ? res.trend.map((p) => (
                           <tr key={p.period} className="border-b border-slate-100 last:border-0">
-                            <td className="py-2 pr-3 text-slate-600">{p.period}</td>
+                            <th scope="row" className="py-2 pr-3 text-slate-600 text-left">{p.period}</th>
                             <td
                               className={`py-2 pr-3 tabular-nums ${
                                 p.value > p.limit ? 'font-bold text-amber-700' : 'text-slate-700'
@@ -147,7 +147,7 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
                         ))
                       : res.distribution.map((d) => (
                           <tr key={d.label} className="border-b border-slate-100 last:border-0">
-                            <td className="py-2 pr-3 text-slate-600">{d.label}</td>
+                            <th scope="row" className="py-2 pr-3 text-slate-600 text-left">{d.label}</th>
                             <td className="py-2 tabular-nums text-slate-700">{d.count}건</td>
                           </tr>
                         ))}

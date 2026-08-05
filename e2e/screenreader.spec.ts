@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { openTab } from './shell'
+import { enterDomain, openSidebar, openTab } from './shell'
 
 /**
  * 화면 낭독기가 **실제로 받는 것**을 본다.
@@ -106,4 +106,263 @@ test('결과가 나오면 낭독기에 알린다 @a11y', async ({ page }) => {
 
   /* 실행 전에도 라이브 리전 자리는 있어야 한다 — 없으면 늦게 만들어져 첫 알림을 놓친다 */
   expect(liveBefore).toBeGreaterThan(0)
+})
+
+/**
+ * 화면이 바뀌면 **낭독기가 알 수 있는가.**
+ *
+ * 라우터가 없어 주소가 안 바뀌므로, 창 제목·라이브 리전·포커스 셋 중
+ * 하나라도 없으면 낭독기 사용자는 화면이 바뀐 것을 모른다.
+ */
+test('화면이 바뀌면 제목·알림·포커스가 함께 움직인다 @a11y', async ({ page }) => {
+  await page.goto('./')
+  await expect(page.getByRole('button', { name: /새빛대학교병원/ })).toBeVisible()
+  const portalTitle = await page.title()
+
+  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await expect(page.getByRole('textbox').first()).toBeVisible()
+
+  /* ① 창 제목이 바뀌고 어느 발주처인지 들어 있다 */
+  const chatTitle = await page.title()
+  expect(chatTitle).not.toBe(portalTitle)
+  expect(chatTitle).toContain('새빛대학교병원')
+
+  /* ② 바뀌었다고 한 번 말한다 */
+  await expect(page.locator('#screen-change-announcer')).toHaveText(/화면입니다/)
+
+  /* ③ 포커스가 새 화면의 제목으로 간다 — body에 떨어지면 가상 커서가 맨 위로 리셋된다 */
+  const focused = await page.evaluate(() => {
+    const el = document.activeElement
+    return { tag: el?.tagName ?? '', text: (el?.textContent ?? '').trim().slice(0, 20) }
+  })
+  expect(['H1', 'MAIN'], '포커스가 body에 떨어지면 가상 커서가 문서 맨 위로 리셋된다').toContain(focused.tag)
+
+  /* 발주처가 다르면 제목도 다르다 — 소리로 구분되는지가 핵심이다 */
+  await page.goto('./')
+  await page.getByRole('button', { name: /한빛정밀/ }).click()
+  await expect(page.getByRole('textbox').first()).toBeVisible()
+  expect(await page.title()).toContain('한빛정밀')
+})
+
+/**
+ * 결과가 **도착했다는 것**을 말하는가.
+ *
+ * 전에는 '작성 중' 리전이 답이 오는 순간 통째로 사라지고 목록에 항목만
+ * 추가돼, 낭독기에는 완전한 침묵이었다. 화면에서는 말풍선이 눈에 띈다.
+ */
+test('챗봇 답변이 도착한 것을 말한다 @a11y', async ({ page }) => {
+  await page.goto('./')
+  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  const status = page.locator('p[role="status"]').first()
+
+  /* 자리는 물어보기 전에도 있어야 한다 — 그때 만들면 첫 변화를 놓친다 */
+  await expect(status).toHaveCount(1)
+
+  await page.getByRole('button', { name: /사전점검에서 무엇을 보나요/ }).click()
+  await expect(status).toHaveText(/답변이 도착했습니다/, { timeout: 15_000 })
+  /* 근거가 있는 답인지 없는 답인지가 소리로 갈려야 한다 */
+  await expect(status).toHaveText(/근거 \d+건/)
+})
+
+/* 릴레이가 끝났다는 것과 남은 확인 지점을 말하는가 */
+test('릴레이가 끝난 것을 말한다 @a11y', async ({ page }) => {
+  await page.goto('./')
+  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await openTab(page, /^에이전트/)
+  await page.getByRole('button', { name: /청구 보류 건 회신 처리/ }).click()
+  await page.getByRole('button', { name: '릴레이 실행' }).click()
+
+  await expect(page.locator('p[role="status"]').first()).toHaveText(
+    /릴레이가 끝났습니다.*확인해야 하는 지점이 \d+건/,
+    { timeout: 30_000 },
+  )
+})
+
+/**
+ * 관리 기준을 **넘는 순간**을 말하는가.
+ *
+ * 값 자체는 `aria-live="off"`가 맞다 — 1초마다 숫자를 읽으면 아무것도 못 한다.
+ * 그 탓에 넘는 순간에도 끝까지 조용했다: 화면은 빨개지고 경고가 나타나는데
+ * 소리로는 아무 일도 없었다. 문장 자체를 `role="alert"`로 삼아, 상태가
+ * 뒤집힐 때만 말하게 했다.
+ */
+test('라이브 지표가 관리 기준을 넘는 순간을 말한다 @a11y', async ({ page }) => {
+  await enterDomain(page)
+  const alert = page.getByRole('alert').filter({ hasText: /관리 기준/ })
+  await expect(alert).toHaveText(/관리 기준 이내입니다/)
+
+  /* 예시 구간을 빨리 감는다 — 실시간으로 기다리면 검사가 몇 분이 된다.
+     라디오 자체는 sr-only라 보이는 라벨을 누른다: 사람이 하는 것과 같은 조작이다 */
+  await page.locator('label').filter({ hasText: '60×' }).click()
+  await expect(page.getByRole('radio', { name: '60×' })).toBeChecked()
+  await expect(alert).toHaveText(/관리 기준 .*를 넘었습니다/, { timeout: 30_000 })
+
+  /* 넘은 뒤에 무엇을 해야 하는지까지 한 문장에 있어야 한다 —
+     '넘었습니다'만 들리면 소리로 쓰는 사람은 다음 행동을 알 수 없다 */
+  await expect(alert).toHaveText(/보전 진단|정지|확인/)
+
+  /* 넘은 뒤 매초 다시 말하면 못 쓴다. 문장이 그대로 머무는지 본다 */
+  const first = await alert.textContent()
+  await page.waitForTimeout(3000)
+  expect(await alert.textContent()).toBe(first)
+})
+
+/**
+ * **본문에 몇 번 만에 닿는가.**
+ *
+ * axe의 `bypass` 규칙은 skip link·랜드마크·제목 중 하나라도 있으면 통과다 —
+ * 이 앱에는 `<main>`이 있으므로 건너뛰기가 0건이어도 초록불이었다. 규칙 엔진이
+ * '있다'고 말한 게 아니라 '판정을 포기했다'는 뜻이다. 그래서 여기서는 규칙이
+ * 아니라 **횟수**를 센다.
+ */
+for (const where of ['portal', 'admin'] as const) {
+  test(`첫 Tab에서 본문으로 건너뛸 수 있다 — ${where} @a11y`, async ({ page }) => {
+    await page.goto('./')
+    if (where === 'portal') {
+      await page.getByRole('button', { name: /한빛정밀/ }).click()
+      await expect(page.getByRole('textbox').first()).toBeVisible()
+    } else {
+      await page.getByRole('button', { name: /관리자 시스템/ }).click()
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    }
+
+    /* 화면 전환 훅이 이미 포커스를 본문으로 옮겨 놓았다. 건너뛰기가 필요한 사람은
+       **문서 맨 위에서 시작하는 사람**이므로 그 상태로 되돌린다.
+       blur()만으로는 안 된다 — 크로미움은 '다음 Tab이 시작할 자리'를 blur 뒤에도
+       그대로 들고 있어서 방금 있던 곳부터 이어 간다. body에 포커스를 줘야 자리가 옮겨진다 */
+    await page.evaluate(() => {
+      document.body.setAttribute('tabindex', '-1')
+      document.body.focus()
+      document.body.removeAttribute('tabindex')
+    })
+
+    /* 첫 정지점이어야 한다 — 사이드바 뒤에 있으면 40번을 눌러야 닿는다 */
+    await page.keyboard.press('Tab')
+    const first = page.locator(':focus')
+    await expect(first).toHaveText(/본문으로 건너뛰기/)
+
+    /* 보이지 않는 채로 눌리면 키보드 사용자는 자기가 어디 있는지 모른다 */
+    await expect(first).toBeVisible()
+
+    await page.keyboard.press('Enter')
+    const focused = await page.evaluate(() => document.activeElement?.tagName ?? '')
+    expect(focused).toBe('MAIN')
+
+    /* 눌렀는데 다음 Tab이 사이드바로 되돌아가면 건너뛴 것이 아니다 */
+    await page.keyboard.press('Tab')
+    const inMain = await page.evaluate(
+      () => !!document.activeElement?.closest('main'),
+    )
+    expect(inMain).toBe(true)
+  })
+}
+
+/**
+ * 화면 틀을 English로 바꾸면 **한국어 콘텐츠에 표시가 붙는가.**
+ *
+ * 이 앱은 화면 틀만 번역하고 업무 콘텐츠는 원문 그대로 둔다(strings.ts의 결정).
+ * 결정은 옳은데 표시를 안 하면 한국어가 `lang="en"` 아래 놓여, 영어 음성 엔진이
+ * 뭉갠 발음을 내거나 통째로 건너뛴다(WCAG 3.1.2).
+ *
+ * ⚠️ axe는 이걸 못 잡는다 — `lang="en"`은 문법적으로 완벽히 유효한 값이고,
+ * 글자가 실제로 무슨 언어인지는 규칙 엔진이 판단하지 않는다. 그래서 여기서는
+ * **한글이 들어 있는 요소마다 가장 가까운 lang**을 직접 본다.
+ */
+test('영어 화면 틀 아래 한국어 콘텐츠에 lang 표시가 있다 @a11y', async ({ page }) => {
+  await enterDomain(page)
+  await openTab(page, /설정|Settings/)
+  await page.locator('label').filter({ hasText: 'English' }).click()
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+
+  /* 화면 틀이 실제로 영어로 바뀌었는지 먼저 확인한다 — 안 바뀌었으면 이 검사는 무의미하다.
+     사이드바 이름도 함께 바뀌므로 헬퍼에 영어 이름을 넘긴다 */
+  const nav = await openSidebar(page, { nav: 'Work area', open: 'Open sidebar' })
+  await nav.getByRole('button', { name: 'Chat', exact: true }).click()
+
+  const bad = await page.evaluate(() => {
+    const hangul = /[가-힣]/
+    const out: string[] = []
+    for (const el of Array.from(document.querySelectorAll('body *'))) {
+      /* 자기 자신이 직접 들고 있는 글자만 본다 — 부모까지 세면 전부 걸린다 */
+      const own = Array.from(el.childNodes)
+        .filter((n) => n.nodeType === Node.TEXT_NODE)
+        .map((n) => n.textContent ?? '')
+        .join('')
+      if (!hangul.test(own)) continue
+      const near = el.closest('[lang]')?.getAttribute('lang') ?? ''
+      if (near !== 'ko') out.push(`${near || '(없음)'} · ${own.trim().slice(0, 24)}`)
+    }
+    return out
+  })
+
+  expect(bad, '한국어인데 영어로 표시된 자리 — 영어 음성이 뭉개 읽는다').toEqual([])
+})
+
+/**
+ * 좁은 화면에서 덮어 여는 패널이 **진짜 대화상자인가.**
+ *
+ * ⚠️ axe의 대화상자 규칙은 `role="dialog"`가 **있을 때만** 돈다 — 역할을 안 붙이면
+ * 검사 대상 자체가 아니다. 틀린 dialog는 잡히지만 dialog가 아닌 dialog는 안 잡힌다.
+ * 그래서 여기서는 규칙이 아니라 **동작**을 본다.
+ */
+test.describe('덮어 여는 패널은 대화상자다 @a11y', () => {
+  test.use({ viewport: { width: 375, height: 812 } })
+
+  type Page = import('@playwright/test').Page
+
+  /* 여는 버튼을 돌려준다 — 닫은 뒤 **그 버튼으로** 포커스가 돌아왔는지 봐야 한다.
+     아이콘 버튼이라 글자가 없으므로 '무언가에 포커스가 있다'로는 판정할 수 없다 */
+  const CASES: [string, (page: Page) => Promise<ReturnType<Page['getByRole']>>][] = [
+    [
+      '사이드바',
+      async (page) => {
+        await enterDomain(page)
+        const opener = page.getByRole('button', { name: '사이드바 열기' })
+        await opener.click()
+        return opener
+      },
+    ],
+    [
+      '답변 근거',
+      async (page) => {
+        await enterDomain(page)
+        const opener = page.getByRole('button', { name: '답변 근거', exact: true })
+        await opener.click()
+        return opener
+      },
+    ],
+  ]
+
+  for (const [what, open] of CASES) {
+    test(`${what} @a11y`, async ({ page }) => {
+      const opener = await open(page)
+
+      const dialog = page.getByRole('dialog')
+      await expect(dialog).toBeVisible()
+
+      /* ① 포커스가 패널 안으로 들어간다 — 밖에 남으면 낭독기는 뒤 화면을 읽는다 */
+      expect(
+        await page.evaluate(() => !!document.activeElement?.closest('[role=dialog]')),
+        '포커스가 밖에 남으면 스와이프가 뒤 화면부터 읽는다',
+      ).toBe(true)
+
+      /* ② 뒤 화면은 없는 것으로 친다 */
+      expect(
+        await page.evaluate(() => document.querySelectorAll('[inert]').length),
+        '뒤 화면이 살아 있으면 화면에 보이지도 않는 것이 읽힌다',
+      ).toBeGreaterThan(0)
+
+      /* ③ Tab을 돌려도 밖으로 안 나간다 */
+      for (let i = 0; i < 25; i += 1) await page.keyboard.press('Tab')
+      expect(
+        await page.evaluate(() => !!document.activeElement?.closest('[role=dialog]')),
+        'Tab이 패널 밖으로 새면 뒤 화면 버튼을 누르게 된다',
+      ).toBe(true)
+
+      /* ④ Esc로 닫히고 ⑤ 연 사람에게 포커스가 돌아온다 */
+      await page.keyboard.press('Escape')
+      await expect(dialog).toHaveCount(0)
+      await expect(opener, '닫은 뒤 포커스가 사라지면 이어 읽기가 문서 맨 위로 리셋된다').toBeFocused()
+    })
+  }
 })

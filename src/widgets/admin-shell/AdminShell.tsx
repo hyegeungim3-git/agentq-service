@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 import { Menu, User } from 'lucide-react'
 import {
   ADMIN_SECTIONS,
@@ -10,6 +10,8 @@ import {
   readyCount,
 } from '@entities/admin/nav'
 import { BrandLock } from '@shared/ui/Brand'
+import { SkipToMain } from '@shared/ui/SkipLink'
+import { useModalOverlay } from '@features/overlay/useModalOverlay'
 import { FALLBACK_ICON, MENU_ICONS, menuIcon } from './menuIcons'
 
 /**
@@ -67,7 +69,9 @@ export function AdminShell({
   children,
 }: AdminShellProps) {
   const [open, setOpen] = useState(false)
-  const close = () => setOpen(false)
+  const close = useCallback(() => setOpen(false), [])
+  /* 좁은 화면에서 메뉴는 본문을 덮는다 — 덮으면 대화상자여야 한다 */
+  const panelRef = useModalOverlay(open, close)
 
   const nav = (
     <nav
@@ -192,7 +196,13 @@ export function AdminShell({
   )
 
   return (
-    <div className="flex min-h-dvh bg-slate-50">
+    /* 관리자는 화면 틀 언어 전환 대상이 아니다 — 메뉴 55개와 본문이 전부 한국어다.
+       그런데 `<html lang>`은 사용자가 고른 화면 틀 언어를 따라가므로, English로 두고
+       관리자로 들어오면 한국어가 통째로 영어 아래 놓인다. 여기서 한 번에 표시한다 */
+    <div lang="ko" className="flex min-h-dvh bg-slate-50">
+      {/* 첫 정지점 — 관리자는 메뉴 버튼 55개를 지나야 본문에 닿는다 */}
+      <SkipToMain label="본문으로 건너뛰기" />
+
       {open && (
         <button
           type="button"
@@ -204,12 +214,17 @@ export function AdminShell({
 
       {/* 사이드바는 한 번만 그린다 — 두 번 그리면 같은 id가 DOM에 둘 생긴다 */}
       <div
+        ref={panelRef}
+        /* 덮고 있을 때만 대화상자다 — 넓은 화면에서는 나란히 놓인 탐색일 뿐이다 */
+        {...(open ? { role: 'dialog' as const, 'aria-modal': true, 'aria-label': '관리 메뉴' } : {})}
+        tabIndex={open ? -1 : undefined}
         className={`${open ? 'fixed inset-y-0 left-0 z-50' : 'hidden'} lg:sticky lg:top-0 lg:z-auto lg:block lg:h-dvh`}
       >
         {nav}
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      {/* 열려 있는 동안 뒤 화면은 없는 것으로 친다 */}
+      <div inert={open || undefined} className="flex min-w-0 flex-1 flex-col">
         <div className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-slate-200 bg-white px-4">
           <button
             type="button"

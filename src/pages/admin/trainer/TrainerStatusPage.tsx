@@ -158,7 +158,7 @@ export function TrainerStatusPage() {
                     <tbody>
                       {r.jobs.map((j) => (
                         <tr key={j.id} className="border-t border-slate-100">
-                          <td className="px-3 py-2 font-mono text-[11px] font-bold text-slate-800">{j.id}</td>
+                          <th scope="row" className="px-3 py-2 font-mono text-[11px] font-bold text-slate-800 text-left">{j.id}</th>
                           <td className="px-3 py-2 text-slate-700">{j.model}</td>
                           <td className="px-3 py-2 text-slate-600">{j.kind}</td>
                           <td className="px-3 py-2 tabular-nums text-slate-600">{j.startedAt}</td>

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 import {
   Bell,
   Bot,
@@ -13,6 +13,8 @@ import {
 import type { Domain } from '@entities/domain/model'
 import { sectorLabel } from '@entities/domain/model'
 import { BrandLock } from '@shared/ui/Brand'
+import { SkipToMain } from '@shared/ui/SkipLink'
+import { useModalOverlay } from '@features/overlay/useModalOverlay'
 import { brandVars } from '@shared/lib/brand'
 import type { Workspace } from '@entities/workspace/model'
 import type { Conversation } from '@features/conversations/useConversations'
@@ -90,8 +92,10 @@ export function AppShell({
   children,
 }: ShellProps) {
   const [open, setOpen] = useState(false)
-  const close = () => setOpen(false)
+  const close = useCallback(() => setOpen(false), [])
   const current = workspaces.find((w) => w.id === workspaceId)
+  /* 좁은 화면에서 사이드바는 본문을 덮는다 — 덮으면 대화상자여야 한다 */
+  const panelRef = useModalOverlay(open, close)
 
   const sidebar = (
     <nav
@@ -111,7 +115,10 @@ export function AppShell({
         <BrandLock context={sectorLabel(domain.sector)} />
       </button>
 
-      <div className="border-b border-slate-200 px-4 py-3">
+      {/* 화면 틀을 English로 바꿔도 **업무 콘텐츠는 원문 그대로** 둔다(strings.ts의 결정).
+          옳은 결정인데 표시를 안 하면 영어 음성 엔진이 한국어를 읽어 뭉갠다 —
+          원문 그대로 두는 자리마다 lang을 붙인다(WCAG 3.1.2 Language of Parts) */}
+      <div lang="ko" className="border-b border-slate-200 px-4 py-3">
         <p className="font-black text-slate-900">{domain.orgName}</p>
         <p className="text-xs text-slate-500">{domain.tagline}</p>
       </div>
@@ -121,8 +128,10 @@ export function AppShell({
         <label htmlFor="ws" className="block text-[11px] font-bold text-slate-500">
           {t(uiLang, 'nav.workspace')}
         </label>
+        {/* 라벨은 화면 틀이라 번역되지만 **항목 이름은 그 조직의 부서·TF 이름**이다 */}
         <select
           id="ws"
+          lang="ko"
           value={workspaceId}
           onChange={(e) => onWorkspace(e.target.value)}
           className="mt-1 min-h-11 w-full rounded-lg border border-slate-300 px-2 text-sm"
@@ -133,7 +142,11 @@ export function AppShell({
             </option>
           ))}
         </select>
-        {current && <p className="mt-1 text-[11px] text-slate-500">{current.purpose}</p>}
+        {current && (
+          <p lang="ko" className="mt-1 text-[11px] text-slate-500">
+            {current.purpose}
+          </p>
+        )}
       </div>
 
       {/* 업무 탭 — 세로 목록이 아니라 한 덩어리 스위처다. 셋이 나란히 있어야
@@ -198,7 +211,8 @@ export function AppShell({
         {conversations.length === 0 ? (
           <p className="px-3 py-2 text-xs text-slate-400">{t(uiLang, 'nav.empty')}</p>
         ) : (
-          <ul className="mt-1 min-h-0 flex-1 overflow-y-auto">
+          /* 대화 제목은 사용자가 물어본 한국어 문장 그대로다 */
+          <ul lang="ko" className="mt-1 min-h-0 flex-1 overflow-y-auto">
             {conversations.map((c) => (
               <li key={c.id} className="flex items-center gap-1">
                 <button
@@ -270,7 +284,8 @@ export function AppShell({
           <span className="bg-brand-soft border-brand-soft flex size-9 shrink-0 items-center justify-center rounded-full border">
             <User className="text-brand size-4" aria-hidden="true" />
           </span>
-          <span className="min-w-0">
+          {/* 이름·직급·부서는 그 조직의 한국어 원문이다 */}
+          <span lang="ko" className="min-w-0">
             <span className="block truncate text-sm font-bold text-slate-800">
               {domain.user.name} {domain.user.title}
             </span>
@@ -290,6 +305,9 @@ export function AppShell({
 
   return (
     <div className="flex min-h-dvh bg-slate-50" style={brandVars(domain.brandColor)}>
+      {/* 첫 정지점 — 여기가 첫 번째가 아니면 있으나 마나다 */}
+      <SkipToMain label={t(uiLang, 'nav.skip')} />
+
       {/* 모바일에서 열렸을 때만 깔리는 막 */}
       {open && (
         <button
@@ -307,12 +325,21 @@ export function AppShell({
       {/* 데스크톱에서는 붙어 있는다 — 본문을 내려도 로고·탭이 따라 사라지면
           '지금 어디에 있는지'가 사라진다 */}
       <div
+        ref={panelRef}
+        /* 덮고 있을 때만 대화상자다. 넓은 화면에서는 나란히 놓인 탐색일 뿐이라
+           역할을 붙이면 '대화상자'라고 잘못 읽힌다 */
+        {...(open
+          ? { role: 'dialog' as const, 'aria-modal': true, 'aria-label': t(uiLang, 'nav.workArea') }
+          : {})}
+        tabIndex={open ? -1 : undefined}
         className={`${open ? 'fixed inset-y-0 left-0 z-50' : 'hidden'} lg:sticky lg:top-0 lg:z-auto lg:block lg:h-dvh`}
       >
         {sidebar}
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      {/* 열려 있는 동안 뒤 화면은 **없는 것으로 친다.** 안 끄면 낭독기 스와이프가
+          화면에 보이지도 않는 FAQ 목록을 읽는다 */}
+      <div inert={open || undefined} className="flex min-w-0 flex-1 flex-col">
         {/* 상단 바는 모든 폭에서 보인다 — 알림은 좁은 화면에서만 필요한 것이 아니다 */}
         {/* 높이를 h-14로 못박는다 — 아래 화면이 이 높이만큼 비켜서 붙기 때문이다
             (대화 화면의 근거 패널이 `top-14`로 이 값을 쓴다) */}
@@ -337,11 +364,18 @@ export function AppShell({
           </span>
           <span className="text-sm font-bold text-slate-800">{shellTabLabel(tab, uiLang)}</span>
           {/* 나가는 길은 사이드바 아래 한 곳뿐이다 — 같은 동작을 두 곳에 두지 않는다 */}
-          <div className="ml-auto">
+          {/* 알림은 아직 화면 틀 번역 대상이 아니다 — 버튼 이름도 신호 내용도 한국어다.
+              번역하는 척하지 말고 한국어라고 표시한다 */}
+          <div lang="ko" className="ml-auto">
             <SignalBell signals={signals} onOpen={onOpenSignal} />
           </div>
         </div>
-        {children}
+        {/* 본문은 통째로 업무 콘텐츠다 — 챗봇 답변·문서명·규정 조항·에이전트 결과가
+            전부 한국어 원문이므로 여기서 한 번에 표시한다. 화면 틀이 영어인 화면
+            (환경설정)은 자기 쪽에서 다시 덮어쓴다 — 가까운 lang이 이긴다 */}
+        <div lang="ko" className="contents">
+          {children}
+        </div>
       </div>
     </div>
   )

@@ -152,9 +152,9 @@ export function AgentOpsPage() {
                       const gaps = gapAreas(o.areaIds)
                       return (
                         <tr key={o.agentId} className="border-t border-slate-100">
-                          <td className="px-3 py-2 font-bold text-slate-800">
+                          <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">
                             {def?.name ?? o.agentId}
-                          </td>
+                          </th>
                           <td className="px-3 py-2 text-slate-600">{o.modelName}</td>
                           <td className="px-3 py-2 text-slate-600">
                             {o.areaIds.length === 0 ? (

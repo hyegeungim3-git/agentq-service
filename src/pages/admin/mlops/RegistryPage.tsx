@@ -86,7 +86,7 @@ export function RegistryPage() {
                         key={m.id}
                         className={`border-t border-slate-100 ${lost.includes(m) ? 'bg-rose-50' : ''}`}
                       >
-                        <td className="px-3 py-2 font-bold text-slate-800">{m.name}</td>
+                        <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{m.name}</th>
                         <td className="px-3 py-2 font-mono text-[11px] text-slate-700">{m.version}</td>
                         <td className="px-3 py-2">
                           <span

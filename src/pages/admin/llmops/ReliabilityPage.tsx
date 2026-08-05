@@ -128,7 +128,7 @@ export function ReliabilityPage() {
                     <tbody>
                       {pipelines.data.map((p) => (
                         <tr key={p.id} className="border-t border-slate-100">
-                          <td className="px-3 py-2 font-bold text-slate-800">{p.agentLabel}</td>
+                          <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{p.agentLabel}</th>
                           <td className="px-3 py-2 text-slate-600">{p.model}</td>
                           <td className="px-3 py-2 tabular-nums text-slate-600">{p.topK}</td>
                           <td className="px-3 py-2 tabular-nums text-slate-600">{p.threshold}</td>

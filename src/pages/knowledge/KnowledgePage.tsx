@@ -350,7 +350,7 @@ function HitCard({
               <tbody>
                 {hit.drawing.attributes.map((a) => (
                   <tr key={a.label} className="border-b border-slate-100 last:border-0">
-                    <td className="py-2 pr-3 text-slate-600">{a.label}</td>
+                    <th scope="row" className="py-2 pr-3 text-slate-600 text-left">{a.label}</th>
                     <td className="py-2 pr-3 text-slate-700">{a.queryValue}</td>
                     <td className="py-2 pr-3 text-slate-700">{a.candidateValue}</td>
                     <td className={`py-2 font-bold ${a.matched ? 'text-emerald-700' : 'text-rose-700'}`}>

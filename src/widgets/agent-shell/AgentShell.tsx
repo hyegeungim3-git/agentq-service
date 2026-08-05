@@ -78,6 +78,7 @@ export function AgentShell<R>({
 }: AgentShellProps<R>) {
   const busy = phase.kind === 'running'
   const Icon = (agentId && AGENT_ICONS[agentId]) ?? FALLBACK_AGENT_ICON
+  const docSectionId = useId()
 
   return (
     <main className="min-h-dvh bg-slate-50 px-4 py-8">
@@ -87,7 +88,7 @@ export function AgentShell<R>({
             <button
               type="button"
               onClick={onBack}
-              aria-label="돌아가기"
+              aria-label="에이전트 허브로 돌아가기"
               className="flex size-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-900"
             >
               <ChevronLeft className="size-5" aria-hidden="true" />
@@ -121,35 +122,47 @@ export function AgentShell<R>({
 
         {phase.kind !== 'loadingDocs' && phase.kind !== 'docsError' && (
           <div className="space-y-5">
-            <section className="rounded-xl border border-slate-200 bg-white p-5">
-              <h2 className="mb-3 text-sm font-black text-slate-900">1 · {docSectionLabel}</h2>
+            <section
+              /* 제목을 영역 이름으로 잇는다. 안 이으면 낭독기가 '무엇을 고르는
+                 목록인지' 말하지 않고 파일 이름만 읽는다 */
+              aria-labelledby={docSectionId}
+              className="rounded-xl border border-slate-200 bg-white p-5"
+            >
+              <h2 id={docSectionId} className="mb-3 text-sm font-black text-slate-900">
+                1 · {docSectionLabel}
+              </h2>
               {docs.length === 0 ? (
                 <p className="text-sm text-slate-600">{emptyDocsLabel}</p>
               ) : (
-                <ul className="space-y-2">
-                  {docs.map((d) => (
-                    <li key={d.id}>
-                      <label className="has-checked:border-brand has-checked:bg-brand-soft flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50">
-                        <input
-                          type="radio"
-                          name="document"
-                          value={d.id}
-                          checked={documentId === d.id}
-                          onChange={() => onSelectDocument(d.id)}
-                          className="size-4"
-                        />
-                        <FileText className="size-4 shrink-0 text-slate-400" aria-hidden="true" />
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-sm font-bold text-slate-800">{d.name}</span>
-                          <span className="block text-xs text-slate-500">
-                            {d.detail ? `${d.detail} · ` : ''}
-                            {formatSize(d.sizeBytes)}
+                /* 라디오 묶음에 이름을 준다 — 개별 라디오만 읽히면 '4개 중 1'이라고만
+                   들리고 무슨 목록인지 알 수 없다. `role`은 감싸는 div에 준다.
+                   `<ul>`에 주면 목록 역할이 덮여 `<li>`가 고아가 된다(axe `listitem`이 잡았다) */
+                <div role="radiogroup" aria-labelledby={docSectionId}>
+                  <ul className="space-y-2">
+                    {docs.map((d) => (
+                      <li key={d.id}>
+                        <label className="has-checked:border-brand has-checked:bg-brand-soft flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50">
+                          <input
+                            type="radio"
+                            name="document"
+                            value={d.id}
+                            checked={documentId === d.id}
+                            onChange={() => onSelectDocument(d.id)}
+                            className="size-4"
+                          />
+                          <FileText className="size-4 shrink-0 text-slate-400" aria-hidden="true" />
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-sm font-bold text-slate-800">{d.name}</span>
+                            <span className="block text-xs text-slate-500">
+                              {d.detail ? `${d.detail} · ` : ''}
+                              {formatSize(d.sizeBytes)}
+                            </span>
                           </span>
-                        </span>
-                      </label>
-                    </li>
-                  ))}
-                </ul>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
 
               {upload && <UploadZone slot={upload} />}
@@ -192,8 +205,10 @@ export function AgentShell<R>({
               {busy ? runningMessage : ''}
             </p>
 
+            {/* 같은 문장이 위 라이브 리전에 이미 있다. 여기까지 읽히면 훑을 때마다
+                두 번 들린다 — 눈으로 보는 사람에게만 보여 준다 */}
             {busy && (
-              <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <div aria-hidden="true" className="rounded-xl border border-slate-200 bg-white p-5">
                 <p className="text-sm font-bold text-slate-700">{runningMessage}</p>
                 <div className="mt-3 space-y-2">
                   {[0, 1, 2].map((i) => (

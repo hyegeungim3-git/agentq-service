@@ -43,8 +43,15 @@ test.describe('문서 요약', () => {
   test('요약 중에는 진행 상태를 알린다', async ({ page }) => {
     await openSummary(page)
     await page.getByRole('button', { name: '요약 생성' }).click()
-    // 지연 동안 로딩 상태가 실제로 보여야 한다 — 보이지 않으면 상태 설계가 죽은 코드다
-    await expect(page.getByRole('status')).toBeVisible()
+    /* 지연 동안 로딩 상태가 실제로 보여야 한다 — 보이지 않으면 상태 설계가 죽은 코드다.
+       `role=status`로 찾지 않는다: 화면 전환 알림용 전역 리전이 생겨 둘이 됐다.
+       여기서 보려는 것은 **눈에 보이는** 진행 표시다 */
+    /* 눈에 보이는 진행 카드(낭독기용 sr-only 리전과 같은 문장을 쓰므로 그쪽과 구분한다) */
+    await expect(
+      page.locator('[aria-hidden="true"]').filter({ hasText: '문서를 요약하고 있습니다…' }),
+    ).toBeVisible()
+    /* 낭독기에도 같은 사실이 전달돼야 한다 */
+    await expect(page.locator('p[role="status"]')).toHaveText('문서를 요약하고 있습니다…')
   })
 
   test('가로 스크롤이 없다', async ({ page }) => {

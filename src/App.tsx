@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { AgentId } from '@entities/agent/model'
+import { AGENTS, type AgentId } from '@entities/agent/model'
+import { useScreenChange, type ScreenChange } from '@features/screen-change/useScreenChange'
 import type { Domain } from '@entities/domain/model'
 import { fetchDomain } from '@shared/api/domains'
 import { setActiveDomain } from '@shared/api/tenant'
@@ -14,7 +15,7 @@ import type { LiveMetric } from '@entities/metric/model'
 import type { SignalLink, WorkSignal } from '@entities/signal/model'
 import { readJson, writeJson } from '@shared/lib/storage'
 import { AppShell } from '@widgets/app-shell/AppShell'
-import type { ShellTab } from '@widgets/app-shell/tabs'
+import { shellTabLabel, type ShellTab } from '@widgets/app-shell/tabs'
 import { PortalPage } from '@pages/portal/PortalPage'
 import { HubPage } from '@pages/hub/HubPage'
 import { SecurityPage } from '@pages/security/SecurityPage'
@@ -113,6 +114,50 @@ const shell = (domainId: string, tab: ShellTab): View => {
   return { name: 'shell', domainId, tab, agentId: null, scenario: false }
 }
 
+/**
+ * 지금 어느 화면인가 — 창 제목과 알림에 쓸 이름.
+ *
+ * 발주처 넷의 제목이 전부 'AgentQ'로 같아서 낭독기로는 어느 발주처인지 알 수
+ * 없었다. 조직 이름을 제목에 넣어 창 제목 읽기로 구분되게 한다.
+ */
+function describeScreen(view: View, domain: Domain | null): ScreenChange & { key: string } {
+  if (view.name === 'portal') {
+    return { key: 'portal', title: '분야 선택', say: '분야 선택 화면입니다.' }
+  }
+  if (view.name === 'admin') {
+    const menu = findMenu(view.menuId)
+    const label = menu?.label ?? '관리자'
+    return {
+      key: `admin:${view.menuId}`,
+      title: label,
+      org: '관리자 시스템',
+      say: `${label} 화면입니다.`,
+    }
+  }
+  const org = domain?.orgName
+  if (view.tab === 'agents' && view.scenario) {
+    return {
+      key: `${view.domainId}:scenario`,
+      title: '복합 업무',
+      org,
+      say: '복합 업무 릴레이 화면입니다.',
+    }
+  }
+  if (view.tab === 'agents' && view.agentId) {
+    const name = AGENTS.find((a) => a.id === view.agentId)?.name ?? '에이전트'
+    return {
+      key: `${view.domainId}:agent:${view.agentId}`,
+      title: name,
+      org,
+      say: `${name} 에이전트 화면입니다.`,
+    }
+  }
+  /* 화면 틀 언어와 무관하게 **한국어 이름**을 쓴다. 다른 가지(에이전트명·관리자 메뉴)가
+     전부 한국어 원문이라, 여기만 영어로 두면 'Chat 화면입니다'처럼 반씩 섞인다 */
+  const tab = shellTabLabel(view.tab, 'ko')
+  return { key: `${view.domainId}:${view.tab}`, title: tab, org, say: `${tab} 화면입니다.` }
+}
+
 export default function App() {
   const [view, setView] = useState<View>({ name: 'portal' })
   /* 불러온 도메인을 id와 함께 들고 있는다.
@@ -184,6 +229,16 @@ export default function App() {
   }, [domainId])
 
   const domain = loaded && loaded.id === domainId ? loaded.domain : null
+
+  /**
+   * 화면이 바뀐 것을 낭독기에도 알린다.
+   *
+   * 훅이라 이른 반환보다 위에 있어야 한다 — 그래서 어느 화면인지를 여기서 한 번에
+   * 계산한다. `key`가 같으면 아무 일도 하지 않으므로, 같은 화면 안에서 상태가
+   * 바뀔 때는 조용하다.
+   */
+  const screen = describeScreen(view, domain)
+  useScreenChange(screen.key, screen)
 
   if (view.name === 'portal') {
     return (

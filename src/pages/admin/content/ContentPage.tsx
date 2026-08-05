@@ -87,7 +87,7 @@ export function ContentPage() {
               <tbody>
                 {notices.data.map((n) => (
                   <tr key={n.id} className="border-t border-slate-100">
-                    <td className="px-3 py-2">
+                    <th scope="row" className="px-3 py-2 text-left">
                       <span
                         className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${
                           n.level === 'important'
@@ -97,7 +97,7 @@ export function ContentPage() {
                       >
                         {noticeLevelLabel(n.level)}
                       </span>
-                    </td>
+                    </th>
                     <td className="px-3 py-2 font-bold text-slate-800">{n.title}</td>
                     <td className="px-3 py-2 tabular-nums text-slate-600">{n.postedOn}</td>
                   </tr>

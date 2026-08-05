@@ -101,7 +101,7 @@ export function GuardrailPage() {
                     {/* 경고만 한 것을 위로 — 놓치면 안 되는 쪽이다 */}
                     {[...passed, ...stopped].map((h) => (
                       <tr key={h.id} className={`border-t border-slate-100 ${h.outcome === 'warned' ? 'bg-amber-50' : ''}`}>
-                        <td className="px-3 py-2 tabular-nums text-slate-600">{h.at}</td>
+                        <th scope="row" className="px-3 py-2 tabular-nums text-slate-600 text-left">{h.at}</th>
                         <td className="px-3 py-2 font-bold text-slate-800">{h.ruleName}</td>
                         <td className="px-3 py-2 text-slate-600">{h.agentLabel}</td>
                         <td className="px-3 py-2 text-slate-600">

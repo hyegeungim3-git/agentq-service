@@ -125,7 +125,7 @@ export function HrSyncPage() {
                   <tbody>
                     {[...failed, ...done].map((c) => (
                       <tr key={c.id} className={`border-t border-slate-100 ${c.failedReason ? 'bg-rose-50' : ''}`}>
-                        <td className="px-3 py-2 font-bold text-slate-800">{c.name}</td>
+                        <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{c.name}</th>
                         <td className="px-3 py-2 text-slate-600">{HR_CHANGE_LABEL[c.kind]}</td>
                         <td className="px-3 py-2 text-slate-600">{c.dept}</td>
                         <td className="px-3 py-2 tabular-nums text-slate-600">{c.syncedOn}</td>

@@ -124,9 +124,9 @@ export function VectorDbPage() {
                   <tbody>
                     {state.data.map((c) => (
                       <tr key={c.id} className="border-t border-slate-100">
-                        <td className="px-3 py-2 font-mono text-[11px] font-bold text-slate-800">
+                        <th scope="row" className="px-3 py-2 font-mono text-[11px] font-bold text-slate-800 text-left">
                           {c.name}
-                        </td>
+                        </th>
                         {/* 빈칸으로 두면 못 적은 것인지 없는 것인지 알 수 없다 */}
                         <td className="px-3 py-2 text-slate-600">
                           {areaName(c.areaId) ?? (

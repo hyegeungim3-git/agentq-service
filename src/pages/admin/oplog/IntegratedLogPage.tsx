@@ -102,7 +102,7 @@ export function IntegratedLogPage() {
               <tbody>
                 {state.data.map((e) => (
                   <tr key={e.id} className={`border-t border-slate-100 ${e.sensitive ? 'bg-amber-50' : ''}`}>
-                    <td className="px-3 py-2 tabular-nums text-slate-600">{e.at}</td>
+                    <th scope="row" className="px-3 py-2 tabular-nums text-slate-600 text-left">{e.at}</th>
                     <td className="px-3 py-2">
                       <span className="font-bold text-slate-800">{e.actor}</span>
                       {e.dept !== '—' && <span className="ml-1 text-slate-500">{e.dept}</span>}

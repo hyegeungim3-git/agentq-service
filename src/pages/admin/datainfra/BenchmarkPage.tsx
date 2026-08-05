@@ -107,9 +107,9 @@ export function BenchmarkPage() {
                     const b = benchmarks.data.find((x) => x.id === r.benchmarkId)
                     return (
                       <tr key={r.id} className="border-t border-slate-100">
-                        <td className="px-3 py-2 font-mono text-[11px] font-bold text-slate-800">
+                        <th scope="row" className="px-3 py-2 font-mono text-[11px] font-bold text-slate-800 text-left">
                           {r.id}
-                        </td>
+                        </th>
                         <td className="px-3 py-2 text-slate-700">
                           {r.modelName}
                           <span className="ml-1 font-mono text-[11px] text-slate-500">

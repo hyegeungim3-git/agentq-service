@@ -363,6 +363,7 @@ test('릴레이가 발주처마다 자기 이야기로 완주한다', async ({ p
   }
 
   await page.getByRole('button', { name: '릴레이 실행' }).click()
-  await expect(page.getByText(/사람이 확인해야 하는 지점/)).toBeVisible({ timeout: 30_000 })
+  /* 같은 문장이 낭독기용 리전과 눈에 보이는 요약 두 곳에 있다 — 보이는 쪽을 본다 */
+  await expect(page.getByText(/사람이 확인해야 하는 지점/).last()).toBeVisible({ timeout: 30_000 })
   await expect(page.getByText(/SUH-/).first()).toBeVisible()
 })

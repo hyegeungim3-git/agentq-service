@@ -34,7 +34,9 @@ export function PortalPage({
   }, [])
 
   return (
-    <main className="min-h-dvh bg-slate-50 px-4 py-10">
+    /* 분야 선택 화면은 기관명·소개가 전부 한국어 원문이다. 화면 틀 언어를 English로
+       두고 나왔을 때 영어 음성이 기관명을 뭉개지 않도록 여기서 표시한다 */
+    <main lang="ko" className="min-h-dvh bg-slate-50 px-4 py-10">
       <div className="mx-auto w-full max-w-3xl">
         <header className="mb-8">
           <BrandLock heading />

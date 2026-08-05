@@ -134,7 +134,7 @@ export function UserListPage() {
               <tbody>
                 {state.data.map((u) => (
                   <tr key={u.id} className="border-t border-slate-100">
-                    <td className="px-3 py-2 font-bold text-slate-800">{u.name}</td>
+                    <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{u.name}</th>
                     <td className="px-3 py-2 text-slate-600">{u.dept}</td>
                     <td className="px-3 py-2 font-mono text-[11px] text-slate-500">{u.email}</td>
                     <td className="px-3 py-2 text-slate-600">{ROLE_LABEL[u.role]}</td>

@@ -123,7 +123,7 @@ export function SystemStatusPage() {
               <tbody>
                 {nodes.data.map((n) => (
                   <tr key={n.name} className="border-t border-slate-100">
-                    <td className="px-3 py-2 font-bold text-slate-800">{n.name}</td>
+                    <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{n.name}</th>
                     <td className="px-3 py-2 font-mono text-[11px] text-slate-600">{n.instance}</td>
                     <td className="px-3 py-2 text-slate-600">{n.os}</td>
                     <td className="px-3 py-2 font-mono text-[11px] text-slate-500">{n.kernel}</td>

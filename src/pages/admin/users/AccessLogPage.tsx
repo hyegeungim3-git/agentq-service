@@ -86,7 +86,7 @@ export function AccessLogPage() {
                     {/* 거부를 위로 — 막힌 시도가 정상 접근 사이에 묻히면 안 된다 */}
                     {[...denied, ...ok].map((l) => (
                       <tr key={l.id} className="border-t border-slate-100">
-                        <td className="px-3 py-2 tabular-nums text-slate-600">{l.at}</td>
+                        <th scope="row" className="px-3 py-2 tabular-nums text-slate-600 text-left">{l.at}</th>
                         <td className="px-3 py-2 font-bold text-slate-800">{l.actor}</td>
                         <td className="px-3 py-2 text-slate-600">{l.action}</td>
                         <td className="px-3 py-2 text-slate-600">

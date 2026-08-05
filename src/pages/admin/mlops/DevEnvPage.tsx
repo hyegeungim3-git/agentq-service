@@ -112,7 +112,7 @@ export function DevEnvPage() {
                         key={w.id}
                         className={`border-t border-slate-100 ${idle.includes(w) ? 'bg-amber-50' : ''}`}
                       >
-                        <td className="px-3 py-2 font-bold text-slate-800">{w.owner}</td>
+                        <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{w.owner}</th>
                         <td className="px-3 py-2 text-slate-600">{w.purpose}</td>
                         <td className="px-3 py-2 tabular-nums text-slate-600">{w.gpuCount}장</td>
                         <td className="px-3 py-2 tabular-nums text-slate-600">{w.lastActiveAt}</td>

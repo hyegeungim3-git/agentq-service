@@ -138,8 +138,8 @@ test.describe('셸 — 알림·브리핑', () => {
     await expect(page.getByRole('heading', { name: '수입검사 성적서 접수 처리' })).toBeVisible()
 
     // 알림 센터
-    await page.getByRole('button', { name: /업무 알림/ }).click()
-    const box = page.getByRole('region', { name: '업무 알림' })
+    await page.getByRole('button', { name: /^알림/ }).click()
+    const box = page.getByRole('region', { name: /업무 알림 \d+건/ })
     await expect(box).toContainText('출처 · PdM 센서 알람')
     await box.getByRole('button', { name: /설비 이력 조회 →/ }).click()
     await expect(page.getByRole('heading', { name: '데이터 조회 에이전트' })).toBeVisible()

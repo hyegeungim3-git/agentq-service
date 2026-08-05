@@ -99,7 +99,7 @@ export function AppSurfacePage() {
               <tbody>
                 {domains.data.map((d) => (
                   <tr key={d.domainId} className="border-t border-slate-100">
-                    <td className="px-3 py-2 font-bold text-slate-800">{d.orgName}</td>
+                    <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{d.orgName}</th>
                     <td className="px-3 py-2">
                       <span
                         className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${

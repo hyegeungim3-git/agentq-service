@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useModalOverlay } from '@features/overlay/useModalOverlay'
 import {
   FAQ_CATEGORIES,
   faqCategoryLabel,
@@ -39,15 +40,48 @@ export function ChatPage({
   const fb = useFeedback()
   const endRef = useRef<HTMLDivElement>(null)
   const [panelOpen, setPanelOpen] = useState(false)
+  const closePanel = useCallback(() => setPanelOpen(false), [])
+  /* 넓은 화면(xl)에서는 옆에 붙어 있으므로 대화상자가 아니다 — 덮는 폭에서만 잠근다 */
+  const panelRef = useModalOverlay(panelOpen, closePanel, 1280)
 
   // 새 메시지가 오면 아래로 스크롤 — 대화가 길어지면 직접 내려야 하는 건 불편하다
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: 'end' })
   }, [c.messages.length, c.pending])
 
+  /**
+   * **답변이 도착했다는 것을 말한다.**
+   *
+   * 예전에는 질문을 보내야 비로소 '작성 중' 리전이 생기고, 답이 오면 그 리전이
+   * 통째로 사라지면서 목록에 항목만 추가됐다 — 낭독기에는 **완전한 침묵**이었다.
+   * 화면에서는 말풍선이 눈에 띄지만 소리로는 아무 일도 안 일어난 것과 같다.
+   *
+   * 답 전체를 읽어 주지는 않는다. 길어서 끊을 수도 없고, 사용자가 직접 읽으러 갈
+   * 수 있어야 한다. 대신 **도착했다는 사실과 근거 유무**만 말한다 — 근거 없는 답을
+   * 근거 있는 답과 구분하는 것이 이 제품의 안전장치이기 때문이다.
+   */
+  const answered = useRef(0)
+  const [arrival, setArrival] = useState('')
+  useEffect(() => {
+    const last = c.messages[c.messages.length - 1]
+    if (!last || last.role !== 'assistant') return
+    if (c.messages.length === answered.current) return
+    answered.current = c.messages.length
+    const basis =
+      last.sources.length > 0 ? `근거 ${last.sources.length}건` : '근거를 찾지 못한 답변입니다'
+    const conf =
+      last.confidence === null ? '' : ` 신뢰도 ${Math.round(last.confidence * 100)}%.`
+    setArrival(`답변이 도착했습니다. ${basis}.${conf}`)
+  }, [c.messages])
+
   return (
     <div className="flex min-h-dvh">
-    <main className="flex min-h-dvh min-w-0 flex-1 flex-col bg-slate-50">
+    {/* 근거 패널이 덮고 있는 동안 본문은 없는 것으로 친다 — 안 끄면 낭독기 스와이프가
+        화면에 보이지도 않는 FAQ 버튼 열몇 개를 먼저 읽는다 */}
+    <main
+      inert={panelOpen || undefined}
+      className="flex min-h-dvh min-w-0 flex-1 flex-col bg-slate-50"
+    >
       <header className="border-b border-slate-200 bg-white px-4 py-4">
         <div className="mx-auto w-full max-w-3xl">
           {onBack && (
@@ -125,9 +159,14 @@ export function ChatPage({
           ))}
         </ol>
 
+        {/* 알림 자리는 **처음부터 있어야 한다.** 상태가 바뀔 때 비로소 만들어지는
+            리전은 낭독기가 첫 변화를 놓치는 경우가 있다. 자리는 늘 두고 내용만 채운다 */}
+        <p role="status" aria-live="polite" className="sr-only">
+          {c.pending ? '답변을 작성하는 중입니다' : arrival}
+        </p>
+
         {c.pending && (
-          <div role="status" aria-live="polite" className="mt-4 max-w-[85%] rounded-xl border border-slate-200 bg-white p-4">
-            <span className="sr-only">답변을 작성하는 중입니다</span>
+          <div aria-hidden="true" className="mt-4 max-w-[85%] rounded-xl border border-slate-200 bg-white p-4">
             <div className="space-y-2">
               {[0, 1].map((i) => (
                 <div key={i} className="h-3 animate-pulse rounded bg-slate-100" />
@@ -233,17 +272,28 @@ export function ChatPage({
         <ChatSidePanel />
       </div>
 
-      {/* 좁은 화면에서는 덮어서 연다 — 같은 패널을 두 번 그리지 않는다 */}
+      {/* 좁은 화면에서는 덮어서 연다 — 같은 패널을 두 번 그리지 않는다.
+          덮는 순간부터는 대화상자다: 안 그러면 낭독기가 뒤에 깔린 FAQ 버튼 열몇 개를
+          먼저 읽고, Esc로 닫히지도 않는다 */}
       {panelOpen && (
         <div className="fixed inset-0 z-50 flex justify-end xl:hidden">
           <button
             type="button"
-            aria-label="답변 근거 닫기 배경"
-            onClick={() => setPanelOpen(false)}
+            /* '배경'은 구현 용어다. 화면 전체를 덮는 버튼이라 훑으면 반드시 걸리는데,
+               눌렀을 때 무슨 일이 일어나는지가 이름이어야 한다 */
+            aria-label="답변 근거 닫기"
+            onClick={closePanel}
             className="absolute inset-0 bg-slate-900/40"
           />
-          <div className="relative h-dvh">
-            <ChatSidePanel onClose={() => setPanelOpen(false)} />
+          <div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="답변 근거"
+            tabIndex={-1}
+            className="relative h-dvh"
+          >
+            <ChatSidePanel onClose={closePanel} />
           </div>
         </div>
       )}
@@ -443,7 +493,10 @@ function FeedbackBar({
           type="button"
           onClick={() => onRate(messageId, v)}
           aria-pressed={entry?.verdict === v}
-          aria-label={v === 'up' ? '도움이 됐어요' : '도움이 안 됐어요'}
+          /* 보이는 글자('도움됨'·'아쉬움')가 이름 안에 있어야 한다 — 음성 조작 사용자가
+             화면에 보이는 대로 말해야 눌린다(WCAG 2.5.3 Label in Name). 그 전에는 보이는
+             글자와 이름이 아예 달랐다 */
+          aria-label={v === 'up' ? '도움됨, 도움이 됐어요' : '아쉬움, 도움이 안 됐어요'}
           className={`min-h-11 rounded-lg border px-3 text-xs font-bold ${
             entry?.verdict === v
               ? 'border-slate-900 bg-brand text-brand-fg'

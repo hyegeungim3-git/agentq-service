@@ -96,9 +96,29 @@ export function OrchestrationPage({
             )}
           </div>
 
+          {/**
+           * 끝났다는 것을 **소리로도** 말한다.
+           *
+           * 단계별 진행 알림은 그 단계가 끝나면 사라진다. 그래서 마지막 단계가 끝나는
+           * 순간 화면의 라이브 리전이 전부 없어지고 요약 상자만 조용히 나타났다 —
+           * 이 제품에서 가장 중요한 문장('확인해야 하는 지점 N건')이 낭독기에는
+           * 통째로 빠져 있었다.
+           *
+           * 자리는 늘 두고 내용만 채운다. 아래 요약 상자는 같은 문장을 눈으로 보여
+           * 주므로 낭독에서 뺀다 — 안 그러면 훑을 때 두 번 들린다.
+           */}
+          <p role="status" aria-live="polite" className="sr-only">
+            {finished
+              ? reviews > 0
+                ? `릴레이가 끝났습니다. 사람이 확인해야 하는 지점이 ${reviews}건 남았습니다.`
+                : '릴레이가 끝났습니다. 모든 단계가 확인 지점 없이 완료됐습니다.'
+              : ''}
+          </p>
+
           {/* 끝까지 갔다고 다 된 게 아니다 — 합계를 결과보다 먼저 말한다 */}
           {finished && (
             <div
+              aria-hidden="true"
               className={`rounded-xl border p-5 ${
                 reviews > 0 ? 'border-amber-200 bg-amber-50' : 'border-emerald-200 bg-emerald-50'
               }`}

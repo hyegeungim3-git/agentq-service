@@ -42,6 +42,7 @@ const KO = {
   'nav.close': '사이드바 닫기',
   'nav.delete': '삭제',
   'nav.home': 'AgentQ 홈으로',
+  'nav.skip': '본문으로 건너뛰기',
 
   'settings.title': '환경설정',
   'settings.lead': '이 브라우저에만 적용됩니다. 계정 설정이 아닙니다.',
@@ -87,6 +88,7 @@ const EN: Record<UiKey, string> = {
   'nav.close': 'Close sidebar',
   'nav.delete': 'Delete',
   'nav.home': 'Go to AgentQ home',
+  'nav.skip': 'Skip to main content',
 
   'settings.title': 'Settings',
   'settings.lead': 'Applies to this browser only. These are not account settings.',

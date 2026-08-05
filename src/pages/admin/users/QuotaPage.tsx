@@ -63,7 +63,7 @@ export function QuotaPage() {
                       const excess = u.quota.limit === null ? 0 : u.quota.used - u.quota.limit
                       return (
                         <tr key={u.id} className="border-t border-slate-100">
-                          <td className="px-3 py-2 font-bold text-slate-800">{u.name}</td>
+                          <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{u.name}</th>
                           <td className="px-3 py-2 text-slate-600">{u.dept}</td>
                           <td className="px-3 py-2 tabular-nums text-slate-600">
                             {u.quota.limit === null ? '무제한' : u.quota.limit.toLocaleString('ko-KR')}

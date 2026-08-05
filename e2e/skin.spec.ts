@@ -75,7 +75,7 @@ test('에이전트 13종의 머리가 같은 모양이다', async ({ page }) => 
     const h1 = page.getByRole('heading', { level: 1 })
     await expect(h1, name).toBeVisible()
     // 돌아가는 길이 있어야 한다 — 셸을 쓰든 안 쓰든
-    if ((await page.getByRole('button', { name: '돌아가기' }).count()) === 0) missing.push(name)
+    if ((await page.getByRole('button', { name: /돌아가기/ }).count()) === 0) missing.push(name)
     const over = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     )

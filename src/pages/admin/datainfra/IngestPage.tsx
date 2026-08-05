@@ -107,7 +107,7 @@ export function IngestPage() {
                           s.lastOk ? (s.fetched === 0 ? 'bg-amber-50' : '') : 'bg-rose-50'
                         }`}
                       >
-                        <td className="px-3 py-2 font-bold text-slate-800">{s.name}</td>
+                        <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{s.name}</th>
                         <td className="px-3 py-2 text-slate-600">{INGEST_METHOD_LABEL[s.method]}</td>
                         <td className="px-3 py-2 text-slate-600">{areaName(s.targetAreaId)}</td>
                         <td className="px-3 py-2 text-slate-600">{s.schedule}</td>

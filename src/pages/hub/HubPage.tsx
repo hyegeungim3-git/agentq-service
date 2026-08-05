@@ -135,7 +135,11 @@ export function HubPage({
                         type="button"
                         onClick={() => onOpen(a.id)}
                         disabled={!usable}
-                        aria-describedby={`${a.id}-desc`}
+                        /* 설명에 **사람 확인 지점**까지 넣는다. 눈으로 보는 사람은 카드
+                           아래 배지로 즉시 골라내지만, Tab으로 도는 사람은 13개를 다
+                           지나도록 그 말을 한 번도 못 들었다 — 이 제품이 강조하는 판단
+                           근거가 소리에서 통째로 빠져 있었다 */
+                        aria-describedby={`${a.id}-desc ${a.id}-check`}
                         className="text-left font-bold text-slate-900 after:absolute after:inset-0 after:content-[''] disabled:cursor-not-allowed"
                       >
                         {a.name}
@@ -184,7 +188,10 @@ export function HubPage({
                       ))}
                     </ol>
 
-                    <div className="mt-3 flex items-center gap-1 border-t border-slate-100 pt-2">
+                    <div
+                      id={`${a.id}-check`}
+                      className="mt-3 flex items-center gap-1 border-t border-slate-100 pt-2"
+                    >
                       {/* 확인 지점이 없으면 결과가 그대로 나간다 — 좋아 보이는 배지보다 이게 중요하다 */}
                       {checks.length > 0 ? (
                         <>

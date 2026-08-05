@@ -134,14 +134,22 @@ function QueryResultView({ result, sourceLabel }: { result: QueryResult; sourceL
             <tbody>
               {result.rows.map((row, i) => (
                 <tr key={i} className="border-b border-slate-100 last:border-0">
-                  {result.columns.map((c) => (
-                    <td
-                      key={c.key}
-                      className={`py-2 pr-3 ${c.numeric ? 'text-right tabular-nums text-slate-700' : 'text-slate-600'}`}
-                    >
-                      {row[c.key] ?? '-'}
-                    </td>
-                  ))}
+                  {result.columns.map((c, ci) => {
+                    const cls = `py-2 pr-3 ${c.numeric ? 'text-right tabular-nums text-slate-700' : 'text-slate-600'}`
+                    const cell = row[c.key] ?? '-'
+                    /* 첫 칸만 행 머리글이다. 여기는 칸을 반복해서 그리므로 자리를
+                       봐야 첫 칸을 안다 — 전부 머리글로 만들면 낭독기가 값마다
+                       자기 값을 머리글로 다시 읽는다 */
+                    return ci === 0 ? (
+                      <th key={c.key} scope="row" className={`${cls} text-left font-normal`}>
+                        {cell}
+                      </th>
+                    ) : (
+                      <td key={c.key} className={cls}>
+                        {cell}
+                      </td>
+                    )
+                  })}
                 </tr>
               ))}
             </tbody>
@@ -167,7 +175,9 @@ function QueryResultView({ result, sourceLabel }: { result: QueryResult; sourceL
             <tbody>
               {result.terms.map((t) => (
                 <tr key={t.phrase} className="border-b border-slate-100 last:border-0">
-                  <td className="py-2 pr-3 text-slate-700">{t.phrase}</td>
+                  <th scope="row" className="py-2 pr-3 text-left font-normal text-slate-700">
+                    {t.phrase}
+                  </th>
                   <td className="py-2 pr-3 font-mono text-xs text-slate-600">{t.column}</td>
                   <td className="py-2 font-mono text-xs text-slate-600">
                     {t.operator} {t.value}

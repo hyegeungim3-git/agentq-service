@@ -280,7 +280,7 @@ export function ToolDeployPage() {
                     <tbody>
                       {deployments.data.map((d) => (
                         <tr key={d.id} className="border-t border-slate-100">
-                          <td className="px-3 py-2 font-bold text-slate-800">{d.target}</td>
+                          <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{d.target}</th>
                           <td className="px-3 py-2">
                             <span
                               className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${

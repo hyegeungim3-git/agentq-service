@@ -67,7 +67,11 @@ export function BrandLock({
             AgentQ
           </Word>
           {context && (
-            <span className="truncate text-[12px] leading-none font-bold tracking-tight text-slate-500">
+            /* 분야명·'관리자'는 번역하지 않는 한국어다 — 화면 틀이 English여도 원문이다 */
+            <span
+              lang="ko"
+              className="truncate text-[12px] leading-none font-bold tracking-tight text-slate-500"
+            >
               {context}
             </span>
           )}

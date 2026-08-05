@@ -86,7 +86,7 @@ export function EvaluationPage() {
                     <tbody>
                       {ranked.map((e, i) => (
                         <tr key={e.id} className="border-t border-slate-100">
-                          <td className="px-3 py-2 tabular-nums font-bold text-slate-500">{i + 1}</td>
+                          <th scope="row" className="px-3 py-2 tabular-nums font-bold text-slate-500 text-left">{i + 1}</th>
                           <td className="px-3 py-2">
                             <span className="font-bold text-slate-800">{e.modelName}</span>
                             <span className="ml-1 font-mono text-[11px] text-slate-500">

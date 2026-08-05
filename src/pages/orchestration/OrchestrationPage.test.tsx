@@ -38,8 +38,11 @@ describe('OrchestrationPage', () => {
   it('끝까지 갔어도 사람이 확인할 지점을 합계로 먼저 말한다', async () => {
     setup()
     await relay()
-    const notice = await screen.findByText(/사람이 확인해야 하는 지점이 \d+건 남았습니다/)
-    expect(notice).toBeInTheDocument()
+    /* 눈으로 보는 요약과 낭독기용 알림 두 군데에 있다 — 둘 다 있어야 한다.
+       한쪽만 보면 '화면에는 있는데 소리에는 없는' 상태를 놓친다 */
+    const notices = await screen.findAllByText(/사람이 확인해야 하는 지점이 \d+건 남았습니다/)
+    expect(notices.length).toBe(2)
+    expect(screen.getByRole('status')).toHaveTextContent(/릴레이가 끝났습니다/)
     expect(screen.getByText(/결재에 올리기 전에/)).toBeInTheDocument()
   })
 
