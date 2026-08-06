@@ -107,22 +107,55 @@ export function useScreenChange(key: string, change: ScreenChange): void {
      * `tabindex="-1"`을 붙여야 포커스를 받을 수 있고, 그래도 Tab 순서에는
      * 안 들어간다. 옮기고 나면 이어 읽기가 새 화면부터 시작한다.
      *
-     * 화면마다 제목이 오는 시점이 달라(자료를 기다리는 화면이 있다) 몇 프레임
-     * 기다렸다 포기한다. 끝내 못 찾으면 아무것도 안 하는 편이 낫다 —
-     * 엉뚱한 곳으로 옮기면 사용자가 어디로 갔는지 더 모른다.
+     * ⚠️ **한 프레임 뒤에 한 번만 옮기면 안 된다 — 배포본에서 실제로 실패했다.**
+     * 발주처 자료는 나중에 도착하므로 그 사이 화면이 한 번 더 갈린다. 첫 프레임의
+     * 제목에 포커스를 줘 봐야 그 노드가 통째로 교체되면서 포커스가 `body`로 떨어지고,
+     * key는 그대로라 이 effect는 다시 돌지 않는다. 검사는 통과하는데(그 환경에서는
+     * 자료가 먼저 왔다) 실제 배포본에서는 끝까지 body에 남아 있었다.
+     *
+     * 그래서 **자리를 잡을 때까지** 계속 다시 놓는다. 조건은 하나다 —
+     * `body`에 있을 때만. 사용자가 Tab이든 클릭이든 어디로든 옮겼으면 그 순간
+     * 손을 뗀다. 화면이 더는 안 갈리면 포커스가 제목에 머물러 저절로 멈춘다.
      */
+    const DEADLINE = 2000
+    const started = performance.now()
+    /* 화면을 바꾼 그 요소. 사이드바 탭처럼 **남아 있는 버튼**으로 화면을 바꾸면
+       포커스가 body가 아니라 그 버튼에 있다 — 거기서 손을 떼면 본문이 통째로
+       바뀌었는데 아무 데도 안 가는, 고치려던 바로 그 상태가 된다 */
+    const entry = document.activeElement
+    let mine: HTMLElement | null = null
     let id = 0
-    let tries = 0
     const move = () => {
-      const main = document.querySelector('main')
-      const target = main?.querySelector('h1') ?? main
-      if (!target) {
-        tries += 1
-        if (tries < 10) id = requestAnimationFrame(move)
+      const active = document.activeElement
+
+      /**
+       * 다시 놓아도 되는가.
+       *
+       * ⚠️ '지금 body에 있으면 다시 놓는다'로 쓰면 안 된다 — 사용자가 빈 곳을
+       * 클릭하기만 해도 포커스를 제목으로 낚아챈다. 실제로 검사가 간헐적으로
+       * 깨지면서 그 동작이 드러났다(건너뛰기 검사가 body로 되돌린 직후를 밟았다).
+       *
+       * 두 경우를 정확히 가르는 신호는 **내가 놓아 둔 노드가 아직 문서에 붙어
+       * 있는가**이다.
+       *  - 빠졌다 → 화면이 갈린 것이다. 새 제목에 다시 놓는다
+       *  - 붙어 있는데 포커스가 딴 데 있다 → 사용자가 옮긴 것이다. 손을 뗀다
+       */
+      if (mine) {
+        if (active !== mine && mine.isConnected) return
+      } else if (active !== document.body && active !== entry) {
+        /* 시작하기도 전에 누가 가져갔다 */
         return
       }
-      target.setAttribute('tabindex', '-1')
-      target.focus({ preventScroll: true })
+
+      const main = document.querySelector('main')
+      const target = main?.querySelector('h1') ?? main
+      if (target && active !== target) {
+        target.setAttribute('tabindex', '-1')
+        target.focus({ preventScroll: true })
+        mine = target
+      }
+      /* 끝내 못 잡으면 포기한다 — 엉뚱한 곳으로 옮기면 어디로 갔는지 더 모른다 */
+      if (performance.now() - started < DEADLINE) id = requestAnimationFrame(move)
     }
     id = requestAnimationFrame(move)
     return () => {

@@ -130,18 +130,74 @@ test('화면이 바뀌면 제목·알림·포커스가 함께 움직인다 @a11y
   /* ② 바뀌었다고 한 번 말한다 */
   await expect(page.locator('#screen-change-announcer')).toHaveText(/화면입니다/)
 
-  /* ③ 포커스가 새 화면의 제목으로 간다 — body에 떨어지면 가상 커서가 맨 위로 리셋된다 */
-  const focused = await page.evaluate(() => {
-    const el = document.activeElement
-    return { tag: el?.tagName ?? '', text: (el?.textContent ?? '').trim().slice(0, 20) }
-  })
-  expect(['H1', 'MAIN'], '포커스가 body에 떨어지면 가상 커서가 문서 맨 위로 리셋된다').toContain(focused.tag)
+  /**
+   * ③ 포커스가 새 화면의 제목으로 가고 **거기 머무는가.**
+   *
+   * ⚠️ 이 단언은 한 번 물러 있었다. '지금 활성 요소의 태그가 H1인가'만 봤더니
+   * 검사는 통과하는데 **배포본에서는 끝까지 body에 남아 있었다.** 발주처 자료가
+   * 늦게 도착하면서 화면이 한 번 더 갈리고, 먼저 포커스를 준 제목 노드가 통째로
+   * 교체되기 때문이다. 검사 환경에서는 자료가 먼저 와서 그 갈림이 없었다.
+   *
+   * 그래서 두 가지를 바꿨다.
+   *  - **다 갈린 뒤에** 본다: 발주처 이름이 제목에 들어온 시점이 최종 화면이다
+   *  - **머무는지** 본다: 1초 뒤에도 같은 자리인가. 놓았다 뺏기는 것을 잡는 유일한 방법이다
+   */
+  const settled = async () =>
+    page.evaluate(() => {
+      const el = document.activeElement
+      const h1 = document.querySelector('main h1')
+      return {
+        tag: el?.tagName ?? '',
+        isMainHeading: !!h1 && el === h1,
+        tabindex: h1?.getAttribute('tabindex') ?? null,
+      }
+    })
+
+  await expect
+    .poll(async () => (await settled()).isMainHeading, {
+      message: '포커스가 본문 제목으로 가지 않으면 가상 커서가 문서 맨 위로 리셋된다',
+      timeout: 5000,
+    })
+    .toBe(true)
+
+  /* 화면이 한 번 더 갈려도 되돌아와야 한다 — 놓았다 뺏기면 결과는 body와 같다 */
+  await page.waitForTimeout(1200)
+  const after = await settled()
+  expect(after.isMainHeading, '포커스를 줬다가 화면이 갈리며 잃으면 고친 것이 아니다').toBe(true)
+  expect(after.tabindex, 'tabindex="-1"이 없으면 제목은 포커스를 받을 수 없다').toBe('-1')
 
   /* 발주처가 다르면 제목도 다르다 — 소리로 구분되는지가 핵심이다 */
   await page.goto('./')
   await page.getByRole('button', { name: /한빛정밀/ }).click()
   await expect(page.getByRole('textbox').first()).toBeVisible()
   expect(await page.title()).toContain('한빛정밀')
+})
+
+/**
+ * 화면을 바꾼 버튼이 **사라지지 않는 경우**도 포커스가 따라가는가.
+ *
+ * 발주처 카드는 눌리는 순간 사라지므로 포커스가 body로 떨어진다. 그런데 사이드바
+ * 탭은 남는다 — 포커스가 그 버튼에 그대로 있고, 본문만 통째로 바뀐다. 낭독기로는
+ * 아무 일도 안 일어난 것과 구분되지 않는다(대본 흐름 1의 6번이 이 자리다).
+ */
+test('사이드바로 화면을 바꿔도 포커스가 본문으로 간다 @a11y', async ({ page }) => {
+  await page.goto('./')
+  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await expect(page.getByRole('textbox').first()).toBeVisible()
+
+  await openTab(page, /^에이전트/)
+  await expect(page.getByRole('button', { name: '문서 요약', exact: true })).toBeVisible()
+
+  await expect
+    .poll(
+      async () =>
+        page.evaluate(() => {
+          const h1 = document.querySelector('main h1')
+          return !!h1 && document.activeElement === h1
+        }),
+      { message: '누른 버튼이 남아 있으면 포커스도 거기 남는다 — 본문이 바뀐 것을 알 수 없다', timeout: 5000 },
+    )
+    .toBe(true)
 })
 
 /**
