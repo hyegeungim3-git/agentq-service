@@ -75,8 +75,13 @@ export function RegulationPage({
             {r.phase.kind === 'running' ? '조회 중…' : '규정 조회'}
           </button>
 
+          {/* 자리는 처음부터 두고 내용만 채운다 — 실행 순간에 만들어지는 리전은 첫 변화를 놓친다 */}
+          <p role="status" aria-live="polite" className="sr-only">
+            {r.phase.kind === 'running' ? '규정을 검색하고 있습니다' : ''}
+          </p>
+
           {r.phase.kind === 'running' && (
-            <div role="status" aria-live="polite" className="rounded-xl border border-slate-200 bg-white p-5">
+            <div aria-hidden="true" className="rounded-xl border border-slate-200 bg-white p-5">
               <p className="text-sm font-bold text-slate-700">규정을 검색하고 있습니다…</p>
               <div className="mt-3 space-y-2">
                 {[0, 1, 2].map((i) => (

@@ -203,8 +203,13 @@ export function KnowledgePage({
               )}
             </div>
 
+            {/* 자리는 처음부터 두고 내용만 채운다 — 실행 순간에 만들어지는 리전은 첫 변화를 놓친다 */}
+            <p role="status" aria-live="polite" className="sr-only">
+              {busy ? '지식베이스를 훑고 있습니다' : ''}
+            </p>
+
             {busy && (
-              <div role="status" aria-live="polite" className="rounded-xl border border-slate-200 bg-white p-5">
+              <div aria-hidden="true" className="rounded-xl border border-slate-200 bg-white p-5">
                 <p className="text-sm font-bold text-slate-700">지식베이스를 훑고 있습니다…</p>
                 <div className="mt-3 space-y-2">
                   {[0, 1, 2].map((i) => (

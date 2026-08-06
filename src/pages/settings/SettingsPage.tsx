@@ -64,6 +64,11 @@ export function SettingsPage({ store }: { store: PrefsStore }) {
           {UI_LANGS.map((l: UiLang) => (
             <label
               key={l}
+              /* 언어 이름은 **그 언어로 적는다** — '한국어'는 English를 골라 놓아도
+                 '한국어'다(`uiLangLabel`). 화면 전체를 `lang={uiLang}`으로 되돌린 탓에
+                 English 상태에서 이 낱말만 영어 아래 놓여 있었다. 결함 14가 닫으려던
+                 바로 그 위반이 정작 언어 고르는 자리에 남아 있던 것이다 */
+              lang={l}
               className="flex min-h-11 cursor-pointer items-center rounded-full border border-slate-200 px-4 text-sm font-bold text-slate-700 hover:bg-slate-50 has-checked:border-brand has-checked:bg-brand has-checked:text-brand-fg"
             >
               <input

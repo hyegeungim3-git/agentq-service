@@ -77,8 +77,15 @@ export function DataQueryPage({
             {q.phase.kind === 'running' ? '조회 중…' : '조회 실행'}
           </button>
 
+          {/* 알림 자리는 **처음부터 있어야 한다.** 실행하는 순간 비로소 만들어지는
+              라이브 리전은 낭독기가 첫 변화를 놓치는 경우가 있다. 자리는 늘 두고
+              내용만 채우고, 보이는 카드는 같은 말을 두 번 읽히지 않게 내린다 */}
+          <p role="status" aria-live="polite" className="sr-only">
+            {q.phase.kind === 'running' ? '질의를 SQL로 변환해 조회하고 있습니다' : ''}
+          </p>
+
           {q.phase.kind === 'running' && (
-            <div role="status" aria-live="polite" className="rounded-xl border border-slate-200 bg-white p-5">
+            <div aria-hidden="true" className="rounded-xl border border-slate-200 bg-white p-5">
               <p className="text-sm font-bold text-slate-700">질의를 SQL로 변환해 조회하고 있습니다…</p>
               <div className="mt-3 space-y-2">
                 {[0, 1, 2].map((i) => (

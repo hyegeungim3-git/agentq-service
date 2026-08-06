@@ -343,7 +343,11 @@ export function AgentPageHeader({
         <button
           type="button"
           onClick={onBack}
-          aria-label="돌아가기"
+          /* 셸 쪽(:91)과 **같은 이름**이어야 한다. 여기만 '돌아가기'로 두면 13종 중
+             5화면(데이터 조회·지식 검색·기준정보 표준화·내규 조회·복합 업무)에서만
+             어디로 가는지 안 들린다 — 실제로 그 상태였다. 부르는 곳은 전부
+             `backToAgents`(App.tsx)라 목적지도 같다 */
+          aria-label="에이전트 허브로 돌아가기"
           className="flex size-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-900"
         >
           <ChevronLeft className="size-5" aria-hidden="true" />

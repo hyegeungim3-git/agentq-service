@@ -234,7 +234,12 @@ export function AppShell({
                 <button
                   type="button"
                   onClick={() => onDeleteConversation(c.id)}
-                  aria-label={`${c.title} ${t(uiLang, 'nav.delete')}`}
+                  /* 이름 안에서는 언어를 나눌 수 없다 — `aria-label`은 한 덩어리 문자열이라
+                     '어디부터 한국어'를 표시할 방법이 없다. 이 이름은 대부분이 한국어
+                     대화 제목이므로 **덩어리 전체를 한국어로** 맞춘다. 화면 틀이 English여도
+                     여기에 'Delete'를 섞으면 한국어 음성이 그 한 낱말을 뭉개 읽는다 */
+                  lang="ko"
+                  aria-label={`${c.title} 삭제`}
                   className="min-h-11 px-2 text-xs text-slate-400 hover:text-rose-700"
                 >
                   ✕

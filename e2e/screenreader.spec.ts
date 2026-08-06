@@ -330,28 +330,59 @@ test('영어 화면 틀 아래 한국어 콘텐츠에 lang 표시가 있다 @a11
   await page.locator('label').filter({ hasText: 'English' }).click()
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
 
-  /* 화면 틀이 실제로 영어로 바뀌었는지 먼저 확인한다 — 안 바뀌었으면 이 검사는 무의미하다.
-     사이드바 이름도 함께 바뀌므로 헬퍼에 영어 이름을 넘긴다 */
+  /**
+   * ⚠️ **훑는 화면을 한 곳으로 두면 안 된다.** 처음에는 English로 바꾼 뒤 곧바로
+   * 대화 탭으로 옮겨서 훑었는데, 그 바람에 **누수가 확정적으로 있던 환경설정 화면**이
+   * 스캔에서 빠졌다(언어 선택의 '한국어'가 `lang={uiLang}` 아래 놓여 있었다).
+   * 검사가 결함이 있는 자리를 떠난 뒤에 훑고 있었던 것이다.
+   */
+  const scan = () =>
+    page.evaluate(() => {
+      const hangul = /[가-힣]/
+      const out: string[] = []
+      for (const el of Array.from(document.querySelectorAll('body *'))) {
+        /* 자기 자신이 직접 들고 있는 글자만 본다 — 부모까지 세면 전부 걸린다 */
+        const own = Array.from(el.childNodes)
+          .filter((n) => n.nodeType === Node.TEXT_NODE)
+          .map((n) => n.textContent ?? '')
+          .join('')
+        if (!hangul.test(own)) continue
+        const near = el.closest('[lang]')?.getAttribute('lang') ?? ''
+        if (near !== 'ko') out.push(`${near || '(없음)'} · ${own.trim().slice(0, 24)}`)
+      }
+      return out
+    })
+
+  /* ① 지금 있는 환경설정 화면부터 — 여기가 결함이 있던 자리다 */
+  expect(await scan(), '환경설정: 한국어인데 영어로 표시된 자리').toEqual([])
+
+  /* ② 사용자 포털의 나머지 탭도 같은 눈으로 본다.
+     못 찾은 탭은 **조용히 넘기지 않는다** — 이름이 바뀌어 안 눌리면 검사가 아무것도
+     안 훑고도 초록불이 된다. 실제로 이 저장소에서 그 실수를 한 번 했다 */
   const nav = await openSidebar(page, { nav: 'Work area', open: 'Open sidebar' })
-  await nav.getByRole('button', { name: 'Chat', exact: true }).click()
-
-  const bad = await page.evaluate(() => {
-    const hangul = /[가-힣]/
-    const out: string[] = []
-    for (const el of Array.from(document.querySelectorAll('body *'))) {
-      /* 자기 자신이 직접 들고 있는 글자만 본다 — 부모까지 세면 전부 걸린다 */
-      const own = Array.from(el.childNodes)
-        .filter((n) => n.nodeType === Node.TEXT_NODE)
-        .map((n) => n.textContent ?? '')
-        .join('')
-      if (!hangul.test(own)) continue
-      const near = el.closest('[lang]')?.getAttribute('lang') ?? ''
-      if (near !== 'ko') out.push(`${near || '(없음)'} · ${own.trim().slice(0, 24)}`)
+  const missed: string[] = []
+  let visited = 0
+  for (const tab of ['Chat', 'Agents', 'Security', 'Notices', 'Guide']) {
+    /* 이름 앞부분으로 찾는다 — 공지 탭은 안 읽은 건수가 이름에 붙어 exact가 안 맞는다 */
+    const button = nav.getByRole('button', { name: new RegExp(`^${tab}`) })
+    if ((await button.count()) === 0) {
+      missed.push(tab)
+      continue
     }
-    return out
-  })
+    await button.click()
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    expect(await scan(), `${tab}: 한국어인데 영어로 표시된 자리`).toEqual([])
+    visited += 1
+    await openSidebar(page, { nav: 'Work area', open: 'Open sidebar' })
+  }
+  expect(missed, '못 연 탭이 있으면 그만큼 안 훑은 것이다').toEqual([])
+  expect(visited, '한 탭도 못 열었으면 이 검사는 아무것도 보지 않았다').toBe(5)
 
-  expect(bad, '한국어인데 영어로 표시된 자리 — 영어 음성이 뭉개 읽는다').toEqual([])
+  /* ③ 관리자는 아예 번역 대상이 아니다 — 통째로 한국어라고 말해야 한다 */
+  await page.goto('./')
+  await page.getByRole('button', { name: /관리자 시스템/ }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  expect(await scan(), '관리자: 한국어인데 영어로 표시된 자리').toEqual([])
 })
 
 /**

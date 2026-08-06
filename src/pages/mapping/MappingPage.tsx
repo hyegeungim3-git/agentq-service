@@ -122,10 +122,15 @@ export function MappingPage({
                 {busy ? "처리 중…" : runLabel}
               </button>
 
+              {/* 자리는 처음부터 두고 내용만 채운다 — 실행 순간에 만들어지는 리전은
+                  첫 변화를 놓친다. 보이는 카드는 같은 말을 두 번 읽히지 않게 내린다 */}
+              <p role="status" aria-live="polite" className="sr-only">
+                {busy ? "표준 체계와 대조하고 있습니다" : ""}
+              </p>
+
               {busy && (
                 <div
-                  role="status"
-                  aria-live="polite"
+                  aria-hidden="true"
                   className="rounded-xl border border-slate-200 bg-white p-5"
                 >
                   <p className="text-sm font-bold text-slate-700">
