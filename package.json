@@ -16,7 +16,8 @@
     "e2e:app": "playwright test --grep-invert @a11y",
     "e2e:a11y": "playwright test --grep @a11y",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run build",
-    "api:spec": "node scripts/build-openapi.mjs"
+    "api:spec": "node scripts/build-openapi.mjs",
+    "budget": "node scripts/bundle-budget.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.28.0",

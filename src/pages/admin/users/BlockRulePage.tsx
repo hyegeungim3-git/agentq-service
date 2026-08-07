@@ -21,7 +21,14 @@ function Row({ rule, active }: { rule: BlockRule; active: boolean }) {
           {rule.kind === 'ip' ? 'IP' : '계정'}
         </span>
       </td>
-      <td className="px-3 py-2 font-mono text-[11px] font-bold text-slate-800">{rule.value}</td>
+      {/* 행 머리글은 **그 행을 가리키는 값**이어야 한다. 첫 칸은 종류 배지(IP/계정)라
+          머리글로 삼으면 '차단 중'을 들을 때 'IP'만 따라온다 — 어느 주소인지가 빠진다 */}
+      <th
+        scope="row"
+        className="px-3 py-2 text-left font-mono text-[11px] font-bold text-slate-800"
+      >
+        {rule.value}
+      </th>
       <td className="px-3 py-2 text-slate-600">{rule.reason}</td>
       <td className="px-3 py-2 tabular-nums text-slate-600">
         {rule.until === null ? '무기한' : rule.until}

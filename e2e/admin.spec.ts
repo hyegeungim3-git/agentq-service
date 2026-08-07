@@ -1,15 +1,7 @@
 import { test, expect, type Page } from '@playwright/test'
-import { openTab } from './shell'
-
-/** 관리자 메뉴는 좁은 화면에서 오버레이라 먼저 연다 */
-async function adminNav(page: Page) {
-  const nav = page.getByRole('navigation', { name: '관리자 메뉴' })
-  if (!(await nav.isVisible().catch(() => false))) {
-    await page.getByRole('button', { name: '메뉴 열기' }).click()
-    await expect(nav).toBeVisible()
-  }
-  return nav
-}
+/* 메뉴 여는 절차는 `shell.ts` 한 곳에 있다. 여기 복사본을 두었더니, 관리자 코드를
+   따로 내려받게 되면서 '도착할 때까지 기다리기'가 필요해졌을 때 이 파일만 깨졌다 */
+import { adminNav, openTab } from './shell'
 
 async function enterAdmin(page: Page) {
   await page.goto('./')

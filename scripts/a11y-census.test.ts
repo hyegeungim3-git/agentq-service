@@ -47,30 +47,30 @@ describe('접근성 전수 — 자리를 세어 본다', () => {
    *
    * 27화면 29행을 바꿨다고 적었는데, 그 숫자가 **전부**인지는 세지 않았다. 여기서 센다.
    */
-  it('tbody의 모든 행에 행 머리글이 있다', () => {
+  it('값이 든 모든 행에 행 머리글이 있다', () => {
     const missing: string[] = []
     let rows = 0
 
     for (const f of FILES) {
-      let i = 0
-      while ((i = f.src.indexOf('<tbody', i)) >= 0) {
-        const end = f.src.indexOf('</tbody>', i)
-        if (end < 0) break
-        const body = f.src.slice(i, end)
-        let j = 0
-        while ((j = body.indexOf('<tr', j)) >= 0) {
-          const close = body.indexOf('</tr>', j)
-          const row = body.slice(j, close < 0 ? body.length : close)
-          rows += 1
-          /* 칸을 반복해 그리는 표는 자리를 봐서 첫 칸만 머리글로 만든다
-             (`ci === 0 ? <th scope="row"` 꼴) — 그래서 순서가 아니라 존재로 본다 */
-          if (!row.includes('scope="row"')) {
-            missing.push(`${f.rel}:${lineOf(f.src, i + j)}`)
-          }
-          if (close < 0) break
-          j = close + 5
-        }
-        i = end + 8
+      let j = 0
+      /**
+       * ⚠️ 처음에는 `<tbody>` 안만 훑었다. 그랬더니 **행을 따로 컴포넌트로 뽑아 둔 표**를
+       * 통째로 못 봤다 — 소스에서 `<tr>`이 `<tbody>` 바깥에 있기 때문이다.
+       * 화면 쪽 전수 검사(`e2e/a11y-census.spec.ts`)가 그 구멍을 잡아 줬다.
+       * 그래서 여기서는 **`<tr>`을 어디 있든 본다.**
+       *
+       * 머리글 행(`<th scope="col">`만 든 행)은 대상이 아니다 — `<td>`가 있는 행,
+       * 즉 값이 든 행만 행 머리글을 가져야 한다.
+       */
+      while ((j = f.src.indexOf('<tr', j)) >= 0) {
+        const close = f.src.indexOf('</tr>', j)
+        const row = f.src.slice(j, close < 0 ? f.src.length : close)
+        j = close < 0 ? f.src.length : close + 5
+        if (!row.includes('<td')) continue
+        rows += 1
+        /* 칸을 반복해 그리는 표는 자리를 봐서 첫 칸만 머리글로 만든다
+           (`ci === 0 ? <th scope="row"` 꼴) — 그래서 순서가 아니라 존재로 본다 */
+        if (!row.includes('scope="row"')) missing.push(`${f.rel}:${lineOf(f.src, j)}`)
       }
     }
 

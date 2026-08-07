@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
-import { enterDomain, openTab } from './shell'
+import { enterDomain, openTab, walkAdminScreens } from './shell'
 
 /**
  * **전수를 센다.** 한 화면에서 되는 것을 보고 '전부 된다'고 적지 않기 위해서다.
@@ -300,4 +300,92 @@ test('상주 알림 자리가 실제로 채워진다 @a11y', async ({ page }) =>
      덮는 대화상자라서(결함 4를 고친 결과) 뒤에 있는 버튼을 가린다 */
   await page.getByRole('button', { name: /금형 교체 주기/ }).first().click()
   await expect(status).toHaveText(/답변이 도착했습니다/, { timeout: 15_000 })
+})
+
+/**
+ * **관리자 56화면 전수.**
+ *
+ * 그동안 관리자를 훑던 것은 axe 검사 하나였고, 거기서 여는 화면은 **다섯 개**였다
+ * (관리 홈 + 메뉴 4개). 나머지 50여 화면은 표도 스크롤 상자도 검사된 적이 없다 —
+ * 사용자 포털에서 잡힌 결함(행 머리글·이름 없는 정지점)이 관리자에 그대로 남아 있어도
+ * 알 방법이 없었다.
+ *
+ * 여기서는 화면마다 **소리로 쓸 수 있는지**의 최소 조건만 본다. 규칙 엔진(axe)이 아니라
+ * 이 저장소가 실제로 밟은 결함들이다.
+ *  ① 제목이 하나 있는가 — 없으면 '여기가 어디'인지 알 수 없다
+ *  ② Tab이 멈추는데 이름이 없는 자리가 있는가
+ *  ③ 표의 행 머리글이 빠진 행이 있는가
+ *
+ * 느리다(56화면). 그래도 화면 다섯 개만 보고 '관리자도 됐다'고 적는 것보다 낫다.
+ */
+test('관리자 화면 전수 — 제목·정지점 이름·행 머리글 @a11y', async ({ page }) => {
+  test.setTimeout(180_000)
+
+  await page.goto('./')
+  await page.getByRole('button', { name: /관리자 시스템/ }).click()
+  await expect(page.getByRole('heading', { name: '시스템 현황' })).toBeVisible()
+
+  const noHeading: string[] = []
+  const unnamedStops: string[] = []
+  const rowsWithoutHeader: string[] = []
+
+  const { visited, unreachable } = await walkAdminScreens(page, async (label) => {
+    const found = await page.evaluate(() => {
+      const main = document.querySelector('main')
+      if (!main) return { heading: 0, stops: 0, rows: 0 }
+
+      /* Tab이 멈추는데 이름이 없는 자리 */
+      const stops = Array.from(main.querySelectorAll('[tabindex="0"]')).filter(
+        (el) => !el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby'),
+      ).length
+
+      /* 행 머리글이 없는 행 — 헤더 전용 행(모두 th)은 제외한다 */
+      let rows = 0
+      for (const tbody of Array.from(main.querySelectorAll('tbody'))) {
+        for (const tr of Array.from(tbody.querySelectorAll('tr'))) {
+          if (tr.querySelector('td') && !tr.querySelector('th[scope="row"]')) rows += 1
+        }
+      }
+
+      return { heading: main.querySelectorAll('h1').length, stops, rows }
+    })
+
+    if (found.heading === 0) noHeading.push(label)
+    if (found.stops > 0) unnamedStops.push(`${label} (${found.stops})`)
+    if (found.rows > 0) rowsWithoutHeader.push(`${label} (${found.rows})`)
+  })
+
+  expect(unreachable, '눌러 볼 수 없어 검사하지 못한 메뉴 — 안 본 화면을 통과로 세면 안 된다').toEqual([])
+  expect(visited.length, '관리자 화면을 다섯 개만 보고 전수라고 할 수 없다').toBeGreaterThan(40)
+  expect(noHeading, '제목이 없는 화면 — 여기가 어디인지 알 수 없다').toEqual([])
+  expect(unnamedStops, 'Tab이 멈추는데 이름이 없는 자리').toEqual([])
+  expect(rowsWithoutHeader, '행 머리글이 없는 행 — 어느 줄의 값인지 안 붙는다').toEqual([])
+})
+
+/**
+ * **관리자 코드를 정말 나중에 받는가.**
+ *
+ * 파일이 나뉘어 있다고 첫 화면이 안 받는 것은 아니다 — 어디선가 정적으로 import하면
+ * 나뉜 채로 같이 딸려 온다. 그래서 파일 크기가 아니라 **실제로 받은 요청**을 본다.
+ * (`npm run budget`은 크기를, 이 검사는 시점을 본다. 둘은 다른 것을 지킨다)
+ */
+test('관리자 코드는 관리자에 들어갈 때 받는다', async ({ page }) => {
+  /* 개발 서버는 모듈을 그대로 주고(`src/AdminApp.tsx`), 빌드본은 해시 청크로 준다
+     (`assets/AdminApp-xxxx.js`). 검사는 둘 다에서 돌아야 하므로 이름만 본다 */
+  const chunks: string[] = []
+  page.on('request', (r) => {
+    const m = /\/(AdminApp|AgentApp)[.-]/.exec(new URL(r.url()).pathname)
+    if (m?.[1]) chunks.push(m[1])
+  })
+
+  await page.goto('./')
+  await expect(page.getByRole('button', { name: /관리자 시스템/ })).toBeVisible()
+  expect(chunks, '분야 선택 화면이 관리자·에이전트 코드까지 받고 있다').toEqual([])
+
+  await page.getByRole('button', { name: /관리자 시스템/ }).click()
+  await expect(page.getByRole('heading', { name: '시스템 현황' })).toBeVisible()
+  expect(chunks, '관리자에 들어갔는데 관리자 코드를 안 받았다면 첫 청크에 이미 있던 것이다').toContain(
+    'AdminApp',
+  )
+  expect(chunks, '관리자에 들어갔을 뿐인데 에이전트 코드까지 받았다').not.toContain('AgentApp')
 })

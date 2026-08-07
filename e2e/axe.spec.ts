@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
-import { openTab } from './shell'
+import { openTab, adminNav } from './shell'
 
 /**
  * 규칙 엔진(axe) 검사.
@@ -81,15 +81,10 @@ test('규칙 엔진이 아는 위반이 없다 — 관리자 @a11y', async ({ pa
   await page.getByRole('button', { name: /관리자 시스템/ }).click()
 
   /* 좁은 화면에서는 메뉴가 오버레이라 **한 번 고르면 닫힌다.** 매번 다시 연다 —
-     처음엔 한 번만 열고 넷을 돌렸더니 모바일에서 셋을 조용히 건너뛰고 있었다 */
-  const openNav = async () => {
-    const nav = page.getByRole('navigation', { name: '관리자 메뉴' })
-    if (!(await nav.isVisible().catch(() => false))) {
-      await page.getByRole('button', { name: '메뉴 열기' }).click()
-    }
-    await expect(nav).toBeVisible()
-    return nav
-  }
+     처음엔 한 번만 열고 넷을 돌렸더니 모바일에서 셋을 조용히 건너뛰고 있었다.
+     여는 절차 자체는 `shell.ts`에 한 곳만 둔다(코드를 나눈 뒤 기다림이 필요해졌는데,
+     복사본이 셋이라 한 곳만 고치면 나머지가 조용히 깨진다) */
+  const openNav = () => adminNav(page)
 
   await openNav()
   all.push(...(await scan(page, '관리 홈')))

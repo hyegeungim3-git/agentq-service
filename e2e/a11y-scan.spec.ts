@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { openTab } from './shell'
+import { openTab, adminNav } from './shell'
 
 /**
  * 접근성 훑기.
@@ -202,22 +202,28 @@ test('접근성 훑기 @a11y', async ({ page }) => {
     content: '*,*::before,*::after{transition:none !important;animation:none !important}',
   })
   await page.getByRole('button', { name: /관리자 시스템/ }).click()
-  const nav = page.getByRole('navigation', { name: '관리자 메뉴' })
-  if (!(await nav.isVisible().catch(() => false))) {
-    await page.getByRole('button', { name: '메뉴 열기' }).click()
-  }
-  await expect(nav).toBeVisible()
+  /* 여는 절차는 `shell.ts` 한 곳에 있다 — 관리자 코드를 따로 내려받게 되면서
+     '도착할 때까지 기다리기'가 필요해졌고, 복사본마다 고칠 수는 없다 */
+  await adminNav(page)
   await scan('관리 홈', 10)
+
+  /* ⚠️ 못 찾은 메뉴를 조용히 넘기면 **안 본 화면이 통과한 화면처럼 보인다.**
+     이 저장소가 이미 두 번 밟은 함정이라 모아서 함께 실패시킨다 */
+  const unreachable: string[] = []
   for (const menu of ['에이전트', '지식 관리', '도구 · 배포']) {
+    const nav = await adminNav(page)
     const b = nav.getByRole('button', { name: menu })
-    if (await b.count()) {
-      await b.first().click()
-      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-      await scan(`관리자 · ${menu}`, 4)
+    if ((await b.count()) === 0) {
+      unreachable.push(menu)
+      continue
     }
+    await b.first().click()
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    await scan(`관리자 · ${menu}`, 4)
   }
 
   console.log(JSON.stringify(all, null, 1))
+  expect(unreachable, '메뉴를 못 찾아 안 본 화면 — 통과로 세면 안 된다').toEqual([])
   expect(thin, '덜 그려진 화면을 훑으면 결함 0건이 나온다').toEqual([])
   expect(all).toEqual([])
 })

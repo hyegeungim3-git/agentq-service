@@ -30,7 +30,10 @@ function PodRows({ pods }: { pods: PodInfo[] }) {
     <>
       {pods.map((p) => (
         <tr key={p.name} className="border-t border-slate-100">
-          <td className="px-3 py-2 font-mono text-[11px] text-slate-700">{p.name}</td>
+          {/* 행 머리글 — 낭독기가 셀마다 '어느 파드의 값인지'를 이걸로 읽는다 */}
+          <th scope="row" className="px-3 py-2 text-left font-mono text-[11px] font-normal text-slate-700">
+            {p.name}
+          </th>
           <td className="px-3 py-2 text-slate-600">{p.namespace}</td>
           <td className="px-3 py-2 tabular-nums text-slate-600">{p.cpuMilli}m</td>
           <td className="px-3 py-2 tabular-nums text-slate-600">{p.memoryMib}Mi</td>

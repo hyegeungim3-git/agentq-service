@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useState, type ReactNode } from 'react'
 import { AGENTS, type AgentId } from '@entities/agent/model'
 import { useScreenChange, type ScreenChange } from '@features/screen-change/useScreenChange'
 import type { Domain } from '@entities/domain/model'
@@ -23,67 +23,9 @@ import { NoticesPage } from '@pages/notices/NoticesPage'
 import { GuidePage } from '@pages/guide/GuidePage'
 import { SettingsPage } from '@pages/settings/SettingsPage'
 import { usePrefs } from '@features/prefs/usePrefs'
-import { SummaryPage } from '@pages/summary/SummaryPage'
-import { TranslatePage } from '@pages/translate/TranslatePage'
-import { ReviewPage } from '@pages/review/ReviewPage'
-import { ReportPage } from '@pages/report/ReportPage'
-import { MeetingPage } from '@pages/meeting/MeetingPage'
-import { RegulationPage } from '@pages/regulation/RegulationPage'
-import { KnowledgePage } from '@pages/knowledge/KnowledgePage'
-import { OcrPage } from '@pages/ocr/OcrPage'
-import { SafetyPage } from '@pages/safety/SafetyPage'
-import { DataQueryPage } from '@pages/dataquery/DataQueryPage'
-import { AnalysisPage } from '@pages/analysis/AnalysisPage'
-import { MappingPage } from '@pages/mapping/MappingPage'
+import { findMenu } from '@entities/admin/nav'
 import { ChatPage } from '@pages/chat/ChatPage'
 import { OrchestrationPage } from '@pages/orchestration/OrchestrationPage'
-import { AdminShell } from '@widgets/admin-shell/AdminShell'
-import { findMenu } from '@entities/admin/nav'
-import { SystemStatusPage } from '@pages/admin/system/SystemStatusPage'
-import { ServiceStatusPage } from '@pages/admin/service/ServiceStatusPage'
-import { GpuStatusPage } from '@pages/admin/gpu/GpuStatusPage'
-import { TrainerStatusPage } from '@pages/admin/trainer/TrainerStatusPage'
-import { PlannedPage } from '@pages/admin/planned/PlannedPage'
-import { UserListPage } from '@pages/admin/users/UserListPage'
-import { ApprovalPage } from '@pages/admin/users/ApprovalPage'
-import { QuotaPage } from '@pages/admin/users/QuotaPage'
-import { AccessLogPage } from '@pages/admin/users/AccessLogPage'
-import { BlockRulePage } from '@pages/admin/users/BlockRulePage'
-import { ModelPage } from '@pages/admin/llmops/ModelPage'
-import { ReliabilityPage } from '@pages/admin/llmops/ReliabilityPage'
-import { QualityPage } from '@pages/admin/llmops/QualityPage'
-import { UsageHistoryPage } from '@pages/admin/analytics/UsageHistoryPage'
-import { SatisfactionPage } from '@pages/admin/analytics/SatisfactionPage'
-import { UsageStatsPage } from '@pages/admin/analytics/UsageStatsPage'
-import { ReportPage as AnalyticsReportPage } from '@pages/admin/analytics/ReportPage'
-import { IntegratedLogPage } from '@pages/admin/oplog/IntegratedLogPage'
-import { UsageMonitorPage } from '@pages/admin/oplog/UsageMonitorPage'
-import { ContentPage } from '@pages/admin/content/ContentPage'
-import { HrSyncPage } from '@pages/admin/sysops/HrSyncPage'
-import { ApiPromptPage } from '@pages/admin/sysops/ApiPromptPage'
-import { IntegrationPage } from '@pages/admin/sysops/IntegrationPage'
-import { AdminHomePage } from '@pages/admin/sysops/AdminHomePage'
-import { GuardrailPage } from '@pages/admin/compliance/GuardrailPage'
-import { AiActPage } from '@pages/admin/compliance/AiActPage'
-import { KnowledgeBasePage } from '@pages/admin/knowledge/KnowledgeBasePage'
-import { AgentOpsPage } from '@pages/admin/agentops/AgentOpsPage'
-import { AppSurfacePage } from '@pages/admin/agentops/AppSurfacePage'
-import { FlowBuilderPage } from '@pages/admin/agentdef/FlowBuilderPage'
-import { ScenarioBuilderPage } from '@pages/admin/agentdef/ScenarioBuilderPage'
-import { WorkflowPage } from '@pages/admin/agentdef/WorkflowPage'
-import { AppInstancePage } from '@pages/admin/appinst/AppInstancePage'
-import { PipelinePage } from '@pages/admin/appinst/PipelinePage'
-import { VectorDbPage } from '@pages/admin/datainfra/VectorDbPage'
-import { IngestPage } from '@pages/admin/datainfra/IngestPage'
-import { BenchmarkPage } from '@pages/admin/datainfra/BenchmarkPage'
-import { PackStudioPage } from '@pages/admin/packops/PackStudioPage'
-import { ToolDeployPage } from '@pages/admin/packops/ToolDeployPage'
-import { DatasetPage } from '@pages/admin/mlops/DatasetPage'
-import { DevEnvPage } from '@pages/admin/mlops/DevEnvPage'
-import { VolumePage } from '@pages/admin/mlops/VolumePage'
-import { RegistryPage } from '@pages/admin/mlops/RegistryPage'
-import { TrainingPage } from '@pages/admin/mlops/TrainingPage'
-import { EvaluationPage } from '@pages/admin/mlops/EvaluationPage'
 
 /* 화면이 여럿이 됐지만 라우터는 아직 넣지 않는다.
    URL 공유·새로고침 복원이 요구사항으로 들어올 때 도입한다(가이드 §8, §12).
@@ -94,6 +36,41 @@ type View =
   | { name: 'shell'; domainId: string; tab: ShellTab; agentId: AgentId | null; scenario: boolean }
   /** 관리자. 발주처와 무관하다 — 플랫폼 전체를 본다 */
   | { name: 'admin'; menuId: string }
+
+/**
+ * 관리자와 에이전트는 **따로 내려받는다.**
+ *
+ * 실측: 첫 청크가 1021KB(gzip 262KB)였고 관리자 44화면과 에이전트 13종이 통째로
+ * 그 안에 있었다. 챗봇만 쓰는 사람도 전부 받는다는 뜻이다. 둘 다 사용자가 **직접
+ * 골라 들어가는 곳**이라 경계가 분명하다.
+ *
+ * 새 화면을 추가할 때는 `AdminApp.tsx`·`AgentApp.tsx`에 넣어야 이 경계가 유지된다.
+ * `App.tsx`에 직접 import하면 다시 첫 청크로 딸려 온다.
+ */
+const AdminApp = lazy(() => import('./AdminApp').then((m) => ({ default: m.AdminApp })))
+const AgentApp = lazy(() => import('./AgentApp').then((m) => ({ default: m.AgentApp })))
+
+/**
+ * 코드를 받는 동안 보여 줄 것.
+ *
+ * 빈 화면을 두지 않는다 — 눌렀는데 아무 일도 안 일어난 것처럼 보인다.
+ * 낭독기에도 말한다: 화면이 바뀌는 중이라는 것을 소리로 알 수 있어야
+ * '안 눌렸나' 하고 다시 누르지 않는다.
+ */
+function Loadable({ children }: { children: ReactNode }) {
+  return (
+    <Suspense
+      fallback={
+        <main role="status" aria-live="polite" className="grid min-h-dvh place-items-center">
+          <span className="sr-only">화면을 불러오는 중입니다</span>
+          <div className="h-8 w-40 animate-pulse rounded bg-slate-200" />
+        </main>
+      }
+    >
+      {children}
+    </Suspense>
+  )
+}
 
 const READ_KEY = 'agentq.readNotices.v1'
 
@@ -253,63 +230,16 @@ export default function App() {
   }
 
   if (view.name === 'admin') {
-    const menu = findMenu(view.menuId)
     return (
-      <AdminShell
-        menuId={view.menuId}
-        onMenu={(id) => setView({ name: 'admin', menuId: id })}
-        onExitAdmin={() => setView({ name: 'portal' })}
-        onUserPortal={() => setView({ name: 'portal' })}
-        admin={ADMIN}
-      >
-        {view.menuId === 'system' && <SystemStatusPage />}
-        {view.menuId === 'service' && <ServiceStatusPage />}
-        {view.menuId === 'gpu' && <GpuStatusPage />}
-        {view.menuId === 'trainer' && <TrainerStatusPage />}
-        {view.menuId === 'users.list' && <UserListPage />}
-        {view.menuId === 'users.approval' && <ApprovalPage />}
-        {view.menuId === 'users.quota' && <QuotaPage />}
-        {view.menuId === 'users.log' && <AccessLogPage />}
-        {view.menuId === 'users.block' && <BlockRulePage />}
-        {view.menuId === 'llmops.models' && <ModelPage />}
-        {view.menuId === 'llmops.reliability' && <ReliabilityPage />}
-        {view.menuId === 'llmops.quality' && <QualityPage />}
-        {view.menuId === 'analytics.history' && <UsageHistoryPage />}
-        {view.menuId === 'analytics.satisfaction' && <SatisfactionPage />}
-        {view.menuId === 'analytics.stats' && <UsageStatsPage />}
-        {view.menuId === 'analytics.report' && <AnalyticsReportPage />}
-        {view.menuId === 'logs.integrated' && <IntegratedLogPage />}
-        {view.menuId === 'logs.usage' && <UsageMonitorPage />}
-        {view.menuId === 'content' && <ContentPage />}
-        {view.menuId === 'hr' && <HrSyncPage />}
-        {view.menuId === 'guardrail' && <GuardrailPage />}
-        {view.menuId === 'aiact' && <AiActPage />}
-        {view.menuId === 'knowledge.areas' && <KnowledgeBasePage />}
-        {view.menuId === 'knowledge.pipeline' && <PipelinePage />}
-        {view.menuId === 'agents.ops' && <AgentOpsPage />}
-        {view.menuId === 'agents.flow' && <FlowBuilderPage />}
-        {view.menuId === 'agents.scenario' && <ScenarioBuilderPage />}
-        {view.menuId === 'agents.workflow' && <WorkflowPage />}
-        {view.menuId === 'apps.surface' && <AppSurfacePage />}
-        {view.menuId === 'apps.instance' && <AppInstancePage />}
-        {view.menuId === 'packstudio' && <PackStudioPage />}
-        {view.menuId === 'deploy' && <ToolDeployPage />}
-        {view.menuId === 'data.sets' && <DatasetPage />}
-        {view.menuId === 'data.vector' && <VectorDbPage />}
-        {view.menuId === 'data.ingest' && <IngestPage />}
-        {view.menuId === 'devenv.workspace' && <DevEnvPage />}
-        {view.menuId === 'devenv.volume' && <VolumePage />}
-        {view.menuId === 'registry' && <RegistryPage />}
-        {view.menuId === 'training' && <TrainingPage />}
-        {view.menuId === 'evaluation.internal' && <EvaluationPage />}
-        {view.menuId === 'evaluation.benchmark' && <BenchmarkPage />}
-        {view.menuId === 'prompts' && <ApiPromptPage />}
-        {view.menuId === 'sysops.integration' && <IntegrationPage />}
-        {view.menuId === 'sysops.home' && (
-          <AdminHomePage onOpen={(id) => setView({ name: 'admin', menuId: id })} />
-        )}
-        {menu !== null && menu.status === 'planned' && <PlannedPage menu={menu} />}
-      </AdminShell>
+      <Loadable>
+        <AdminApp
+          menuId={view.menuId}
+          onMenu={(id) => setView({ name: 'admin', menuId: id })}
+          onExit={() => setView({ name: 'portal' })}
+          onUserPortal={() => setView({ name: 'portal' })}
+          admin={ADMIN}
+        />
+      </Loadable>
     )
   }
 
@@ -371,39 +301,12 @@ export default function App() {
         />
       )}
       {view.tab === 'agents' && !view.scenario && view.agentId !== null && (
-        <AgentView agentId={view.agentId} onBack={backToAgents} />
+        <Loadable>
+          <AgentApp agentId={view.agentId} onBack={backToAgents} />
+        </Loadable>
       )}
     </AppShell>
   )
 }
 
 /** 에이전트 화면 선택 — 허브가 준비된 것만 열어 주므로 여기 오면 카탈로그와 어긋난 것이다 */
-function AgentView({ agentId, onBack }: { agentId: AgentId; onBack: () => void }) {
-  if (agentId === 'summary') return <SummaryPage onBack={onBack} />
-  if (agentId === 'translate') return <TranslatePage onBack={onBack} />
-  if (agentId === 'review') return <ReviewPage onBack={onBack} />
-  if (agentId === 'report') return <ReportPage onBack={onBack} />
-  if (agentId === 'meeting') return <MeetingPage onBack={onBack} />
-  if (agentId === 'internalreg') return <RegulationPage onBack={onBack} />
-  if (agentId === 'knowledge') return <KnowledgePage onBack={onBack} />
-  if (agentId === 'ocr') return <OcrPage onBack={onBack} />
-  if (agentId === 'safety') return <SafetyPage onBack={onBack} />
-  if (agentId === 'dbquery') return <DataQueryPage onBack={onBack} />
-  if (agentId === 'dataanalysis') return <AnalysisPage onBack={onBack} />
-  if (agentId === 'address') return <MappingPage onBack={onBack} />
-  if (agentId === 'chatbot') return <ChatPage onBack={onBack} />
-  return (
-    <main className="min-h-dvh grid place-items-center p-6">
-      <div role="alert" className="max-w-sm text-center">
-        <p className="font-bold text-slate-900">아직 준비되지 않은 에이전트입니다</p>
-        <button
-          type="button"
-          onClick={onBack}
-          className="mt-3 min-h-11 text-sm font-bold text-slate-600 underline"
-        >
-          허브로 돌아가기
-        </button>
-      </div>
-    </main>
-  )
-}
