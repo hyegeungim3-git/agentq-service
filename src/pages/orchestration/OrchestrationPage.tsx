@@ -53,6 +53,16 @@ export function OrchestrationPage({
 
   const finished = isComplete(o.outcomes, scenario.steps)
 
+  /**
+   * 지금 어느 단계가 도는가 — **한 곳에서만** 말한다.
+   *
+   * 원래는 단계마다 자기 라이브 리전을 갖고 있었다. 그 리전은 그 단계가 시작할 때
+   * 생겨나 끝나면 사라지므로, 낭독기가 첫 변화를 놓치거나 앞 알림이 끝나기 전에
+   * 다음 것이 덮어써 네 번 중 몇 번만 들린다(대본 흐름 4의 3번이 그 자리다).
+   * 자리를 하나로 모아 상주시키고 내용만 갈아 끼운다.
+   */
+  const running = scenario.steps.find((_, i) => statusOf(i) === 'running')
+
   return (
     <main className="min-h-dvh bg-slate-50 px-4 py-8">
       <div className="mx-auto w-full max-w-3xl">
@@ -112,7 +122,9 @@ export function OrchestrationPage({
               ? reviews > 0
                 ? `릴레이가 끝났습니다. 사람이 확인해야 하는 지점이 ${reviews}건 남았습니다.`
                 : '릴레이가 끝났습니다. 모든 단계가 확인 지점 없이 완료됐습니다.'
-              : ''}
+              : running
+                ? `${running.title} 진행 중입니다`
+                : ''}
           </p>
 
           {/* 끝까지 갔다고 다 된 게 아니다 — 합계를 결과보다 먼저 말한다 */}
@@ -191,9 +203,11 @@ function StepCard({
       {/* 서버가 붙으면 이 자리가 엔드포인트가 된다 */}
       <p className="mt-0.5 font-mono text-[11px] text-slate-400">{step.apiCall}</p>
 
+      {/* 진행 중이라는 말은 **위의 상주 리전 한 곳**이 한다 — 단계마다 리전을 두면
+          그 단계가 끝날 때 리전이 사라져 첫 변화를 놓치고, 앞 알림이 끝나기 전에
+          다음 것이 덮어써 네 번 중 몇 번만 들린다 */}
       {status === 'running' && (
-        <div role="status" aria-live="polite" className="mt-3 space-y-2">
-          <span className="sr-only">{step.title} 진행 중입니다</span>
+        <div aria-hidden="true" className="mt-3 space-y-2">
           {[0, 1].map((i) => (
             <div key={i} className="h-3 animate-pulse rounded bg-slate-100" />
           ))}

@@ -219,7 +219,14 @@ function QueryResultView({ result, sourceLabel }: { result: QueryResult; sourceL
 
         <details className="mt-4">
           <summary className="cursor-pointer text-xs font-bold text-slate-600">생성된 SQL 보기</summary>
-          <pre tabIndex={0} className="mt-2 overflow-x-auto rounded-lg bg-slate-900 p-3 text-xs leading-relaxed text-slate-100">
+          {/* Tab이 여기 멈춘다 — 이름이 없으면 낭독기가 아무 말 없이 서거나
+              SQL 전체를 한 덩어리로 쏟는다 */}
+          <pre
+            tabIndex={0}
+            role="region"
+            aria-label="생성된 SQL — 가로로 스크롤됩니다"
+            className="mt-2 overflow-x-auto rounded-lg bg-slate-900 p-3 text-xs leading-relaxed text-slate-100"
+          >
             {result.sql}
           </pre>
         </details>
