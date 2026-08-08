@@ -1,5 +1,6 @@
 import { lazy, useCallback, useEffect, useState } from 'react'
-import { AGENTS, type AgentId } from '@entities/agent/model'
+import { useRoute, type Route } from '@features/routing/useRoute'
+import { AGENTS } from '@entities/agent/model'
 import { useScreenChange, type ScreenChange } from '@features/screen-change/useScreenChange'
 import type { Domain } from '@entities/domain/model'
 import { fetchDomain } from '@shared/api/domains'
@@ -30,15 +31,14 @@ import { findMenu } from '@entities/admin/nav'
 import { ChatPage } from '@pages/chat/ChatPage'
 import { OrchestrationPage } from '@pages/orchestration/OrchestrationPage'
 
-/* 화면이 여럿이 됐지만 라우터는 아직 넣지 않는다.
-   URL 공유·새로고침 복원이 요구사항으로 들어올 때 도입한다(가이드 §8, §12).
-   그때 이 View 타입이 그대로 라우트 정의가 된다. */
-type View =
-  | { name: 'portal' }
-  /** 셸 안. tab이 무엇을 보여 줄지, agentId·scenario가 에이전트 탭의 안쪽을 정한다 */
-  | { name: 'shell'; domainId: string; tab: ShellTab; agentId: AgentId | null; scenario: boolean }
-  /** 관리자. 발주처와 무관하다 — 플랫폼 전체를 본다 */
-  | { name: 'admin'; menuId: string }
+/**
+ * 화면 상태 = 주소.
+ *
+ * 예전에는 메모리에만 뒀다. 새로고침하면 첫 화면으로 돌아갔고 링크로 줄 수도 없었다.
+ * 지금은 `features/routing`이 해시와 이 타입을 오간다 — **여기 있던 View 타입이
+ * 그대로 라우트 정의가 됐다.**
+ */
+type View = Route
 
 /**
  * 관리자와 에이전트는 **따로 내려받는다.**
@@ -59,18 +59,13 @@ const READ_KEY = 'agentq.readNotices.v1'
    실제로는 로그인 사용자 정보에서 온다(API 제안서 §3 인증). */
 const ADMIN = { name: '운영 담당자', org: 'AgentQ 플랫폼' }
 
-/**
- * 셸로 들어간다.
- *
- * 여기서 **발주처를 경계에 꽂는다.** 화면이 요청마다 발주처를 넘기는 대신
- * `shared/api`가 그 값을 들고 있다(제안서 §3-2의 헤더 방식과 같다).
- * 렌더나 effect에서 꽂으면 안 된다 — 자식 effect가 부모보다 먼저 돌아서
- * **아직 발주처가 안 정해진 채로 데이터를 부른다.**
- */
-const shell = (domainId: string, tab: ShellTab): View => {
-  setActiveDomain(domainId)
-  return { name: 'shell', domainId, tab, agentId: null, scenario: false }
-}
+const shell = (domainId: string, tab: ShellTab): View => ({
+  name: 'shell',
+  domainId,
+  tab,
+  agentId: null,
+  scenario: false,
+})
 
 /**
  * 지금 어느 화면인가 — 창 제목과 알림에 쓸 이름.
@@ -117,7 +112,23 @@ function describeScreen(view: View, domain: Domain | null): ScreenChange & { key
 }
 
 export default function App() {
-  const [view, setView] = useState<View>({ name: 'portal' })
+  const [view, setView] = useRoute()
+
+  /**
+   * **발주처를 경계에 꽂는 곳은 여기 하나다.**
+   *
+   * 화면이 요청마다 발주처를 넘기는 대신 `shared/api`가 그 값을 들고 있다
+   * (제안서 §3-2의 헤더 방식과 같다).
+   *
+   * 예전에는 포털에서 들어가는 **이동 함수**에서 꽂았다. 주소로 화면을 기억하게 되자
+   * 그 함수를 안 거치는 길이 생겼다 — 링크로 바로 들어오거나 새로고침하면 발주처가
+   * 안 꽂힌 채 자식들이 데이터를 부른다. 실제로 새로고침 뒤 대화 목록이 비었다.
+   *
+   * effect가 아니라 **렌더 중**에 부른다. 자식 effect는 부모 effect보다 먼저 돌기
+   * 때문에, effect에 두면 아직 발주처가 안 정해진 채로 요청이 나간다.
+   * `setActiveDomain`은 React 상태가 아니라 모듈 값이라 렌더 중 호출이 안전하다.
+   */
+  setActiveDomain(view.name === 'shell' ? view.domainId : null)
   /* 불러온 도메인을 id와 함께 들고 있는다.
      effect 안에서 setDomain(null)로 지우던 것을 없앤 이유:
      ① 렌더 중 동기 setState는 연쇄 렌더를 만든다(react-hooks/set-state-in-effect가 잡았다)
@@ -179,12 +190,20 @@ export default function App() {
     if (!domainId) return
     let alive = true
     void fetchDomain(domainId).then((res) => {
-      if (alive && res.ok) setLoaded({ id: domainId, domain: res.data })
+      if (!alive) return
+      if (res.ok) {
+        setLoaded({ id: domainId, domain: res.data })
+        return
+      }
+      /* 주소가 없는 발주처를 가리켰다. 기다리는 척하며 영원히 도는 대신 첫 화면으로
+         보낸다 — 링크를 잘못 받은 사람이 빈 화면을 보고 있게 두지 않는다 */
+      setView({ name: 'portal' })
     })
     return () => {
       alive = false
     }
-  }, [domainId])
+    /* setView는 useRoute가 useCallback으로 고정해 준다 — 넣어도 다시 안 돈다 */
+  }, [domainId, setView])
 
   const domain = loaded && loaded.id === domainId ? loaded.domain : null
 
@@ -202,10 +221,7 @@ export default function App() {
     return (
       <PortalPage
         onSelect={(id) => setView(shell(id, 'general'))}
-        onAdmin={() => {
-          setActiveDomain(null)
-          setView({ name: 'admin', menuId: 'system' })
-        }}
+        onAdmin={() => setView({ name: 'admin', menuId: 'system' })}
       />
     )
   }

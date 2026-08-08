@@ -103,7 +103,7 @@ test.describe('셸 — 워크스페이스·공지·가이드', () => {
     await expect(page.getByText(/일 60,000원/)).toBeVisible({ timeout: 10_000 })
 
     await page.reload()
-    await page.getByRole('button', { name: /사용자 포털 입장/ }).click()
+    /* 이제는 새로고침해도 보던 자리에 남는다 — 포털을 다시 거치지 않는다 */
     const nav = await openSidebar(page)
     await expect(nav).toContainText('출장 여비 기준 알려줘')
   })
