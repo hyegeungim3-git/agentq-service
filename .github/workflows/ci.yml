@@ -38,7 +38,8 @@ jobs:
         run: npm run budget
       # E2E는 preview 빌드를 띄워 돌린다(playwright.config.ts 참조).
       # 브라우저 설치는 CI에서만 필요하다.
-      - run: npx playwright install --with-deps chromium
+      - id: browsers
+        run: npx playwright install --with-deps chromium
 
       # 기능과 접근성을 **다른 step으로** 나눈다. 한 덩어리면 CI가 빨개졌을 때
       # 로그를 열어야 어느 쪽인지 알 수 있다 — step 이름이 그 답을 대신한다.
@@ -79,8 +80,12 @@ jobs:
         if: always()
         run: command -v fuser >/dev/null && fuser -k 5180/tcp || true
 
+      # `always()`만 걸면 **브라우저 설치 전에 깨진 커밋**에서도 이 step이 돌고,
+      # 실행기가 없어 접근성 검사 전부가 실패로 찍힌다. 실제 원인은 위쪽 step인데
+      # 로그는 접근성이 무너진 것처럼 보인다(2026-08-08에 그렇게 읽었다).
+      # 브라우저가 깔린 경우에만 돈다 — 기능 e2e가 깨져도 도는 것은 그대로다.
       - name: E2E — 접근성 (axe · 훑기 · 낭독기 재료)
-        if: always()
+        if: always() && steps.browsers.outcome == 'success'
         run: npm run e2e:a11y
 
       # ⚠️ 여기 올리는 dist는 위 build step의 산출물이 **아니다.**
