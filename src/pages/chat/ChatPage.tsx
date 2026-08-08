@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useModalOverlay } from '@features/overlay/useModalOverlay'
 import {
   FAQ_CATEGORIES,
+  answerAsText,
   faqCategoryLabel,
   isUngrounded,
   needsCheck,
@@ -17,7 +18,9 @@ import { LiveMetricCard } from '@widgets/live-metric/LiveMetricCard'
 import { DOWN_REASONS, useFeedback, type FeedbackEntry } from '@features/feedback/useFeedback'
 import { MapIntelCard } from '@widgets/map-intel/MapIntelCard'
 import { ChatSidePanel } from '@widgets/chat-panel/ChatSidePanel'
-import { BookOpen, MessageSquare } from 'lucide-react'
+import { BookOpen, MessageSquare, Paperclip } from 'lucide-react'
+import { DOCUMENT_UPLOAD, validateUpload } from '@entities/upload/model'
+import { uploadDocument } from '@shared/api/documents'
 
 export function ChatPage({
   onBack,
@@ -39,7 +42,29 @@ export function ChatPage({
   const c = useChat(apiOptions ?? {}, store)
   const fb = useFeedback()
   const endRef = useRef<HTMLDivElement>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [attachError, setAttachError] = useState<string | null>(null)
   const [panelOpen, setPanelOpen] = useState(false)
+
+  /**
+   * 첨부 — **형식·용량까지는 여기서 거르고, 전송은 서버가 해야 한다.**
+   *
+   * 서버가 없으니 지금은 반드시 실패한다. 성공한 척 파일 이름만 붙여 두면
+   * 사용자는 그 문서를 근거로 답할 거라고 믿는다(D-009와 같은 처리).
+   * 검사는 서버가 붙어도 그대로 남는다 — 큰 파일을 다 올린 뒤에 거절당하지 않게.
+   */
+  const attach = async (files: FileList | null) => {
+    const file = files?.[0]
+    if (fileRef.current) fileRef.current.value = ''
+    if (!file) return
+    const invalid = validateUpload(file, DOCUMENT_UPLOAD)
+    if (invalid !== null) {
+      setAttachError(invalid)
+      return
+    }
+    const res = await uploadDocument(file)
+    setAttachError(res.ok ? null : res.error)
+  }
   const closePanel = useCallback(() => setPanelOpen(false), [])
   /* 넓은 화면(xl)에서는 옆에 붙어 있으므로 대화상자가 아니다 — 덮는 폭에서만 잠근다 */
   const panelRef = useModalOverlay(panelOpen, closePanel, 1280)
@@ -235,9 +260,33 @@ export function ChatPage({
       </div>
 
       <div className="sticky bottom-0 border-t border-slate-200 bg-white px-4 py-3">
-        <div className="mx-auto flex w-full max-w-3xl items-end gap-2">
+        <div className="mx-auto w-full max-w-3xl">
+          {/* 올린 파일이 왜 안 되는지는 **올려 본 자리에서** 말한다. 가이드에만 적어 두면
+              올리고 나서야 안 된다는 걸 알고, 그때는 이미 기다린 뒤다 */}
+          {attachError !== null && (
+            <p role="alert" className="mb-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-800">
+              {attachError}
+            </p>
+          )}
+        <div className="flex w-full items-end gap-2">
           <label htmlFor="chat-input" className="sr-only">
             질문 입력
+          </label>
+          <input
+            ref={fileRef}
+            id="chat-attach"
+            type="file"
+            accept={DOCUMENT_UPLOAD.extensions.map((e) => `.${e}`).join(',')}
+            onChange={(e) => void attach(e.target.files)}
+            className="sr-only"
+          />
+          <label
+            htmlFor="chat-attach"
+            title={DOCUMENT_UPLOAD.hint}
+            className="inline-flex min-h-11 cursor-pointer items-center rounded-lg border border-slate-200 px-3 text-slate-600 hover:bg-slate-50"
+          >
+            <Paperclip className="size-4" aria-hidden="true" />
+            <span className="sr-only">파일 첨부</span>
           </label>
           <textarea
             id="chat-input"
@@ -262,6 +311,7 @@ export function ChatPage({
           >
             전송
           </button>
+        </div>
         </div>
       </div>
     </main>
@@ -298,6 +348,54 @@ export function ChatPage({
         </div>
       )}
     </div>
+  )
+}
+
+/**
+ * 답변을 클립보드로.
+ *
+ * `navigator.clipboard`는 **실패할 수 있다** — 권한이 없거나 보안 컨텍스트가 아니면
+ * 거절된다. 조용히 넘기면 사용자는 복사된 줄 알고 다른 곳에 붙여 넣는다.
+ * 그래서 성공/실패를 그 자리에서 말한다.
+ */
+function CopyButton({ message }: { message: ChatMessage }) {
+  const [state, setState] = useState<'idle' | 'done' | 'failed'>('idle')
+
+  const copy = () => {
+    const text = answerAsText(message)
+    const api = navigator.clipboard
+    if (api === undefined) {
+      setState('failed')
+      return
+    }
+    void api.writeText(text).then(
+      () => setState('done'),
+      () => setState('failed'),
+    )
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={copy}
+        /* 보이는 글자가 이름 안에 있어야 한다 — 음성 조작 사용자는 보이는 대로 말한다 */
+        aria-label="답변 복사, 근거와 함께 복사합니다"
+        className="min-h-11 rounded-lg border border-slate-200 px-3 text-xs font-bold text-slate-600 hover:bg-slate-50"
+      >
+        답변 복사
+      </button>
+      {state === 'done' && (
+        <span role="status" className="text-[11px] font-bold text-emerald-700">
+          근거까지 복사했습니다
+        </span>
+      )}
+      {state === 'failed' && (
+        <span role="alert" className="text-[11px] font-bold text-rose-700">
+          복사하지 못했습니다 — 브라우저가 클립보드 접근을 막았습니다
+        </span>
+      )}
+    </>
   )
 }
 
@@ -366,6 +464,10 @@ function MessageBubble({
             {message.map && <MapIntelCard map={message.map} />}
           </>
         )}
+      </div>
+
+      <div className="mt-1.5 flex flex-wrap items-center gap-2">
+        <CopyButton message={message} />
       </div>
 
       <FeedbackBar

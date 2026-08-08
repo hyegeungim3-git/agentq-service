@@ -1,0 +1,269 @@
+{
+  "출처": "reb-ai-platform-v3 = C:/한국부동산원/genos-app/src/user",
+  "실측일": "2026-08-08",
+  "합계": {
+    "모듈": 52
+  },
+  "모듈": [
+    {
+      "file": "auditLog.js",
+      "lines": 39,
+      "purpose": "사용자 포털의 실사용 이벤트를 도메인별 localStorage에 축적하고,      */"
+    },
+    {
+      "file": "guardrails.js",
+      "lines": 87,
+      "purpose": "관리자 시스템이 localStorage에 기록한 규칙을 사용자 앱이 읽어 적용   */"
+    },
+    {
+      "file": "i18n.js",
+      "lines": 49,
+      "purpose": "답변·팩 콘텐츠는 도메인 데모 특성상 한국어 유지 (V4 로드맵 W3에서    */"
+    },
+    {
+      "file": "liveEngine.js",
+      "lines": 57,
+      "purpose": "라이브 데이터 엔진 — 팩 liveMetric 설정으로 구동되는 시뮬레이션 틱   */"
+    },
+    {
+      "file": "mapIntel.js",
+      "lines": 68,
+      "purpose": "지도 인텔리전스 (3단계) — GENERAL 채팅의 지역 질의 감지·응답 생성     */"
+    },
+    {
+      "file": "mdLite.jsx",
+      "lines": 83,
+      "purpose": "경량 마크다운 렌더러 — 채팅 말풍선 전용                              */"
+    },
+    {
+      "file": "scenarios.js",
+      "lines": 30,
+      "purpose": "커스텀 오케스트레이션 시나리오 오버레이 (시나리오 빌더가 생성)       */"
+    },
+    {
+      "file": "shiftHandover.js",
+      "lines": 146,
+      "purpose": "교대 인수인계 (Shift Handover)"
+    },
+    {
+      "file": "utils.jsx",
+      "lines": 92,
+      "purpose": "도메인 팩 orchestration 필드 정규화 — 객체 1개(기존 팩 하위호환) 또는 배열(시나리오 여러 "
+    },
+    {
+      "file": "voiceInput.js",
+      "lines": 55,
+      "purpose": "음성 입력 (Web Speech API)"
+    },
+    {
+      "file": "workOrders.js",
+      "lines": 97,
+      "purpose": "작업지시 닫힌 루프"
+    },
+    {
+      "file": "components/ApprovalModal.jsx",
+      "lines": 144,
+      "purpose": ""
+    },
+    {
+      "file": "components/LiveMetricCard.jsx",
+      "lines": 67,
+      "purpose": "라이브 지표 카드 — 팩 liveMetric + 엔진 상태를 SVG 스파크라인으로    */"
+    },
+    {
+      "file": "components/MapIntelCard.jsx",
+      "lines": 135,
+      "purpose": "지도 인텔리전스 카드 — SVG 타일 히트맵 + 시계열 차트 (시뮬레이션)     */"
+    },
+    {
+      "file": "components/ScanModal.jsx",
+      "lines": 147,
+      "purpose": "설비·로트 코드 스캔"
+    },
+    {
+      "file": "components/SelfCheckModal.jsx",
+      "lines": 424,
+      "purpose": ""
+    },
+    {
+      "file": "components/ShiftHandoverModal.jsx",
+      "lines": 185,
+      "purpose": "교대 인수인계 — 받은 인계 확인 + 이번 조 노트 작성"
+    },
+    {
+      "file": "components/Toast.jsx",
+      "lines": 19,
+      "purpose": ""
+    },
+    {
+      "file": "components/WorkOrderModal.jsx",
+      "lines": 130,
+      "purpose": "작업지시 추적 — 발행된 지시가 실제로 조치·검증됐는지 닫는 화면"
+    },
+    {
+      "file": "components/XaiPanel.jsx",
+      "lines": 138,
+      "purpose": "데이터는 answer 객체에서: confidence(number)·citations[]·xai{}      "
+    },
+    {
+      "file": "components/agents/AddressAgent.jsx",
+      "lines": 1411,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/AgentHub.jsx",
+      "lines": 367,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/AgentWorkflowPanel.jsx",
+      "lines": 443,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/ChatbotAgent.jsx",
+      "lines": 965,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/DBQueryAgent.jsx",
+      "lines": 972,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/DataAnalysisAgent.jsx",
+      "lines": 765,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/DocReviewAgent.jsx",
+      "lines": 562,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/InternalRegAgent.jsx",
+      "lines": 580,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/KnowledgeAgent.jsx",
+      "lines": 660,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/MeetingMinutesAgent.jsx",
+      "lines": 817,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/OCRAgent.jsx",
+      "lines": 645,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/OrchestrationScenario.jsx",
+      "lines": 363,
+      "purpose": "에이전트 강조색 — AgentHub COLOR_MAP과 동일 팔레트 (표시용 부분집합) */"
+    },
+    {
+      "file": "components/agents/ReportAgent.jsx",
+      "lines": 1332,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/SafetyPlanAgent.jsx",
+      "lines": 685,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/SummaryAgent.jsx",
+      "lines": 618,
+      "purpose": ""
+    },
+    {
+      "file": "components/agents/TranslateAgent.jsx",
+      "lines": 503,
+      "purpose": ""
+    },
+    {
+      "file": "components/layout/ChatHeader.jsx",
+      "lines": 169,
+      "purpose": "알림 심각도별 아이콘·색 (팩 notifications[].severity: 'alert'|'warn'|'i"
+    },
+    {
+      "file": "components/layout/ChatInput.jsx",
+      "lines": 131,
+      "purpose": "하단 입력 영역 — 통합 단일 박스 (첨부·음성·RAG 토글·LLM 선택·전송)   */"
+    },
+    {
+      "file": "components/layout/ChatMessages.jsx",
+      "lines": 649,
+      "purpose": "지도 인텔리전스 카드: recharts 포함 — 지역 질의 응답 시점에만 로드 (초기 번들 분리)"
+    },
+    {
+      "file": "components/layout/RightPanel.jsx",
+      "lines": 530,
+      "purpose": "추천 카드 버튼에 쓸 에이전트 짧은 이름 — 도메인 카탈로그가 정본."
+    },
+    {
+      "file": "components/layout/Sidebar.jsx",
+      "lines": 370,
+      "purpose": "윗면·왼면은 채우고 오른면만 선으로 비워 '열린 큐브'를 만든다."
+    },
+    {
+      "file": "components/modals/AgentBuilderModal.jsx",
+      "lines": 114,
+      "purpose": "에이전트 빌더(내부 로직) 모달 — 파이프라인 노드 + 연동 도구 (읽기 전용)"
+    },
+    {
+      "file": "components/modals/DocPreviewModal.jsx",
+      "lines": 48,
+      "purpose": "공문서 미리보기 모달 — iframe 렌더링 + 인쇄/다운로드. org: 도메인 조직 정보(브랜딩) */"
+    },
+    {
+      "file": "components/modals/ErrorReportModal.jsx",
+      "lines": 52,
+      "purpose": ""
+    },
+    {
+      "file": "components/modals/LLMDropdownPortal.jsx",
+      "lines": 51,
+      "purpose": ""
+    },
+    {
+      "file": "components/modals/QnaModal.jsx",
+      "lines": 54,
+      "purpose": ""
+    },
+    {
+      "file": "components/modals/SatisfactionModal.jsx",
+      "lines": 46,
+      "purpose": "이용만족도 평가 모달 — AI 답변 3회 후 자동 팝업 */"
+    },
+    {
+      "file": "components/modals/TutorialModal.jsx",
+      "lines": 65,
+      "purpose": "사용 가이드(튜토리얼) 모달 — 주요 기능 8종 안내 */"
+    },
+    {
+      "file": "data/constants.js",
+      "lines": 285,
+      "purpose": ""
+    },
+    {
+      "file": "data/logos.js",
+      "lines": 3,
+      "purpose": "한국부동산원 공식 CI 로고 (base64 — 인쇄 템플릿용)"
+    },
+    {
+      "file": "data/responses.js",
+      "lines": 321,
+      "purpose": "한국부동산원 표준 공문서 템플릿                                      */"
+    },
+    {
+      "file": "hooks/useAgentSimulation.js",
+      "lines": 44,
+      "purpose": "에이전트 진행 시뮬레이션 공통 훅 (8개 에이전트의 동일 패턴을 단일화)"
+    }
+  ]
+}

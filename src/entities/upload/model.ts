@@ -64,7 +64,8 @@ export function validateUpload(
   const ext = extensionOf(file.name)
   if (!ext) return '확장자가 없는 파일은 형식을 확인할 수 없습니다.'
   if (!c.extensions.includes(ext)) {
-    return `${ext.toUpperCase()} 형식은 이 에이전트가 받지 않습니다. ${c.hint}`
+    /* 에이전트 화면뿐 아니라 일반 채팅에서도 쓴다 — 화면 종류를 문구에 박지 않는다 */
+    return `${ext.toUpperCase()} 형식은 여기서 받지 않습니다. ${c.hint}`
   }
   if (file.size === 0) return '빈 파일입니다.'
   if (file.size > c.maxBytes) {

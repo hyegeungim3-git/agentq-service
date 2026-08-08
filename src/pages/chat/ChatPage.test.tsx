@@ -193,4 +193,64 @@ describe('ChatPage', () => {
     })
   })
 
+  describe('답변 복사', () => {
+    /**
+     * 본문만 복사하면 붙여 넣은 쪽에서 사람이 쓴 문장과 구분되지 않는다.
+     * 그 상태로 결재 문서에 들어가면 아무도 원문을 확인하지 않는다.
+     */
+    it('근거와 AI 초안 고지를 함께 복사한다', async () => {
+      const write = vi.fn().mockResolvedValue(undefined)
+      Object.assign(navigator, { clipboard: { writeText: write } })
+      setup()
+      await ask('금형 교체 주기 알려줘')
+      await userEvent.click(await screen.findByRole('button', { name: /답변 복사/ }))
+
+      const copied = String(write.mock.calls[0]?.[0] ?? '')
+      expect(copied).toContain('타수 50만 타')
+      expect(copied).toContain('근거')
+      expect(copied).toContain('SOP-PR-011 · 제4장')
+      expect(copied).toContain('AI가 만든 초안')
+      expect(await screen.findByText('근거까지 복사했습니다')).toBeInTheDocument()
+    })
+
+    /* 근거를 못 찾은 답변은 그 사실이 맨 앞에 와야 복사한 사람이 먼저 본다 */
+    it('근거 없는 답변은 그 사실을 첫 줄에 붙인다', async () => {
+      const write = vi.fn().mockResolvedValue(undefined)
+      Object.assign(navigator, { clipboard: { writeText: write } })
+      setup()
+      await ask('사내 동호회 지원금 얼마야')
+      await userEvent.click(await screen.findByRole('button', { name: /답변 복사/ }))
+      expect(String(write.mock.calls[0]?.[0] ?? '').split(/\r?\n/)[0]).toContain('근거 문서 없음')
+    })
+
+    /* 조용히 넘기면 복사된 줄 알고 다른 곳에 붙여 넣는다 */
+    it('클립보드가 거절하면 실패를 말한다', async () => {
+      Object.assign(navigator, { clipboard: { writeText: vi.fn().mockRejectedValue(new Error('denied')) } })
+      setup()
+      await ask('금형 교체 주기 알려줘')
+      await userEvent.click(await screen.findByRole('button', { name: /답변 복사/ }))
+      expect(await screen.findByRole('alert')).toHaveTextContent(/복사하지 못했습니다/)
+    })
+  })
+
+  describe('파일 첨부', () => {
+    /* 형식 검사는 서버가 붙어도 남는다 — 큰 파일을 다 올린 뒤 거절당하지 않게 */
+    it('받지 않는 형식은 올리기 전에 거른다', async () => {
+      setup()
+      const file = new File(['x'], 'sheet.xlsx', { type: 'application/vnd.ms-excel' })
+      /* `accept`는 고르는 창을 좁힐 뿐 보장이 아니다 — 끌어다 놓기·다른 브라우저에서는
+         그대로 들어온다. 그래서 검사가 실제로 도는지를 보려면 accept를 우회해 넣는다 */
+      await userEvent.upload(screen.getByLabelText('파일 첨부'), file, { applyAccept: false })
+      expect(await screen.findByRole('alert')).toHaveTextContent(/XLSX 형식은/)
+    })
+
+    /* 성공한 척하면 그 문서를 근거로 답할 거라고 믿는다 */
+    it('형식이 맞아도 서버가 없으면 실패를 그대로 말한다', async () => {
+      setup()
+      const file = new File(['x'], 'spec.pdf', { type: 'application/pdf' })
+      await userEvent.upload(screen.getByLabelText('파일 첨부'), file)
+      expect(await screen.findByRole('alert')).toHaveTextContent(/서버/)
+    })
+  })
+
 })

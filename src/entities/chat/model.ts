@@ -92,3 +92,31 @@ const CHAT_REVIEW_THRESHOLD = 0.8
 export function needsCheck(m: ChatMessage): boolean {
   return m.confidence !== null && m.confidence < CHAT_REVIEW_THRESHOLD
 }
+
+/**
+ * 답변을 다른 곳에 옮겨 붙일 수 있는 글로 만든다.
+ *
+ * ⚠️ **본문만 복사하지 않는다.** 근거를 떼고 나가면, 붙여 넣은 쪽에서는 사람이 쓴
+ * 문장과 구분되지 않는다. 그 상태로 결재 문서에 들어가면 아무도 원문을 확인하지 않는다.
+ * 그래서 근거 목록과 'AI가 만든 초안'이라는 사실을 함께 붙인다.
+ *
+ * 근거를 못 찾은 답변은 그 사실이 첫 줄에 온다 — 복사한 사람이 제일 먼저 봐야 한다.
+ */
+export function answerAsText(m: ChatMessage): string {
+  const lines: string[] = []
+  if (isUngrounded(m)) lines.push('[근거 문서 없음 · 담당 부서 확인 필요]')
+  lines.push(m.text)
+  if (m.sources.length > 0) {
+    lines.push('')
+    lines.push('근거')
+    /* 화면에 보이는 것과 같은 모양으로 — 복사본과 화면이 다르면 어느 쪽이 맞는지 모른다 */
+    for (const s of m.sources) lines.push(`- ${s.title} · ${s.locator}`)
+  }
+  if (m.confidence !== null) {
+    lines.push('')
+    lines.push(`신뢰도 ${Math.round(m.confidence * 100)}%${needsCheck(m) ? ' · 원문 확인 권장' : ''}`)
+  }
+  lines.push('')
+  lines.push('※ AI가 만든 초안입니다. 결재·대외 제출 전에 원문과 대조하십시오.')
+  return lines.join('\n')
+}

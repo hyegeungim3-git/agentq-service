@@ -120,6 +120,89 @@ const PLAN: Record<string, Disposition> = {
   'admin.connectedmon': { kind: '옮김', to: 'sysops.integration' },
 }
 
+
+/**
+ * 사용자 포털의 처분.
+ *
+ * 관리자는 **메뉴**라는 눈에 보이는 목록이 있어 전수가 쉬웠다. 포털은 기능이
+ * 버튼·모달·말풍선 안에 흩어져 있어 목록이 없다 — 그래서 처음 대조 때 id 집합만
+ * 맞춰 보고 '같다'고 적었다. **셀 수 있는 것만 센 것**이었고, 열어 보니 9개가 없었다.
+ *
+ * 그래서 이전 데모의 **모듈 파일 자체**를 목록으로 삼는다(`docs/_v3-portal.json`).
+ * 파일은 지어낼 수 없고, 기능이 생기면 파일이 늘어난다.
+ *
+ * 여기 적는 것은 **화면에 보이는 기능이 있는 모듈**뿐이다. 순수 유틸(`utils.jsx`)이나
+ * 콘텐츠 데이터(`data/*.js`)는 옮기고 말고 할 '기능'이 아니라 제외한다.
+ */
+const PORTAL: Record<string, Disposition> = {
+  /* ── 옮김 ── */
+  'components/LiveMetricCard.jsx': { kind: '옮김' },
+  'components/MapIntelCard.jsx': { kind: '옮김' },
+  'components/XaiPanel.jsx': { kind: '옮김' },
+  'components/Toast.jsx': { kind: '옮김' },
+  'components/agents/AgentHub.jsx': { kind: '옮김' },
+  'components/agents/OrchestrationScenario.jsx': { kind: '옮김' },
+  'components/layout/ChatHeader.jsx': { kind: '옮김' },
+  'components/layout/ChatMessages.jsx': { kind: '옮김' }, /* 답변 복사도 2026-08-08에 붙였다 */
+  'components/layout/RightPanel.jsx': { kind: '옮김' },
+  'components/layout/Sidebar.jsx': { kind: '옮김' },
+  'components/modals/TutorialModal.jsx': { kind: '합침', note: '모달 대신 가이드 페이지 — 못 하는 것을 같은 비중으로 적었다' },
+  'components/modals/QnaModal.jsx': { kind: '합침', note: '채팅 안 FAQ 섹션 — 물어볼 자리 옆에 있어야 고른다' },
+  'components/modals/SatisfactionModal.jsx': { kind: '합침', note: '👍/👎 + 사유 칩. 3회 뒤 자동 팝업은 일부러 안 만들었다 — 하던 일을 끊는다' },
+  'components/modals/ErrorReportModal.jsx': { kind: '합침', note: '👎의 사유 칩으로 받는다 — 같은 것을 두 곳에서 받으면 정본이 흐려진다' },
+  'components/modals/LLMDropdownPortal.jsx': { kind: '합침', note: '모델 선택은 에이전트 화면에 있다 — 일반 채팅에는 고를 것이 하나뿐이다' },
+
+  /* ── 축소 ── */
+  'components/layout/ChatInput.jsx': {
+    kind: '축소',
+    note: '파일 첨부를 일반 채팅에도 뒀다(검사까지·전송은 실패). 음성 입력은 아직 없다',
+  },
+  'components/modals/DocPreviewModal.jsx': {
+    kind: '축소',
+    note: 'OCR 결과 미리보기만 있다. 공문서 인쇄 서식·내려받기는 아직 없다',
+  },
+
+  /* ── 미이관 ── */
+  'components/SelfCheckModal.jsx': { kind: '미이관', note: 'P7 — 내보내기 전 항목별 자가점검(회의록·보고서·안전계획)' },
+  'components/ApprovalModal.jsx': { kind: '미이관', note: 'P7 — 결과를 결재선에 올리기' },
+  'components/ShiftHandoverModal.jsx': { kind: '미이관', note: 'P7 — 교대 인수인계' },
+  'components/WorkOrderModal.jsx': { kind: '미이관', note: 'P7 — 작업지시가 조치·검증됐는지 닫기' },
+  'components/ScanModal.jsx': { kind: '미이관', note: 'P7 — 설비·로트 코드 스캔(현장 입력)' },
+  'components/modals/AgentBuilderModal.jsx': { kind: '미이관', note: 'P7 — 무엇을 거쳐 답했는지 사용자가 보는 화면' },
+  'voiceInput.js': { kind: '미이관', note: 'P7 — 음성 입력. Web Speech API 사용 여부는 결정이 필요하다' },
+  'shiftHandover.js': { kind: '미이관', note: 'P7 — 교대 인수인계 모델' },
+  'workOrders.js': { kind: '미이관', note: 'P7 — 작업지시 모델' },
+}
+
+/** 화면 기능이 아닌 모듈 — 옮기고 말고 할 것이 없다 */
+const PORTAL_NOT_A_FEATURE = [
+  'utils.jsx',
+  'i18n.js',
+  'mdLite.jsx',
+  'auditLog.js',
+  'guardrails.js',
+  'liveEngine.js',
+  'mapIntel.js',
+  'scenarios.js',
+  'hooks/useAgentSimulation.js',
+  'data/constants.js',
+  'data/logos.js',
+  'data/responses.js',
+  'components/agents/AgentWorkflowPanel.jsx',
+]
+
+type PortalSnapshot = { 모듈: { file: string; lines: number }[] }
+
+const portalSnap = JSON.parse(
+  readFileSync(join(process.cwd(), 'docs/_v3-portal.json'), 'utf8'),
+) as PortalSnapshot
+
+/** 에이전트 13종 화면은 따로 대조했다 — 여기서는 셸 밖 기능만 본다 */
+const portalModules = portalSnap.모듈
+  .map((m) => m.file)
+  .filter((f) => !f.startsWith('components/agents/') || f in PORTAL)
+  .filter((f) => !PORTAL_NOT_A_FEATURE.includes(f))
+
 type Snapshot = { 메뉴: { id: string; label: string; kind: '부모' | '화면'; routed: boolean }[] }
 
 const snapshot = JSON.parse(
@@ -170,6 +253,28 @@ describe('이전 데모와의 대조', () => {
     const n = Object.values(PLAN).filter((d) => d.kind === '미이관').length
     const stated = /미이관 \*\*(\d+)개\*\*/.exec(AUDIT)
     expect(stated?.[1], 'PARITY-AUDIT.md에서 미이관 건수를 못 찾았다').toBeDefined()
+    expect(Number(stated?.[1]), '문서와 처분표가 다른 수를 말한다').toBe(n)
+  })
+
+  it('이전 데모의 포털 기능에 모두 처분이 있다', () => {
+    expect(portalModules.length, '포털 스냅샷이 비었거나 형식이 바뀌었다').toBeGreaterThan(15)
+    const missing = portalModules.filter((f) => !PORTAL[f])
+    expect(missing, '처분을 안 적은 포털 모듈이 있다 — 열어 보고 옮김/합침/축소/미이관을 적을 것').toEqual([])
+  })
+
+  it('없어진 포털 모듈의 처분이 남아 있지 않다', () => {
+    const files = new Set(portalSnap.모듈.map((m) => m.file))
+    expect(
+      [...Object.keys(PORTAL)].filter((f) => !files.has(f)),
+      '이전 데모에 없는 모듈의 처분이다 — 지울 것',
+    ).toEqual([])
+    expect([...PORTAL_NOT_A_FEATURE].filter((f) => !files.has(f)), '없는 파일을 제외 목록에 두고 있다').toEqual([])
+  })
+
+  it('포털 미이관 건수를 대조 문서가 같은 수로 말한다', () => {
+    const n = Object.values(PORTAL).filter((d) => d.kind === '미이관').length
+    const stated = /\*\*미이관\*\* \| \*\*(\d+)\*\* \| 없다 \(이전 데모/.exec(AUDIT)
+    expect(stated?.[1], 'PARITY-AUDIT.md 포털 절에서 미이관 건수를 못 찾았다').toBeDefined()
     expect(Number(stated?.[1]), '문서와 처분표가 다른 수를 말한다').toBe(n)
   })
 })
