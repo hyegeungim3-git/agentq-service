@@ -4,7 +4,7 @@ import { currentPack, withPack } from './pack'
 
 /** 이 발주처가 조회하는 데이터 소스 — 이름도 예시 질의도 발주처가 정한다 */
 export function fetchQuerySources(): Promise<ApiResult<DataSourceOption[]>> {
-  // TODO(api-미확정): GET /queries/sources 로 교체. 제거 조건 = API 명세 확정.
+  // TODO(api-미확정): GET /queries/sources 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
   return withPack((p) => p.querySources)
 }
 

@@ -8,7 +8,7 @@ import { withPack } from './pack'
 export function fetchDatasets(): Promise<ApiResult<Dataset[]>> {
   /* 학습·평가 데이터셋(`shared/api/mlops`)과 **다른 자원**이다. 이름이 같아 한때
      같은 주소를 제안했는데, 응답 형태가 서로 달라 명세를 만들 때 충돌했다. */
-  // TODO(api-미확정): GET /analysis/datasets 로 교체. 제거 조건 = API 명세 확정.
+  // TODO(api-미확정): GET /analysis/datasets 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
   return withPack((p) => p.datasets)
 }
 

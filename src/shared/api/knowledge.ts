@@ -14,7 +14,7 @@ const wait = (ms: number): Promise<void> =>
  * 그러면 발주처를 바꿔도 예시와 사양이 제조 것으로 남는다.
  */
 export function fetchKnowledgeContext(): Promise<ApiResult<KnowledgeContext>> {
-  // TODO(api-미확정): GET /knowledge-bases 로 교체. 제거 조건 = API 명세 확정.
+  // TODO(api-미확정): GET /knowledge-bases 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
   return withPack((p) => ({
     bases: p.knowledgeBases,
     examples: p.knowledgeExamples,

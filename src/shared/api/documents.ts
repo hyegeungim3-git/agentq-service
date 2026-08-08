@@ -7,7 +7,7 @@ import { withPack } from './pack'
 
 /** kinds를 주면 그 종류만 걸러 준다 — 번역은 성적서를, 요약은 전부 받는 식이다. */
 export function fetchDocuments(kinds?: DocumentKind[]): Promise<ApiResult<BusinessDocument[]>> {
-  // TODO(api-미확정): GET /documents 로 교체. 제거 조건 = API 명세 확정.
+  // TODO(api-미확정): GET /documents 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
   return withPack((p) => (kinds?.length ? p.documents.filter((d) => kinds.includes(d.kind)) : p.documents))
 }
 

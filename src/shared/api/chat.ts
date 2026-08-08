@@ -28,7 +28,7 @@ export async function sendMessage(
 
 /** 자주 묻는 질문 목록 — 범주는 화면이 거른다 */
 export function fetchFaq(): Promise<ApiResult<FaqItem[]>> {
-  // TODO(api-미확정): GET /chat/faq 로 교체. 제거 조건 = API 명세 확정.
+  // TODO(api-미확정): GET /chat/faq 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
   return withPack((p) => p.faq)
 }
 

@@ -4,7 +4,7 @@ import { currentPack, withPack } from './pack'
 
 /** 이 발주처가 대조하는 규정 묶음 — 이름도 발주처가 정한다 */
 export function fetchReviewSets(): Promise<ApiResult<RegulationSetOption[]>> {
-  // TODO(api-미확정): GET /reviews/regulation-sets 로 교체. 제거 조건 = API 명세 확정.
+  // TODO(api-미확정): GET /reviews/regulation-sets 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
   return withPack((p) => p.reviewSets)
 }
 
