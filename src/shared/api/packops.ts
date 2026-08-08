@@ -1,9 +1,8 @@
 import type { Deployment, DomainPack, ToolEntry } from '@entities/packops/model'
-import { AGENTS } from '@entities/agent/model'
+import type { AgentId } from '@entities/agent/model'
 import { DEPLOYMENTS } from '@fixtures/packops'
 import { DOMAIN_FIXTURES } from '@fixtures/domains'
 import { packStatuses, type DomainPackData } from '@fixtures/packs'
-import { sectorLabel } from '@entities/domain/model'
 import type { ApiResult } from './domains'
 import { withPack, withPackOf } from './pack'
 
@@ -24,7 +23,7 @@ export function fetchPacks(): Promise<ApiResult<DomainPack[]>> {
     return {
       domainId: d.id,
       orgName: d.orgName,
-      sector: sectorLabel(d.sector),
+      sector: d.sector,
       filled: (pack?.filled ?? []) as DomainPack['filled'],
       usable: pack !== undefined,
     }
@@ -49,11 +48,10 @@ export function createPack(orgName: string): Promise<ApiResult<never>> {
  * 그 도구의 사용처 목록에는 없어서, 화면이 '끊기면 멈추는 에이전트'를
  * 실제보다 적게 말하고 있었다. 정의에서 유도하면 어긋날 자리가 없다.
  */
-function usedBy(pack: DomainPackData, toolId: string): string[] {
-  const ids = pack.agentDefs
+function usedBy(pack: DomainPackData, toolId: string): AgentId[] {
+  return pack.agentDefs
     .filter((d) => d.steps.some((s) => s.toolIds.includes(toolId)))
     .map((d) => d.agentId)
-  return ids.map((id) => AGENTS.find((a) => a.id === id)?.name ?? id)
 }
 
 /**

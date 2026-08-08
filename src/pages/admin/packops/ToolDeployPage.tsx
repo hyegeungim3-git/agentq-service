@@ -6,6 +6,7 @@ import {
   pendingPromotion,
 } from '@entities/packops/model'
 import { fetchDeployments, fetchTools, promote } from '@shared/api/packops'
+import { agentName } from '@entities/agent/model'
 import { externalServers } from '@entities/evidence/model'
 import { fetchMcpServers } from '@shared/api/evidence'
 import { fetchDomains } from '@shared/api/domains'
@@ -112,7 +113,7 @@ export function ToolDeployPage() {
                     <p className="text-sm font-black text-rose-900">
                       끊긴 도구 때문에 못 도는 에이전트 {blocked.length}종
                     </p>
-                    <p className="mt-1 text-xs text-rose-800">{blocked.join(', ')}</p>
+                    <p className="mt-1 text-xs text-rose-800">{blocked.map(agentName).join(', ')}</p>
                     <p className="mt-2 text-xs font-bold text-rose-900">
                       서비스는 계속 돌고 있어 오류가 나지 않습니다. 이 에이전트를 쓰면 결과가 비거나
                       옛 값으로 나옵니다.
@@ -150,7 +151,7 @@ export function ToolDeployPage() {
                       {/* 이름만 보고는 무엇이 이 도구에 기대는지 알 수 없다 */}
                       <p className="mt-2 rounded-lg bg-slate-50 p-2 text-[11px] text-slate-700">
                         {t.connected ? '끊기면 멈추는 에이전트 · ' : '지금 못 도는 에이전트 · '}
-                        {t.usedBy.join(', ')}
+                        {t.usedBy.map(agentName).join(', ')}
                       </p>
                     </li>
                   ))}

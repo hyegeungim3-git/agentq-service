@@ -113,11 +113,21 @@ AgentQ-claude/
 | `widgets` | 큰 화면 영역 조합 | features, entities, shared |
 | `features` | 업무 기능 단위 | entities, shared |
 | `entities` | 도메인 데이터·타입 | shared |
-| `shared` | 기반 코드(UI·유틸·데이터 접근) | 없음 — 상위를 참조하지 않는다 |
+| `shared` | 기반 코드(UI·유틸·데이터 접근) | `entities`의 **타입만** + `fixtures`(교체 지점) |
 | `fixtures` | 예시 데이터 | entities(타입만) |
 
 **`shared`가 특정 페이지나 업무 도메인을 알면 안 된다.** 경로 별칭(`@shared` 등)을
 쓰는 이유가 이것이다 — 상대경로 `../../../`는 의존 방향을 숨긴다.
+
+`shared`의 예외 두 가지는 **의도한 것**이라 명시해 둔다(2026-08-08 전수 대조에서 정리).
+
+- `entities`의 **타입**: 경계 함수가 도메인 타입을 안 돌려주면 부르는 쪽이 전부
+  캐스팅해야 한다. 타입은 빌드 뒤 사라지므로 런타임 의존이 아니다.
+  **값을 가져오는 것은 금지** — 실제로 그 자리에서 표시용 변환이 새어 나왔다.
+- `fixtures`: `shared/api`가 지금은 fixture를 돌려주는 것이 설계다(§9). 서버가 붙으면
+  이 경계 안에서만 바뀐다.
+
+둘 다 `scripts/boundary.test.ts`가 지킨다 — 문서로만 두었더니 이미 새고 있었다.
 
 ## 6. 구현 원칙
 
@@ -261,6 +271,7 @@ production build: npm run build
 | API 제안서 | `docs/API-PROPOSAL.md` | 있음 — 백엔드 확정 대기 |
 | 범위 계획 | `docs/SCOPE-PLAN.md` | 있음 (P0~P4, 85종) |
 | 재구축 기록 | `docs/REBUILD-NOTES.md` | 있음 — 이전 데모와 달라진 점·이유. 작업마다 갱신 |
+| 규칙 전수 대조 | `docs/RULE-AUDIT.md` | 있음 (2026-08-08) — 절별 준수·위반·남은 빚 |
 | 현재 작업 목록 | 이 문서 §20 | 별도 파일을 만들지 않았다 — 항목이 적어 나눌 이유가 없다 |
 
 ## 18. AI 완료 보고 형식

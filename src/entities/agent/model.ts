@@ -51,3 +51,14 @@ export const AGENTS: AgentDefinition[] = [
 
 export const READY_AGENTS = AGENTS.filter((a) => a.status === 'ready')
 
+
+/**
+ * id를 사람이 읽는 이름으로.
+ *
+ * **경계(`shared/api`)는 id를 돌려주고 이름은 화면이 붙인다** — 경계가 이름을 만들면
+ * 서버가 붙을 때 그 문자열까지 서버가 줘야 하고, 카탈로그와 갈라진다(AGENTS.md §9).
+ * 화면마다 이 한 줄을 복사해 두면 그 사본이 또 갈라지므로 여기 한 곳에 둔다.
+ */
+export function agentName(id: string): string {
+  return AGENTS.find((a) => a.id === id)?.name ?? id
+}

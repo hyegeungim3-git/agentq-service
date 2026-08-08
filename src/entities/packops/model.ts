@@ -1,3 +1,5 @@
+import type { SectorCode } from '@entities/domain/model'
+import type { AgentId } from '@entities/agent/model'
 /**
  * 도메인 팩 · 도구/배포.
  *
@@ -40,7 +42,9 @@ export const PACK_ITEMS: PackItemKey[] = [
 export type DomainPack = {
   domainId: string
   orgName: string
-  sector: string
+  /** 분야 **코드**. 화면이 `sectorLabel()`로 옮겨 적는다 —
+      경계가 라벨을 만들면 서버가 붙을 때 그 문자열을 서버가 줘야 한다 */
+  sector: SectorCode
   /** 채워진 항목 */
   filled: PackItemKey[]
   /** 이 팩으로 포털에 들어갈 수 있는가 */
@@ -91,14 +95,14 @@ export type ToolSpec = {
 }
 
 export type ToolEntry = ToolSpec & {
-  /** 이 도구를 쓰는 에이전트 이름 — 정의에서 유도한다 */
-  usedBy: string[]
+  /** 이 도구를 쓰는 에이전트 **id** — 정의에서 유도한다. 이름은 화면이 붙인다 */
+  usedBy: AgentId[]
 }
 
-/** 끊긴 도구 때문에 못 도는 에이전트 */
-export function blockedAgents(tools: ToolEntry[]): string[] {
-  const names = tools.filter((t) => !t.connected).flatMap((t) => t.usedBy)
-  return [...new Set(names)]
+/** 끊긴 도구 때문에 못 도는 에이전트 — id로 돌려준다 */
+export function blockedAgents(tools: ToolEntry[]): AgentId[] {
+  const ids = tools.filter((t) => !t.connected).flatMap((t) => t.usedBy)
+  return [...new Set(ids)]
 }
 
 export type DeployStage = 'staging' | 'production'

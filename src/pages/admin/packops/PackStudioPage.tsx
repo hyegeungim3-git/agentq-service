@@ -1,3 +1,4 @@
+import { sectorLabel } from '@entities/domain/model'
 import { useState } from 'react'
 import {
   PACK_ITEMS,
@@ -91,7 +92,7 @@ export function PackStudioPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-sm font-black text-slate-900">{p.orgName}</p>
                         <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">
-                          {p.sector}
+                          {sectorLabel(p.sector)}
                         </span>
                         {/* 색만으로 알리지 않는다 */}
                         <span

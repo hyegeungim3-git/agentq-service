@@ -15,6 +15,7 @@ import { fetchTools } from '@shared/api/packops'
 import { DOMAIN_FIXTURES } from '@fixtures/domains'
 import { PACKED_DOMAIN_IDS } from '@fixtures/packs'
 import { fetchPacks } from '@shared/api/packops'
+import { agentName } from '@entities/agent/model'
 import { fetchDomainExposure } from '@shared/api/agentops'
 
 /* 기대값을 손으로 적지 않는다. 발주처를 추가할 때마다 숫자를 고쳐야 하면
@@ -153,7 +154,7 @@ describe('판정', () => {
   const pack = (filled: DomainPack['filled']): DomainPack => ({
     domainId: 'x',
     orgName: '예시',
-    sector: '예시',
+    sector: 'public',
     filled,
     usable: filled.length > 0,
   })
@@ -177,7 +178,14 @@ describe('판정', () => {
   it('끊긴 도구를 쓰는 에이전트를 경계가 유도해 준다', async () => {
     const res = await fetchTools('manufacturing')
     if (!res.ok) throw new Error(res.error)
-    expect(blockedAgents(res.data).sort()).toEqual(['데이터 분석', '안전관리계획 수립'])
+    /* 경계는 **id**를 돌려준다 — 이름을 만들면 서버가 붙을 때 그 문자열까지
+       서버가 줘야 하고 카탈로그와 갈라진다(AGENTS.md §9) */
+    expect(blockedAgents(res.data).sort()).toEqual(['dataanalysis', 'safety'])
+    /* 사람이 읽는 이름은 화면이 붙인다 */
+    expect(blockedAgents(res.data).map(agentName).sort()).toEqual([
+      '데이터 분석',
+      '안전관리계획 수립',
+    ])
   })
 
   /* 검증과 운영이 같으면 반영할 것이 없다 */

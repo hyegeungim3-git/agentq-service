@@ -11,9 +11,9 @@ import {
 } from '@entities/agentdef/model'
 import { fetchAgentDefs, saveAgentDef } from '@shared/api/agentdef'
 import { fetchDomains } from '@shared/api/domains'
+import { fetchTools } from '@shared/api/packops'
 import { useRemote } from '@features/remote/useRemote'
 import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
-import { TOOLS } from '@fixtures/packops'
 
 /**
  * 태스크플로우 빌더 — 에이전트가 무엇을 하도록 정해 놓았나.
@@ -48,8 +48,18 @@ export function FlowBuilderPage() {
     })
   }
 
-  const toolName = (id: string): string => TOOLS.find((t) => t.id === id)?.name ?? id
-  const toolBroken = (id: string): boolean => TOOLS.find((t) => t.id === id)?.connected === false
+  /**
+   * 도구 이름과 연결 상태도 **경계에서 받는다.**
+   *
+   * 전에는 fixture를 직접 import해 읽었다. 이름은 그래도 됐지만 **연결 상태는
+   * 살아 있는 값**이라, 서버가 붙으면 이 화면만 옛 상태를 보여 주게 된다.
+   * 화면이 '끊김'을 잘못 말하는 것은 '안 보여 주는 것'보다 나쁘다.
+   */
+  const tools = useRemote(() => fetchTools(domainId), [domainId])
+  const toolOf = (id: string) =>
+    tools.kind === 'ready' ? tools.data.find((t) => t.id === id) : undefined
+  const toolName = (id: string): string => toolOf(id)?.name ?? id
+  const toolBroken = (id: string): boolean => toolOf(id)?.connected === false
 
   return (
     <main className="min-w-0 p-4 sm:p-6">

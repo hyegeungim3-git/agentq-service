@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AGENTS } from '@entities/agent/model'
+import { AGENTS, agentName } from '@entities/agent/model'
 import { blockedBy, notAdopted, unknownAgents } from '@entities/agentdef/model'
 import {
   fetchAdoptedAgents,
@@ -8,9 +8,9 @@ import {
   saveScenario,
 } from '@shared/api/agentdef'
 import { fetchDomains } from '@shared/api/domains'
+import { fetchTools } from '@shared/api/packops'
 import { useRemote } from '@features/remote/useRemote'
 import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
-import { TOOLS } from '@fixtures/packops'
 import { withSubject } from '@shared/lib/korean'
 
 /**
@@ -46,9 +46,13 @@ export function ScenarioBuilderPage() {
     })
   }
 
-  const agentName = (id: string): string => AGENTS.find((a) => a.id === id)?.name ?? id
-  const toolName = (id: string): string => TOOLS.find((t) => t.id === id)?.name ?? id
-  const brokenTools = TOOLS.filter((t) => !t.connected).map((t) => t.id)
+  /* 도구 이름도 경계에서 받는다 — fixture를 직접 읽으면 서버가 붙어도 이 화면만 안 바뀐다 */
+  const tools = useRemote(() => fetchTools(domainId), [domainId])
+  const toolName = (id: string): string =>
+    (tools.kind === 'ready' ? tools.data.find((t) => t.id === id)?.name : undefined) ?? id
+  /* 끊긴 도구도 같은 출처에서 — 이름은 경계에서, 상태는 fixture에서 읽으면 갈라진다 */
+  const brokenTools =
+    tools.kind === 'ready' ? tools.data.filter((t) => !t.connected).map((t) => t.id) : []
   const knownAgents = AGENTS.map((a) => a.id)
 
   return (
