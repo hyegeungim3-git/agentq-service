@@ -39,7 +39,8 @@ export function NoticeBanner({
       <button
         type="button"
         onClick={onOpen}
-        className="min-w-0 flex-1 truncate text-left text-xs font-bold text-slate-800 hover:underline"
+        /* 손가락으로 누르는 자리는 44px이다 — 글자 높이(16px)만큼만 잡혀 있었다 */
+        className="min-h-11 min-w-0 flex-1 truncate text-left text-xs font-bold text-slate-800 hover:underline"
       >
         {next.title}
       </button>
@@ -48,7 +49,7 @@ export function NoticeBanner({
         type="button"
         onClick={() => onRead([next.id])}
         aria-label="이 공지 닫기, 읽음으로 표시합니다"
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-white hover:text-slate-700"
+        className="flex size-11 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-white hover:text-slate-700"
       >
         <X className="size-4" aria-hidden="true" />
       </button>
