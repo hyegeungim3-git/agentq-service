@@ -106,7 +106,7 @@
 | `GET /apps/domains` | `fetchDomainExposure` | `src/pages/admin/agentops/AppSurfacePage.tsx` |
 | `GET /packs` | `fetchPacks` | `src/pages/admin/packops/PackStudioPage.tsx` |
 | `POST /packs` | `createPack` | `src/pages/admin/packops/PackStudioPage.tsx` |
-| `GET /tools` | `fetchTools` | `src/pages/admin/packops/ToolDeployPage.tsx`<br>`src/widgets/chat-panel/ChatSidePanel.tsx` |
+| `GET /tools` | `fetchTools` | `src/pages/admin/agentdef/FlowBuilderPage.tsx`<br>`src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/admin/packops/ToolDeployPage.tsx`<br>`src/widgets/chat-panel/ChatSidePanel.tsx` |
 | `GET /deployments` | `fetchDeployments` | `src/pages/admin/packops/ToolDeployPage.tsx` |
 | `POST /deployments:promote` | `promote` | `src/pages/admin/packops/ToolDeployPage.tsx` |
 | `GET /datasets` | `fetchDatasets` | `src/pages/admin/mlops/DatasetPage.tsx` |
