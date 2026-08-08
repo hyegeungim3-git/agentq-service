@@ -12,6 +12,7 @@ import { BlockRulePage } from '@pages/admin/users/BlockRulePage'
 import { ContentPage } from '@pages/admin/content/ContentPage'
 import { HrSyncPage } from '@pages/admin/sysops/HrSyncPage'
 import { IntegratedLogPage } from '@pages/admin/oplog/IntegratedLogPage'
+import { SecurityArchPage } from '@pages/admin/sysops/SecurityArchPage'
 import { IntegrationPage } from '@pages/admin/sysops/IntegrationPage'
 import { ModelPage } from '@pages/admin/llmops/ModelPage'
 import { QualityPage } from '@pages/admin/llmops/QualityPage'
@@ -46,6 +47,7 @@ export function OpsSection({ menuId, onMenu }: { menuId: string; onMenu: (id: st
       {menuId === 'hr' && <HrSyncPage />}
       {menuId === 'prompts' && <ApiPromptPage />}
       {menuId === 'sysops.integration' && <IntegrationPage />}
+      {menuId === 'sysops.security' && <SecurityArchPage />}
       {menuId === 'sysops.home' && (
         <AdminHomePage onOpen={onMenu} />
       )}

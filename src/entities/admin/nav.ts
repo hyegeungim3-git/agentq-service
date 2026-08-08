@@ -82,6 +82,7 @@ export const ADMIN_MENUS: AdminMenu[] = [
   { id: 'data', label: '데이터 관리', section: '인프라 · 개발', parentId: null, status: 'ready', phase: 'P4', summary: '데이터셋·벡터 DB·자동 적재' },
   { id: 'data.sets', label: '데이터셋', section: '인프라 · 개발', parentId: 'data', status: 'ready', phase: 'P4', summary: '학습·평가 데이터셋과 출처·개인정보' },
   { id: 'data.vector', label: '벡터 DB', section: '인프라 · 개발', parentId: 'data', status: 'ready', phase: 'P5', summary: '컬렉션과 임베딩 차원' },
+  { id: 'data.catalog', label: '카탈로그 · 리니지', section: '인프라 · 개발', parentId: 'data', status: 'ready', phase: 'P6', summary: '자산의 원천→처리→소비처와 표준화율' },
   { id: 'data.ingest', label: '자동 적재', section: '인프라 · 개발', parentId: 'data', status: 'ready', phase: 'P5', summary: '외부에서 문서를 가져오는 수집기' },
   { id: 'devenv', label: '개발 환경', section: '인프라 · 개발', parentId: null, status: 'ready', phase: 'P4', summary: '작업 공간과 공유 볼륨' },
   { id: 'devenv.workspace', label: '작업 공간', section: '인프라 · 개발', parentId: 'devenv', status: 'ready', phase: 'P4', summary: '사람별 작업 공간과 잡고 있는 GPU' },
@@ -90,6 +91,7 @@ export const ADMIN_MENUS: AdminMenu[] = [
   { id: 'training', label: '학습 · 튜닝', section: '인프라 · 개발', parentId: null, status: 'ready', phase: 'P4', summary: '학습 작업 하나하나 — 집계는 트레이너 현황' },
   { id: 'evaluation', label: '모델 평가', section: '인프라 · 개발', parentId: null, status: 'ready', phase: 'P4', summary: '사내 평가셋 결과와 공개 벤치마크' },
   { id: 'evaluation.internal', label: '평가 결과', section: '인프라 · 개발', parentId: 'evaluation', status: 'ready', phase: 'P4', summary: '사내 평가셋 — 믿을 수 없는 결과는 순위에서 뺀다' },
+  { id: 'evaluation.predops', label: '예측 모델 운영', section: '인프라 · 개발', parentId: 'evaluation', status: 'ready', phase: 'P6', summary: '드리프트·재학습·챔피언과 챌린저' },
   { id: 'evaluation.benchmark', label: '평가 지표', section: '인프라 · 개발', parentId: 'evaluation', status: 'ready', phase: 'P5', summary: '공개 벤치마크 — 무엇을 재는지 먼저' },
 
   { id: 'guardrail', label: '가드레일', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '규칙에 걸린 실제 기록 — 규칙 설정은 신뢰성 관리' },
@@ -109,6 +111,7 @@ export const ADMIN_MENUS: AdminMenu[] = [
 
   { id: 'knowledge', label: '지식 관리', section: '지식 · RAG', parentId: null, status: 'ready', phase: 'P3', summary: '지식영역과 색인 파이프라인' },
   { id: 'knowledge.areas', label: '지식영역', section: '지식 · RAG', parentId: 'knowledge', status: 'ready', phase: 'P3', summary: '영역별 검색 가능 문서와 RAG 설정' },
+  { id: 'knowledge.augment', label: '지식 증강 전략', section: '지식 · RAG', parentId: 'knowledge', status: 'ready', phase: 'P6', summary: 'RAG·CAG·TAG 라우팅과 캐시 신선도' },
   { id: 'knowledge.pipeline', label: 'RAG 파이프라인', section: '지식 · RAG', parentId: 'knowledge', status: 'ready', phase: 'P5', summary: '문서가 어느 단계에서 떨어졌나' },
 
   { id: 'users', label: '사용자 관리', section: '운영 · 관리', parentId: null, status: 'ready', phase: 'P2', summary: '계정·승인·권한 부여' },
@@ -134,6 +137,7 @@ export const ADMIN_MENUS: AdminMenu[] = [
   { id: 'prompts', label: 'API·프롬프트', section: '운영 · 관리', parentId: null, status: 'ready', phase: 'P2', summary: '외부에 열어 준 API와 에이전트 프롬프트' },
   { id: 'sysops', label: '시스템 설정', section: '운영 · 관리', parentId: null, status: 'ready', phase: 'P2', summary: '관리 홈과 외부 연동 상태' },
   { id: 'sysops.home', label: '관리 홈', section: '운영 · 관리', parentId: 'sysops', status: 'ready', phase: 'P2', summary: '자주 여는 화면으로 가는 진입점' },
+  { id: 'sysops.security', label: '보안 아키텍처', section: '운영 · 관리', parentId: 'sysops', status: 'ready', phase: 'P6', summary: '망 경계를 넘는 흐름과 통제' },
   { id: 'sysops.integration', label: '연계 SW 모니터링', section: '운영 · 관리', parentId: 'sysops', status: 'ready', phase: 'P2', summary: '외부 시스템 연동 상태' },
 ]
 

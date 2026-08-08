@@ -3358,6 +3358,475 @@
         }
       }
     },
+    "/security/flows": {
+      "get": {
+        "operationId": "fetchDataFlows",
+        "summary": "**게이트웨이 주소·토큰·내부 호스트명은 넣지 않는다** — 이 화면은 캡처되고 공유된다",
+        "description": "→ `DataFlow[]` (`entities/secarch/model.ts`). **게이트웨이 주소·토큰·내부 호스트명은 넣지 않는다** — 이 화면은 캡처되고 공유된다",
+        "tags": [
+          "security"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DataFlow"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/security/boundary-policy": {
+      "get": {
+        "operationId": "fetchBoundaryRules",
+        "summary": "이것은 **선언된 정책**이다",
+        "description": "→ `BoundaryRule[]`. 이것은 **선언된 정책**이다. 실제로 막고 있는지를 확인하는 API가 따로 생기면 화면이 정책과 실제를 나란히 놓는다",
+        "tags": [
+          "security"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BoundaryRule"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/security/external-access": {
+      "get": {
+        "operationId": "fetchExternalAccess",
+        "summary": "기간·2단계 인증 여부 필수",
+        "description": "→ `ExternalAccess[]`. 기간·2단계 인증 여부 필수",
+        "tags": [
+          "security"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExternalAccess"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/augment/strategies": {
+      "get": {
+        "operationId": "fetchStrategies",
+        "summary": "강점만이 아니라 **못 하는 것까지** — 셋 다 좋아 보이면 고를 수 없다",
+        "description": "→ `Strategy[]` (`entities/augment/model.ts`). 강점만이 아니라 **못 하는 것(`caveat`)까지** — 셋 다 좋아 보이면 고를 수 없다",
+        "tags": [
+          "augment"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Strategy"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/augment/routes": {
+      "get": {
+        "operationId": "fetchRoutes",
+        "summary": "**적용 순서와 켜짐 여부**가 결과를 바꾼다",
+        "description": "→ `Route[]`. **적용 순서(`order`)와 켜짐 여부**가 결과를 바꾼다",
+        "tags": [
+          "augment"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Route"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/augment/cache": {
+      "get": {
+        "operationId": "fetchCacheEntries",
+        "summary": "**올릴 때의 원문 버전과 지금 원문 버전을 모두** — '최신/재적재 필요' 판정만 오면 기준이 서버에 숨는다",
+        "description": "→ `CacheEntry[]`. **올릴 때의 원문 버전과 지금 원문 버전을 모두** — '최신/재적재 필요' 판정만 오면 기준이 서버에 숨는다",
+        "tags": [
+          "augment"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CacheEntry"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/augment/cache/{id}:reload": {
+      "post": {
+        "operationId": "reloadCacheEntry",
+        "summary": "다시 올리기",
+        "description": "다시 올리기. 서버가 원문을 읽어 교체한다",
+        "tags": [
+          "augment"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "응답 형태 미정 — 제안서 본문 참조"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/catalog/assets": {
+      "get": {
+        "operationId": "fetchDataAssets",
+        "summary": "표준화율과 **쓰임** 을 함께 — 같은 74%라도 집계에 쓰이면 위험이 다르다",
+        "description": "→ `DataAsset[]` (`entities/catalog/model.ts`). 표준화율과 **쓰임(`usage`)** 을 함께 — 같은 74%라도 집계에 쓰이면 위험이 다르다",
+        "tags": [
+          "catalog"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DataAsset"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/catalog/lineage": {
+      "get": {
+        "operationId": "fetchLineages",
+        "summary": "**없으면 없는 대로** — 빈 계보를 채워 보내면 아무도 그 자산을 안 고친다",
+        "description": "→ `Lineage[]`. **없으면 없는 대로** — 빈 계보를 채워 보내면 아무도 그 자산을 안 고친다",
+        "tags": [
+          "catalog"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lineage"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predops/models": {
+      "get": {
+        "operationId": "fetchPredModels",
+        "summary": "**지표 방향을 반드시** — 없으면 화면이 MAE를 거꾸로 그린다",
+        "description": "→ `PredModel[]` (`entities/predops/model.ts`). **지표 방향(`direction`)을 반드시** — 없으면 화면이 MAE를 거꾸로 그린다",
+        "tags": [
+          "predops"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PredModel"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predops/drift": {
+      "get": {
+        "operationId": "fetchDriftItems",
+        "summary": "GET /predops/drift",
+        "description": "→ `DriftItem[]`",
+        "tags": [
+          "predops"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DriftItem"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predops/retrain-runs": {
+      "get": {
+        "operationId": "fetchRetrainRuns",
+        "summary": "챔피언·챌린저 값과 방향",
+        "description": "→ `RetrainRun[]`. 챔피언·챌린저 값과 방향",
+        "tags": [
+          "predops"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RetrainRun"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predops/retrain-runs/{id}:promote": {
+      "post": {
+        "operationId": "promoteChallenger",
+        "summary": "교체",
+        "description": "교체. 서비스 중인 모델을 바꾸는 일이라 서버가 처리한다",
+        "tags": [
+          "predops"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "응답 형태 미정 — 제안서 본문 참조"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
     "/repro/snapshots": {
       "get": {
         "operationId": "fetchSnapshots",
@@ -4654,6 +5123,14 @@
         "additionalProperties": false,
         "description": "자원 배분 — 합이 1이 되지 않을 수 있다. 남는 몫이 곧 여유다"
       },
+      "Allowance": {
+        "type": "string",
+        "enum": [
+          "allow",
+          "conditional",
+          "block"
+        ]
+      },
       "Alternative": {
         "type": "object",
         "properties": {
@@ -5320,6 +5797,34 @@
         ],
         "additionalProperties": false
       },
+      "BoundaryRule": {
+        "type": "object",
+        "properties": {
+          "grade": {
+            "$ref": "#/components/schemas/GradeCode"
+          },
+          "internal": {
+            "$ref": "#/components/schemas/Allowance"
+          },
+          "gateway": {
+            "$ref": "#/components/schemas/Allowance"
+          },
+          "external": {
+            "$ref": "#/components/schemas/Allowance"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "grade",
+          "internal",
+          "gateway",
+          "external",
+          "note"
+        ],
+        "additionalProperties": false
+      },
       "BranchTaken": {
         "type": "object",
         "properties": {
@@ -5367,6 +5872,44 @@
           "kind",
           "sizeBytes",
           "text"
+        ],
+        "additionalProperties": false
+      },
+      "CacheEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "tokens": {
+            "type": "string"
+          },
+          "loadedAt": {
+            "type": "string"
+          },
+          "loadedRev": {
+            "type": "string",
+            "description": "캐시에 올릴 때의 원문 버전"
+          },
+          "currentRev": {
+            "type": "string",
+            "description": "지금 원문 버전"
+          },
+          "hits": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "tokens",
+          "loadedAt",
+          "loadedRev",
+          "currentRev",
+          "hits"
         ],
         "additionalProperties": false
       },
@@ -5664,6 +6207,114 @@
           "sources"
         ],
         "description": "재현에 필요한 구성 조각"
+      },
+      "DataAsset": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "grade": {
+            "$ref": "#/components/schemas/GradeCode"
+          },
+          "format": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "updateCycle": {
+            "type": "string"
+          },
+          "freshness": {
+            "type": "string",
+            "description": "마지막으로 새로 들어온 때"
+          },
+          "standardizedRatio": {
+            "type": "number",
+            "description": "코드·단위가 표준에 맞는 비율(%)"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/UsageKind"
+          },
+          "consumers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "이 자산이 틀리면 함께 틀리는 곳"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "source",
+          "owner",
+          "grade",
+          "format",
+          "volume",
+          "updateCycle",
+          "freshness",
+          "standardizedRatio",
+          "usage",
+          "consumers"
+        ],
+        "additionalProperties": false
+      },
+      "DataFlow": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "processedAt": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "crossesBoundary": {
+            "type": "boolean",
+            "description": "망 경계를 넘는가 — 이 화면이 실제로 보는 것"
+          },
+          "grade": {
+            "$ref": "#/components/schemas/GradeCode",
+            "description": "넘어가는 데이터의 등급"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "protection": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "from",
+          "processedAt",
+          "to",
+          "crossesBoundary",
+          "grade",
+          "volume",
+          "protection"
+        ],
+        "additionalProperties": false
       },
       "DataSource": {
         "type": "string",
@@ -6034,6 +6685,27 @@
         "additionalProperties": false,
         "description": "그때와 지금이 어떻게 다른가"
       },
+      "DriftItem": {
+        "type": "object",
+        "properties": {
+          "feature": {
+            "type": "string"
+          },
+          "psi": {
+            "type": "number",
+            "description": "분포가 얼마나 이동했나"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "feature",
+          "psi",
+          "note"
+        ],
+        "additionalProperties": false
+      },
       "DutyKey": {
         "type": "string",
         "enum": [
@@ -6146,6 +6818,43 @@
           "none"
         ],
         "description": "기록이 어디에 남는가"
+      },
+      "ExternalAccess": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "org": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "grade": {
+            "$ref": "#/components/schemas/GradeCode"
+          },
+          "expiresOn": {
+            "type": "string",
+            "description": "언제까지"
+          },
+          "mfa": {
+            "type": "boolean"
+          },
+          "lastAccessAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "org",
+          "scope",
+          "grade",
+          "expiresOn",
+          "mfa",
+          "lastAccessAt"
+        ],
+        "additionalProperties": false
       },
       "FaqCategory": {
         "type": "string",
@@ -6315,6 +7024,15 @@
           "cards"
         ],
         "additionalProperties": false
+      },
+      "GradeCode": {
+        "type": "string",
+        "enum": [
+          "confidential",
+          "restricted",
+          "internal",
+          "public"
+        ]
       },
       "GuardrailHit": {
         "type": "object",
@@ -6932,6 +7650,75 @@
         ],
         "description": "문서 번역 모델.\n\n제조 수출 문서(검사성적서·작업표준)를 대상으로 한다. 번역 자체보다\n**용어집 일치**와 **역번역 검증**이 실무의 관심사다 — 규격 용어가 흔들리면 해외 고객 검수에서 반려된다."
       },
+      "Lineage": {
+        "type": "object",
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "upstream": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LineageNode"
+            }
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LineageStage"
+            }
+          },
+          "downstream": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LineageNode"
+            }
+          }
+        },
+        "required": [
+          "assetId",
+          "upstream",
+          "stages",
+          "downstream"
+        ],
+        "additionalProperties": false
+      },
+      "LineageNode": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "additionalProperties": false
+      },
+      "LineageStage": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "what": {
+            "type": "string"
+          },
+          "tool": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "what",
+          "tool"
+        ],
+        "additionalProperties": false
+      },
       "LiveMetric": {
         "type": "object",
         "properties": {
@@ -7419,6 +8206,14 @@
           "elapsedSeconds"
         ],
         "additionalProperties": false
+      },
+      "MetricDirection": {
+        "type": "string",
+        "enum": [
+          "higher",
+          "lower"
+        ],
+        "description": "지표가 큰 쪽이 좋은가, 작은 쪽이 좋은가"
       },
       "ModelEntry": {
         "type": "object",
@@ -8069,6 +8864,72 @@
           "Failed"
         ]
       },
+      "PredModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "task": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "deployedOn": {
+            "type": "string"
+          },
+          "metricName": {
+            "type": "string"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/MetricDirection"
+          },
+          "baseline": {
+            "type": "number",
+            "description": "배포 시점 값"
+          },
+          "current": {
+            "type": "number"
+          },
+          "threshold": {
+            "type": "number",
+            "description": "이 값을 넘으면(방향에 따라) 손봐야 한다"
+          },
+          "samples": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "nextRetrainOn": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "다음 재학습 예정. 아직 안 정했으면 null"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "task",
+          "version",
+          "deployedOn",
+          "metricName",
+          "direction",
+          "baseline",
+          "current",
+          "threshold",
+          "samples",
+          "owner",
+          "nextRetrainOn"
+        ],
+        "additionalProperties": false
+      },
       "PromptEntry": {
         "type": "object",
         "properties": {
@@ -8615,6 +9476,56 @@
         ],
         "description": "결과를 어떻게 내놓는가"
       },
+      "RetrainRun": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "modelId": {
+            "type": "string"
+          },
+          "trigger": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string"
+          },
+          "champion": {
+            "type": "number",
+            "description": "지금 도는 모델의 점수"
+          },
+          "challenger": {
+            "type": "number",
+            "description": "새로 만든 모델의 점수"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/MetricDirection"
+          },
+          "promotedOn": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "아직 안 바꿨으면 null"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "modelId",
+          "trigger",
+          "startedAt",
+          "champion",
+          "challenger",
+          "direction",
+          "promotedOn",
+          "note"
+        ],
+        "additionalProperties": false
+      },
       "ReviewRequest": {
         "type": "object",
         "properties": {
@@ -8705,6 +9616,43 @@
           "by",
           "risks",
           "actionsDone"
+        ],
+        "additionalProperties": false
+      },
+      "Route": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number",
+            "description": "위에서부터 적용된다 — 이 값이 곧 우선순위다"
+          },
+          "when": {
+            "type": "string"
+          },
+          "keywords": {
+            "type": "string"
+          },
+          "strategy": {
+            "$ref": "#/components/schemas/StrategyId"
+          },
+          "hits": {
+            "type": "number"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "order",
+          "when",
+          "keywords",
+          "strategy",
+          "hits",
+          "enabled"
         ],
         "additionalProperties": false
       },
@@ -9399,6 +10347,66 @@
           "30d",
           "quarter"
         ]
+      },
+      "Strategy": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/StrategyId"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "what": {
+            "type": "string"
+          },
+          "targets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "어떤 자료에 쓰는가"
+          },
+          "share": {
+            "type": "number",
+            "description": "전체 질의 중 이 방법으로 답한 비율(%)"
+          },
+          "avgLatencyMs": {
+            "type": "number"
+          },
+          "hitRate": {
+            "type": "number",
+            "description": "근거를 찾아낸 비율(%)"
+          },
+          "strength": {
+            "type": "string"
+          },
+          "caveat": {
+            "type": "string",
+            "description": "이 방법이 못 하는 것 — 강점만 적으면 고를 수 없다"
+          }
+        },
+        "required": [
+          "id",
+          "fullName",
+          "what",
+          "targets",
+          "share",
+          "avgLatencyMs",
+          "hitRate",
+          "strength",
+          "caveat"
+        ],
+        "additionalProperties": false
+      },
+      "StrategyId": {
+        "type": "string",
+        "enum": [
+          "rag",
+          "cag",
+          "tag"
+        ],
+        "description": "지식 증강 전략 — RAG · CAG · TAG.\n\n\"RAG 하나로 다 한다\"가 아니라 질의 성격에 맞는 방법을 골라 쓴다는 것을 관리할 수 있게 만든 화면이다. 규정 조회에 매번 벡터 검색을 도는 것은 낭비고, 집계 수치를 문서 검색으로 답하면 **틀린다**.\n\n이 화면의 위험한 자리는 캐시(CAG)다. 원문이 바뀌었는데 다시 안 올리면\n**옛 내용으로 자신 있게 답한다.** 규정·표준 문서에서 특히 위험하다. 지식 관리의 '색인 뒤 바뀜'과 다른 것이다 — 저기는 검색 색인, 여기는 미리 올려 둔 본문.\n\n라우팅은 **위에서부터** 적용된다. 순서가 결과를 바꾸므로 순서 자체가 설정이다."
       },
       "SummaryRequest": {
         "type": "object",
@@ -10138,6 +11146,15 @@
           "reported"
         ],
         "additionalProperties": false
+      },
+      "UsageKind": {
+        "type": "string",
+        "enum": [
+          "search",
+          "aggregate",
+          "ocr"
+        ],
+        "description": "이 자산을 무엇으로 쓰는가 — 집계에 쓰이면 표준화가 낮을 때 위험이 다르다"
       },
       "UsageMode": {
         "type": "string",

@@ -47,7 +47,7 @@ const PLAN: Record<string, Disposition> = {
     note: '검색 시뮬레이터는 안 만들었다 — 실제 벡터 DB에 질의해야 결과가 나온다(SCOPE-PLAN §6)',
   },
   'data.autoload': { kind: '옮김', to: 'data.ingest' },
-  'data.catalog': { kind: '미이관', note: 'P6 — 자산 리니지(원천→처리→소비처)와 표준화율' },
+  'data.catalog': { kind: '옮김', to: 'data.catalog' },
   'dev.codespace': {
     kind: '축소',
     to: 'devenv.workspace',
@@ -65,7 +65,7 @@ const PLAN: Record<string, Disposition> = {
     note: '순위표는 점수 나열이라 무엇을 재는지·업무 근접도를 앞에 두는 형태로 재구성(REBUILD-NOTES §4)',
   },
   'eval.metrics': { kind: '옮김', to: 'evaluation.benchmark' },
-  'eval.predops': { kind: '미이관', note: 'P6 — 드리프트·재학습·챔피언/챌린저' },
+  'eval.predops': { kind: '옮김', to: 'evaluation.predops' },
 
   /* ── AI 서비스 ── */
   'guardrail.filter': {
@@ -74,7 +74,7 @@ const PLAN: Record<string, Disposition> = {
     note: '규칙 목록이 두 화면에 있으면 어느 쪽이 진짜인지 알 수 없다 — 설정은 신뢰성 관리로',
   },
   'guardrail.log': { kind: '옮김', to: 'guardrail' },
-  'security.arch': { kind: '미이관', note: 'P6 — 망 경계를 넘는 흐름과 통제' },
+  'security.arch': { kind: '옮김', to: 'sysops.security' },
   aiact: { kind: '옮김', to: 'aiact' },
   safetyact: { kind: '옮김', to: 'safetyact' },
   repro: { kind: '옮김', to: 'repro' },
@@ -94,7 +94,7 @@ const PLAN: Record<string, Disposition> = {
   /* ── 지식 · RAG ── */
   'admin.knowledge': { kind: '옮김', to: 'knowledge.areas' },
   'admin.rag': { kind: '옮김', to: 'knowledge.pipeline' },
-  'admin.augment': { kind: '미이관', note: 'P6 — RAG·CAG·TAG 라우팅과 캐시 신선도' },
+  'admin.augment': { kind: '옮김', to: 'knowledge.augment' },
 
   /* ── 운영 · 관리 ── */
   'admin.users': { kind: '옮김', to: 'users.list' },

@@ -154,6 +154,19 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /compliance/systems` | `fetchAiSystems` | → `AiSystem[]`. 판정에는 근거(`reason`)와 운영 여부(`inService`)를 함께 |
 | `GET /compliance/labeling` | `fetchLabelRules` | → `LabelRule[]` |
 | `GET /compliance/assessments` | `fetchAssessments` | → `Assessment[]`. 안 끝난 것은 무엇이 남았는지(`remaining`) |
+| `GET /security/flows` | `fetchDataFlows` | → `DataFlow[]` (`entities/secarch/model.ts`). **게이트웨이 주소·토큰·내부 호스트명은 넣지 않는다** — 이 화면은 캡처되고 공유된다 |
+| `GET /security/boundary-policy` | `fetchBoundaryRules` | → `BoundaryRule[]`. 이것은 **선언된 정책**이다. 실제로 막고 있는지를 확인하는 API가 따로 생기면 화면이 정책과 실제를 나란히 놓는다 |
+| `GET /security/external-access` | `fetchExternalAccess` | → `ExternalAccess[]`. 기간·2단계 인증 여부 필수 |
+| `GET /augment/strategies` | `fetchStrategies` | → `Strategy[]` (`entities/augment/model.ts`). 강점만이 아니라 **못 하는 것(`caveat`)까지** — 셋 다 좋아 보이면 고를 수 없다 |
+| `GET /augment/routes` | `fetchRoutes` | → `Route[]`. **적용 순서(`order`)와 켜짐 여부**가 결과를 바꾼다 |
+| `GET /augment/cache` | `fetchCacheEntries` | → `CacheEntry[]`. **올릴 때의 원문 버전과 지금 원문 버전을 모두** — '최신/재적재 필요' 판정만 오면 기준이 서버에 숨는다 |
+| `POST /augment/cache/{id}:reload` | `reloadCacheEntry` | 다시 올리기. 서버가 원문을 읽어 교체한다 |
+| `GET /catalog/assets` | `fetchDataAssets` | → `DataAsset[]` (`entities/catalog/model.ts`). 표준화율과 **쓰임(`usage`)** 을 함께 — 같은 74%라도 집계에 쓰이면 위험이 다르다 |
+| `GET /catalog/lineage` | `fetchLineages` | → `Lineage[]`. **없으면 없는 대로** — 빈 계보를 채워 보내면 아무도 그 자산을 안 고친다 |
+| `GET /predops/models` | `fetchPredModels` | → `PredModel[]` (`entities/predops/model.ts`). **지표 방향(`direction`)을 반드시** — 없으면 화면이 MAE를 거꾸로 그린다 |
+| `GET /predops/drift` | `fetchDriftItems` | → `DriftItem[]` |
+| `GET /predops/retrain-runs` | `fetchRetrainRuns` | → `RetrainRun[]`. 챔피언·챌린저 값과 방향 |
+| `POST /predops/retrain-runs/{id}:promote` | `promoteChallenger` | 교체. 서비스 중인 모델을 바꾸는 일이라 서버가 처리한다 |
 | `GET /repro/snapshots` | `fetchSnapshots` | → `Snapshot[]` (`entities/repro/model.ts`). **질의·답변 원문은 넣지 않는다** — 접근 로그·이용 이력과 같은 전제(§3-7). 근거 문서는 이름이 아니라 **개정 버전**까지 |
 | `POST /repro/snapshots/{id}:run` | `runReproduction` | 그때 구성으로 재실행. 서버가 없으면 **실패를 그대로 돌려준다** — 지어낸 '결과 일치'는 심사에서 재현해 봤다는 말이 된다 |
 | `GET /safety/duties` | `fetchSafetyDuties` | → `SafetyDuty[]` (`entities/safetyact/model.ts`). **증빙 갱신 시각(`evidenceAt`)과 조직이 정한 갱신 주기(`cycleDays`)를 함께** — 이행 여부만 오면 화면은 한 번 초록색이 된 항목을 영원히 초록색으로 그린다 |

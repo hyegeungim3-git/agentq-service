@@ -5,6 +5,7 @@
  * 섹션은 사이드바에서 눈에 보이는 경계라 나누기에 자연스럽다.
  */
 import { KnowledgeBasePage } from '@pages/admin/knowledge/KnowledgeBasePage'
+import { AugmentPage } from '@pages/admin/knowledge/AugmentPage'
 import { PipelinePage } from '@pages/admin/appinst/PipelinePage'
 
 export function KnowledgeSection({ menuId }: { menuId: string }) {
@@ -12,6 +13,7 @@ export function KnowledgeSection({ menuId }: { menuId: string }) {
     <>
       {menuId === 'knowledge.areas' && <KnowledgeBasePage />}
       {menuId === 'knowledge.pipeline' && <PipelinePage />}
+      {menuId === 'knowledge.augment' && <AugmentPage />}
     </>
   )
 }
