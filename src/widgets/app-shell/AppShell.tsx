@@ -11,6 +11,7 @@ import {
   type LucideIcon,
   ArrowRightLeft,
   ClipboardCheck,
+  Layers,
 } from 'lucide-react'
 import type { Domain } from '@entities/domain/model'
 import { sectorLabel } from '@entities/domain/model'
@@ -127,27 +128,39 @@ export function AppShell({
         <p className="text-xs text-slate-500">{domain.tagline}</p>
       </div>
 
-      {/* 워크스페이스를 바꾸면 아래 대화 목록이 실제로 바뀐다 */}
-      <div className="border-b border-slate-200 p-3">
-        <label htmlFor="ws" className="block text-[11px] font-bold text-slate-500">
+      {/* 워크스페이스를 **목록으로** 보여 준다(원본 배치, D-014).
+          접어 둔 셀렉트는 몇 개가 있는지·지금 어디인지를 열어 봐야 안다.
+          바꾸면 아래 대화 목록이 실제로 바뀐다 */}
+      <div className="border-b border-slate-200 p-2">
+        <p className="px-2 pb-1 text-[11px] font-bold tracking-wide text-slate-400">
           {t(uiLang, 'nav.workspace')}
-        </label>
-        {/* 라벨은 화면 틀이라 번역되지만 **항목 이름은 그 조직의 부서·TF 이름**이다 */}
-        <select
-          id="ws"
-          lang="ko"
-          value={workspaceId}
-          onChange={(e) => onWorkspace(e.target.value)}
-          className="mt-1 min-h-11 w-full rounded-lg border border-slate-300 px-2 text-sm"
-        >
-          {workspaces.map((w) => (
-            <option key={w.id} value={w.id}>
-              {w.name}
-            </option>
-          ))}
-        </select>
+        </p>
+        <ul lang="ko">
+          {workspaces.map((w) => {
+            const on = w.id === workspaceId
+            return (
+              <li key={w.id}>
+                <button
+                  type="button"
+                  onClick={() => onWorkspace(w.id)}
+                  aria-current={on ? 'true' : undefined}
+                  title={w.purpose}
+                  className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] ${
+                    on ? 'bg-brand-soft font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <Layers
+                    className={`size-4 shrink-0 ${on ? 'text-brand' : 'text-slate-400'}`}
+                    aria-hidden="true"
+                  />
+                  <span className="min-w-0 truncate">{w.name}</span>
+                </button>
+              </li>
+            )
+          })}
+        </ul>
         {current && (
-          <p lang="ko" className="mt-1 text-[11px] text-slate-500">
+          <p lang="ko" className="px-2 pt-1 text-[11px] text-slate-500">
             {current.purpose}
           </p>
         )}
@@ -199,7 +212,9 @@ export function AppShell({
             onTab('general')
             close()
           }}
-          className="min-h-11 rounded-lg border border-slate-300 px-3 text-sm font-bold text-slate-700 hover:bg-slate-50"
+          /* 원본과 같이 **채운 버튼**이다 — 사이드바에서 제일 먼저 누르는 것이라
+             테두리만 있으면 목록에 묻힌다 */
+          className="bg-brand text-brand-fg min-h-11 rounded-lg px-3 text-sm font-bold shadow-sm hover:opacity-90"
         >
           {t(uiLang, 'nav.newChat')}
         </button>
@@ -292,7 +307,7 @@ export function AppShell({
         })}
       </ul>
 
-      <ul className="shrink-0 border-t border-slate-200 p-2">
+      <ul className="shrink-0 border-t border-slate-200 p-2 grid grid-cols-2 gap-1">
         {INFO_TABS.map((tab_) => {
           const Icon = TAB_ICON[tab_]
           return (
@@ -304,11 +319,13 @@ export function AppShell({
                 close()
               }}
               aria-current={tab === tab_ ? 'page' : undefined}
-              className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-sm ${
-                tab === tab_ ? 'bg-slate-100 font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50'
+              className={`flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg border px-2 text-center text-[12px] ${
+                tab === tab_
+                  ? 'border-slate-300 bg-slate-100 font-bold text-slate-900'
+                  : 'border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <Icon className="size-4 shrink-0 text-slate-400" aria-hidden="true" />
+              <Icon className="size-3.5 shrink-0 text-slate-400" aria-hidden="true" />
               {shellTabLabel(tab_, uiLang)}
               {tab_ === 'notices' && unreadNotices > 0 && (
                 <span className="ml-auto rounded-full bg-rose-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
@@ -321,15 +338,23 @@ export function AppShell({
         })}
       </ul>
 
-      <div className="border-t border-slate-200 p-4">
-        <div className="flex items-center gap-2.5">
+      <div className="border-t border-slate-200 p-3">
+        {/* 원본처럼 카드로 묶는다 — 사이드바 맨 아래에서 '내가 누구로 들어와 있는지'가
+            한 덩어리로 보여야 한다 */}
+        <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 p-2.5">
           <span className="bg-brand-soft border-brand-soft flex size-9 shrink-0 items-center justify-center rounded-full border">
             <User className="text-brand size-4" aria-hidden="true" />
           </span>
           {/* 이름·직급·부서는 그 조직의 한국어 원문이다 */}
           <span lang="ko" className="min-w-0">
-            <span className="block truncate text-sm font-bold text-slate-800">
-              {domain.user.name} {domain.user.title}
+            <span className="flex items-center gap-1.5">
+              <span className="truncate text-sm font-bold text-slate-800">
+                {domain.user.name} {domain.user.title}
+              </span>
+              {/* 어떻게 들어왔는지 — 원본 배지를 그대로 옮긴다(D-014) */}
+              <span className="rounded bg-slate-200 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">
+                SSO
+              </span>
             </span>
             <span className="block truncate text-xs text-slate-500">{domain.user.dept}</span>
           </span>

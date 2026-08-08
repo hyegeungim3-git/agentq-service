@@ -87,11 +87,17 @@ test.describe('셸 — 워크스페이스·공지·가이드', () => {
     let nav = await openSidebar(page)
     await expect(nav).toContainText('금형 교체 주기가 어떻게 되나요')
 
-    await nav.getByRole('combobox', { name: '워크스페이스' }).selectOption({ index: 1 })
+    /* 워크스페이스는 접힌 셀렉트가 아니라 목록이다(D-014) — 몇 개가 있는지,
+       지금 어디인지가 열어 보지 않아도 보여야 한다 */
+    const rooms = nav.getByRole('button', { name: /TF$|업무반$|팀$/ })
+    const second = rooms.nth(1)
+    const secondName = ((await second.textContent()) ?? '').trim()
+    await second.click()
     nav = await openSidebar(page)
     await expect(nav).toContainText('이 워크스페이스에는 아직 없습니다')
 
-    await nav.getByRole('combobox', { name: '워크스페이스' }).selectOption({ index: 0 })
+    await nav.getByRole('button', { name: secondName }).click()
+    await nav.getByRole('button', { name: /TF$|업무반$|팀$/ }).first().click()
     nav = await openSidebar(page)
     await expect(nav).toContainText('금형 교체 주기가 어떻게 되나요')
   })
