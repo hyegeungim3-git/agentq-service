@@ -186,7 +186,12 @@ export function AppShell({
         <p className="mt-2 px-1 text-[11px] text-slate-500">{shellTabDesc(tab, uiLang)}</p>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col p-2">
+      {/* 대화 목록 칸.
+          `flex-1`만 주면 세로가 모자랄 때 이 칸이 줄어드는데, 안에 든 버튼·머리글은
+          줄지 않아 **아래 묶음 위로 넘친다**. 넘친 자리는 눌리지 않는다.
+          그래서 줄지 않게 하고(`shrink-0`) 최소 높이를 준다 — 모자라면 사이드바
+          전체가 스크롤된다(`nav`의 `overflow-y-auto`). */}
+      <div className="flex min-h-40 shrink-0 grow flex-col overflow-hidden p-2">
         <button
           type="button"
           onClick={() => {
@@ -259,8 +264,10 @@ export function AppShell({
         </p>
       </div>
 
-      {/* 묻고 시키는 자리(위)와 이미 벌어진 일을 닫는 자리(여기)를 나눈다 */}
-      <ul className="border-t border-slate-200 p-2" aria-label={t(uiLang, 'nav.field')}>
+      {/* 묻고 시키는 자리(위)와 이미 벌어진 일을 닫는 자리(여기)를 나눈다.
+          `shrink-0`이 없으면 세로가 모자랄 때 이 묶음이 줄면서 **내용이 넘쳐
+          대화 목록을 덮는다** — 덮인 버튼은 눌리지 않는다(2026-08-08 CI가 잡음) */}
+      <ul className="shrink-0 border-t border-slate-200 p-2" aria-label={t(uiLang, 'nav.field')}>
         <li className="px-3 pb-1 text-[11px] font-bold text-slate-400">{t(uiLang, 'nav.field')}</li>
         {FIELD_TABS.map((tab_) => {
           const Icon = TAB_ICON[tab_]
@@ -285,7 +292,7 @@ export function AppShell({
         })}
       </ul>
 
-      <ul className="border-t border-slate-200 p-2">
+      <ul className="shrink-0 border-t border-slate-200 p-2">
         {INFO_TABS.map((tab_) => {
           const Icon = TAB_ICON[tab_]
           return (
