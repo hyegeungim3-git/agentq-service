@@ -23,8 +23,11 @@ test.describe('표준 보고서 설정', () => {
     const r = page.getByRole('region', { name: /주간 실적 보고/ })
     await expect(r).toContainText('수출 로트 3건 선적 완료', { timeout: 10_000 })
     await expect(r).toContainText('출처 · 직접 입력')
-    await expect(page.getByText('주요 실적 — 직접 입력 필요')).toHaveCount(0)
-    await expect(page.getByText('다음 계획 — 직접 입력 필요')).toBeVisible()
+    /* 결과 영역 안에서 본다 — 같은 문구가 '내보내기 전 확인'의 점검 목록에도 나온다.
+       화면 전체로 세면 두 자리를 합쳐 세게 되고, 그건 이 검사가 묻는 것이 아니다 */
+    const pending = r.getByRole('list', { name: '담당자 작성이 필요한 칸' })
+    await expect(pending).not.toContainText('주요 실적')
+    await expect(pending).toContainText('다음 계획')
   })
 })
 

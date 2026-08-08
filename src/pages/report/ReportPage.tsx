@@ -261,8 +261,13 @@ export function ReportPage({ onBack, apiOptions }: { onBack?: () => void; apiOpt
 
           {res.pendingFields.length > 0 && (
             <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4">
-              <h3 className="text-sm font-bold text-amber-900">담당자 작성이 필요한 칸</h3>
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-amber-900">
+              <h3 id="report-pending" className="text-sm font-bold text-amber-900">
+                담당자 작성이 필요한 칸
+              </h3>
+              <ul
+                aria-labelledby="report-pending"
+                className="mt-2 list-disc space-y-1 pl-5 text-sm text-amber-900"
+              >
                 {res.pendingFields.map((f) => (
                   <li key={f}>{f}</li>
                 ))}
