@@ -11,9 +11,9 @@
  *  - 온도 프로파일 1.00 : 설비 자체 로거라 결측이 없다 — 경고가 뜨지 않는 경로도 있어야
  *    '부분 결론' 표시가 죽은 코드가 되지 않는다
  */
-import type { AnalysisKind, AnalysisResult } from '@entities/analysis/model'
+import type { AnalysisResult, StoredAnalysisKind } from '@entities/analysis/model'
 
-type ResultsByKind = Record<AnalysisKind, AnalysisResult>
+type ResultsByKind = Record<StoredAnalysisKind, AnalysisResult>
 
 export const ANALYSIS_RESULTS: Record<string, ResultsByKind> = {
   /* 로트별 경도검사 — 공정조건과 품질 결과를 잇는 데이터 */

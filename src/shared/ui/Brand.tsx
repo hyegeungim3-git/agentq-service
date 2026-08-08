@@ -14,11 +14,19 @@
  * 윗면·왼면은 채우고 오른면만 선으로 비워 '열린 큐브'를 만든다.
  * AgentQ의 Q는 우하단 점으로 암시.
  */
-export function OcubeMark({ size = 'md' }: { size?: 'sm' | 'md' }) {
+export function OcubeMark({
+  size = 'md',
+  /** 브랜드 색 위에 얹을 때는 심볼 바탕을 흰 반투명으로 — 같은 색끼리 겹치면 사라진다 */
+  tone = 'light',
+}: {
+  size?: 'sm' | 'md'
+  tone?: 'light' | 'onBrand'
+}) {
   const box = size === 'sm' ? 'size-9 rounded-lg' : 'size-11 rounded-xl'
   const glyph = size === 'sm' ? 'size-[22px]' : 'size-[26px]'
+  const bg = tone === 'onBrand' ? 'bg-white/15' : 'bg-brand shadow-md'
   return (
-    <span className={`flex shrink-0 items-center justify-center bg-brand shadow-md ${box}`}>
+    <span className={`flex shrink-0 items-center justify-center ${bg} ${box}`}>
       <svg viewBox="0 0 32 32" fill="none" className={glyph} aria-hidden="true">
         <path d="M16 4.2 L26.6 10.3 L16 16.4 L5.4 10.3 Z" fill="#fff" />
         <path d="M5.4 10.3 L16 16.4 L16 28.2 L5.4 22.1 Z" fill="#fff" opacity="0.62" />
@@ -47,30 +55,49 @@ export function BrandLock({
   size = 'md',
   /** 이 자리가 화면의 제목이면 워드마크 자체를 h1으로 낸다 — 안 보이는 제목을 따로 두지 않는다 */
   heading = false,
+  /**
+   * 브랜드 색 위에 얹는가.
+   *
+   * 관리자 사이드바 머리가 원본처럼 브랜드 색으로 꽉 찬 블록이다(D-014).
+   * 기본 배색을 그대로 두면 남색 위 남색 글씨가 된다.
+   */
+  tone = 'light',
   className = '',
 }: {
   context?: string
   size?: 'sm' | 'md'
   heading?: boolean
+  tone?: 'light' | 'onBrand'
   className?: string
 }) {
   const Word = heading ? 'h1' : 'span'
+  const onBrand = tone === 'onBrand'
   return (
     <span className={`flex min-w-0 items-center gap-2.5 ${className}`}>
-      <OcubeMark size={size} />
+      <OcubeMark size={size} tone={tone} />
       <span className="min-w-0">
-        <span className="block text-[9px] leading-none font-black tracking-[0.22em] text-slate-400">
+        <span
+          className={`block text-[9px] leading-none font-black tracking-[0.22em] ${
+            onBrand ? 'text-white' : 'text-slate-400'
+          }`}
+        >
           OCUBE
         </span>
         <span className="mt-1 flex items-baseline gap-1.5">
-          <Word className="text-brand text-[19px] leading-none font-black tracking-[0.01em]">
+          <Word
+            className={`text-[19px] leading-none font-black tracking-[0.01em] ${
+              onBrand ? 'text-white' : 'text-brand'
+            }`}
+          >
             AgentQ
           </Word>
           {context && (
             /* 분야명·'관리자'는 번역하지 않는 한국어다 — 화면 틀이 English여도 원문이다 */
             <span
               lang="ko"
-              className="truncate text-[12px] leading-none font-bold tracking-tight text-slate-500"
+              className={`truncate text-[12px] leading-none font-bold tracking-tight ${
+                onBrand ? 'text-white' : 'text-slate-500'
+              }`}
             >
               {context}
             </span>

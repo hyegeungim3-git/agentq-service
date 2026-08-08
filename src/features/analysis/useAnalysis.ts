@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import type { AnalysisKind, AnalysisResult } from '@entities/analysis/model'
+import { buildOutlierResult } from '@entities/analysis/model'
 import { datasetShape } from '@entities/dataset/model'
 import { DATASET_UPLOAD } from '@entities/upload/model'
 import { analyzeData, type AnalysisApiOptions } from '@shared/api/analysis'
@@ -46,7 +47,19 @@ export function useAnalysis(opts: AnalysisOptions = {}) {
   const [kind, setKind] = useState<AnalysisKind>('trend')
   const delayMs = opts.delayMs
   const run = useCallback(
-    (datasetId: string) => analyzeData({ datasetId, kind }, { delayMs }),
+    async (datasetId: string): Promise<ApiResult<AnalysisResult>> => {
+      if (kind !== 'outlier') return analyzeData({ datasetId, kind }, { delayMs })
+
+      /* 이상치는 저장돼 있지 않다 — 추이와 분포를 받아서 계산한다.
+         한쪽만 실패해도 이상치라고 부르면 안 된다. 그대로 실패로 말한다 */
+      const [trend, dist] = await Promise.all([
+        analyzeData({ datasetId, kind: 'trend' }, { delayMs }),
+        analyzeData({ datasetId, kind: 'distribution' }, { delayMs: 0 }),
+      ])
+      if (!trend.ok) return trend
+      if (!dist.ok) return dist
+      return { ok: true, data: buildOutlierResult(trend.data, dist.data) }
+    },
     [kind, delayMs],
   )
   const agent = useAgentRun<AnalysisResult, AgentInput>({

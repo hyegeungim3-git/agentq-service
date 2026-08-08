@@ -5,7 +5,7 @@
  *
  * ⚠️ 문구는 행정·심사 관점으로만 쓴다. 환자 개인에 대한 판단을 넣지 않는다.
  */
-import type { AnalysisKind, AnalysisResult } from '@entities/analysis/model'
+import type { StoredAnalysisKind, AnalysisResult } from '@entities/analysis/model'
 import type { DataSourceOption, QueryResult } from '@entities/dataquery/model'
 import type { RegulationSetOption, Violation } from '@entities/review/model'
 import type { Hazard } from '@entities/safety/model'
@@ -380,7 +380,7 @@ export const MEDICAL_QUERY_RESULTS: Record<string, QueryResult> = {
 
 /* ── 데이터 분석 ───────────────────────────────────────────── */
 
-export const MEDICAL_ANALYSES: Record<string, Record<AnalysisKind, AnalysisResult>> = {
+export const MEDICAL_ANALYSES: Record<string, Record<StoredAnalysisKind, AnalysisResult>> = {
   'ds-suh-claim': {
     trend: {
       datasetId: 'ds-suh-claim',

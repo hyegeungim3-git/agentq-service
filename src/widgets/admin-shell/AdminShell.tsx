@@ -1,5 +1,5 @@
 import { useCallback, useState, type ReactNode } from 'react'
-import { LayoutGrid, Menu, User } from 'lucide-react'
+import { Grid2x2, LayoutGrid, Menu, User } from 'lucide-react'
 import {
   ADMIN_SECTIONS,
   childrenOf,
@@ -76,13 +76,15 @@ export function AdminShell({
   const nav = (
     <nav
       aria-label="관리자 메뉴"
-      className="flex h-full w-72 shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-white"
+      className="flex h-full w-64 shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-white"
     >
-      <div className="border-b border-slate-200 p-4">
-        <BrandLock context="관리자" size="sm" />
-        <p className="mt-2 text-xs text-slate-500">{admin.org}</p>
+      {/* 원본처럼 머리를 브랜드 색으로 채운다 — 관리자 콘솔에 들어와 있다는 표시가
+          화면 맨 위에 있어야 사용자 포털과 헷갈리지 않는다(둘 다 흰 사이드바였다) */}
+      <div className="bg-brand p-4">
+        <BrandLock context="관리자" size="sm" tone="onBrand" />
+        <p className="mt-2 text-xs text-white/90">{admin.org}</p>
         {/* 목록을 보기 전에 얼마가 준비 중인지 먼저 말한다 */}
-        <p className="mt-1 text-[11px] text-slate-500">
+        <p className="mt-1 text-[11px] text-white/90">
           화면 {readyCount()}개 사용 가능 · {plannedCount()}개 준비 중
         </p>
       </div>
@@ -105,14 +107,15 @@ export function AdminShell({
                       close()
                     }}
                     aria-current={menuId === m.id ? 'page' : undefined}
-                    className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-sm ${
-                      active && kids.length === 0
-                        ? 'bg-brand text-brand-fg font-bold'
-                        : active
-                          ? 'bg-brand-soft text-brand font-bold'
-                          : m.status === 'ready'
-                            ? 'font-bold text-slate-700 hover:bg-slate-50'
-                            : 'text-slate-500 hover:bg-slate-50'
+                    /* 원본은 지금 보고 있는 곳을 **연한 배경 + 브랜드 글씨 + 왼쪽 굵은 바**로
+                       표시한다. 진한 색으로 꽉 채우면 메뉴 55개 중 한 줄만 크게 튀어
+                       목록 전체의 결이 끊긴다 */
+                    className={`flex min-h-11 w-full items-center gap-2 rounded-lg border-l-[3px] px-3 text-left text-sm ${
+                      active
+                        ? 'border-brand bg-brand-soft text-brand font-bold'
+                        : m.status === 'ready'
+                          ? 'border-transparent font-bold text-slate-700 hover:bg-slate-50'
+                          : 'border-transparent text-slate-500 hover:bg-slate-50'
                     }`}
                   >
                     <Icon
@@ -124,9 +127,7 @@ export function AdminShell({
                     {m.status === 'planned' && (
                       <span
                         className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                          active && kids.length === 0
-                            ? 'text-brand bg-white'
-                            : 'bg-slate-100 text-slate-500'
+                          active ? 'text-brand bg-white' : 'bg-slate-100 text-slate-500'
                         }`}
                       >
                         준비 중
@@ -146,12 +147,19 @@ export function AdminShell({
                               close()
                             }}
                             aria-current={menuId === k.id ? 'page' : undefined}
-                            className={`flex min-h-11 w-full items-center rounded-lg px-3 text-left text-xs ${
+                            className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-xs ${
                               menuId === k.id
-                                ? 'bg-brand text-brand-fg font-bold'
+                                ? 'bg-brand-soft text-brand font-bold'
                                 : 'text-slate-600 hover:bg-slate-50'
                             }`}
                           >
+                            {/* 원본의 점 마커 — 들여쓰기만으로는 상위와 하위가 안 갈린다 */}
+                            <span
+                              aria-hidden="true"
+                              className={`size-1.5 shrink-0 rounded-full ${
+                                menuId === k.id ? 'bg-brand' : 'bg-slate-300'
+                              }`}
+                            />
                             {k.label}
                           </button>
                         </li>
@@ -240,10 +248,21 @@ export function AdminShell({
               사이드바 아래에도 같은 길이 있지만, 관리자는 화면이 길어 아래까지
               내려가야 나갈 수 있었다 — 위에서도 닿게 한다 */}
           <div className="ml-auto flex items-center gap-2">
+            {/* 원본은 '포털 선택'과 '사용자 포털 전환'을 나란히 둔다. 사이드바 아래에도
+                같은 길이 있지만 화면이 길어 거기까지 내려가야 나갈 수 있었다 */}
+            <button
+              type="button"
+              onClick={onExitAdmin}
+              className="hidden min-h-11 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 lg:inline-flex"
+            >
+              <Grid2x2 className="size-3.5" aria-hidden="true" />
+              포털 선택
+            </button>
             <button
               type="button"
               onClick={onUserPortal}
-              className="hidden min-h-11 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 sm:inline-flex"
+              /* 여기가 원본에서 유일하게 강조된 버튼이다 — 관리자가 가장 자주 쓰는 길 */
+              className="border-brand text-brand hover:bg-brand-soft hidden min-h-11 items-center gap-1.5 rounded-lg border px-3 text-xs font-bold sm:inline-flex"
             >
               <LayoutGrid className="size-3.5" aria-hidden="true" />
               사용자 포털

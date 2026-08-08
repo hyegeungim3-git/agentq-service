@@ -4,8 +4,10 @@ import {
   analysisKindDesc,
   analysisKindLabel,
   breaches,
+  findOutliers,
   isPartial,
   statusLabel,
+  OUTLIER_FACTOR,
   type AnalysisResult,
   type StatRow,
 } from '@entities/analysis/model'
@@ -24,6 +26,65 @@ const STATUS_STYLE: Record<StatRow['status'], string> = {
   good: 'text-emerald-700',
   watch: 'text-amber-700',
   bad: 'text-rose-700',
+}
+
+/**
+ * 이상으로 본 것 — 무엇을, 무엇과 견줘, 왜.
+ *
+ * **판정 규칙을 화면이 먼저 말한다.** 규칙을 안 밝히면 사용자는 '왜 이건 빠졌지'를
+ * 물을 수 없고, 물을 수 없는 목록은 결국 안 본다. 이전 데모의 이상치 탐지가
+ * 그랬다 — 목록만 있고 기준이 없었다.
+ */
+function OutlierTable({ result }: { result: AnalysisResult }) {
+  const rows = findOutliers(result)
+
+  return (
+    <div className="mt-4">
+      <p className="mb-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+        관리 기준을 넘은 구간과, 항목 평균의 {OUTLIER_FACTOR}배를 넘은 항목을 이상으로 봤습니다.
+        표준편차 기준은 쓰지 않습니다 — 한쪽으로 쏠린 데이터에서 멀쩡한 값을 이상이라고
+        말하기 때문입니다.
+      </p>
+
+      {rows.length === 0 ? (
+        <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-900">
+          이 기준으로는 이상 항목이 없습니다.
+        </p>
+      ) : (
+        <div className="overflow-x-auto" role="region" aria-label="이상 항목 표 — 가로로 스크롤됩니다" tabIndex={0}>
+          <table className="w-full min-w-[26rem] text-sm">
+            <caption className="sr-only">이상으로 본 항목</caption>
+            <thead>
+              <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
+                <th scope="col" className="py-2 pr-3 font-bold">항목</th>
+                <th scope="col" className="py-2 pr-3 font-bold">값</th>
+                <th scope="col" className="py-2 pr-3 font-bold">견준 기준</th>
+                <th scope="col" className="py-2 font-bold">왜 이상인가</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={`${r.label}-${r.value}`} className="border-b border-slate-100 last:border-0">
+                  <th scope="row" className="py-2 pr-3 text-left font-bold text-slate-800">
+                    {r.label}
+                    {/* 색만으로 급한 것을 구분하지 않는다 */}
+                    {r.severity === 'high' && (
+                      <span className="ml-1.5 rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-800">
+                        즉시 확인
+                      </span>
+                    )}
+                  </th>
+                  <td className="py-2 pr-3 tabular-nums text-slate-700">{r.value}</td>
+                  <td className="py-2 pr-3 text-slate-500">{r.basis}</td>
+                  <td className="py-2 text-slate-700">{r.why}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
 }
 
 const ChartFallback = () => (
@@ -98,12 +159,16 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
               )}
 
               <Suspense fallback={<ChartFallback />}>
-                {res.kind === 'trend' ? (
-                  <TrendChart data={res.trend} unit={res.unit} />
-                ) : (
+                {/* 이상치도 추이 위에서 봐야 한다 — 어느 구간이 튀었는지는
+                    기준선과 함께 볼 때만 읽힌다 */}
+                {res.kind === 'distribution' ? (
                   <DistributionChart data={res.distribution} />
+                ) : (
+                  <TrendChart data={res.trend} unit={res.unit} />
                 )}
               </Suspense>
+
+              {res.kind === 'outlier' && <OutlierTable result={res} />}
 
               {/* 차트는 스크린리더가 못 읽는다 — 같은 데이터를 표로도 준다 */}
               <div className="mt-4 overflow-x-auto" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
@@ -111,7 +176,7 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
                   <caption className="sr-only">{analysisKindLabel(res.kind)} 데이터</caption>
                   <thead>
                     <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
-                      {res.kind === 'trend' ? (
+                      {res.kind !== 'distribution' ? (
                         <>
                           <th scope="col" className="py-2 pr-3 font-bold">기간</th>
                           <th scope="col" className="py-2 pr-3 font-bold">실측</th>
@@ -126,7 +191,7 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
                     </tr>
                   </thead>
                   <tbody>
-                    {res.kind === 'trend'
+                    {res.kind !== 'distribution'
                       ? res.trend.map((p) => (
                           <tr key={p.period} className="border-b border-slate-100 last:border-0">
                             <th scope="row" className="py-2 pr-3 text-slate-600 text-left">{p.period}</th>
@@ -155,7 +220,7 @@ export function AnalysisPage({ onBack, apiOptions }: { onBack?: () => void; apiO
                 </table>
               </div>
 
-              {over.length > 0 && (
+              {res.kind !== 'outlier' && over.length > 0 && (
                 <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-bold text-amber-900">
                   관리 기준을 넘은 기간이 {over.length}개월 있습니다 ({over.map((o) => o.period).join(', ')}).
                 </p>

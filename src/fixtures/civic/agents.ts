@@ -4,7 +4,7 @@
  * 세 번째 팩이다. 앞의 둘에서 뽑아 둔 자리에 값만 채운다 —
  * 구조를 고칠 일이 없다는 것이 이 팩의 확인 사항이다.
  */
-import type { AnalysisKind, AnalysisResult } from '@entities/analysis/model'
+import type { StoredAnalysisKind, AnalysisResult } from '@entities/analysis/model'
 import type { DataSourceOption, QueryResult } from '@entities/dataquery/model'
 import type { RegulationSetOption, Violation } from '@entities/review/model'
 import type { Hazard } from '@entities/safety/model'
@@ -380,7 +380,7 @@ export const CIVIC_QUERY_RESULTS: Record<string, QueryResult> = {
 
 /* ── 데이터 분석 ───────────────────────────────────────────── */
 
-export const CIVIC_ANALYSES: Record<string, Record<AnalysisKind, AnalysisResult>> = {
+export const CIVIC_ANALYSES: Record<string, Record<StoredAnalysisKind, AnalysisResult>> = {
   'ds-hsc-civil': {
     trend: {
       datasetId: 'ds-hsc-civil',

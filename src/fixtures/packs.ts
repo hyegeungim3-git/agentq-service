@@ -18,7 +18,7 @@ import type { AgentOps } from '@entities/agentops/model'
 import type { AgentDefinition, ScenarioDefinition } from '@entities/agentdef/model'
 import type { McpServer } from '@entities/evidence/model'
 import type { ToolSpec } from '@entities/packops/model'
-import type { AnalysisKind, AnalysisResult } from '@entities/analysis/model'
+import type { AnalysisResult, StoredAnalysisKind } from '@entities/analysis/model'
 import type { ChatMessage, FaqItem } from '@entities/chat/model'
 import type { BusinessDocument } from '@entities/document/model'
 import type { DataSourceOption, QueryResult } from '@entities/dataquery/model'
@@ -97,7 +97,7 @@ export type DomainPackData = {
   /** 소스별 조회 결과 */
   queryResults: Record<string, QueryResult>
   /** 데이터셋별·유형별 분석 결과 */
-  analyses: Record<string, Record<AnalysisKind, AnalysisResult>>
+  analyses: Record<string, Record<StoredAnalysisKind, AnalysisResult>>
   /** 위험성평가 — 인원에 따라 성립하지 않는 대책이 있다 */
   safety: {
     /** 무슨 작업을 평가하는가 — 경계에 박아 두면 발주처를 바꿔도 안 바뀐다 */

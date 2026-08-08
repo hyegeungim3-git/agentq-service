@@ -10,9 +10,9 @@
  *  - 실거래 0.94 : 정정 신고분이 원 신고와 중복돼 일부를 뺐다
  *  - 표준지 1.00 : 조사 시스템 자체 집계라 결측이 없다
  */
-import type { AnalysisKind, AnalysisResult } from '@entities/analysis/model'
+import type { StoredAnalysisKind, AnalysisResult } from '@entities/analysis/model'
 
-export const PUBLIC_ANALYSES: Record<string, Record<AnalysisKind, AnalysisResult>> = {
+export const PUBLIC_ANALYSES: Record<string, Record<StoredAnalysisKind, AnalysisResult>> = {
   'ds-reb-appeal': {
     trend: {
       datasetId: 'ds-reb-appeal',
