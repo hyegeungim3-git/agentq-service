@@ -8,6 +8,8 @@ import {
 } from '@entities/meeting/model'
 import { useMeeting, type MeetingOptions } from '@features/meeting/useMeeting'
 import { AgentShell, ResultSection } from '@widgets/agent-shell/AgentShell'
+import { DocActions } from '@widgets/doc-actions/DocActions'
+import type { OutgoingDoc } from '@entities/docflow/model'
 
 /* 부모 안에서 정의하지 않는다 — 매 렌더 새 타입이 되어 리마운트되고,
    입력창이라면 첫 글자만 입력된다(AGENTS.md §6) */
@@ -51,6 +53,48 @@ function Field({
       )}
     </div>
   )
+}
+
+/**
+ * 회의록을 내보낼 문서 모양으로.
+ *
+ * 결정·조치를 절로 옮기고, **출처는 발언 기록**이다 — 회의록의 근거는 그 자리에서
+ * 누가 무엇을 말했는가다. 담당자·기한이 안 정해진 조치는 사람이 채울 칸으로 넘긴다.
+ */
+function asDoc(res: MeetingResult): OutgoingDoc {
+  const sections = [
+    {
+      heading: '결정 사항',
+      body: res.decisions.map((d) => `- ${d.text}`).join('\n'),
+      source: `발언 기록 ${res.utterances.length}건`,
+    },
+    {
+      heading: '조치 항목',
+      body: res.actionItems
+        .map((a) => {
+          /* 회의에서 안 정해진 담당·기한을 채우지 않는다 — 미정이라고 적는다 */
+          const owner = res.speakers.find((sp) => sp.id === a.ownerId)?.name ?? '미정'
+          return `- ${a.task} (담당 ${owner} · 기한 ${a.due ?? '미정'})`
+        })
+        .join('\n'),
+      source: `발언 기록 ${res.utterances.length}건`,
+    },
+    {
+      heading: '회의 개요',
+      body: `${res.title} · ${res.heldOn} · ${res.place}`,
+      source: res.headerSource === 'input' ? '작성자 입력' : '녹음 파일에서 추정',
+    },
+  ]
+  const pending = incompleteActions(res.actionItems).map((a) => `조치 항목 — ${a.task}`)
+  return {
+    docNo: res.docNo,
+    title: res.title,
+    department: res.speakers[0]?.dept ?? '',
+    period: res.heldOn,
+    sections,
+    pendingFields: pending,
+    securityGrade: null,
+  }
 }
 
 export function MeetingPage({ onBack, apiOptions }: { onBack?: () => void; apiOptions?: MeetingOptions }) {
@@ -285,6 +329,7 @@ export function MeetingPage({ onBack, apiOptions }: { onBack?: () => void; apiOp
                   담당자 또는 기한이 정해지지 않은 항목이 {pending.length}건 있습니다. 회의 후 확정이 필요합니다.
                 </p>
               )}
+              <DocActions doc={asDoc(res)} />
             </ResultSection>
 
             {res.utterances.length > 0 && (

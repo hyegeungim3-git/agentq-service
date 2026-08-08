@@ -96,6 +96,7 @@ export const CIVIC_PACK: DomainPackData = {
   analyses: CIVIC_ANALYSES,
   safety: {
     taskName: '현장 확인 업무',
+    docNo: 'HSC-안전총괄과-2026-071',
     hazardsCrew1: CIVIC_HAZARDS_CREW_1,
     hazardsCrew2: CIVIC_HAZARDS_CREW_2,
     references: CIVIC_SAFETY_REFERENCES,

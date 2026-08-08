@@ -248,6 +248,7 @@ export const simulateMedicalReport = makeReportSimulator(MEDICAL_REPORT_BASE)
 /* ── 회의록 ────────────────────────────────────────────────── */
 
 const MEETING_BASE = {
+  docNo: 'SUH-의무기록팀-2026-039',
   title: '3월 4주 환자안전위원회',
   heldOn: '2026-03-26',
   place: '본관 4층 회의실',

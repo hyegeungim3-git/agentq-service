@@ -99,6 +99,8 @@ export type DomainPackData = {
   safety: {
     /** 무슨 작업을 평가하는가 — 경계에 박아 두면 발주처를 바꿔도 안 바뀐다 */
     taskName: string
+    /** 문서번호. **발번은 조직이 한다** — 화면이 만들면 실제 문서대장과 갈라진다 */
+    docNo: string
     hazardsCrew1: Hazard[]
     hazardsCrew2: Hazard[]
     references: string[]

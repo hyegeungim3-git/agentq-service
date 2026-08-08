@@ -14,6 +14,8 @@ import {
 } from '@entities/report/model'
 import { useReport, type ReportOptions } from '@features/report/useReport'
 import { AgentShell, ResultSection } from '@widgets/agent-shell/AgentShell'
+import { DocActions } from '@widgets/doc-actions/DocActions'
+import type { OutgoingDoc } from '@entities/docflow/model'
 
 /* 부모 안에서 정의하지 않는다 — 매 렌더 새 타입이 되어 리마운트되고,
    입력창이라면 첫 글자만 입력된다(AGENTS.md §6, 이전 데모에서 난 사고) */
@@ -100,6 +102,24 @@ function RadioCards<T extends string>({
       ))}
     </div>
   )
+}
+
+/**
+ * 보고서 결과를 **내보낼 문서 모양**으로 옮긴다.
+ *
+ * 자가점검·내려받기·결재가 이 모양 하나만 보게 해서 세 화면이 갈라지지 않게 한다.
+ * 보안등급은 아직 정하는 자리가 없다 — 없는 것을 `null`로 넘겨 점검이 그 사실을 말하게 한다.
+ */
+function asDoc(res: ReportResult): OutgoingDoc {
+  return {
+    docNo: res.docNo,
+    title: `${reportTypeLabel(res.type)} — ${res.department}`,
+    department: res.department,
+    period: res.period,
+    sections: res.sections,
+    pendingFields: res.pendingFields,
+    securityGrade: null,
+  }
 }
 
 export function ReportPage({ onBack, apiOptions }: { onBack?: () => void; apiOptions?: ReportOptions }) {
@@ -236,6 +256,8 @@ export function ReportPage({ onBack, apiOptions }: { onBack?: () => void; apiOpt
               </div>
             ))}
           </div>
+
+          <DocActions doc={asDoc(res)} />
 
           {res.pendingFields.length > 0 && (
             <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4">

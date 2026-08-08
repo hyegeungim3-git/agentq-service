@@ -111,6 +111,8 @@
 | `GET /predops/drift` | `fetchDriftItems` | `src/pages/admin/mlops/PredOpsPage.tsx` |
 | `GET /predops/retrain-runs` | `fetchRetrainRuns` | `src/pages/admin/mlops/PredOpsPage.tsx` |
 | `POST /predops/retrain-runs/{id}:promote` | `promoteChallenger` | `src/pages/admin/mlops/PredOpsPage.tsx` |
+| `GET /approvals/line` | `fetchApprovalLine` | `src/widgets/doc-actions/DocActions.tsx` |
+| `POST /approvals` | `submitApproval` | `src/widgets/doc-actions/DocActions.tsx` |
 | `GET /repro/snapshots` | `fetchSnapshots` | `src/pages/admin/compliance/ReproPage.tsx` |
 | `POST /repro/snapshots/{id}:run` | `runReproduction` | `src/pages/admin/compliance/ReproPage.tsx` |
 | `GET /safety/duties` | `fetchSafetyDuties` | `src/pages/admin/compliance/SafetyActPage.tsx` |

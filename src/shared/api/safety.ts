@@ -22,6 +22,7 @@ export async function createSafetyPlan(
     ok: true,
     data: {
       documentId: req.documentId,
+      docNo: pack.safety.docNo,
       taskName: pack.safety.taskName,
       hazards,
       references: pack.safety.references,

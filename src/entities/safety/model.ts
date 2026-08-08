@@ -26,6 +26,8 @@ export type Hazard = {
 
 export type SafetyPlan = {
   documentId: string
+  /** 문서번호. 발번은 조직이 한다 */
+  docNo: string
   taskName: string
   hazards: Hazard[]
   /** 근거 법령·사내 규정 */

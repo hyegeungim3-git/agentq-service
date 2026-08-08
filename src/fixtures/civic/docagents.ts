@@ -248,6 +248,7 @@ export const simulateCivicReport = makeReportSimulator(CIVIC_REPORT_BASE)
 /* ── 회의록 ────────────────────────────────────────────────── */
 
 const MEETING_BASE = {
+  docNo: 'HSC-총무과-2026-058',
   title: '3월 4주 재난안전대책회의',
   heldOn: '2026-03-25',
   place: '한성시청 2층 상황실',

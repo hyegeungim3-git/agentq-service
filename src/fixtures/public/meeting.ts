@@ -13,6 +13,7 @@
 import { makeMeetingSimulator, type MeetingCorpus } from '../meeting'
 
 const BASE = {
+  docNo: 'KREA-부동산평가처-2026-031',
   title: '3월 4주 공시가격 심의회',
   heldOn: '2026-03-24',
   place: '본원 3층 중회의실',

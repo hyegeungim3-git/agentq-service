@@ -2188,6 +2188,36 @@
             }
           }
         }
+      },
+      "post": {
+        "operationId": "submitApproval",
+        "summary": "상신",
+        "description": "상신. 그룹웨어에 문서를 만드는 일이라 서버가 한다. **올린 척하지 않는다**(D-009)",
+        "tags": [
+          "approvals"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "응답 형태 미정 — 제안서 본문 참조"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/meta/as-of": {
@@ -3825,6 +3855,41 @@
             }
           }
         ]
+      }
+    },
+    "/approvals/line": {
+      "get": {
+        "operationId": "fetchApprovalLine",
+        "summary": "**조직도가 정본** — 이름만 오면 동명이인을 구분할 수 없다",
+        "description": "→ `ApprovalStep[]` (`entities/approval/model.ts`). **조직도가 정본** — 이름만 오면 동명이인을 구분할 수 없다",
+        "tags": [
+          "approvals"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApprovalStep"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/repro/snapshots": {
@@ -5468,6 +5533,39 @@
           "requestedAt",
           "detail",
           "reason"
+        ],
+        "additionalProperties": false
+      },
+      "ApprovalRole": {
+        "type": "string",
+        "enum": [
+          "drafter",
+          "reviewer",
+          "approver"
+        ],
+        "description": "전자결재 상신.\n\n결과를 만들고 끝내면 업무가 화면에서 끊긴다. 여기서는 **결재선이 어떻게 되는지**를 보여 주고, 올리는 것은 서버가 한다.\n\n⚠️ **올린 척하지 않는다.** 이전 데모는 진행 막대를 돌린 뒤 상신 완료를 띄웠다. 그러면 결재가 올라간 줄 알고 화면을 닫는데 그룹웨어에는 아무것도 없다. 계정 정지·업로드와 같은 처리다(D-009).\n\n결재선은 **서버가 준다.** 화면이 만들면 조직개편 때마다 화면을 고쳐야 하고, 실제 결재선과 갈라진 채로 상신된다."
+      },
+      "ApprovalStep": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/ApprovalRole"
+          },
+          "name": {
+            "type": "string"
+          },
+          "dept": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "name",
+          "dept",
+          "title"
         ],
         "additionalProperties": false
       },
@@ -8120,6 +8218,10 @@
           "documentId": {
             "type": "string"
           },
+          "docNo": {
+            "type": "string",
+            "description": "문서번호. 발번은 조직이 한다 — 화면이 만들면 문서대장과 갈라진다"
+          },
           "title": {
             "type": "string"
           },
@@ -8192,6 +8294,7 @@
         },
         "required": [
           "documentId",
+          "docNo",
           "title",
           "heldOn",
           "place",
@@ -9711,6 +9814,10 @@
           "documentId": {
             "type": "string"
           },
+          "docNo": {
+            "type": "string",
+            "description": "문서번호. 발번은 조직이 한다"
+          },
           "taskName": {
             "type": "string"
           },
@@ -9733,6 +9840,7 @@
         },
         "required": [
           "documentId",
+          "docNo",
           "taskName",
           "hazards",
           "references",

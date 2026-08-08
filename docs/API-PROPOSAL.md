@@ -167,6 +167,8 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /predops/drift` | `fetchDriftItems` | → `DriftItem[]` |
 | `GET /predops/retrain-runs` | `fetchRetrainRuns` | → `RetrainRun[]`. 챔피언·챌린저 값과 방향 |
 | `POST /predops/retrain-runs/{id}:promote` | `promoteChallenger` | 교체. 서비스 중인 모델을 바꾸는 일이라 서버가 처리한다 |
+| `GET /approvals/line` | `fetchApprovalLine` | → `ApprovalStep[]` (`entities/approval/model.ts`). **조직도가 정본** — 이름만 오면 동명이인을 구분할 수 없다 |
+| `POST /approvals` | `submitApproval` | 상신. 그룹웨어에 문서를 만드는 일이라 서버가 한다. **올린 척하지 않는다**(D-009) |
 | `GET /repro/snapshots` | `fetchSnapshots` | → `Snapshot[]` (`entities/repro/model.ts`). **질의·답변 원문은 넣지 않는다** — 접근 로그·이용 이력과 같은 전제(§3-7). 근거 문서는 이름이 아니라 **개정 버전**까지 |
 | `POST /repro/snapshots/{id}:run` | `runReproduction` | 그때 구성으로 재실행. 서버가 없으면 **실패를 그대로 돌려준다** — 지어낸 '결과 일치'는 심사에서 재현해 봤다는 말이 된다 |
 | `GET /safety/duties` | `fetchSafetyDuties` | → `SafetyDuty[]` (`entities/safetyact/model.ts`). **증빙 갱신 시각(`evidenceAt`)과 조직이 정한 갱신 주기(`cycleDays`)를 함께** — 이행 여부만 오면 화면은 한 번 초록색이 된 항목을 영원히 초록색으로 그린다 |

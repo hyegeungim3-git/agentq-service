@@ -63,6 +63,7 @@ export const MANUFACTURING_PACK: DomainPackData = {
   analyses: ANALYSIS_RESULTS,
   safety: {
     taskName: '프레스 금형 교체 작업',
+    docNo: 'HBP-안전-2026-034',
     hazardsCrew1: HAZARDS_CREW_1,
     hazardsCrew2: HAZARDS_CREW_2,
     references: SAFETY_REFERENCES,

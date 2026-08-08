@@ -81,7 +81,7 @@ npm run dev                           # http://localhost:5173
 ## 데이터 및 API
 
 - **모든 데이터는 `src/fixtures/`.** 서버 없음
-- 교체 지점: `src/shared/api/` 경계 함수 **136개**, `TODO(api-미확정)` 표시 **130개**
+- 교체 지점: `src/shared/api/` 경계 함수 **138개**, `TODO(api-미확정)` 표시 **132개**
 - 계약 제안서: `docs/API-PROPOSAL.md` — **프론트 제안이고 백엔드 확정 전이다.**
   확정된 것처럼 쓰지 말 것
 - 기계가 읽는 명세: `docs/api/openapi.yaml`(생성물). **손으로 고치지 말 것** —

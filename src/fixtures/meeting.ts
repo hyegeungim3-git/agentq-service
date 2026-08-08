@@ -8,6 +8,7 @@
 import type { MeetingRequest, MeetingResult } from '@entities/meeting/model'
 
 export const MEETING_BASE = {
+  docNo: 'HBP-회의-2026-042',
   title: '3월 3주 공정회의',
   heldOn: '2026-03-20',
   place: '창원본사 3층 회의실',
@@ -160,6 +161,7 @@ function simulateWith(c: MeetingCorpus, req: MeetingRequest): MeetingResult {
 
   return {
     documentId: req.documentId,
+    docNo: BASE.docNo,
     title: req.inputs.title.trim() || BASE.title,
     heldOn: req.inputs.heldOn.trim() || BASE.heldOn,
     place: req.inputs.place.trim() || BASE.place,

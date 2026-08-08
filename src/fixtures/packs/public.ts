@@ -74,6 +74,7 @@ export const PUBLIC_PACK: DomainPackData = {
   analyses: PUBLIC_ANALYSES,
   safety: {
     taskName: '표준지 현장조사',
+    docNo: 'KREA-안전-2026-018',
     hazardsCrew1: PUBLIC_HAZARDS_CREW_1,
     hazardsCrew2: PUBLIC_HAZARDS_CREW_2,
     references: PUBLIC_SAFETY_REFERENCES,

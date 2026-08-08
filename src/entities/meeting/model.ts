@@ -70,6 +70,8 @@ export type ActionItem = {
 
 export type MeetingResult = {
   documentId: string
+  /** 문서번호. 발번은 조직이 한다 — 화면이 만들면 문서대장과 갈라진다 */
+  docNo: string
   title: string
   heldOn: string
   place: string

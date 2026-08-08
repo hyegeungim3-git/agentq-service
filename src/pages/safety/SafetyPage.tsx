@@ -8,6 +8,8 @@ import {
 } from '@entities/safety/model'
 import { useSafety, type SafetyOptions } from '@features/safety/useSafety'
 import { AgentShell, ResultSection } from '@widgets/agent-shell/AgentShell'
+import { DocActions } from '@widgets/doc-actions/DocActions'
+import type { OutgoingDoc } from '@entities/docflow/model'
 
 /* 등급은 색만으로 구분하지 않는다 — 라벨과 점수를 항상 함께 쓴다 */
 const LEVEL_STYLE: Record<RiskLevel, string> = {
@@ -15,6 +17,28 @@ const LEVEL_STYLE: Record<RiskLevel, string> = {
   high: 'border-amber-200 bg-amber-50 text-amber-900',
   medium: 'border-sky-200 bg-sky-50 text-sky-900',
   low: 'border-slate-200 bg-slate-50 text-slate-700',
+}
+
+/**
+ * 위험성평가를 내보낼 문서 모양으로.
+ *
+ * 위험요인 하나가 절 하나다. 출처는 **근거 법령·규정** — 대책의 근거가 없으면
+ * 그 대책은 누가 정한 것인지 알 수 없다.
+ */
+function asDoc(res: SafetyPlan): OutgoingDoc {
+  return {
+    docNo: res.docNo,
+    title: `위험성평가 — ${res.taskName}`,
+    department: '안전보건팀',
+    period: res.taskName,
+    sections: res.hazards.map((h) => ({
+      heading: `${h.step} — ${h.cause}`,
+      body: `대책 · ${h.control}\n잔여 위험 · ${h.residual}`,
+      source: res.references[0] ?? '',
+    })),
+    pendingFields: [],
+    securityGrade: null,
+  }
 }
 
 export function SafetyPage({ onBack, apiOptions }: { onBack?: () => void; apiOptions?: SafetyOptions }) {
@@ -117,6 +141,8 @@ export function SafetyPage({ onBack, apiOptions }: { onBack?: () => void; apiOpt
                   <li key={r}>{r}</li>
                 ))}
               </ul>
+
+              <DocActions doc={asDoc(res)} />
             </ResultSection>
           </>
         )

@@ -98,6 +98,7 @@ export const MEDICAL_PACK: DomainPackData = {
   analyses: MEDICAL_ANALYSES,
   safety: {
     taskName: '응급의료센터 운영',
+    docNo: 'SUH-안전관리팀-2026-025',
     hazardsCrew1: MEDICAL_HAZARDS_CREW_1,
     hazardsCrew2: MEDICAL_HAZARDS_CREW_2,
     references: MEDICAL_SAFETY_REFERENCES,
