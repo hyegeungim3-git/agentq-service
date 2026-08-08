@@ -9,6 +9,8 @@ import {
   Shield,
   User,
   type LucideIcon,
+  ArrowRightLeft,
+  ClipboardCheck,
 } from 'lucide-react'
 import type { Domain } from '@entities/domain/model'
 import { sectorLabel } from '@entities/domain/model'
@@ -19,7 +21,7 @@ import { brandVars } from '@shared/lib/brand'
 import type { Workspace } from '@entities/workspace/model'
 import type { Conversation } from '@features/conversations/useConversations'
 import type { SignalLink, WorkSignal } from '@entities/signal/model'
-import { INFO_TABS, SHELL_TABS, shellTabDesc, shellTabLabel, type ShellTab } from './tabs'
+import { FIELD_TABS, INFO_TABS, SHELL_TABS, shellTabDesc, shellTabLabel, type ShellTab } from './tabs'
 import { t, type UiLang } from '@shared/i18n/strings'
 import { SignalBell } from './SignalBell'
 
@@ -41,6 +43,8 @@ const TAB_ICON: Record<ShellTab, LucideIcon> = {
   notices: Bell,
   guide: HelpCircle,
   settings: Settings,
+  handover: ArrowRightLeft,
+  workorders: ClipboardCheck,
 }
 
 export type ShellProps = {
@@ -254,6 +258,32 @@ export function AppShell({
           {t(uiLang, conversationsPersisted ? 'nav.saved' : 'nav.notSaved')}
         </p>
       </div>
+
+      {/* 묻고 시키는 자리(위)와 이미 벌어진 일을 닫는 자리(여기)를 나눈다 */}
+      <ul className="border-t border-slate-200 p-2" aria-label={t(uiLang, 'nav.field')}>
+        <li className="px-3 pb-1 text-[11px] font-bold text-slate-400">{t(uiLang, 'nav.field')}</li>
+        {FIELD_TABS.map((tab_) => {
+          const Icon = TAB_ICON[tab_]
+          return (
+            <li key={tab_}>
+              <button
+                type="button"
+                onClick={() => {
+                  onTab(tab_)
+                  close()
+                }}
+                aria-current={tab === tab_ ? 'page' : undefined}
+                className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-sm ${
+                  tab === tab_ ? 'bg-slate-100 font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <Icon className="size-4 shrink-0 text-slate-400" aria-hidden="true" />
+                {shellTabLabel(tab_, uiLang)}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
 
       <ul className="border-t border-slate-200 p-2">
         {INFO_TABS.map((tab_) => {

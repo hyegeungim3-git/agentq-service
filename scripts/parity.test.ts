@@ -159,19 +159,19 @@ const PORTAL: Record<string, Disposition> = {
   },
   'components/modals/DocPreviewModal.jsx': {
     kind: '축소',
-    note: 'OCR 결과 미리보기만 있다. 공문서 인쇄 서식·내려받기는 아직 없다',
+    note: '내려받기(글자 파일)와 인쇄는 만들었다. 공문서 서식(PDF·HWP)은 서버가 만들어야 한다',
   },
 
   /* ── 미이관 ── */
-  'components/SelfCheckModal.jsx': { kind: '미이관', note: 'P7 — 내보내기 전 항목별 자가점검(회의록·보고서·안전계획)' },
-  'components/ApprovalModal.jsx': { kind: '미이관', note: 'P7 — 결과를 결재선에 올리기' },
-  'components/ShiftHandoverModal.jsx': { kind: '미이관', note: 'P7 — 교대 인수인계' },
-  'components/WorkOrderModal.jsx': { kind: '미이관', note: 'P7 — 작업지시가 조치·검증됐는지 닫기' },
+  'components/SelfCheckModal.jsx': { kind: '합침', to: undefined, note: '결과 옆 내보내기 전 확인으로 — 미리 적어 둔 결과가 아니라 문서를 보고 계산한다' },
+  'components/ApprovalModal.jsx': { kind: '합침', to: undefined, note: '모달 대신 결과 옆에 — 고쳐야 할 것이 남으면 올릴 수 없다고 그 자리에서 말한다' },
+  'components/ShiftHandoverModal.jsx': { kind: '합침', to: undefined, note: '모달 대신 셸의 현장 화면으로 — 교대 시간에 모달을 띄우면 뒤가 안 보인다' },
+  'components/WorkOrderModal.jsx': { kind: '합침', to: undefined, note: '모달 대신 셸의 현장 화면으로 — 이력을 함께 보려면 자리가 필요하다' },
   'components/ScanModal.jsx': { kind: '미이관', note: 'P7 — 설비·로트 코드 스캔(현장 입력)' },
   'components/modals/AgentBuilderModal.jsx': { kind: '미이관', note: 'P7 — 무엇을 거쳐 답했는지 사용자가 보는 화면' },
   'voiceInput.js': { kind: '미이관', note: 'P7 — 음성 입력. Web Speech API 사용 여부는 결정이 필요하다' },
-  'shiftHandover.js': { kind: '미이관', note: 'P7 — 교대 인수인계 모델' },
-  'workOrders.js': { kind: '미이관', note: 'P7 — 작업지시 모델' },
+  'shiftHandover.js': { kind: '옮김' },
+  'workOrders.js': { kind: '옮김' },
 }
 
 /** 화면 기능이 아닌 모듈 — 옮기고 말고 할 것이 없다 */

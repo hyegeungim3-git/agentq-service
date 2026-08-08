@@ -167,6 +167,11 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /predops/drift` | `fetchDriftItems` | → `DriftItem[]` |
 | `GET /predops/retrain-runs` | `fetchRetrainRuns` | → `RetrainRun[]`. 챔피언·챌린저 값과 방향 |
 | `POST /predops/retrain-runs/{id}:promote` | `promoteChallenger` | 교체. 서비스 중인 모델을 바꾸는 일이라 서버가 처리한다 |
+| `GET /field/shifts` | `fetchShifts` | → `{shifts, currentId}` (`entities/field/model.ts`). 2교대·3교대가 발주처마다 다르다 |
+| `GET /field/handover/received` | `fetchReceivedHandover` | → `ReceivedHandover`. **확인한 항목 id를 함께** — 확인 여부가 없으면 화면이 '이 조에서 끊겼다'를 못 말한다 |
+| `POST /field/handover/ack` | `confirmHandover` | 확인 처리. **다음 조가 봐야** 의미가 있으므로 서버에 남는다 |
+| `GET /field/work-orders` | `fetchWorkOrders` | → `WorkOrder[]`. **이력(`history`)을 함께** — 현재 상태만 오면 추적이 아니라 현황판이다 |
+| `POST /field/work-orders/{id}:advance` | `advanceWorkOrder` | 상태 진행. **되돌리는 것은 없다** — 현장 기록은 정정이 아니라 추가로 남긴다 |
 | `GET /approvals/line` | `fetchApprovalLine` | → `ApprovalStep[]` (`entities/approval/model.ts`). **조직도가 정본** — 이름만 오면 동명이인을 구분할 수 없다 |
 | `POST /approvals` | `submitApproval` | 상신. 그룹웨어에 문서를 만드는 일이라 서버가 한다. **올린 척하지 않는다**(D-009) |
 | `GET /repro/snapshots` | `fetchSnapshots` | → `Snapshot[]` (`entities/repro/model.ts`). **질의·답변 원문은 넣지 않는다** — 접근 로그·이용 이력과 같은 전제(§3-7). 근거 문서는 이름이 아니라 **개정 버전**까지 |

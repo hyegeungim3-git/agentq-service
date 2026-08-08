@@ -63,7 +63,7 @@
 | `GET /users` | `fetchUsers` | `src/pages/admin/users/QuotaPage.tsx`<br>`src/pages/admin/users/UserListPage.tsx` |
 | `PATCH /users/{id}` | `updateUserState` | `src/pages/admin/users/UserListPage.tsx` |
 | `GET /approvals` | `fetchApprovals` | `src/pages/admin/users/ApprovalPage.tsx` |
-| `GET /meta/as-of` | `fetchAsOf` | `src/pages/admin/compliance/SafetyActPage.tsx`<br>`src/pages/admin/sysops/SecurityArchPage.tsx`<br>`src/pages/admin/users/ApprovalPage.tsx`<br>`src/pages/admin/users/BlockRulePage.tsx` |
+| `GET /meta/as-of` | `fetchAsOf` | `src/pages/admin/compliance/SafetyActPage.tsx`<br>`src/pages/admin/sysops/SecurityArchPage.tsx`<br>`src/pages/admin/users/ApprovalPage.tsx`<br>`src/pages/admin/users/BlockRulePage.tsx`<br>`src/pages/field/WorkOrderPage.tsx` |
 | `POST /approvals/{id}:decide` | `decideApproval` | `src/pages/admin/users/ApprovalPage.tsx` |
 | `GET /audit/access` | `fetchAccessLogs` | `src/pages/admin/users/AccessLogPage.tsx` |
 | `GET /audit/coverage` | `fetchLogGaps` | `src/pages/admin/users/AccessLogPage.tsx` |
@@ -111,6 +111,11 @@
 | `GET /predops/drift` | `fetchDriftItems` | `src/pages/admin/mlops/PredOpsPage.tsx` |
 | `GET /predops/retrain-runs` | `fetchRetrainRuns` | `src/pages/admin/mlops/PredOpsPage.tsx` |
 | `POST /predops/retrain-runs/{id}:promote` | `promoteChallenger` | `src/pages/admin/mlops/PredOpsPage.tsx` |
+| `GET /field/shifts` | `fetchShifts` | `src/pages/field/HandoverPage.tsx` |
+| `GET /field/handover/received` | `fetchReceivedHandover` | `src/pages/field/HandoverPage.tsx` |
+| `POST /field/handover/ack` | `confirmHandover` | `src/pages/field/HandoverPage.tsx` |
+| `GET /field/work-orders` | `fetchWorkOrders` | `src/pages/field/WorkOrderPage.tsx` |
+| `POST /field/work-orders/{id}:advance` | `advanceWorkOrder` | `src/pages/field/WorkOrderPage.tsx` |
 | `GET /approvals/line` | `fetchApprovalLine` | `src/widgets/doc-actions/DocActions.tsx` |
 | `POST /approvals` | `submitApproval` | `src/widgets/doc-actions/DocActions.tsx` |
 | `GET /repro/snapshots` | `fetchSnapshots` | `src/pages/admin/compliance/ReproPage.tsx` |

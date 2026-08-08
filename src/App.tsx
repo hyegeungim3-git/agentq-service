@@ -22,6 +22,8 @@ import { HubPage } from '@pages/hub/HubPage'
 import { SecurityPage } from '@pages/security/SecurityPage'
 import { NoticesPage } from '@pages/notices/NoticesPage'
 import { GuidePage } from '@pages/guide/GuidePage'
+import { HandoverPage } from '@pages/field/HandoverPage'
+import { WorkOrderPage } from '@pages/field/WorkOrderPage'
 import { SettingsPage } from '@pages/settings/SettingsPage'
 import { usePrefs } from '@features/prefs/usePrefs'
 import { findMenu } from '@entities/admin/nav'
@@ -270,6 +272,8 @@ export default function App() {
       {view.tab === 'security' && <SecurityPage />}
       {view.tab === 'notices' && <NoticesPage onRead={markRead} />}
       {view.tab === 'guide' && <GuidePage />}
+      {view.tab === 'handover' && <HandoverPage />}
+      {view.tab === 'workorders' && <WorkOrderPage />}
       {view.tab === 'settings' && <SettingsPage store={prefs} />}
       {view.tab === 'agents' && view.scenario && <OrchestrationPage onBack={backToAgents} />}
       {view.tab === 'agents' && !view.scenario && view.agentId === null && (

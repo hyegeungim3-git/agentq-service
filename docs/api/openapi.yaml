@@ -2444,6 +2444,115 @@ paths:
           required: true
           schema:
             type: string
+  /field/shifts:
+    get:
+      operationId: fetchShifts
+      summary: "2교대·3교대가 발주처마다 다르다"
+      description: → `{shifts, currentId}` (`entities/field/model.ts`). 2교대·3교대가 발주처마다 다르다
+      tags:
+        - field
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /field/handover/received:
+    get:
+      operationId: fetchReceivedHandover
+      summary: "**확인한 항목 id를 함께** — 확인 여부가 없으면 화면이 '이 조에서 끊겼다'를 못 말한다"
+      description: "→ `ReceivedHandover`. **확인한 항목 id를 함께** — 확인 여부가 없으면 화면이 '이 조에서 끊겼다'를 못 말한다"
+      tags:
+        - field
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReceivedHandover"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /field/handover/ack:
+    post:
+      operationId: confirmHandover
+      summary: 확인 처리
+      description: 확인 처리. **다음 조가 봐야** 의미가 있으므로 서버에 남는다
+      tags:
+        - field
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /field/work-orders:
+    get:
+      operationId: fetchWorkOrders
+      summary: "**이력을 함께** — 현재 상태만 오면 추적이 아니라 현황판이다"
+      description: → `WorkOrder[]`. **이력(`history`)을 함께** — 현재 상태만 오면 추적이 아니라 현황판이다
+      tags:
+        - field
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkOrder"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /field/work-orders/{id}:advance:
+    post:
+      operationId: advanceWorkOrder
+      summary: 상태 진행
+      description: 상태 진행. **되돌리는 것은 없다** — 현장 기록은 정정이 아니라 추가로 남긴다
+      tags:
+        - field
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
   /approvals/line:
     get:
       operationId: fetchApprovalLine
@@ -4873,6 +4982,35 @@ components:
         - hits
         - riskIfOff
       additionalProperties: false
+    HandoverItem:
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          $ref: "#/components/schemas/HandoverKind"
+        text:
+          type: string
+      required:
+        - id
+        - kind
+        - text
+      additionalProperties: false
+    HandoverKind:
+      type: string
+      enum:
+        - alarm
+        - action
+        - pending
+        - note
+      description: |-
+        현장 업무 — 교대 인수인계와 작업지시.
+        
+        두 가지 모두 "그래서 처리됐나"에 답하는 자리다. 문서를 만들어 놓고 끝나면 이 제품은 문서 생성기가 된다.
+        
+        **교대 인수인계** — 3교대 현장에서 사고·품질 문제가 가장 많이 새는 지점이다. 받은 인계를 확인했는지, 이번 조가 무엇을 넘기는지를 같은 화면에서 본다.
+        
+        **작업지시** — 발행 → 착수 → 완료 → 검증까지 간다. 상태는 **되돌리지 않는다.** 현장 기록은 정정이 아니라 추가로 남겨야 추적이 된다 — 되돌릴 수 있으면 '언제 무엇이 있었나'가 사라진다.
     Hazard:
       type: object
       properties:
@@ -6458,6 +6596,31 @@ components:
         - searchMode
         - topK
         - reindexedRatio
+      additionalProperties: false
+    ReceivedHandover:
+      type: object
+      properties:
+        shiftId:
+          type: string
+        author:
+          type: string
+        at:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/HandoverItem"
+        acknowledged:
+          type: array
+          items:
+            type: string
+          description: 받는 쪽이 확인했다고 표시한 항목 id
+      required:
+        - shiftId
+        - author
+        - at
+        - items
+        - acknowledged
       additionalProperties: false
     RegulationAnswer:
       type: object
@@ -8131,6 +8294,62 @@ components:
         - users
         - lastWriteAt
         - idleDays
+      additionalProperties: false
+    WorkOrder:
+      type: object
+      properties:
+        id:
+          type: string
+        docNo:
+          type: string
+        title:
+          type: string
+        source:
+          type: string
+          description: 어디서 나온 지시인가 — 시나리오·회의·점검
+        owner:
+          type: string
+        due:
+          type:
+            - string
+            - "null"
+          description: 기한. 안 정했으면 null
+        status:
+          $ref: "#/components/schemas/WorkOrderStatus"
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkOrderStep"
+      required:
+        - id
+        - docNo
+        - title
+        - source
+        - owner
+        - due
+        - status
+        - history
+      additionalProperties: false
+    WorkOrderStatus:
+      type: string
+      enum:
+        - issued
+        - working
+        - done
+        - verified
+    WorkOrderStep:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/WorkOrderStatus"
+        at:
+          type: string
+        by:
+          type: string
+      required:
+        - status
+        - at
+        - by
       additionalProperties: false
     WorkSignal:
       type: object
