@@ -11,6 +11,7 @@
  * **13종을 모두 도입했다.** 번역 말뭉치와 표준화 대장까지 갖췄다.
  */
 import type { AgentId } from '@entities/agent/model'
+import { SUH_ACTIVITY } from '../medical/agentusage'
 import { MEDICAL_RELAY_SCENARIO } from '../medical/relay'
 import {
   MEDICAL_ANALYSES,
@@ -74,6 +75,7 @@ const ADOPTED: AgentId[] = [
 
 export const MEDICAL_PACK: DomainPackData = {
   agents: ADOPTED,
+  activity: SUH_ACTIVITY,
   documents: MEDICAL_DOCUMENTS,
   workspaces: MEDICAL_WORKSPACES,
   notices: MEDICAL_NOTICES,

@@ -6,6 +6,7 @@
  * 테스트 20여 개가 함께 깨지고, 옮기는 김에 내용이 조금씩 바뀐다.
  */
 import { AGENTS } from '@entities/agent/model'
+import { HBP_ACTIVITY } from '../agentusage'
 import { INSPECTION_SCENARIO } from '../orchestration'
 import { AGENT_DEFS, SCENARIO_DEFS } from '../agentdef'
 import { TOOLS } from '../packops'
@@ -39,6 +40,7 @@ import type { DomainPackData } from '../packs'
 /* 제조는 13종을 전부 도입했다 — 업무 데이터가 다 갖춰져 있다 */
 export const MANUFACTURING_PACK: DomainPackData = {
   agents: AGENTS.map((a) => a.id),
+  activity: HBP_ACTIVITY,
   documents: DOCUMENTS,
   workspaces: WORKSPACES,
   notices: NOTICES,

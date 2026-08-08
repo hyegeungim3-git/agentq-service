@@ -5,7 +5,7 @@ import { openTab, enterDomain } from './shell'
 async function openSummary(page: import('@playwright/test').Page) {
   await enterDomain(page)
   await openTab(page, /^에이전트/)
-  await page.getByRole('main').getByRole('button', { name: /문서 요약/ }).click()
+  await page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true }).click()
   await expect(page.getByRole('heading', { name: '문서 요약 에이전트' })).toBeVisible()
 }
 

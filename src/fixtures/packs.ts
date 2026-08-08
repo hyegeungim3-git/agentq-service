@@ -12,6 +12,7 @@
  * 돌려주고, 경계 함수는 '이 발주처의 업무 데이터가 없다'고 말한다. 조용히
  * 채워 넣으면 그게 바로 이전 데모의 사고다.
  */
+import type { AgentActivity } from '@entities/agentusage/model'
 import type { AgentId } from '@entities/agent/model'
 import type { AgentOps } from '@entities/agentops/model'
 import type { AgentDefinition, ScenarioDefinition } from '@entities/agentdef/model'
@@ -60,6 +61,8 @@ export type DomainPackData = {
    * 이 발주처에는 아직 안 들어온 것이다. 둘을 뭉뚱그리면 어느 쪽인지 알 수 없다.
    */
   agents: AgentId[]
+  /** 이 발주처에서 무엇을 얼마나 쓰는가 — 허브의 수와 활동 패널 재료 */
+  activity: AgentActivity
   documents: BusinessDocument[]
   workspaces: Workspace[]
   notices: Notice[]

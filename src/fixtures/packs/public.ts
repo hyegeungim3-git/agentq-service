@@ -8,6 +8,7 @@
  * 세계관은 2026년 3월, 표준지 공시지가 조사·검증 시즌이다.
  */
 import type { AgentId } from '@entities/agent/model'
+import { REB_ACTIVITY } from '../public/agentusage'
 import { PUBLIC_RELAY_SCENARIO } from '../public/relay'
 import { PUBLIC_WORKSPACES, PUBLIC_NOTICES, PUBLIC_SIGNALS, PUBLIC_APPEAL_QUEUE, PUBLIC_DATASETS } from '../public/basics'
 import { PUBLIC_CHAT, PUBLIC_CHAT_UNKNOWN, PUBLIC_FAQ } from '../public/chat'
@@ -50,6 +51,7 @@ const ADOPTED: AgentId[] = ['chatbot', 'knowledge', 'internalreg', 'summary', 'r
 
 export const PUBLIC_PACK: DomainPackData = {
   agents: ADOPTED,
+  activity: REB_ACTIVITY,
   documents: PUBLIC_DOCUMENTS,
   workspaces: PUBLIC_WORKSPACES,
   notices: PUBLIC_NOTICES,

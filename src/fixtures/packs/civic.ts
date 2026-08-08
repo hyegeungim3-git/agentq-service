@@ -9,6 +9,7 @@
  * 공공과 같은 이유(4개 언어 대역 데이터 / 신규 설계)다.
  */
 import type { AgentId } from '@entities/agent/model'
+import { HSC_ACTIVITY } from '../civic/agentusage'
 import { CIVIC_RELAY_SCENARIO } from '../civic/relay'
 import {
   CIVIC_ANALYSES,
@@ -72,6 +73,7 @@ const ADOPTED: AgentId[] = [
 
 export const CIVIC_PACK: DomainPackData = {
   agents: ADOPTED,
+  activity: HSC_ACTIVITY,
   documents: CIVIC_DOCUMENTS,
   workspaces: CIVIC_WORKSPACES,
   notices: CIVIC_NOTICES,

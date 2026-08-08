@@ -45,12 +45,14 @@ export async function enterDomain(page: Page, org = '한빛정밀') {
 }
 
 /** 분야 선택 → 에이전트 탭 → 해당 에이전트 */
-export async function openAgent(page: Page, name: RegExp) {
+export async function openAgent(page: Page, name: string) {
   await enterDomain(page)
   await openTab(page, /^에이전트/)
-  /* 에이전트 이름은 이제 **사이드바 목록과 허브 카드 양쪽**에 있다(D-014).
-     허브 카드가 처음 여는 사람의 동선이라 본문 쪽을 누른다 */
-  await page.getByRole('main').getByRole('button', { name }).click()
+  /* 에이전트 이름은 이제 사이드바 목록·최근 사용 칩·활동 패널에도 있다(D-014).
+     허브 카드가 처음 여는 사람의 동선이라 본문 쪽을 누른다.
+     카드 버튼의 이름은 **에이전트 이름 그대로**다. 최근 사용 칩·활동 패널에는
+     자리를 덧붙인 이름이 있으므로 exact로 집으면 카드만 걸린다 */
+  await page.getByRole('main').getByRole('button', { name, exact: true }).click()
 }
 
 /* ─── 관리자 메뉴 전수 순회 ────────────────────────────────────────────────

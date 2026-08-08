@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronRight, Search, UserCheck, Workflow } from 'lucide-react'
+import { ChevronRight, Search, Star, UserCheck, Workflow } from 'lucide-react'
 import { AGENTS, type AgentDefinition, type AgentId } from '@entities/agent/model'
 import {
   CAPABILITY_LABEL,
@@ -9,6 +9,9 @@ import {
 import type { Domain } from '@entities/domain/model'
 import { sectorLabel } from '@entities/domain/model'
 import { fetchAdoptedAgents, fetchAgentDefs } from '@shared/api/agentdef'
+import { fetchAgentActivity } from '@shared/api/agentusage'
+import { isFavorite, rankOf, recentlyUsed, runsOf } from '@entities/agentusage/model'
+import { AgentActivityPanel } from '@widgets/agent-activity/AgentActivityPanel'
 import { useRemote } from '@features/remote/useRemote'
 import { AGENT_ICONS, FALLBACK_AGENT_ICON } from '@shared/ui/agentIcons'
 
@@ -49,6 +52,9 @@ export function HubPage({
   /* 이 발주처가 도입한 에이전트. 못 받았으면 아무것도 막지 않는다 —
      목록을 잘못 잠그는 것보다 그대로 두는 편이 덜 위험하다 */
   const adopted = useRemote(fetchAdoptedAgents, [domain.id])
+  /* 실행 횟수·순위·최근 작업 — 서버가 붙으면 이용 통계에서 온다(D-014) */
+  const activity = useRemote(fetchAgentActivity, [domain.id])
+  const usage = activity.kind === 'ready' ? activity.data.usage : []
   const adoptedIds = adopted.kind === 'ready' ? adopted.data.agents : null
   const scenario = adopted.kind === 'ready' ? adopted.data.scenario : null
   const adoptedCount = adoptedIds?.length ?? null
@@ -65,8 +71,11 @@ export function HubPage({
     defs.kind === 'ready' ? (defs.data.find((d) => d.agentId === id) ?? null) : null
 
   return (
-    <main className="min-h-dvh bg-slate-50 px-4 py-8">
-      <div className="mx-auto w-full max-w-3xl">
+    /* 본문과 활동 패널을 나란히 — 원본 배치(D-014). 좁은 화면에서는 패널이 접힌다,
+       카드 목록이 먼저다 */
+    <div className="flex min-h-dvh bg-slate-50">
+      <main className="min-w-0 flex-1 px-4 py-8">
+        <div className="mx-auto w-full max-w-3xl">
         <header className="mb-6">
           {onBack && (
             <button
@@ -125,6 +134,30 @@ export function HubPage({
               {shown.length}종 표시
             </span>
           </div>
+
+          {/* 최근 쓴 것부터 — 13장을 다시 훑지 않게 한다(원본 배치) */}
+          {activity.kind === 'ready' && recentlyUsed(activity.data.recent, 3).length > 0 && (
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-[11px] font-bold text-slate-400">최근 사용</span>
+              {recentlyUsed(activity.data.recent, 3).map((id) => {
+                const a = agents.find((x) => x.id === id)
+                if (!a) return null
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => onOpen(id)}
+                    /* 카드에도 같은 이름이 있다 — 겹치면 음성으로 골라 누를 수 없다.
+                       보이는 글자를 담고 뒤에 자리를 덧붙인다(WCAG 2.5.3) */
+                    aria-label={`${a.name} 최근 사용에서 열기`}
+                    className="min-h-11 rounded-lg border border-slate-200 bg-white px-2.5 text-[11px] font-bold text-slate-700 hover:bg-slate-50"
+                  >
+                    {a.name} <span className="text-slate-400">{runsOf(usage, id)}회</span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </header>
 
         {/* 한 에이전트로 끝나지 않는 업무는 릴레이로 묶는다 */}
@@ -202,6 +235,25 @@ export function HubPage({
                           {notAdopted ? '도입 전' : '준비 중'}
                         </span>
                       )}
+                      {/* 얼마나 쓰는지 — 원본 카드의 실행 횟수·순위·즐겨찾기(D-014).
+                          많이 쓰는 것이 위에 있지 않으므로 카드에서 알 수 있어야 한다.
+                          숫자만 두지 않고 '이번 달'을 붙인다 — 언제부터 센 수인지 없으면
+                          21회가 하루치인지 1년치인지 알 수 없다 */}
+                      {usable && runsOf(usage, a.id) > 0 && (
+                        <span className="ml-auto flex shrink-0 items-center gap-1.5 text-[10px] text-slate-400">
+                          {isFavorite(usage, a.id) && (
+                            <Star className="size-3 fill-amber-400 text-amber-400" aria-hidden="true" />
+                          )}
+                          <span className="font-bold text-slate-500">
+                            이번 달 {runsOf(usage, a.id)}회
+                          </span>
+                          {(rankOf(usage, a.id) ?? 99) <= 3 && (
+                            <span className="bg-brand-soft text-brand rounded px-1 py-0.5 font-black">
+                              #{String(rankOf(usage, a.id)).padStart(2, '0')}
+                            </span>
+                          )}
+                        </span>
+                      )}
                     </div>
                     <p id={`${a.id}-desc`} className="mt-1 text-sm text-slate-600">
                       {a.desc}
@@ -270,8 +322,15 @@ export function HubPage({
               </li>
             )
           })}
-        </ul>
-      </div>
-    </main>
+          </ul>
+        </div>
+      </main>
+
+      {activity.kind === 'ready' && (
+        <div className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] xl:block">
+          <AgentActivityPanel activity={activity.data} onOpen={onOpen} />
+        </div>
+      )}
+    </div>
   )
 }

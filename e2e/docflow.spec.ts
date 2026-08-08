@@ -10,7 +10,7 @@ import { openAgent } from './shell'
  */
 
 test('보고서 — 점검하고 내려받고 결재까지', async ({ page }) => {
-  await openAgent(page, /표준 보고서 작성/)
+  await openAgent(page, '표준 보고서 작성')
 
   await page.getByRole('button', { name: '보고서 생성' }).click()
   await expect(page.getByRole('region', { name: /주간 실적 보고/ })).toBeVisible({ timeout: 15_000 })
@@ -32,7 +32,7 @@ test('보고서 — 점검하고 내려받고 결재까지', async ({ page }) =>
 })
 
 test('안전관리계획 — 결과 옆에 같은 확인 절차가 붙는다', async ({ page }) => {
-  await openAgent(page, /안전관리계획 수립/)
+  await openAgent(page, '안전관리계획 수립')
 
   await page.getByRole('button', { name: '위험성평가 실시' }).click()
   await expect(page.getByRole('region', { name: '내보내기 전 확인' })).toBeVisible({ timeout: 15_000 })

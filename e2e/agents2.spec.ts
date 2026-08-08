@@ -2,15 +2,17 @@ import { test, expect } from '@playwright/test'
 import { openTab, enterDomain } from './shell'
 import { AGENTS, READY_AGENTS } from '../src/entities/agent/model'
 
-async function openAgent(page: import('@playwright/test').Page, name: RegExp) {
+async function openAgent(page: import('@playwright/test').Page, name: string) {
   await enterDomain(page)
   await openTab(page, /^에이전트/)
-  await page.getByRole('main').getByRole('button', { name }).click()
+  /* 카드 버튼의 이름은 **에이전트 이름 그대로**다. 최근 사용 칩·활동 패널에는
+     자리를 덧붙인 이름이 있으므로 exact로 집으면 카드만 걸린다 */
+  await page.getByRole('main').getByRole('button', { name, exact: true }).click()
 }
 
 test.describe('신규 에이전트 3종 (2차)', () => {
   test('지식 검색 — 유사도 근거를 속성 대조로 보여준다', async ({ page }) => {
-    await openAgent(page, /지식 검색/)
+    await openAgent(page, '지식 검색')
     await page.getByRole('searchbox').fill('브래킷 굽힘 금형')
     await page.getByRole('button', { name: /검색 시작/ }).click()
     const r = page.getByRole('region', { name: /HBM-2211/ })
@@ -20,7 +22,7 @@ test.describe('신규 에이전트 3종 (2차)', () => {
 
   /* 필터에 걸려 빠진 문서를 감추면 '없다'로 읽힌다 */
   test('지식 검색 — 보안 등급으로 빠진 건수를 밝힌다', async ({ page }) => {
-    await openAgent(page, /지식 검색/)
+    await openAgent(page, '지식 검색')
     await page.getByRole('searchbox').fill('브래킷 굽힘 금형')
     // 라디오는 sr-only라 사용자와 같은 방식으로 라벨을 누른다
     await page.locator('label').filter({ hasText: /^일반$/ }).click()
@@ -32,7 +34,7 @@ test.describe('신규 에이전트 3종 (2차)', () => {
   })
 
   test('OCR — 못 읽은 줄과 마스킹 기록을 함께 보여준다', async ({ page }) => {
-    await openAgent(page, /문서 인식/)
+    await openAgent(page, '문서 인식(OCR)')
     await page.getByRole('main').getByRole('button', { name: '문서 인식', exact: true }).click()
     await expect(page.getByRole('region', { name: '인식 결과' })).toContainText('미만인 줄이 2개', {
       timeout: 10_000,
@@ -41,7 +43,7 @@ test.describe('신규 에이전트 3종 (2차)', () => {
   })
 
   test('안전계획 — 1인 작업이면 대책과 권고가 달라진다', async ({ page }) => {
-    await openAgent(page, /안전관리계획 수립/)
+    await openAgent(page, '안전관리계획 수립')
     await page.getByLabel('작업 인원').selectOption('1')
     await page.getByRole('button', { name: '위험성평가 실시' }).click()
     await expect(page.getByRole('region', { name: /위험요인/ })).toContainText('2인 배치를 권고한다', {

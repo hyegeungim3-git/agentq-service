@@ -3857,6 +3857,38 @@
         ]
       }
     },
+    "/agents/activity": {
+      "get": {
+        "operationId": "fetchAgentActivity",
+        "summary": "**순위는 넣지 않는다** — 횟수만 주면 화면이 센다",
+        "description": "→ `AgentActivity` (`entities/agentusage/model.ts`). **순위는 넣지 않는다** — 횟수만 주면 화면이 센다. 둘 다 오면 어긋나는 날이 온다",
+        "tags": [
+          "agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentActivity"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/scan/targets": {
       "get": {
         "operationId": "fetchScanTargets",
@@ -5222,6 +5254,35 @@
         "additionalProperties": false,
         "description": "안건별 논의 여부 — 논의되지 않은 안건을 드러내는 것이 회의록의 실무 가치다"
       },
+      "AgentActivity": {
+        "type": "object",
+        "properties": {
+          "usage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AgentUsage"
+            }
+          },
+          "recent": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecentRun"
+            }
+          },
+          "hints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkHint"
+            }
+          }
+        },
+        "required": [
+          "usage",
+          "recent",
+          "hints"
+        ],
+        "additionalProperties": false
+      },
       "AgentDefinition": {
         "type": "object",
         "properties": {
@@ -5330,6 +5391,28 @@
           "failed7d",
           "owner",
           "exposed"
+        ],
+        "additionalProperties": false
+      },
+      "AgentUsage": {
+        "type": "object",
+        "properties": {
+          "agentId": {
+            "$ref": "#/components/schemas/AgentId"
+          },
+          "runs": {
+            "type": "number",
+            "description": "이번 달 실행 횟수"
+          },
+          "favorite": {
+            "type": "boolean",
+            "description": "사용자가 즐겨찾기에 둔 것"
+          }
+        },
+        "required": [
+          "agentId",
+          "runs",
+          "favorite"
         ],
         "additionalProperties": false
       },
@@ -9611,6 +9694,36 @@
         ],
         "additionalProperties": false
       },
+      "RecentRun": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "agentId": {
+            "$ref": "#/components/schemas/AgentId"
+          },
+          "title": {
+            "type": "string",
+            "description": "무엇을 했는가 — 한 줄"
+          },
+          "detail": {
+            "type": "string",
+            "description": "결과물이나 건수"
+          },
+          "at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "agentId",
+          "title",
+          "detail",
+          "at"
+        ],
+        "additionalProperties": false
+      },
       "RegulationAnswer": {
         "type": "object",
         "properties": {
@@ -11872,6 +11985,37 @@
           "idleDays"
         ],
         "additionalProperties": false
+      },
+      "WorkHint": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "agentId": {
+            "$ref": "#/components/schemas/AgentId",
+            "description": "이어서 열 에이전트"
+          },
+          "action": {
+            "type": "string",
+            "description": "버튼에 적을 말"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "body",
+          "agentId",
+          "action"
+        ],
+        "additionalProperties": false,
+        "description": "지금 하면 좋을 일.\n\n⚠️ **AI가 판단한 것이 아니다.** 팩이 적어 둔 업무 맥락이다. 서버가 붙으면 실제 업무 상태에서 나온다. 화면이 'AI 추천'이라고 부르지 않는 이유다 — 추천의 근거를 댈 수 없으면 그렇게 부르면 안 된다."
       },
       "WorkOrder": {
         "type": "object",
