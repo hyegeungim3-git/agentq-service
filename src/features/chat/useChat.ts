@@ -83,6 +83,9 @@ export function useChat(opts: ChatOptions = {}, store?: ChatStore) {
     ask,
     reset,
     faq: shownFaq,
+    /* 범주 필터를 걸어도 추천 카드는 그대로여야 한다 — 카드는 '무엇을 물어볼까'를
+       고르는 자리이고, 필터는 아래 목록을 좁히는 자리다 */
+    allFaq: faq,
     faqCategory,
     setFaqCategory,
     canSend: input.trim().length > 0 && !pending,

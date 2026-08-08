@@ -96,7 +96,9 @@ describe('ChatPage', () => {
 
     it('질문을 누르면 바로 물어본다', async () => {
       setup()
-      await userEvent.click(await screen.findByRole('button', { name: /초품 검사는 언제 실시하나요/ }))
+      /* 같은 질문이 추천 카드와 아래 목록 양쪽에 있다 — 목록 쪽에서 누른다 */
+      const faq = await screen.findByRole('region', { name: '자주 묻는 질문' })
+      await userEvent.click(within(faq).getByRole('button', { name: /초품 검사는 언제 실시하나요/ }))
       expect(await screen.findByText(/초품 검사는 금형 교체 직후에 실시합니다/)).toBeInTheDocument()
     })
 

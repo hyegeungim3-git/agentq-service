@@ -190,11 +190,11 @@ export const PUBLIC_CHAT_UNKNOWN: Omit<ChatMessage, 'id' | 'role'> = {
  * 것은 아니고, 근거가 없으면 없다고 말해야 한다 — 그 경로가 목록에서도 닿아야 한다.
  */
 export const PUBLIC_FAQ: FaqItem[] = [
-  { category: 'standard', question: '이용상황이 바뀌면 조사표에 무엇을 적나요?' },
-  { category: 'standard', question: '경계 지역 가격 균형 협의 기준이 어떻게 되나요?' },
+  { category: 'standard', question: '이용상황이 바뀌면 조사표에 무엇을 적나요?', hint: '변동 사유와 근거 기재 방법을 조사지침으로' },
+  { category: 'standard', question: '경계 지역 가격 균형 협의 기준이 어떻게 되나요?', hint: '인접 시군 협의 시점과 판단 기준' },
   { category: 'labor', question: '출장 여비 기준 알려줘' },
-  { category: 'quality', question: '이의신청 처리 기한이 어떻게 되나요?' },
-  { category: 'quality', question: '실거래 의심 거래 판정 기준이 무엇인가요?' },
+  { category: 'quality', question: '이의신청 처리 기한이 어떻게 되나요?', hint: '접수부터 회신까지 법정 기한' },
+  { category: 'quality', question: '실거래 의심 거래 판정 기준이 무엇인가요?', hint: '시세 괴리율과 검증 대상 선별 기준' },
   { category: 'security', question: '개인 노트북 반출 절차가 어떻게 되나요?' },
   { category: 'system', question: '시도별 공시지가 변동률 보여줘' },
 ]

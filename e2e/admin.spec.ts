@@ -206,7 +206,7 @@ test.describe('관리자 셸', () => {
   /* 포털에서 누른 피드백이 관리자 화면으로 이어진다 */
   test('AI 품질 관리 — 포털 피드백이 집계되고 한계를 밝힌다', async ({ page }) => {
     await enterDomain(page)
-    await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
+    await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).first().click()
     await expect(page.getByText(/타수 50만 타/)).toBeVisible({ timeout: 10_000 })
     await page.getByRole('button', { name: '도움이 안 됐어요' }).click()
     await page.getByRole('button', { name: '근거가 부족하다' }).click()

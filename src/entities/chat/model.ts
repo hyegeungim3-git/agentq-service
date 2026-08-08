@@ -32,7 +32,18 @@ export type FaqCategory = 'standard' | 'labor' | 'quality' | 'security' | 'syste
 export type FaqItem = {
   category: FaqCategory
   question: string
+  /**
+   * 빈 화면 추천 카드에 붙는 한 줄 설명.
+   *
+   * 없으면 카드로 안 올라간다 — 목록에는 남는다. 카드는 넷만 놓는 자리라
+   * **무엇을 물어볼지 고르게 돕는 것**이 목적이고, 설명 없는 질문은 그 일을 못 한다.
+   */
+  hint?: string
 }
+
+/** 빈 화면에 카드로 올릴 것 — 설명이 있는 것만, 최대 넷 */
+export const suggestionCards = (items: FaqItem[]): FaqItem[] =>
+  items.filter((f) => f.hint !== undefined).slice(0, 4)
 
 /* 업종 말을 쓰지 않는다 — '작업표준'은 공장의 말이라 병원 화면에도 떴다 */
 const FAQ_CATEGORY_LABEL: Record<FaqCategory, string> = {

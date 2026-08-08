@@ -182,10 +182,10 @@ export const CIVIC_CHAT_UNKNOWN: Omit<ChatMessage, 'id' | 'role'> = {
 
 /** 보안 항목은 일부러 답할 수 없는 질문으로 뒀다 */
 export const CIVIC_FAQ: FaqItem[] = [
-  { category: 'standard', question: '소관이 아닌 민원은 어떻게 이송하나요?' },
-  { category: 'standard', question: '현장 확인은 무엇을 기록해야 하나요?' },
-  { category: 'labor', question: '처리 기한 연장은 어떻게 통지하나요?' },
-  { category: 'quality', question: '옥외광고물 계고 기준이 어떻게 되나요?' },
+  { category: 'standard', question: '소관이 아닌 민원은 어떻게 이송하나요?', hint: '이송 요건과 통지 기한을 처리지침으로' },
+  { category: 'standard', question: '현장 확인은 무엇을 기록해야 하나요?', hint: '사진·계측·입회자까지 남겨야 할 것' },
+  { category: 'labor', question: '처리 기한 연장은 어떻게 통지하나요?', hint: '연장 사유와 통지 방법·시점' },
+  { category: 'quality', question: '옥외광고물 계고 기준이 어떻게 되나요?', hint: '위반 유형별 계고와 이행강제금 절차' },
   { category: 'quality', question: '개인정보를 제3자에게 줄 수 있나요?' },
   { category: 'security', question: '청사 출입증 재발급 절차가 어떻게 되나요?' },
   { category: 'system', question: '행정동별 접수 현황 보여줘' },

@@ -219,11 +219,11 @@ export const CHAT_UNKNOWN: Omit<ChatMessage, 'id' | 'role'> = {
  * 아니고, 지식베이스에 없으면 없다고 말해야 한다 — 그 경로가 목록에서도 닿아야 한다.
  */
 export const FAQ_ITEMS: FaqItem[] = [
-  { category: 'standard', question: '금형 교체 주기가 어떻게 되나요?' },
-  { category: 'standard', question: '초품 검사는 언제 실시하나요?' },
+  { category: 'standard', question: '금형 교체 주기가 어떻게 되나요?', hint: '작업표준의 교체 기준과 예외 조건을 근거와 함께' },
+  { category: 'standard', question: '초품 검사는 언제 실시하나요?', hint: '금형 교체 직후 검사 시점과 판정 기준' },
   { category: 'labor', question: '출장 여비 기준 알려줘' },
-  { category: 'quality', question: '수입검사 판정 기준이 무엇인가요?' },
+  { category: 'quality', question: '수입검사 판정 기준이 무엇인가요?', hint: '입고 자재의 합격·특채 기준을 규정 조항으로' },
   { category: 'security', question: '도면 등 기밀 기술자료는 어떻게 처리하나요?' },
   { category: 'system', question: '진동 알람이 뜨면 어떻게 하나요?' },
-  { category: 'quality', question: '사업장별 가동률 보여줘' },
+  { category: 'quality', question: '사업장별 가동률 보여줘', hint: '사업장 배치 위에 최근 가동률과 추이' },
 ]

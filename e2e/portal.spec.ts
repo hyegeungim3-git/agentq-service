@@ -60,7 +60,7 @@ test.describe('셸 — 최근 대화', () => {
   test('질문하면 목록에 남고, 새 대화로 갈랐다가 되돌아올 수 있다', async ({ page }) => {
     await enterDomain(page)
 
-    await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
+    await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).first().click()
     await expect(page.getByText(/타수 50만 타/)).toBeVisible({ timeout: 10_000 })
 
     let nav = await openSidebar(page)
@@ -81,7 +81,7 @@ test.describe('셸 — 워크스페이스·공지·가이드', () => {
   test('워크스페이스를 바꾸면 대화 목록이 갈린다', async ({ page }) => {
     await enterDomain(page)
 
-    await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
+    await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).first().click()
     await expect(page.getByText(/타수 50만 타/)).toBeVisible({ timeout: 10_000 })
 
     let nav = await openSidebar(page)
@@ -105,7 +105,7 @@ test.describe('셸 — 워크스페이스·공지·가이드', () => {
   /* 새로고침해도 남아야 '저장'이라고 말할 수 있다 */
   test('대화가 새로고침 뒤에도 남는다', async ({ page }) => {
     await enterDomain(page)
-    await page.getByRole('button', { name: /출장 여비 기준 알려줘/ }).click()
+    await page.getByRole('button', { name: /출장 여비 기준 알려줘/ }).first().click()
     await expect(page.getByText(/일 60,000원/)).toBeVisible({ timeout: 10_000 })
 
     await page.reload()
@@ -163,7 +163,7 @@ test.describe('셸 — 라이브 지표·판단 근거·피드백', () => {
 
   test('판단 근거와 피드백이 답변에 붙는다', async ({ page }) => {
     await enterDomain(page)
-    await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
+    await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).first().click()
     await expect(page.getByText(/타수 50만 타/)).toBeVisible({ timeout: 10_000 })
 
     await page.getByRole('button', { name: '왜 이 답변인가' }).click()
@@ -177,7 +177,7 @@ test.describe('셸 — 라이브 지표·판단 근거·피드백', () => {
 
   test('사업장별 지표는 도식임을 밝히고 값 없는 곳을 지우지 않는다', async ({ page }) => {
     await enterDomain(page)
-    await page.getByRole('button', { name: /사업장별 가동률 보여줘/ }).click()
+    await page.getByRole('button', { name: /사업장별 가동률 보여줘/ }).first().click()
 
     await expect(page.getByText('배치 도식 — 실제 지리 좌표 아님')).toBeVisible({ timeout: 10_000 })
     await expect(page.getByText(/2개 사업장은 값이 없어 평균에서 빠졌습니다/)).toBeVisible()

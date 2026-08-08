@@ -4,6 +4,7 @@ import {
   FAQ_CATEGORIES,
   answerAsText,
   faqCategoryLabel,
+  suggestionCards,
   isUngrounded,
   needsCheck,
   type ChatMessage,
@@ -18,7 +19,29 @@ import { LiveMetricCard } from '@widgets/live-metric/LiveMetricCard'
 import { DOWN_REASONS, useFeedback, type FeedbackEntry } from '@features/feedback/useFeedback'
 import { MapIntelCard } from '@widgets/map-intel/MapIntelCard'
 import { ChatSidePanel } from '@widgets/chat-panel/ChatSidePanel'
-import { BookOpen, MessageSquare, Paperclip, Mic, ScanLine } from 'lucide-react'
+import {
+  Activity,
+  BookOpen,
+  FileSearch,
+  MessageSquare,
+  Mic,
+  Paperclip,
+  ScanLine,
+  SendHorizontal,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react'
+import type { FaqCategory } from '@entities/chat/model'
+
+/** 추천 카드의 아이콘 — 범주에서 고른다. 질문마다 아이콘을 데이터로 들고 다니면
+    발주처 팩마다 아이콘 이름을 적어야 하고, 그건 화면의 일이다 */
+const SUGGEST_ICON: Record<FaqCategory, typeof Activity> = {
+  standard: FileSearch,
+  labor: BookOpen,
+  quality: Activity,
+  security: ShieldCheck,
+  system: Sparkles,
+}
 import { useVoice } from '@features/voice/useVoice'
 import { ScanDialog } from '@widgets/scan/ScanDialog'
 import { DOCUMENT_UPLOAD, validateUpload } from '@entities/upload/model'
@@ -42,6 +65,8 @@ export function ChatPage({
   metrics?: LiveMetric[]
 }) {
   const c = useChat(apiOptions ?? {}, store)
+  /* 설명이 있는 것만 카드로 올린다 — 설명 없는 질문은 고르는 데 도움이 안 된다 */
+  const cards = suggestionCards(c.allFaq)
   const fb = useFeedback()
   const endRef = useRef<HTMLDivElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -128,10 +153,22 @@ export function ChatPage({
               <MessageSquare className="text-brand-fg size-5" aria-hidden="true" />
             </span>
             <div className="min-w-0">
-              <h1 className="text-lg font-black text-slate-900">업무 챗봇</h1>
+              <span className="flex flex-wrap items-center gap-2">
+                <h1 className="text-lg font-black text-slate-900">업무 챗봇</h1>
+                {/* 지금 쓸 수 있는 상태라는 표시 — 원본 배지를 그대로 옮긴다(D-014) */}
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+                  활성
+                </span>
+              </span>
               <p className="text-sm text-slate-600">사내 문서를 근거로 답합니다.</p>
             </div>
             <div className="ml-auto flex items-center gap-2">
+              {/* 데이터가 어디서 처리되는지 — 보안 탭에 들어가지 않아도 보이게 둔다.
+                  자세한 것은 그 탭이 말한다 */}
+              <span className="hidden items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-[11px] font-bold text-slate-600 sm:flex">
+                <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+                내부망 전용
+              </span>
               {/* 좁은 화면에서는 근거 패널을 접어 둔다 — 열 수 있다는 것은 보여 준다 */}
               <button
                 type="button"
@@ -156,7 +193,38 @@ export function ChatPage({
       </header>
 
       <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
-        {/* 빈 화면에서 가장 먼저 봐야 하는 것은 오늘 처리할 일이다 */}
+        {/* 빈 화면의 첫인상은 **무엇을 물어볼 수 있는가**다(원본 배치, D-014).
+            처리할 일(브리핑)은 그 아래에 둔다 — 둘 다 필요하지만, 처음 여는 사람에게
+            먼저 필요한 것은 '이걸로 뭘 하지?'에 대한 답이다 */}
+        {c.messages.length === 0 && !c.pending && cards.length > 0 && (
+          <section aria-labelledby="sug-title" className="mb-5">
+            <h2 id="sug-title" className="mb-2 flex items-center gap-1.5 text-xs font-bold text-slate-500">
+              <Sparkles className="size-3.5" aria-hidden="true" />
+              추천 질문
+            </h2>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {cards.map((f) => {
+                const Icon = SUGGEST_ICON[f.category]
+                return (
+                  <li key={f.question}>
+                    <button
+                      type="button"
+                      onClick={() => void c.ask(f.question)}
+                      className="group h-full w-full rounded-xl border border-slate-200 bg-white p-4 text-left transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm"
+                    >
+                      <span className="bg-brand-soft flex size-9 items-center justify-center rounded-full">
+                        <Icon className="text-brand size-4" aria-hidden="true" />
+                      </span>
+                      <span className="mt-3 block text-sm font-bold text-slate-900">{f.question}</span>
+                      <span className="mt-1 block text-xs leading-relaxed text-slate-500">{f.hint}</span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </section>
+        )}
+
         {c.messages.length === 0 && !c.pending && onOpenSignal && (
           <div className="mb-4 space-y-4">
             <BriefingCards signals={signals} onOpen={onOpenSignal} />
@@ -171,7 +239,7 @@ export function ChatPage({
             <p className="text-sm text-slate-600">
               사내 규정과 업무 문서를 근거로 답변합니다. 근거를 찾지 못하면 지어내지 않고 모른다고 답합니다.
             </p>
-            <p className="mt-2 text-xs text-slate-500">아래 자주 묻는 질문에서 골라 물어볼 수 있습니다.</p>
+            <p className="mt-2 text-xs text-slate-500">아래 자주 묻는 질문에서 더 고를 수 있습니다.</p>
           </div>
         )}
 
@@ -286,10 +354,29 @@ export function ChatPage({
               {attachError}
             </p>
           )}
-        <div className="flex w-full items-end gap-2">
+        {/* 원본처럼 **한 상자 안에** 담는다(D-014) — 첨부·음성·코드는 입력의 일부이지
+            입력 옆에 붙은 다른 기능이 아니다. 상자 밖에 늘어놓으면 무엇이 입력이고
+            무엇이 도구인지 흐려진다 */}
+        <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 shadow-sm focus-within:border-slate-400">
           <label htmlFor="chat-input" className="sr-only">
             질문 입력
           </label>
+          <textarea
+            id="chat-input"
+            value={c.input}
+            onChange={(e) => c.setInput(e.target.value)}
+            onKeyDown={(e) => {
+              // Enter로 전송, Shift+Enter는 줄바꿈 — 안내한 대로 실제로 동작해야 한다
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                void c.send()
+              }
+            }}
+            rows={2}
+            placeholder="궁금한 내용을 입력하세요 (Enter로 전송)"
+            className="min-h-11 w-full resize-none border-0 bg-transparent px-2 py-2 text-sm outline-none"
+          />
+          <div className="flex items-center gap-1 px-1 pb-1">
           <input
             ref={fileRef}
             id="chat-attach"
@@ -333,29 +420,18 @@ export function ChatPage({
             <Paperclip className="size-4" aria-hidden="true" />
             <span className="sr-only">파일 첨부</span>
           </label>
-          <textarea
-            id="chat-input"
-            value={c.input}
-            onChange={(e) => c.setInput(e.target.value)}
-            onKeyDown={(e) => {
-              // Enter로 전송, Shift+Enter는 줄바꿈 — 안내한 대로 실제로 동작해야 한다
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault()
-                void c.send()
-              }
-            }}
-            rows={2}
-            placeholder="궁금한 내용을 입력하세요 (Enter로 전송)"
-            className="min-h-11 flex-1 resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
-          />
-          <button
-            type="button"
-            onClick={() => void c.send()}
-            disabled={!c.canSend}
-            className="bg-brand text-brand-fg min-h-11 rounded-lg px-4 text-sm font-bold hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            전송
-          </button>
+            {/* 원본과 같이 **원형 보내기** — 글자 버튼보다 손이 먼저 간다.
+                이름은 남긴다(아이콘만 있으면 낭독기가 읽을 것이 없다) */}
+            <button
+              type="button"
+              onClick={() => void c.send()}
+              disabled={!c.canSend}
+              aria-label="전송"
+              className="bg-brand text-brand-fg ml-auto flex size-11 items-center justify-center rounded-full hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <SendHorizontal className="size-5" aria-hidden="true" />
+            </button>
+          </div>
         </div>
         </div>
       </div>

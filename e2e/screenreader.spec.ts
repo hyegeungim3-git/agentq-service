@@ -224,7 +224,7 @@ test('챗봇 답변이 도착한 것을 말한다 @a11y', async ({ page }) => {
   /* 자리는 물어보기 전에도 있어야 한다 — 그때 만들면 첫 변화를 놓친다 */
   await expect(status).toHaveCount(1)
 
-  await page.getByRole('button', { name: /사전점검에서 무엇을 보나요/ }).click()
+  await page.getByRole('button', { name: /사전점검에서 무엇을 보나요/ }).first().click()
   await expect(status).toHaveText(/답변이 도착했습니다/, { timeout: 15_000 })
   /* 근거가 있는 답인지 없는 답인지가 소리로 갈려야 한다 */
   await expect(status).toHaveText(/근거 \d+건/)

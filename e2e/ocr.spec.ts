@@ -121,7 +121,7 @@ test.describe('챗봇 — FAQ·출처 원문', () => {
     await page.locator('label').filter({ hasText: /^업무기준$/ }).click()
     await expect(faq).not.toContainText('출장 여비 기준 알려줘')
 
-    await page.getByRole('button', { name: /초품 검사는 언제 실시하나요/ }).click()
+    await page.getByRole('button', { name: /초품 검사는 언제 실시하나요/ }).first().click()
     await expect(page.getByText(/초품 검사는 금형 교체 직후에 실시합니다/)).toBeVisible({
       timeout: 10_000,
     })

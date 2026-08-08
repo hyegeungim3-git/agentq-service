@@ -179,10 +179,10 @@ export const MEDICAL_CHAT_UNKNOWN: Omit<ChatMessage, 'id' | 'role'> = {
 
 /** 보안 항목은 일부러 답할 수 없는 질문으로 뒀다 */
 export const MEDICAL_FAQ: FaqItem[] = [
-  { category: 'standard', question: '사전점검에서 무엇을 보나요?' },
-  { category: 'standard', question: '진료기록 근거는 왜 필요한가요?' },
-  { category: 'labor', question: '조정 통보를 받으면 언제까지 이의신청하나요?' },
-  { category: 'quality', question: '응급 진료 산정 기준이 어떻게 되나요?' },
+  { category: 'standard', question: '사전점검에서 무엇을 보나요?', hint: '삭감 위험이 높은 항목과 확인 순서' },
+  { category: 'standard', question: '진료기록 근거는 왜 필요한가요?', hint: '심사에서 요구하는 기록의 범위' },
+  { category: 'labor', question: '조정 통보를 받으면 언제까지 이의신청하나요?', hint: '이의신청 기한과 준비 서류' },
+  { category: 'quality', question: '응급 진료 산정 기준이 어떻게 되나요?', hint: '응급도 판정과 가산 적용 요건' },
   { category: 'quality', question: '연구 목적으로 민감정보를 쓸 수 있나요?' },
   { category: 'security', question: '주차 정기권 신청은 어디서 하나요?' },
   { category: 'system', question: '진료과별 병상 가동률 보여줘' },
