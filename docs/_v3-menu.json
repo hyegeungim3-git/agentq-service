@@ -1,0 +1,558 @@
+{
+  "출처": "reb-ai-platform-v3 = C:/한국부동산원/genos-app/src/App.jsx",
+  "실측일": "2026-08-08",
+  "합계": {
+    "항목": 78,
+    "부모": 18,
+    "화면": 60,
+    "라우팅됨": 60
+  },
+  "메뉴": [
+    {
+      "id": "dashboard",
+      "label": "대시보드",
+      "kind": "부모",
+      "section": "대시보드",
+      "routed": false
+    },
+    {
+      "id": "dashboard.system",
+      "label": "시스템 현황",
+      "kind": "화면",
+      "section": "대시보드",
+      "routed": true
+    },
+    {
+      "id": "dashboard.service",
+      "label": "서비스 현황",
+      "kind": "화면",
+      "section": "대시보드",
+      "routed": true
+    },
+    {
+      "id": "dashboard.gpu",
+      "label": "GPU 현황",
+      "kind": "화면",
+      "section": "대시보드",
+      "routed": true
+    },
+    {
+      "id": "dashboard.trainer",
+      "label": "트레이너 현황",
+      "kind": "화면",
+      "section": "대시보드",
+      "routed": true
+    },
+    {
+      "id": "data",
+      "label": "데이터 관리",
+      "kind": "부모",
+      "section": "인프라 · 개발",
+      "routed": false
+    },
+    {
+      "id": "data.dataset",
+      "label": "데이터셋",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "data.vectordb",
+      "label": "벡터 DB",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "data.autoload",
+      "label": "자동 적재",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "data.catalog",
+      "label": "카탈로그 · 리니지",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "dev",
+      "label": "개발 환경",
+      "kind": "부모",
+      "section": "인프라 · 개발",
+      "routed": false
+    },
+    {
+      "id": "dev.codespace",
+      "label": "코드스페이스",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "dev.volume",
+      "label": "공유 볼륨",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "model.registry",
+      "label": "모델 레지스트리",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "trainer",
+      "label": "학습 · 튜닝",
+      "kind": "부모",
+      "section": "인프라 · 개발",
+      "routed": false
+    },
+    {
+      "id": "trainer.llm",
+      "label": "LLM 파인튜닝",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "trainer.vlm",
+      "label": "VLM 학습",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "trainer.embedding",
+      "label": "임베딩 학습",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "trainer.reranking",
+      "label": "리랭킹 학습",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "eval",
+      "label": "모델 평가",
+      "kind": "부모",
+      "section": "인프라 · 개발",
+      "routed": false
+    },
+    {
+      "id": "eval.leaderboard",
+      "label": "리더보드",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "eval.metrics",
+      "label": "평가 지표",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "eval.predops",
+      "label": "예측 모델 운영",
+      "kind": "화면",
+      "section": "인프라 · 개발",
+      "routed": true
+    },
+    {
+      "id": "guardrail",
+      "label": "가드레일",
+      "kind": "부모",
+      "section": "AI 서비스",
+      "routed": false
+    },
+    {
+      "id": "guardrail.filter",
+      "label": "필터 설정",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "guardrail.log",
+      "label": "탐지 로그",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "security.arch",
+      "label": "보안 아키텍처",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "compliance",
+      "label": "규제 대응",
+      "kind": "부모",
+      "section": "AI 서비스",
+      "routed": false
+    },
+    {
+      "id": "aiact",
+      "label": "AI 기본법 대응",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "safetyact",
+      "label": "중대재해처벌법 대응",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "repro",
+      "label": "답변 재현성",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "packstudio",
+      "label": "도메인 팩 스튜디오",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "deploy",
+      "label": "도구 · 배포",
+      "kind": "부모",
+      "section": "AI 서비스",
+      "routed": false
+    },
+    {
+      "id": "deploy.tools.mcp",
+      "label": "MCP 도구",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "deploy.tools.server",
+      "label": "MCP 서버",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "deploy.tools.prompt",
+      "label": "프롬프트 라이브러리",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "deploy.serving",
+      "label": "서빙 관리",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "agent",
+      "label": "에이전트",
+      "kind": "부모",
+      "section": "AI 서비스",
+      "routed": false
+    },
+    {
+      "id": "agent.taskflow.builder",
+      "label": "태스크플로우 빌더",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "agent.taskflow.deploy",
+      "label": "태스크플로우 배포",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "agent.workflow",
+      "label": "워크플로우",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "agent.scenario",
+      "label": "시나리오 빌더",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "app",
+      "label": "애플리케이션",
+      "kind": "부모",
+      "section": "AI 서비스",
+      "routed": false
+    },
+    {
+      "id": "app.chat",
+      "label": "채팅",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "app.report",
+      "label": "보고서 생성",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "app.analysis",
+      "label": "데이터 분석",
+      "kind": "화면",
+      "section": "AI 서비스",
+      "routed": true
+    },
+    {
+      "id": "knowledge",
+      "label": "지식 관리",
+      "kind": "부모",
+      "section": "지식 · RAG",
+      "routed": false
+    },
+    {
+      "id": "admin.knowledge",
+      "label": "지식영역 설정",
+      "kind": "화면",
+      "section": "지식 · RAG",
+      "routed": true
+    },
+    {
+      "id": "admin.rag",
+      "label": "RAG 파이프라인",
+      "kind": "화면",
+      "section": "지식 · RAG",
+      "routed": true
+    },
+    {
+      "id": "admin.augment",
+      "label": "지식 증강 전략",
+      "kind": "화면",
+      "section": "지식 · RAG",
+      "routed": true
+    },
+    {
+      "id": "usermgmt",
+      "label": "사용자 관리",
+      "kind": "부모",
+      "section": "운영 · 관리",
+      "routed": false
+    },
+    {
+      "id": "admin.users",
+      "label": "사용자 목록",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "ops.approval",
+      "label": "승인 관리",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "ops.quota",
+      "label": "할당량",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "admin.logs",
+      "label": "접근 로그",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "admin.accesssec",
+      "label": "접근권한·차단",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "admin.hrsync",
+      "label": "HR 연계·그룹 관리",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "llmops",
+      "label": "LLM 운영",
+      "kind": "부모",
+      "section": "운영 · 관리",
+      "routed": false
+    },
+    {
+      "id": "admin.llm",
+      "label": "LLM 설정",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "admin.trust",
+      "label": "신뢰성 관리",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "admin.quality",
+      "label": "AI 품질 관리",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "analytics",
+      "label": "서비스 분석",
+      "kind": "부모",
+      "section": "운영 · 관리",
+      "routed": false
+    },
+    {
+      "id": "admin.history",
+      "label": "이용 이력",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "admin.satisfaction",
+      "label": "이용만족도",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "admin.stats",
+      "label": "이용 통계",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "admin.infostats",
+      "label": "서비스 통계 리포트",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "logmgmt",
+      "label": "로그·모니터링",
+      "kind": "부모",
+      "section": "운영 · 관리",
+      "routed": false
+    },
+    {
+      "id": "admin.worklog",
+      "label": "통합 로그 관리",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "admin.usagemon",
+      "label": "사용량 모니터링",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "content",
+      "label": "콘텐츠 관리",
+      "kind": "부모",
+      "section": "운영 · 관리",
+      "routed": false
+    },
+    {
+      "id": "admin.content",
+      "label": "공지사항·Q&A·설문",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "apiops",
+      "label": "API·프롬프트",
+      "kind": "부모",
+      "section": "운영 · 관리",
+      "routed": false
+    },
+    {
+      "id": "admin.apiprompt",
+      "label": "API·프롬프트 관리",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "system",
+      "label": "시스템 설정",
+      "kind": "부모",
+      "section": "운영 · 관리",
+      "routed": false
+    },
+    {
+      "id": "admin.manage",
+      "label": "관리 홈",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "admin.announce",
+      "label": "공지사항",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "admin.monitor",
+      "label": "시스템 모니터링",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    },
+    {
+      "id": "admin.connectedmon",
+      "label": "연계 SW 모니터링",
+      "kind": "화면",
+      "section": "운영 · 관리",
+      "routed": true
+    }
+  ]
+}
