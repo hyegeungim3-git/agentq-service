@@ -7,6 +7,23 @@ if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {}
 }
 
+/* jsdom은 matchMedia도 구현하지 않는다. 덮어 여는 대화상자는 '넓어지면 스스로 닫는다'를
+   위해 이걸 쓴다 — 브라우저에는 항상 있으므로 화면 코드에서 방어하지 않고 여기서 채운다.
+   좁은 화면으로 답하게 둔다: 단위 테스트에서 대화상자는 열려 있어야 볼 수 있다. */
+if (typeof window !== 'undefined' && window.matchMedia === undefined) {
+  window.matchMedia = (query: string) =>
+    ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    }) as MediaQueryList
+}
+
 /* 화면 테스트는 페이지를 단독으로 그린다 — 앱을 거치지 않으니 발주처가 안 정해진다.
    실제 앱에서는 발주처를 고른 뒤에만 이 화면들에 닿으므로, 그 상태를 여기서 만든다.
    이 줄이 없으면 모든 화면이 '이 발주처의 업무 데이터가 없습니다'를 그린다. */

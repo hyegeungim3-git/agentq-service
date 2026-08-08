@@ -111,6 +111,7 @@
 | `GET /predops/drift` | `fetchDriftItems` | `src/pages/admin/mlops/PredOpsPage.tsx` |
 | `GET /predops/retrain-runs` | `fetchRetrainRuns` | `src/pages/admin/mlops/PredOpsPage.tsx` |
 | `POST /predops/retrain-runs/{id}:promote` | `promoteChallenger` | `src/pages/admin/mlops/PredOpsPage.tsx` |
+| `GET /scan/targets` | `fetchScanTargets` | `src/widgets/scan/ScanDialog.tsx` |
 | `GET /field/shifts` | `fetchShifts` | `src/pages/field/HandoverPage.tsx` |
 | `GET /field/handover/received` | `fetchReceivedHandover` | `src/pages/field/HandoverPage.tsx` |
 | `POST /field/handover/ack` | `confirmHandover` | `src/pages/field/HandoverPage.tsx` |

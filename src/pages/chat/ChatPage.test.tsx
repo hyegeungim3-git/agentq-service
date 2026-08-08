@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ChatPage } from './ChatPage'
 
@@ -250,6 +250,82 @@ describe('ChatPage', () => {
       const file = new File(['x'], 'spec.pdf', { type: 'application/pdf' })
       await userEvent.upload(screen.getByLabelText('파일 첨부'), file)
       expect(await screen.findByRole('alert')).toHaveTextContent(/서버/)
+    })
+  })
+
+  describe('음성 입력', () => {
+    /* 눌러도 아무 일 없는 버튼을 두지 않는다 — 못 하면 못 한다고 이름에 적는다 */
+    it('브라우저가 지원하지 않으면 이유를 이름에 담고 눌리지 않는다', () => {
+      setup()
+      const mic = screen.getByRole('button', { name: /이 브라우저는 지원하지 않습니다/ })
+      expect(mic).toBeDisabled()
+    })
+
+    /**
+     * 인식한 문장을 바로 보내지 않는다.
+     *
+     * 소음 속 오인식이 그대로 질의가 되면 답도 틀린다. 그리고 브라우저 내장 인식기는
+     * 음성을 밖으로 보낼 수 있어, 그 사실을 듣는 동안 화면이 말해야 한다.
+     */
+    it('받아쓴 문장은 입력창에 채우고 보내지 않는다', async () => {
+      class FakeRecognition {
+        lang = ''
+        continuous = false
+        interimResults = false
+        onresult: ((e: unknown) => void) | null = null
+        onerror: ((e: { error: string }) => void) | null = null
+        onend: (() => void) | null = null
+        start() {
+          this.onresult?.({
+            resultIndex: 0,
+            results: { length: 1, 0: { isFinal: true, 0: { transcript: '금형 교체 주기 알려줘' } } },
+          })
+        }
+        stop() {
+          this.onend?.()
+        }
+      }
+      Object.assign(window, { SpeechRecognition: FakeRecognition })
+      setup()
+      await userEvent.click(screen.getByRole('button', { name: '음성 입력 시작' }))
+
+      expect(screen.getByLabelText('질문 입력')).toHaveValue('금형 교체 주기 알려줘')
+      /* 채워지기만 하고 답은 없어야 한다 */
+      expect(screen.queryByText(/타수 50만 타/)).not.toBeInTheDocument()
+      expect(screen.getByText(/음성이 외부로 나갈 수 있습니다/)).toBeInTheDocument()
+      Reflect.deleteProperty(window, 'SpeechRecognition')
+    })
+  })
+
+  describe('코드로 찾기', () => {
+    it('등록되지 않은 코드는 넘겨짚지 않는다', async () => {
+      setup()
+      await userEvent.click(screen.getByRole('button', { name: '코드로 찾기' }))
+      await userEvent.type(await screen.findByLabelText('코드 직접 입력'), 'PRS-C99')
+      await userEvent.click(screen.getByRole('button', { name: '찾기' }))
+      expect(await screen.findByRole('alert')).toHaveTextContent(/등록되지 않은 코드입니다: PRS-C99/)
+    })
+
+    /* 코드 인식도 오인식이 있다 — 옆 설비 코드를 읽은 채 질의가 나가면 안 된다 */
+    it('고른 코드는 입력창에 채우고 보내지 않는다', async () => {
+      setup()
+      await userEvent.click(screen.getByRole('button', { name: '코드로 찾기' }))
+      /* 목록 버튼의 이름은 '설비 PRS-C03 프레스 3호기'로 읽힌다 — 종류 배지가 앞에 온다 */
+      await userEvent.click(await screen.findByRole('button', { name: /설비 PRS-C03/ }))
+      expect(screen.getByLabelText('질문 입력')).toHaveValue('PRS-C03 진동 추이와 관리 기준 알려줘')
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      /* 채워지기만 하고 질의가 나가면 안 된다 — 옆 설비 코드를 잘못 읽었을 수 있다.
+         보냈는지는 대화 목록이 늘었는지로 본다 */
+      expect(within(screen.getByRole('list', { name: '대화' })).queryAllByRole('listitem')).toHaveLength(0)
+    })
+
+    /* 카메라에만 기대면 지원 안 하는 기기에서 없는 기능이 된다 */
+    it('카메라를 못 쓰면 목록과 직접 입력으로 가라고 말한다', async () => {
+      setup()
+      await userEvent.click(screen.getByRole('button', { name: '코드로 찾기' }))
+      await userEvent.click(await screen.findByRole('button', { name: '카메라로 찍기' }))
+      expect(await screen.findByText(/코드 인식을 지원하지 않습니다/)).toBeInTheDocument()
+      expect(screen.getByLabelText('코드 직접 입력')).toBeInTheDocument()
     })
   })
 

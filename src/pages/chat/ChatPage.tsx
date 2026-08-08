@@ -18,7 +18,9 @@ import { LiveMetricCard } from '@widgets/live-metric/LiveMetricCard'
 import { DOWN_REASONS, useFeedback, type FeedbackEntry } from '@features/feedback/useFeedback'
 import { MapIntelCard } from '@widgets/map-intel/MapIntelCard'
 import { ChatSidePanel } from '@widgets/chat-panel/ChatSidePanel'
-import { BookOpen, MessageSquare, Paperclip } from 'lucide-react'
+import { BookOpen, MessageSquare, Paperclip, Mic, ScanLine } from 'lucide-react'
+import { useVoice } from '@features/voice/useVoice'
+import { ScanDialog } from '@widgets/scan/ScanDialog'
 import { DOCUMENT_UPLOAD, validateUpload } from '@entities/upload/model'
 import { uploadDocument } from '@shared/api/documents'
 
@@ -44,6 +46,9 @@ export function ChatPage({
   const endRef = useRef<HTMLDivElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const [attachError, setAttachError] = useState<string | null>(null)
+  const [scanOpen, setScanOpen] = useState(false)
+  /* 받아쓴 문장은 **입력창에 채운다.** 바로 보내면 소음 속 오인식이 그대로 질의가 된다 */
+  const voice = useVoice(c.setInput)
   const [panelOpen, setPanelOpen] = useState(false)
 
   /**
@@ -170,7 +175,9 @@ export function ChatPage({
           </div>
         )}
 
-        <ol className="space-y-4">
+        {/* 목록에 이름을 준다 — 낭독기가 '무엇의 목록'인지 알아야 훑을 수 있고,
+            검사도 '대화가 늘었는가'를 이 목록으로 물을 수 있다 */}
+        <ol aria-label="대화" className="space-y-4">
           {c.messages.map((m) => (
             <li key={m.id}>
               <MessageBubble
@@ -263,6 +270,17 @@ export function ChatPage({
         <div className="mx-auto w-full max-w-3xl">
           {/* 올린 파일이 왜 안 되는지는 **올려 본 자리에서** 말한다. 가이드에만 적어 두면
               올리고 나서야 안 된다는 걸 알고, 그때는 이미 기다린 뒤다 */}
+          {voice.listening && (
+            <p role="status" className="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+              듣고 있습니다 — 말한 문장은 <b>입력창에 채워지고 바로 보내지 않습니다.</b> 브라우저 내장
+              인식기는 엔진에 따라 <b>음성이 외부로 나갈 수 있습니다.</b>
+            </p>
+          )}
+          {voice.error !== null && (
+            <p role="alert" className="mb-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-800">
+              {voice.error}
+            </p>
+          )}
           {attachError !== null && (
             <p role="alert" className="mb-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-800">
               {attachError}
@@ -280,6 +298,33 @@ export function ChatPage({
             onChange={(e) => void attach(e.target.files)}
             className="sr-only"
           />
+          <button
+            type="button"
+            onClick={() => setScanOpen(true)}
+            aria-label="코드로 찾기"
+            className="inline-flex min-h-11 items-center rounded-lg border border-slate-200 px-3 text-slate-600 hover:bg-slate-50"
+          >
+            <ScanLine className="size-4" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={voice.listening ? voice.stop : voice.start}
+            disabled={!voice.supported}
+            aria-pressed={voice.listening}
+            aria-label={
+              voice.supported
+                ? voice.listening
+                  ? '음성 입력 멈추기, 듣는 중'
+                  : '음성 입력 시작'
+                : '음성 입력, 이 브라우저는 지원하지 않습니다'
+            }
+            title={voice.supported ? '음성 입력' : '이 브라우저는 음성 입력을 지원하지 않습니다'}
+            className={`inline-flex min-h-11 items-center rounded-lg border px-3 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 ${
+              voice.listening ? 'border-rose-300 text-rose-700' : 'border-slate-200 text-slate-600'
+            }`}
+          >
+            <Mic className="size-4" aria-hidden="true" />
+          </button>
           <label
             htmlFor="chat-attach"
             title={DOCUMENT_UPLOAD.hint}
@@ -314,6 +359,15 @@ export function ChatPage({
         </div>
         </div>
       </div>
+      {scanOpen && (
+        <ScanDialog
+          onClose={() => setScanOpen(false)}
+          onPick={(t) => {
+            c.setInput(t.ask)
+            setScanOpen(false)
+          }}
+        />
+      )}
     </main>
 
       {/* 넓은 화면에서는 옆에 붙여 둔다. `top-14`는 셸 상단 바 높이(h-14)다 —

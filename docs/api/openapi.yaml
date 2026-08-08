@@ -2444,6 +2444,28 @@ paths:
           required: true
           schema:
             type: string
+  /scan/targets:
+    get:
+      operationId: fetchScanTargets
+      summary: "**설비 대장이 정본** — 화면이 목록을 들면 현장에 붙은 코드와 갈라진다"
+      description: → `ScanTarget[]` (`entities/scan/model.ts`). **설비 대장이 정본** — 화면이 목록을 들면 현장에 붙은 코드와 갈라진다
+      tags:
+        - scan
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScanTarget"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
   /field/shifts:
     get:
       operationId: fetchShifts
@@ -7118,6 +7140,39 @@ components:
         - distribution
         - trend
         - comments
+      additionalProperties: false
+    ScanKind:
+      type: string
+      enum:
+        - equipment
+        - lot
+        - workOrder
+        - material
+      description: |-
+        설비·로트 코드 스캔.
+        
+        현장에서 "PRS-C03 진동 어때?"를 **장갑 낀 손으로 타이핑하는 것**이 실제 병목이다. 설비에 붙은 코드를 찍는 것이 제조의 표준 동선이다.
+        
+        ⚠️ **카메라에만 기대지 않는다.** 브라우저가 코드 인식을 지원하지 않거나, 권한이 거부되거나, 조명이 나쁘면 못 읽는다. 그때 아무것도 못 하면 그 기능은 현장에서 없는 것과 같다. 그래서 **등록 코드 목록과 직접 입력을 항상 함께** 둔다.
+        
+        ⚠️ **등록되지 않은 코드를 추측하지 않는다.** 비슷한 코드로 넘겨짚으면 옆 설비의 상태를 그 설비의 것으로 읽게 된다.
+    ScanTarget:
+      type: object
+      properties:
+        code:
+          type: string
+        kind:
+          $ref: "#/components/schemas/ScanKind"
+        name:
+          type: string
+        ask:
+          type: string
+          description: 이 대상을 찍었을 때 물어볼 문장 — 찍는 이유가 곧 질문이다
+      required:
+        - code
+        - kind
+        - name
+        - ask
       additionalProperties: false
     ScenarioDefinition:
       type: object

@@ -167,6 +167,7 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /predops/drift` | `fetchDriftItems` | → `DriftItem[]` |
 | `GET /predops/retrain-runs` | `fetchRetrainRuns` | → `RetrainRun[]`. 챔피언·챌린저 값과 방향 |
 | `POST /predops/retrain-runs/{id}:promote` | `promoteChallenger` | 교체. 서비스 중인 모델을 바꾸는 일이라 서버가 처리한다 |
+| `GET /scan/targets` | `fetchScanTargets` | → `ScanTarget[]` (`entities/scan/model.ts`). **설비 대장이 정본** — 화면이 목록을 들면 현장에 붙은 코드와 갈라진다 |
 | `GET /field/shifts` | `fetchShifts` | → `{shifts, currentId}` (`entities/field/model.ts`). 2교대·3교대가 발주처마다 다르다 |
 | `GET /field/handover/received` | `fetchReceivedHandover` | → `ReceivedHandover`. **확인한 항목 id를 함께** — 확인 여부가 없으면 화면이 '이 조에서 끊겼다'를 못 말한다 |
 | `POST /field/handover/ack` | `confirmHandover` | 확인 처리. **다음 조가 봐야** 의미가 있으므로 서버에 남는다 |
