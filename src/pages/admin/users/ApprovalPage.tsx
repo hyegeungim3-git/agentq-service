@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { APPROVAL_LABEL, waitingDays, type ApprovalRequest } from '@entities/user/model'
-import { decideApproval, fetchApprovals } from '@shared/api/users'
+import { decideApproval, fetchApprovals, fetchAsOf } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
-import { TODAY } from '@fixtures/users'
 
 /**
  * 승인 관리.
@@ -67,6 +66,9 @@ function Card({
 export function ApprovalPage() {
   const [failure, setFailure] = useState<string | null>(null)
   const state = useRemote(fetchApprovals, [])
+  /* 기준 날짜는 **데이터를 준 쪽**이 말한다. fixture 상수를 화면이 직접 읽으면
+     서버가 붙어도 옛 날짜로 계산해 조용히 틀린 일수를 보여 준다(AGENTS.md §9) */
+  const asOf = useRemote(fetchAsOf, [])
 
   const decide = (id: string, accept: boolean) => {
     void decideApproval(id, accept).then((res) => {
@@ -100,10 +102,11 @@ export function ApprovalPage() {
       )}
 
       {state.kind === 'ready' &&
+        asOf.kind === 'ready' &&
         state.data.length > 0 &&
         (() => {
           const withDays = state.data
-            .map((r) => ({ req: r, days: waitingDays(r, TODAY) }))
+            .map((r) => ({ req: r, days: waitingDays(r, asOf.data) }))
             .sort((a, b) => b.days - a.days)
           const late = withDays.filter((x) => x.days >= LONG_WAIT_DAYS)
           return (

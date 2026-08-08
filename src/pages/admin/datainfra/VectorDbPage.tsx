@@ -5,9 +5,9 @@ import {
   unattached,
 } from '@entities/datainfra/model'
 import { fetchCollections } from '@shared/api/datainfra'
+import { fetchAreas } from '@shared/api/knowledgebase'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
-import { AREAS } from '@fixtures/knowledgebase'
 
 /**
  * 벡터 DB.
@@ -20,10 +20,14 @@ import { AREAS } from '@fixtures/knowledgebase'
  */
 
 const fmt = (n: number): string => n.toLocaleString('ko-KR')
-const areaName = (id: string | null): string | null =>
-  id === null ? null : (AREAS.find((a) => a.id === id)?.name ?? id)
-
 export function VectorDbPage() {
+  /* 이름은 **경계에서 받은 목록**으로 붙인다. fixture를 직접 읽으면 서버가 붙어도
+     이 화면만 옛 목록을 쓴다(AGENTS.md §9) */
+  const areas = useRemote(fetchAreas, [])
+  const areaName = (id: string | null): string | null =>
+    id === null
+      ? null
+      : ((areas.kind === 'ready' ? areas.data.find((a) => a.id === id)?.name : undefined) ?? id)
   const state = useRemote(fetchCollections, [])
 
   return (

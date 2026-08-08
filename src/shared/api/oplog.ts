@@ -1,8 +1,10 @@
-import type { OpLogEntry, OpLogKind, UsageBucket } from '@entities/oplog/model'
+import type { BillingMonth, OpLogEntry, OpLogKind, UsageBucket } from '@entities/oplog/model'
 import type { Notice } from '@entities/notice/model'
 import type { FaqItem } from '@entities/chat/model'
 import {
   ACCESS_AS_OPLOG,
+  MONTH_ELAPSED_DAYS,
+  MONTH_TOTAL_DAYS,
   EXPORT_LOGS,
   OPERATION_LOGS,
   QUERY_LOGS,
@@ -66,5 +68,20 @@ export function saveNotice(notice: Pick<Notice, 'title' | 'level'>): Promise<Api
     ok: false,
     error:
       '공지를 저장하지 못했습니다. 서버가 연결되지 않아 사용자 포털에는 아무 것도 올라가지 않았습니다.',
+  })
+}
+
+/**
+ * 청구 월이 얼마나 지났나 — **서버가 말해야 하는 값**이다.
+ *
+ * '이 속도면 며칠 뒤 한도를 넘는다'는 판정이 여기에 걸린다. 화면이 fixture 상수를
+ * 직접 읽으면 서버가 붙어도 옛 진행도로 계산해 **틀린 날짜를 자신 있게 말한다.**
+ * 청구 주기는 요금제마다 다르므로 브라우저가 달력으로 유추할 수도 없다.
+ */
+export function fetchBillingMonth(): Promise<ApiResult<BillingMonth>> {
+  // TODO(api-미확정): GET /usage/period 로 교체. 제거 조건 = 백엔드가 요금 주기를 확정.
+  return Promise.resolve({
+    ok: true,
+    data: { elapsedDays: MONTH_ELAPSED_DAYS, totalDays: MONTH_TOTAL_DAYS },
   })
 }

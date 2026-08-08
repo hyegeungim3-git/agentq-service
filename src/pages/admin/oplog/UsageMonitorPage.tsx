@@ -1,7 +1,6 @@
 import { bucketRatio, daysToLimit } from '@entities/oplog/model'
-import { fetchUsageBuckets } from '@shared/api/oplog'
+import { fetchUsageBuckets, fetchBillingMonth } from '@shared/api/oplog'
 import { useRemote } from '@features/remote/useRemote'
-import { MONTH_ELAPSED_DAYS, MONTH_TOTAL_DAYS } from '@fixtures/oplog'
 
 /**
  * 사용량 모니터링.
@@ -17,12 +16,16 @@ const fmt = (n: number): string => n.toLocaleString('ko-KR')
 
 export function UsageMonitorPage() {
   const state = useRemote(fetchUsageBuckets, [])
+  /* 청구 주기 진행도는 **서버가 주는 값**이다. fixture 상수를 화면이 직접 읽으면
+     서버가 붙어도 옛 진행도로 '며칠 뒤 한도 초과'를 계산해 틀린 날짜를 말한다 */
+  const month = useRemote(fetchBillingMonth, [])
 
   return (
     <main className="min-w-0 p-4 sm:p-6">
       <h1 className="text-lg font-black text-slate-900">사용량 모니터링</h1>
       <p className="mt-1 text-sm text-slate-600">
-        이번 달 {MONTH_ELAPSED_DAYS}일이 지났습니다. 업무별 토큰 소비량입니다.
+        {month.kind === 'ready' ? `이번 달 ${month.data.elapsedDays}일이 지났습니다. ` : ''}
+        업무별 토큰 소비량입니다.
       </p>
 
       {state.kind === 'loading' && (
@@ -32,13 +35,14 @@ export function UsageMonitorPage() {
       )}
 
       {state.kind === 'ready' &&
+        month.kind === 'ready' &&
         (() => {
           const over = state.data.filter((b) => {
             const r = bucketRatio(b)
             return r !== null && r > 1
           })
           const soon = state.data.filter((b) => {
-            const d = daysToLimit(b, MONTH_ELAPSED_DAYS, MONTH_TOTAL_DAYS)
+            const d = daysToLimit(b, month.data.elapsedDays, month.data.totalDays)
             return d !== null && d > 0
           })
           const total = state.data.reduce((n, b) => n + b.used, 0)
@@ -73,7 +77,7 @@ export function UsageMonitorPage() {
               <ul className="mt-4 space-y-3">
                 {state.data.map((b) => {
                   const ratio = bucketRatio(b)
-                  const days = daysToLimit(b, MONTH_ELAPSED_DAYS, MONTH_TOTAL_DAYS)
+                  const days = daysToLimit(b, month.data.elapsedDays, month.data.totalDays)
                   const isOver = ratio !== null && ratio > 1
                   return (
                     <li

@@ -62,3 +62,16 @@ export function daysToLimit(b: UsageBucket, elapsedDays: number, monthDays: numb
   const days = Math.floor(remaining / perDay)
   return days < monthDays - elapsedDays ? days : null
 }
+
+/**
+ * 청구 월 진행도 — **서버가 주는 값**이다.
+ *
+ * '이 속도면 며칠 뒤 한도를 넘는다'가 여기에 걸린다. 청구 주기는 요금제마다 달라
+ * 브라우저가 달력으로 유추할 수 없다.
+ */
+export type BillingMonth = {
+  /** 이번 주기에서 지난 일수 */
+  elapsedDays: number
+  /** 이번 주기의 총 일수 */
+  totalDays: number
+}

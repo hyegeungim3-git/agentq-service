@@ -1389,6 +1389,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiError"
+  /meta/as-of:
+    get:
+      operationId: fetchAsOf
+      summary: (YYYY-MM-DD)
+      description: "→ `string`(YYYY-MM-DD). **이 데이터가 언제 기준인가.** '며칠 대기'·'차단 만료'가 여기에 걸린다. 응답 헤더의 Date 값으로 대신해도 된다 — 화면이 브라우저 시계를 쓰면 사용자 시계가 어긋난 만큼 틀린 수를 말한다"
+      tags:
+        - meta
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
   /approvals/{id}:decide:
     post:
       operationId: decideApproval
@@ -1884,6 +1904,26 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UsageBucket"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /usage/period:
+    get:
+      operationId: fetchBillingMonth
+      summary: 청구 주기의 경과·총 일수
+      description: "→ `BillingMonth`. 청구 주기의 경과·총 일수. **'며칠 뒤 한도 초과'가 여기에 걸린다** — 주기는 요금제마다 달라 브라우저가 달력으로 유추할 수 없다"
+      tags:
+        - usage
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillingMonth"
         default:
           description: 오류
           content:
@@ -3279,6 +3319,23 @@ components:
         - state
         - runOn
       additionalProperties: false
+    BillingMonth:
+      type: object
+      properties:
+        elapsedDays:
+          type: number
+          description: 이번 주기에서 지난 일수
+        totalDays:
+          type: number
+          description: 이번 주기의 총 일수
+      required:
+        - elapsedDays
+        - totalDays
+      additionalProperties: false
+      description: |-
+        청구 월 진행도 — **서버가 주는 값**이다.
+        
+        '이 속도면 며칠 뒤 한도를 넘는다'가 여기에 걸린다. 청구 주기는 요금제마다 달라 브라우저가 달력으로 유추할 수 없다.
     BlockOutcome:
       type: string
       enum:

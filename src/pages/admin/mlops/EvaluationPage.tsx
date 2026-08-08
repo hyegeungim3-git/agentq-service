@@ -1,8 +1,7 @@
 import { untrusted } from '@entities/mlops/model'
-import { fetchEvalResults } from '@shared/api/mlops'
+import { fetchEvalResults, fetchDatasets } from '@shared/api/mlops'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
-import { DATASETS } from '@fixtures/mlops'
 
 /**
  * 모델 평가.
@@ -15,9 +14,14 @@ import { DATASETS } from '@fixtures/mlops'
  */
 
 const pct = (r: number): string => `${(r * 100).toFixed(1)}%`
-const datasetName = (id: string): string => DATASETS.find((d) => d.id === id)?.name ?? id
 
 export function EvaluationPage() {
+/* 이름은 **경계에서 받은 목록**으로 붙인다. fixture를 직접 읽으면 서버가 붙어도
+   이 화면만 옛 목록을 쓴다 — 있는 항목을 id로 보여 주거나, 없어진 항목을 이름으로
+   보여 주게 된다(AGENTS.md §9) */
+  const datasets = useRemote(fetchDatasets, [])
+  const datasetName = (id: string): string =>
+    (datasets.kind === 'ready' ? datasets.data.find((d) => d.id === id)?.name : undefined) ?? id
   const state = useRemote(fetchEvalResults, [])
 
   return (

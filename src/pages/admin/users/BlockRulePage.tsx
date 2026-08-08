@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { isActiveRule, type BlockRule } from '@entities/user/model'
-import { createBlockRule, fetchBlockRules } from '@shared/api/users'
+import { createBlockRule, fetchBlockRules, fetchAsOf } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
-import { TODAY } from '@fixtures/users'
 
 /**
  * 접근권한·차단.
@@ -51,6 +50,9 @@ export function BlockRulePage() {
   const [failure, setFailure] = useState<string | null>(null)
   const [value, setValue] = useState('')
   const state = useRemote(fetchBlockRules, [])
+  /* 기준 날짜는 **데이터를 준 쪽**이 말한다. fixture 상수를 화면이 직접 읽으면
+     서버가 붙어도 옛 날짜로 계산해 조용히 틀린 일수를 보여 준다(AGENTS.md §9) */
+  const asOf = useRemote(fetchAsOf, [])
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -83,9 +85,10 @@ export function BlockRulePage() {
       )}
 
       {state.kind === 'ready' &&
+        asOf.kind === 'ready' &&
         (() => {
-          const active = state.data.filter((r) => isActiveRule(r, TODAY))
-          const expired = state.data.filter((r) => !isActiveRule(r, TODAY))
+          const active = state.data.filter((r) => isActiveRule(r, asOf.data))
+          const expired = state.data.filter((r) => !isActiveRule(r, asOf.data))
           return (
             <>
               <p className="mt-4 text-xs text-slate-600">

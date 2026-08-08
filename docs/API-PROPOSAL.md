@@ -119,6 +119,7 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /users?keyword=&role=&state=` | `fetchUsers` | → `PlatformUser[]` (`entities/user/model.ts`). **거르기는 서버가 한다** — §3-3 |
 | `PATCH /users/{id}` | `updateUserState` | 상태 변경. 인증·권한이 정해지기 전까지 화면은 실패를 그대로 알린다 |
 | `GET /approvals` | `fetchApprovals` | → `ApprovalRequest[]`. 신청 사유가 없으면 `null`(빈 문자열 금지) |
+| `GET /meta/as-of` | `fetchAsOf` | → `string`(YYYY-MM-DD). **이 데이터가 언제 기준인가.** '며칠 대기'·'차단 만료'가 여기에 걸린다. 응답 헤더의 Date 값으로 대신해도 된다 — 화면이 브라우저 시계를 쓰면 사용자 시계가 어긋난 만큼 틀린 수를 말한다 |
 | `POST /approvals/{id}:decide` | `decideApproval` | 승인·반려 |
 | `GET /audit/access?denied=&keyword=` | `fetchAccessLogs` | → `AccessLogEntry[]`. 거부는 `deniedReason` 필수 |
 | `GET /audit/coverage` | `fetchLogGaps` | → 로그에 **남지 않는 것** 목록. 없으면 화면이 '여기 있는 게 전부'로 그리게 된다 |
@@ -140,6 +141,7 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /audit/logs?kind=` | `fetchOpLogs` | `kind`=`export`\|`access`\|`operation`\|`query` → `OpLogEntry[]`. **접속 로그는 `/audit/access`와 같은 자원**이어야 한다 |
 | `GET /audit/logs.csv?kind=` | `exportLogsCsv` | 서버가 파일을 만든다 — 화면에 보이는 것만 모으면 조회 조건 밖 기록이 빠진다 |
 | `GET /usage/buckets` | `fetchUsageBuckets` | → `UsageBucket[]`. 금액이 아니라 **토큰 수**로 준다(단가 미정) |
+| `GET /usage/period` | `fetchBillingMonth` | → `BillingMonth`. 청구 주기의 경과·총 일수. **'며칠 뒤 한도 초과'가 여기에 걸린다** — 주기는 요금제마다 달라 브라우저가 달력으로 유추할 수 없다 |
 | `GET /notices` | `fetchManagedNotices` | → `Notice[]` (`entities/notice/model.ts`). 관리자와 포털이 **같은 엔드포인트**를 쓴다 — 따로 두면 고쳐도 포털에 안 나온다 |
 | `GET /chat/faq` | `fetchManagedFaq` | → `FaqItem[]` (`entities/chat/model.ts`). 위와 같은 이유로 포털과 같은 자원 |
 | `POST /notices` | `saveNotice` | 공지 등록 |

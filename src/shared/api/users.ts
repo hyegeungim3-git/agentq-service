@@ -6,7 +6,7 @@ import type {
   UserRole,
   UserState,
 } from '@entities/user/model'
-import { ACCESS_LOGS, APPROVALS, BLOCK_RULES, LOG_GAPS, USERS } from '@fixtures/users'
+import { ACCESS_LOGS, APPROVALS, BLOCK_RULES, LOG_GAPS, TODAY, USERS } from '@fixtures/users'
 import type { ApiResult } from './domains'
 
 /**
@@ -63,6 +63,21 @@ export function updateUserState(userId: string, next: UserState): Promise<ApiRes
     error:
       '계정 상태를 바꾸지 못했습니다. 서버가 연결되지 않아 변경을 저장할 곳이 없습니다. 변경한 척하면 정지된 줄 알고 화면을 닫게 되므로 그대로 알립니다.',
   })
+}
+
+/**
+ * 이 데이터가 **언제 기준인가.**
+ *
+ * '며칠 대기 중'·'차단이 만료됐나'는 기준 날짜가 있어야 계산된다. 예전에는 화면이
+ * fixture의 `TODAY`를 직접 읽었는데, 그러면 서버가 붙어도 화면은 계속 그 날짜를 쓴다 —
+ * **조용히 틀린 일수를 보여 준다.** 브라우저 시계를 쓰는 것도 답이 아니다.
+ * 사용자 시계가 어긋나 있으면 서버와 다른 수를 말하게 된다.
+ *
+ * 그래서 데이터를 준 쪽이 기준 시점도 같이 말한다.
+ */
+export function fetchAsOf(): Promise<ApiResult<string>> {
+  // TODO(api-미확정): GET /meta/as-of 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
+  return Promise.resolve({ ok: true, data: TODAY })
 }
 
 export function fetchApprovals(): Promise<ApiResult<ApprovalRequest[]>> {

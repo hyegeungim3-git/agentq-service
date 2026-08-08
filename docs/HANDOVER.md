@@ -47,7 +47,7 @@ npm run dev                           # http://localhost:5173
 | `src/App.tsx` | 화면 전환(라우터 없음 — `View` 타입이 곧 라우트 정의) |
 | `src/AdminApp.tsx` · `src/admin/sections/*` | 관리자 셸과 5개 구역. **새 관리자 화면은 섹션 파일에** |
 | `src/AgentApp.tsx` | 에이전트 13종 라우팅. **새 에이전트 화면은 여기에** |
-| `src/shared/api/*.ts` | **데이터 경계 함수 116개.** 서버를 붙일 때 만지는 유일한 자리 |
+| `src/shared/api/*.ts` | **데이터 경계 함수 118개.** 서버를 붙일 때 만지는 유일한 자리 |
 | `src/fixtures/` | 예시 데이터. 발주처별 팩(`packs/`)이 테넌시의 핵심 |
 | `src/entities/*/model.ts` | 도메인 타입과 순수 판정 함수. **API 명세의 정본** |
 | `src/widgets/` · `src/features/` | 화면 조각과 업무 훅 |
@@ -81,7 +81,7 @@ npm run dev                           # http://localhost:5173
 ## 데이터 및 API
 
 - **모든 데이터는 `src/fixtures/`.** 서버 없음
-- 교체 지점: `src/shared/api/` 경계 함수 **116개**, `TODO(api-미확정)` 표시 **110개**
+- 교체 지점: `src/shared/api/` 경계 함수 **118개**, `TODO(api-미확정)` 표시 **112개**
 - 계약 제안서: `docs/API-PROPOSAL.md` — **프론트 제안이고 백엔드 확정 전이다.**
   확정된 것처럼 쓰지 말 것
 - 기계가 읽는 명세: `docs/api/openapi.yaml`(생성물). **손으로 고치지 말 것** —
@@ -129,8 +129,7 @@ npm run dev                           # http://localhost:5173
 
 | # | 무엇 | 왜 안 했나 |
 |---|---|---|
-| 1 | 백엔드 연결 | 계약 미확정. 경계 116곳은 준비돼 있다 |
-| 3 | 화면 5곳이 fixture 직접 읽음 | id→이름 조회라 위험은 낮다. `scripts/boundary.test.ts`의 `DEBT` 목록이 정본 |
+| 1 | 백엔드 연결 | 계약 미확정. 경계 118곳은 준비돼 있다 |
 | 4 | 사람의 낭독기 청취 | 자동으로 못 하는 유일한 검증 |
 | 5 | 인증·권한·테넌시 | **프론트가 정할 수 없다.** 백엔드 확정 사항 |
 

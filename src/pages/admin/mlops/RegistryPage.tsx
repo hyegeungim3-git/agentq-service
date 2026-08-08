@@ -1,8 +1,7 @@
 import { MODEL_STAGE_LABEL, unevaluated, untraceable } from '@entities/mlops/model'
-import { fetchEvalResults, fetchModelVersions } from '@shared/api/mlops'
+import { fetchEvalResults, fetchModelVersions, fetchDatasets } from '@shared/api/mlops'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
-import { DATASETS } from '@fixtures/mlops'
 
 /**
  * 모델 레지스트리.
@@ -14,9 +13,14 @@ import { DATASETS } from '@fixtures/mlops'
  * 평가 기록이 없는데 운영 중인 모델도 함께 본다 — 점수 없이 올라간 것이다.
  */
 
-const datasetName = (id: string): string => DATASETS.find((d) => d.id === id)?.name ?? id
 
 export function RegistryPage() {
+/* 이름은 **경계에서 받은 목록**으로 붙인다. fixture를 직접 읽으면 서버가 붙어도
+   이 화면만 옛 목록을 쓴다 — 있는 항목을 id로 보여 주거나, 없어진 항목을 이름으로
+   보여 주게 된다(AGENTS.md §9) */
+  const datasets = useRemote(fetchDatasets, [])
+  const datasetName = (id: string): string =>
+    (datasets.kind === 'ready' ? datasets.data.find((d) => d.id === id)?.name : undefined) ?? id
   const models = useRemote(fetchModelVersions, [])
   const evals = useRemote(fetchEvalResults, [])
 

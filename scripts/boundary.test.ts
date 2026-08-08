@@ -72,19 +72,19 @@ describe('경계', () => {
    * **'아직 안 옮겼다'** 는 뜻이다 — 서버가 붙기 전에 없애야 할 빚이다.
    */
   it('화면이 fixture를 직접 읽지 않는다', () => {
-    /** 남은 빚 — 파일:심볼. 새로 늘리지 않는다 */
-    const DEBT = new Map<string, string>([
-      ['src/pages/admin/datainfra/IngestPage.tsx', 'AREAS'],
-      ['src/pages/admin/datainfra/VectorDbPage.tsx', 'AREAS'],
-      ['src/pages/admin/mlops/EvaluationPage.tsx', 'DATASETS'],
-      ['src/pages/admin/mlops/RegistryPage.tsx', 'DATASETS'],
-      ['src/pages/admin/mlops/TrainingPage.tsx', 'DATASETS'],
-      /* 아래 둘은 데이터가 아니라 **fixture가 기준으로 삼는 날짜**다.
-         서버가 붙으면 응답의 시각을 쓰게 되므로 함께 사라진다 */
-      ['src/pages/admin/oplog/UsageMonitorPage.tsx', 'MONTH_ELAPSED_DAYS'],
-      ['src/pages/admin/users/ApprovalPage.tsx', 'TODAY'],
-      ['src/pages/admin/users/BlockRulePage.tsx', 'TODAY'],
-    ])
+    /**
+     * 남은 빚 — 파일:심볼. **비어 있는 것이 정상이다.**
+     *
+     * 2026-08-08에 8곳을 전부 옮겨 비웠다. 두 종류였다.
+     *  - id→이름 조회 5곳 → 이미 있던 경계 함수(`fetchAreas`·`fetchDatasets`)로
+     *  - 기준 시각 3곳 → `fetchAsOf`·`fetchBillingMonth`를 새로 만들어 **서버가 줄 값**으로
+     *
+     * 뒤엣것이 더 위험했다. 화면이 `'2026-08-02'`를 박아 쓰는 셈이라 서버가 붙어도
+     * 옛 날짜로 '며칠 대기'를 계산해 **조용히 틀린 수**를 자신 있게 보여 준다.
+     *
+     * 여기에 다시 채우려거든 왜 못 옮기는지도 같이 적을 것.
+     */
+    const DEBT = new Map<string, string>([])
 
     const found: string[] = []
     for (const f of [...read('pages'), ...read('widgets')]) {

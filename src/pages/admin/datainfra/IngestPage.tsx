@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { INGEST_METHOD_LABEL, failing, silent } from '@entities/datainfra/model'
 import { fetchIngestSources, runIngest } from '@shared/api/datainfra'
+import { fetchAreas } from '@shared/api/knowledgebase'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
-import { AREAS } from '@fixtures/knowledgebase'
 
 /**
  * 자동 적재.
@@ -15,9 +15,14 @@ import { AREAS } from '@fixtures/knowledgebase'
  * 그래서 '정상/실패'만 쓰지 않고 **마지막 실행에서 몇 건 가져왔는지**를 함께 본다.
  */
 
-const areaName = (id: string): string => AREAS.find((a) => a.id === id)?.name ?? id
 
 export function IngestPage() {
+/* 이름은 **경계에서 받은 목록**으로 붙인다. fixture를 직접 읽으면 서버가 붙어도
+   이 화면만 옛 목록을 쓴다 — 있는 항목을 id로 보여 주거나, 없어진 항목을 이름으로
+   보여 주게 된다(AGENTS.md §9) */
+  const areas = useRemote(fetchAreas, [])
+  const areaName = (id: string): string =>
+    (areas.kind === 'ready' ? areas.data.find((a) => a.id === id)?.name : undefined) ?? id
   const [failure, setFailure] = useState<string | null>(null)
   const state = useRemote(fetchIngestSources, [])
 
