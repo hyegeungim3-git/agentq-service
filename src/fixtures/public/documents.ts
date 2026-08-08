@@ -16,6 +16,10 @@ export const PUBLIC_DOCUMENTS: BusinessDocument[] = [
     name: '표준지공시지가_조사지침_2026.pdf',
     kind: 'sop',
     sizeBytes: 3_355_443,
+    registeredOn: '2026-07-01',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `표준지공시지가 조사·평가 지침 (2026년)
 
 제1장 적용 범위
@@ -47,6 +51,10 @@ export const PUBLIC_DOCUMENTS: BusinessDocument[] = [
     name: '2026년_1분기_부동산시장동향조사.pdf',
     kind: 'report',
     sizeBytes: 2_202_009,
+    registeredOn: '2026-07-01',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `2026년 1분기 부동산시장 동향조사
 
 1. 개요
@@ -69,6 +77,10 @@ export const PUBLIC_DOCUMENTS: BusinessDocument[] = [
     name: '실거래신고_검증결과서_RTMS-2026-0412.pdf',
     kind: 'certificate',
     sizeBytes: 921_600,
+    registeredOn: '2026-07-01',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `실거래 신고 검증결과서 (RTMS-2026-0412)
 
 본 결과서는 2026년 1분기 실거래 신고분에 대한 검증 결과를 기록한 것이다.
@@ -83,6 +95,10 @@ export const PUBLIC_DOCUMENTS: BusinessDocument[] = [
     name: '3월4주_공시가격심의회_녹음.m4a',
     kind: 'minutes',
     sizeBytes: 21_504_000,
+    registeredOn: '2026-07-01',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `3월 4주 공시가격 심의회 (2026-03-24)
 참석: 김민준(부동산공시처), 윤서경(토지공시부), 정하윤(주택공시부)
 

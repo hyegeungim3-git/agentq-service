@@ -8,6 +8,8 @@
 
 export type DocumentKind = 'sop' | 'report' | 'certificate' | 'minutes'
 
+import type { SecurityLevel } from '@entities/knowledgebase/model'
+
 export type BusinessDocument = {
   id: string
   name: string
@@ -16,6 +18,19 @@ export type BusinessDocument = {
   sizeBytes: number
   /** 추출된 본문. 실제로는 서버가 파싱해서 준다 */
   text: string
+  /** 지식베이스에 등록된 날 */
+  registeredOn: string
+  /** 이 문서를 누가 볼 수 있는가 */
+  security: SecurityLevel
+  /** 색인이 끝나 검색에 잡히는가. 아니면 목록에 있어도 못 찾는다 */
+  indexed: boolean
+  /**
+   * 이 문서를 넣을 때 거친 처리 — 'DRM 자동해제', 'OCR 적용' 같은 것.
+   *
+   * 문서마다 다르고, 무엇을 거쳤는지가 **답변 품질의 이유**가 된다.
+   * 스캔본을 OCR로 읽었다면 오탈자가 섞일 수 있다는 뜻이다.
+   */
+  tags: string[]
 }
 
 

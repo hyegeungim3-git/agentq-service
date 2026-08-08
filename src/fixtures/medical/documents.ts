@@ -17,6 +17,10 @@ export const MEDICAL_DOCUMENTS: BusinessDocument[] = [
     name: '진료비청구_심사지침_2026.pdf',
     kind: 'sop',
     sizeBytes: 3_040_870,
+    registeredOn: '2026-07-01',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `진료비 청구 심사지침 (2026년)
 
 제1장 적용 범위
@@ -47,6 +51,10 @@ export const MEDICAL_DOCUMENTS: BusinessDocument[] = [
     name: '2026년_1분기_적정성평가결과.pdf',
     kind: 'report',
     sizeBytes: 1_992_294,
+    registeredOn: '2026-07-01',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `2026년 1분기 적정성 평가 결과
 
 1. 개요
@@ -69,6 +77,10 @@ export const MEDICAL_DOCUMENTS: BusinessDocument[] = [
     name: '삭감위험_사전점검결과서_SUH-2026-0071.pdf',
     kind: 'certificate',
     sizeBytes: 812_032,
+    registeredOn: '2026-07-01',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `삭감위험 사전점검 결과서 (SUH-2026-0071)
 
 본 결과서는 2026년 1분기 청구분에 대한 사전점검 결과를 기록한 것이다.
@@ -84,6 +96,10 @@ export const MEDICAL_DOCUMENTS: BusinessDocument[] = [
     name: '3월4주_환자안전위원회_녹음.m4a',
     kind: 'minutes',
     sizeBytes: 20_971_520,
+    registeredOn: '2026-07-01',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `3월 4주 환자안전위원회 (2026-03-26)
 참석: 서지은(적정진료관리실), 하태경(응급의료센터), 문정아(간호부)
 

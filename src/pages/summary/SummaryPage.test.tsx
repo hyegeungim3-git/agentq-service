@@ -54,6 +54,10 @@ describe('SummaryPage', () => {
           kind: 'report',
           sizeBytes: 2048,
           text: '올린 문서 본문',
+          registeredOn: '2026-08-02',
+          security: 'internal',
+          indexed: false,
+          tags: [],
         },
       })
       setup()

@@ -16,6 +16,10 @@ export const CIVIC_DOCUMENTS: BusinessDocument[] = [
     name: '민원사무_처리지침_2026.pdf',
     kind: 'sop',
     sizeBytes: 2_936_012,
+    registeredOn: '2026-07-01',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `민원사무 처리지침 (2026년)
 
 제1장 적용 범위
@@ -46,6 +50,10 @@ export const CIVIC_DOCUMENTS: BusinessDocument[] = [
     name: '2026년_1분기_민원처리통계.pdf',
     kind: 'report',
     sizeBytes: 1_782_579,
+    registeredOn: '2026-07-01',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `2026년 1분기 민원 처리 통계
 
 1. 개요
@@ -68,6 +76,10 @@ export const CIVIC_DOCUMENTS: BusinessDocument[] = [
     name: '옥외광고물_정비결과서_HSC-2026-0318.pdf',
     kind: 'certificate',
     sizeBytes: 743_424,
+    registeredOn: '2026-07-01',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `옥외광고물 정비 결과서 (HSC-2026-0318)
 
 본 결과서는 2026년 1분기 옥외광고물 실태 점검 결과를 기록한 것이다.
@@ -83,6 +95,10 @@ export const CIVIC_DOCUMENTS: BusinessDocument[] = [
     name: '3월4주_재난안전대책회의_녹음.m4a',
     kind: 'minutes',
     sizeBytes: 19_922_944,
+    registeredOn: '2026-07-01',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `3월 4주 재난안전대책회의 (2026-03-25)
 참석: 이서연(민원여권과), 오현석(안전총괄과), 배수진(도시재생과)
 

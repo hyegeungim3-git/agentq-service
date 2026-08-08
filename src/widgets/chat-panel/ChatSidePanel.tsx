@@ -1,11 +1,21 @@
 import { useState } from 'react'
-import { BookOpen, PlugZap, X } from 'lucide-react'
+import { BookOpen, FileText, PlugZap, X } from 'lucide-react'
 import {
   SECURITY_LABEL,
   hasGap,
   missing,
   type KnowledgeArea,
+  type SecurityLevel,
 } from '@entities/knowledgebase/model'
+import { formatSize } from '@entities/document/model'
+import { fetchDocuments } from '@shared/api/documents'
+
+/** 등급이 무엇을 뜻하는지 — 배지 색만 보고 짐작하게 두지 않는다 */
+const SECURITY_SCOPE: Record<SecurityLevel, string> = {
+  confidential: '지정된 담당자만',
+  internal: '사내 구성원',
+  public: '제한 없음',
+}
 import { TOOL_KIND_LABEL, type ToolEntry } from '@entities/packops/model'
 import { fetchAreas } from '@shared/api/knowledgebase'
 import { fetchTools } from '@shared/api/packops'
@@ -31,7 +41,7 @@ const SECURITY_TONE: Record<KnowledgeArea['security'], string> = {
   public: 'bg-emerald-100 text-emerald-800',
 }
 
-type PanelTab = 'knowledge' | 'tools'
+type PanelTab = 'docs' | 'tools' | 'knowledge'
 
 function KnowledgeList() {
   const state = useRemote(fetchAreas, [])
@@ -169,12 +179,115 @@ function ToolList() {
 }
 
 const TABS: { id: PanelTab; label: string; Icon: typeof BookOpen }[] = [
-  { id: 'knowledge', label: '지식 영역', Icon: BookOpen },
+  { id: 'docs', label: '문서 목록', Icon: FileText },
   { id: 'tools', label: '연동 도구', Icon: PlugZap },
+  { id: 'knowledge', label: '지식 영역', Icon: BookOpen },
 ]
 
+const DOC_TONE: Record<SecurityLevel, string> = {
+  confidential: 'bg-rose-100 text-rose-800',
+  internal: 'bg-amber-100 text-amber-900',
+  public: 'bg-emerald-100 text-emerald-800',
+}
+
+/**
+ * 이 대화가 근거로 삼는 문서.
+ *
+ * 원본과 같은 카드다(D-014) — 이름·크기·등록일·등급, 그리고 넣을 때 거친 처리.
+ * 거기에 **색인 여부**를 더한다: 목록에 있다고 답할 수 있는 것은 아니고,
+ * 색인이 안 된 문서는 물어봐도 '없다'고 답한다. 그 구분이 없으면 사용자는
+ * 문서가 있는데 왜 못 찾느냐고 묻게 된다.
+ */
+function DocumentList() {
+  const state = useRemote(fetchDocuments, [])
+
+  if (state.kind === 'loading') {
+    return (
+      <div role="status" className="space-y-2 p-3">
+        <span className="sr-only">문서 목록을 불러오는 중입니다</span>
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="h-20 animate-pulse rounded-lg border border-slate-200 bg-white" />
+        ))}
+      </div>
+    )
+  }
+  if (state.kind === 'error') {
+    return (
+      <p role="alert" className="p-3 text-xs text-rose-800">
+        {state.message}
+      </p>
+    )
+  }
+
+  const docs = state.data
+  const notIndexed = docs.filter((d) => !d.indexed)
+
+  return (
+    <div className="p-3">
+      {/* 등급 기준을 먼저 — 배지 색만 보고 짐작하게 두지 않는다 */}
+      <div className="rounded-xl border border-slate-200 bg-white p-3">
+        <p className="text-[11px] font-bold text-slate-500">데이터 보안 등급 기준</p>
+        <ul className="mt-1.5 space-y-1">
+          {(['confidential', 'internal', 'public'] as SecurityLevel[]).map((lv) => (
+            <li key={lv} className="flex items-center gap-2">
+              <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${DOC_TONE[lv]}`}>
+                {SECURITY_LABEL[lv]}
+              </span>
+              <span className="text-[11px] text-slate-600">{SECURITY_SCOPE[lv]}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {notIndexed.length > 0 && (
+        <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-900">
+          목록에는 있지만 <b>아직 검색에 안 잡히는 문서 {notIndexed.length}건</b>이 있습니다.
+          물어보면 없다고 답합니다.
+        </p>
+      )}
+
+      <ul className="mt-3 space-y-2">
+        {docs.map((d) => (
+          <li key={d.id} className="rounded-xl border border-slate-200 bg-white p-3">
+            <div className="flex items-start gap-2">
+              <FileText className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true" />
+              <span className="min-w-0 flex-1 text-xs font-bold text-slate-900">{d.name}</span>
+              <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${DOC_TONE[d.security]}`}>
+                {SECURITY_LABEL[d.security]}
+              </span>
+            </div>
+            <p className="mt-1 pl-6 text-[11px] text-slate-500">
+              {formatSize(d.sizeBytes)} · {d.registeredOn}
+            </p>
+            <div className="mt-1.5 flex flex-wrap items-center gap-1.5 pl-6">
+              <span
+                className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                  d.indexed ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                }`}
+              >
+                {d.indexed ? '적재됨' : '적재 전'}
+              </span>
+              {d.tags.map((tag) => (
+                <span key={tag} className="rounded border border-slate-200 px-1.5 py-0.5 text-[10px] text-slate-600">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {/* 원본의 '문서 추가 업로드' 자리. 누르면 무엇이 필요한지 말한다 —
+          올린 척하면 그 문서를 근거로 답할 거라고 믿는다(D-009) */}
+      <p className="mt-3 rounded-xl border border-dashed border-slate-300 px-3 py-4 text-center text-[11px] text-slate-500">
+        문서 추가는 <b>서버가 붙어야</b> 합니다. 지금은 위 목록으로만 답합니다.
+      </p>
+    </div>
+  )
+}
+
 export function ChatSidePanel({ onClose }: { onClose?: (() => void) | undefined }) {
-  const [tab, setTab] = useState<PanelTab>('knowledge')
+  const [tab, setTab] = useState<PanelTab>('docs')
 
   return (
     <aside
@@ -184,6 +297,10 @@ export function ChatSidePanel({ onClose }: { onClose?: (() => void) | undefined 
       <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-3 py-3">
         <BookOpen className="text-brand size-4 shrink-0" aria-hidden="true" />
         <p className="min-w-0 flex-1 text-sm font-black text-slate-900">답변 근거</p>
+        {/* 검색이 무엇으로 도는지 — 원본의 연결 배지를 그대로 옮긴다(D-014) */}
+        <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+          벡터 검색 연결됨
+        </span>
         {onClose && (
           <button
             type="button"
@@ -219,7 +336,9 @@ export function ChatSidePanel({ onClose }: { onClose?: (() => void) | undefined 
         </ul>
       </div>
 
-      {tab === 'knowledge' ? <KnowledgeList /> : <ToolList />}
+      {tab === 'docs' && <DocumentList />}
+      {tab === 'tools' && <ToolList />}
+      {tab === 'knowledge' && <KnowledgeList />}
     </aside>
   )
 }

@@ -12,6 +12,10 @@ export const DOCUMENTS: BusinessDocument[] = [
     name: '프레스_작업표준서_SOP-PR-011.pdf',
     kind: 'sop',
     sizeBytes: 2_205_184,
+    registeredOn: '2026-07-14',
+    security: 'confidential',
+    indexed: true,
+    tags: ['DRM 자동해제'],
     text: `프레스 작업표준서 (SOP-PR-011)
 
 제1장 적용 범위
@@ -39,6 +43,10 @@ export const DOCUMENTS: BusinessDocument[] = [
     name: '2026년_1분기_품질동향조사.pdf',
     kind: 'report',
     sizeBytes: 1_468_006,
+    registeredOn: '2026-07-02',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `2026년 1분기 품질동향조사
 
 1. 개요
@@ -61,6 +69,10 @@ export const DOCUMENTS: BusinessDocument[] = [
     name: '수입검사성적서_SPCC-2211.pdf',
     kind: 'certificate',
     sizeBytes: 864_256,
+    registeredOn: '2026-07-28',
+    security: 'internal',
+    indexed: false,
+    tags: ['OCR 적용'],
     text: `수입검사성적서 (SPCC-2211)
 
 본 검사성적서는 냉간압연강판 SPCC 2.0T 코일에 대한 수입검사 결과를 기록한 것이다.
@@ -74,6 +86,10 @@ export const DOCUMENTS: BusinessDocument[] = [
     name: '3월3주_공정회의_녹음.m4a',
     kind: 'minutes',
     sizeBytes: 18_432_000,
+    registeredOn: '2026-03-20',
+    security: 'internal',
+    indexed: true,
+    tags: [],
     text: `3월 3주 공정회의 (2026-03-20)
 참석: 박태윤(생산기술팀), 한지민(품질관리부), 김도현(설비보전팀)
 

@@ -56,6 +56,12 @@ test('로고와 근거 패널이 자리를 지킨다', async ({ page }) => {
     await page.getByRole('button', { name: '답변 근거' }).click()
   }
   const panel = page.getByRole('complementary', { name: '답변 근거' })
+  /* 처음 보이는 것은 **무엇을 근거로 답하는가**(문서 목록)다 — 원본과 같은 순서(D-014) */
+  await expect(panel).toContainText('데이터 보안 등급 기준')
+  await expect(panel).toContainText('적재됨')
+
+  /* 영역별 집계는 그 옆 탭에 있다 */
+  await panel.getByRole('button', { name: '지식 영역' }).click()
   await expect(panel).toContainText('지금 답변 근거로 쓸 수 있는 문서')
   await expect(panel).toContainText('등록됐지만 못 찾는 문서가 있는 영역')
 })
