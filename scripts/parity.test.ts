@@ -77,7 +77,7 @@ const PLAN: Record<string, Disposition> = {
   'security.arch': { kind: '미이관', note: 'P6 — 망 경계를 넘는 흐름과 통제' },
   aiact: { kind: '옮김', to: 'aiact' },
   safetyact: { kind: '옮김', to: 'safetyact' },
-  repro: { kind: '미이관', note: 'P6 — 과거 답변을 그때 구성으로 재현' },
+  repro: { kind: '옮김', to: 'repro' },
   packstudio: { kind: '옮김', to: 'packstudio' },
   'deploy.tools.mcp': { kind: '합침', to: 'deploy', note: '도구 등록과 배포를 한 화면에서 봐야 무엇이 안 나갔는지 보인다' },
   'deploy.tools.server': { kind: '합침', to: 'deploy', note: '서버 등록도 배포 화면에서 — 주소·토큰은 표시하지 않는다' },

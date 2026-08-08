@@ -6,6 +6,7 @@
  */
 import { AgentOpsPage } from '@pages/admin/agentops/AgentOpsPage'
 import { AiActPage } from '@pages/admin/compliance/AiActPage'
+import { ReproPage } from '@pages/admin/compliance/ReproPage'
 import { SafetyActPage } from '@pages/admin/compliance/SafetyActPage'
 import { AppInstancePage } from '@pages/admin/appinst/AppInstancePage'
 import { AppSurfacePage } from '@pages/admin/agentops/AppSurfacePage'
@@ -22,6 +23,7 @@ export function AiSection({ menuId }: { menuId: string }) {
       {menuId === 'guardrail' && <GuardrailPage />}
       {menuId === 'aiact' && <AiActPage />}
       {menuId === 'safetyact' && <SafetyActPage />}
+      {menuId === 'repro' && <ReproPage />}
       {menuId === 'agents.ops' && <AgentOpsPage />}
       {menuId === 'agents.flow' && <FlowBuilderPage />}
       {menuId === 'agents.scenario' && <ScenarioBuilderPage />}

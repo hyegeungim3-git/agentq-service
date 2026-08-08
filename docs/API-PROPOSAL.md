@@ -154,6 +154,8 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /compliance/systems` | `fetchAiSystems` | → `AiSystem[]`. 판정에는 근거(`reason`)와 운영 여부(`inService`)를 함께 |
 | `GET /compliance/labeling` | `fetchLabelRules` | → `LabelRule[]` |
 | `GET /compliance/assessments` | `fetchAssessments` | → `Assessment[]`. 안 끝난 것은 무엇이 남았는지(`remaining`) |
+| `GET /repro/snapshots` | `fetchSnapshots` | → `Snapshot[]` (`entities/repro/model.ts`). **질의·답변 원문은 넣지 않는다** — 접근 로그·이용 이력과 같은 전제(§3-7). 근거 문서는 이름이 아니라 **개정 버전**까지 |
+| `POST /repro/snapshots/{id}:run` | `runReproduction` | 그때 구성으로 재실행. 서버가 없으면 **실패를 그대로 돌려준다** — 지어낸 '결과 일치'는 심사에서 재현해 봤다는 말이 된다 |
 | `GET /safety/duties` | `fetchSafetyDuties` | → `SafetyDuty[]` (`entities/safetyact/model.ts`). **증빙 갱신 시각(`evidenceAt`)과 조직이 정한 갱신 주기(`cycleDays`)를 함께** — 이행 여부만 오면 화면은 한 번 초록색이 된 항목을 영원히 초록색으로 그린다 |
 | `GET /safety/risk-assessments` | `fetchRiskAssessments` | → `RiskAssessment[]`. 찾은 위험요인 수와 **조치가 끝난 수를 따로** — 평가를 한 것과 위험이 없어진 것은 다르다 |
 | `GET /safety/trainings` | `fetchSafetyTrainings` | → `SafetyTraining[]`. 이수율이 아니라 **대상 인원과 이수 인원** — 비율만 오면 남은 사람 수를 말할 수 없다 |
@@ -336,6 +338,10 @@ API 키·토큰 원문은 **조회 응답에 넣지 않기를 요청한다.** �
 - **정해지면**: `429`를 오류 문구로 그대로 띄우고, 값이 있으면 그만큼 기다린다
 
 **3-7. 질의 본문 보관 여부** — 사용자가 무엇을 물었는지 저장하나
+
+> 2026-08-08에 걸린 화면이 하나 늘었다 — **답변 재현성**. 본문을 안 남기면 그 화면은
+> '그때 구성 그대로 돌릴 수 있는가'까지만 말할 수 있고 '같은 답이 나오는가'는 못 말한다.
+> 지금은 그 한계를 화면이 밝히고 있다. 저장하기로 정하면 화면이 할 수 있는 말이 늘어난다
 
 - **권장**: **저장하지 않는다.** 지금 접근 로그·이용 이력 두 화면이 그 전제로 통일돼 있다
   (이전 데모는 이용 이력에 본문을 그대로 보여 줬다)

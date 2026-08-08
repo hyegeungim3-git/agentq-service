@@ -2129,6 +2129,55 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiError"
+  /repro/snapshots:
+    get:
+      operationId: fetchSnapshots
+      summary: "**질의·답변 원문은 넣지 않는다** — 접근 로그·이용 이력과 같은 전제(§3-7)"
+      description: → `Snapshot[]` (`entities/repro/model.ts`). **질의·답변 원문은 넣지 않는다** — 접근 로그·이용 이력과 같은 전제(§3-7). 근거 문서는 이름이 아니라 **개정 버전**까지
+      tags:
+        - repro
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Snapshot"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /repro/snapshots/{id}:run:
+    post:
+      operationId: runReproduction
+      summary: 그때 구성으로 재실행
+      description: "그때 구성으로 재실행. 서버가 없으면 **실패를 그대로 돌려준다** — 지어낸 '결과 일치'는 심사에서 재현해 봤다는 말이 된다"
+      tags:
+        - repro
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                description: 응답 형태 미정 — 제안서 본문 참조
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
   /safety/duties:
     get:
       operationId: fetchSafetyDuties
@@ -3693,6 +3742,16 @@ components:
         자동 응답 임계값.
         
         이 값 아래면 사람이 확인하도록 넘긴다. 값만 보여 주면 무슨 뜻인지 알 수 없어 화면이 '넘겼을 때 어떻게 되는지'를 함께 말한다.
+    ConfigPart:
+      type: string
+      enum:
+        - model
+        - knowledge
+        - prompt
+        - guardrail
+        - params
+        - sources
+      description: 재현에 필요한 구성 조각
     DataSource:
       type: string
       description: |-
@@ -3967,6 +4026,23 @@ components:
         - attributes
         - reusable
       additionalProperties: false
+    Drift:
+      type: object
+      properties:
+        part:
+          $ref: "#/components/schemas/ConfigPart"
+        was:
+          type: string
+          description: 그때 값
+        now:
+          type: string
+          description: 지금 값
+      required:
+        - part
+        - was
+        - now
+      additionalProperties: false
+      description: 그때와 지금이 어떻게 다른가
     DutyKey:
       type: string
       enum:
@@ -6395,6 +6471,65 @@ components:
         ⚠️ 지리 좌표가 아니라 **배치 도식**이다. 실제 지도 위에 찍으면 위치가 맞아야 하는데 그 데이터가 없다. 격자 위치만 두고 화면이 '도식'이라고 말한다. 지도처럼 보이는데 위치가 틀리면 그게 제일 위험하다.
         
         값이 없는 사업장을 빼지 않는다. 빼면 '전 사업장이 이렇다'로 읽힌다 — 빈칸으로 두고 왜 없는지 말한다.
+    Snapshot:
+      type: object
+      properties:
+        id:
+          type: string
+        at:
+          type: string
+        topic:
+          type: string
+          description: 무엇에 대한 질의였는가 — **본문이 아니라 분류**다. 본문 보관은 정해지지 않았고, 정해지기 전에 화면이 본문을 들고 있으면 안 된다.
+        agentLabel:
+          type: string
+        model:
+          type: string
+        modelVersion:
+          type: string
+        knowledgeRev:
+          type: string
+        promptVersion:
+          type: string
+        guardrailVersion:
+          type: string
+        temperature:
+          type: number
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/SourceRev"
+        drift:
+          type: array
+          items:
+            $ref: "#/components/schemas/Drift"
+          description: 지금 구성과의 차이. 비어 있으면 그때 그대로다
+      required:
+        - id
+        - at
+        - topic
+        - agentLabel
+        - model
+        - modelVersion
+        - knowledgeRev
+        - promptVersion
+        - guardrailVersion
+        - temperature
+        - sources
+        - drift
+      additionalProperties: false
+    SourceRev:
+      type: object
+      properties:
+        name:
+          type: string
+        rev:
+          type: string
+          description: 그때 검색된 개정 버전 — 문서 이름만으로는 재현이 안 된다
+      required:
+        - name
+        - rev
+      additionalProperties: false
     Speaker:
       type: object
       properties:

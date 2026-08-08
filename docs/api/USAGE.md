@@ -98,6 +98,8 @@
 | `GET /compliance/systems` | `fetchAiSystems` | `src/pages/admin/compliance/AiActPage.tsx` |
 | `GET /compliance/labeling` | `fetchLabelRules` | `src/pages/admin/compliance/AiActPage.tsx` |
 | `GET /compliance/assessments` | `fetchAssessments` | `src/pages/admin/compliance/AiActPage.tsx` |
+| `GET /repro/snapshots` | `fetchSnapshots` | `src/pages/admin/compliance/ReproPage.tsx` |
+| `POST /repro/snapshots/{id}:run` | `runReproduction` | `src/pages/admin/compliance/ReproPage.tsx` |
 | `GET /safety/duties` | `fetchSafetyDuties` | `src/pages/admin/compliance/SafetyActPage.tsx` |
 | `GET /safety/risk-assessments` | `fetchRiskAssessments` | `src/pages/admin/compliance/SafetyActPage.tsx` |
 | `GET /safety/trainings` | `fetchSafetyTrainings` | `src/pages/admin/compliance/SafetyActPage.tsx` |
