@@ -11,8 +11,13 @@ if (!Element.prototype.scrollIntoView) {
    실제 앱에서는 발주처를 고른 뒤에만 이 화면들에 닿으므로, 그 상태를 여기서 만든다.
    이 줄이 없으면 모든 화면이 '이 발주처의 업무 데이터가 없습니다'를 그린다. */
 import { setActiveDomain } from '@shared/api/tenant'
+import { loadPack } from '@fixtures/packs'
 import { beforeEach } from 'vitest'
 
-beforeEach(() => {
+/* 팩은 **고를 때 받는다**(첫 화면에서 넷을 다 받지 않으려는 것). 실제 앱에서는
+   발주처를 고른 뒤에야 화면이 뜨므로, 테스트도 그 상태에서 시작해야 한다.
+   안 그러면 첫 테스트만 모듈 로딩 비용을 물고 타임아웃한다(실제로 그랬다). */
+beforeEach(async () => {
   setActiveDomain('manufacturing')
+  await loadPack('manufacturing')
 })

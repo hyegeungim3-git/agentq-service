@@ -18,7 +18,7 @@ export async function askRegulation(
   if (!q) return { ok: false, error: '질문을 입력하세요.' }
   if (req.categories.length === 0) return { ok: false, error: '조회할 규정 분류를 1개 이상 선택하세요.' }
 
-  const pack = currentPack()
+  const pack = await currentPack()
   if (!pack) return { ok: false, error: '이 발주처의 업무 데이터가 아직 없습니다.' }
 
   const hit = pack.regulations.find(

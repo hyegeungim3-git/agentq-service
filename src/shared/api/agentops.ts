@@ -3,7 +3,7 @@ import { APP_SURFACES } from '@fixtures/agentops'
 import type { DomainPackData } from '@fixtures/packs'
 import { withPack, withPackOf } from './pack'
 import { DOMAIN_FIXTURES } from '@fixtures/domains'
-import { packStatuses } from '@fixtures/packs'
+import { loadPackStatuses } from '@fixtures/packs'
 import type { ApiResult } from './domains'
 
 /**
@@ -40,12 +40,12 @@ export function fetchAppSurfaces(): Promise<ApiResult<AppSurface[]>> {
   return Promise.resolve({ ok: true, data: APP_SURFACES })
 }
 
-export function fetchDomainExposure(): Promise<ApiResult<DomainExposure[]>> {
+export async function fetchDomainExposure(): Promise<ApiResult<DomainExposure[]>> {
   /* 표를 따로 두지 않고 **실제 팩과 발주처 목록에서 뽑는다.**
      네 번째 발주처를 열었을 때 포털은 열렸는데 여기는 '데이터 없음'이라고
      말하는 상태가 됐다 — 같은 사실을 두 곳에 두면 반드시 갈라진다. */
   // TODO(api-미확정): GET /apps/domains 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
-  const byId = new Map(packStatuses().map((p) => [p.domainId, p]))
+  const byId = new Map((await loadPackStatuses()).map((p) => [p.domainId, p]))
   const data: DomainExposure[] = DOMAIN_FIXTURES.map((d) => {
     const pack = byId.get(d.id)
     return {
@@ -58,5 +58,5 @@ export function fetchDomainExposure(): Promise<ApiResult<DomainExposure[]>> {
         : '업무 데이터가 없어 포털에서 고를 수 없습니다.',
     }
   })
-  return Promise.resolve({ ok: true, data })
+  return { ok: true, data }
 }

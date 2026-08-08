@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { DOMAIN_FIXTURES } from './domains'
-import { PACKED_DOMAIN_IDS, packOf } from './packs'
+import { PACKED_DOMAIN_IDS, loadPack } from './packs'
 
 /**
  * 발주처를 골랐을 때 **다른 발주처의 데이터가 나오지 않는지.**
@@ -41,7 +41,7 @@ const MARKERS: Record<string, string[]> = {
   medical: ['삭감', '병상', '진료과', '요양급여', '응급의료센터', '새빛'],
 }
 
-const textOf = (id: string): string => JSON.stringify(packOf(id))
+const textOf = async (id: string): Promise<string> => JSON.stringify(await loadPack(id))
 
 describe('발주처 팩 누수', () => {
   it("'ready'인 발주처에는 업무 데이터가 있다", () => {
@@ -56,10 +56,10 @@ describe('발주처 팩 누수', () => {
     expect(dangling, '팩은 있는데 못 고르는 발주처 — 만들어 두고 안 연 것이다').toEqual([])
   })
 
-  it('한 발주처의 팩에 다른 발주처의 말이 없다', () => {
+  it('한 발주처의 팩에 다른 발주처의 말이 없다', async () => {
     const leaks: string[] = []
     for (const id of PACKED_DOMAIN_IDS) {
-      const text = textOf(id)
+      const text = await textOf(id)
       for (const [other, words] of Object.entries(MARKERS)) {
         if (other === id) continue
         for (const w of words) {
@@ -76,9 +76,9 @@ describe('발주처 팩 누수', () => {
    * 도입 안 한 에이전트의 정의가 들어 있으면 허브가 **못 쓰는 카드에 단계를**
    * 그린다. 반대로 도입했는데 정의가 없으면 카드가 이름만 남는다.
    */
-  it('에이전트 정의는 그 발주처가 도입한 것만 다룬다', () => {
+  it('에이전트 정의는 그 발주처가 도입한 것만 다룬다', async () => {
     for (const id of PACKED_DOMAIN_IDS) {
-      const pack = packOf(id)
+      const pack = await loadPack(id)
       if (!pack) throw new Error(`${id} 팩이 없다`)
       const defIds = pack.agentDefs.map((d) => d.agentId)
       expect(defIds.filter((x) => !pack.agents.includes(x)), `${id}: 도입 전인데 정의가 있다`).toEqual(
@@ -97,9 +97,9 @@ describe('발주처 팩 누수', () => {
    * 안 맞으면 화면이 도구 이름 대신 `t-mes` 같은 날 id를 그린다 —
    * 오류는 안 나고 화면만 이상해져서 늦게 발견된다.
    */
-  it('정의가 부르는 도구가 그 팩에 있다', () => {
+  it('정의가 부르는 도구가 그 팩에 있다', async () => {
     for (const id of PACKED_DOMAIN_IDS) {
-      const pack = packOf(id)
+      const pack = await loadPack(id)
       if (!pack) throw new Error(`${id} 팩이 없다`)
       const have = new Set(pack.tools.map((t) => t.id))
       const dangling = pack.agentDefs.flatMap((d) =>
@@ -109,9 +109,9 @@ describe('발주처 팩 누수', () => {
     }
   })
 
-  it('서버가 주는 도구도 그 팩에 있다', () => {
+  it('서버가 주는 도구도 그 팩에 있다', async () => {
     for (const id of PACKED_DOMAIN_IDS) {
-      const pack = packOf(id)
+      const pack = await loadPack(id)
       if (!pack) throw new Error(`${id} 팩이 없다`)
       const have = new Set(pack.tools.map((t) => t.id))
       const dangling = pack.mcpServers.flatMap((sv) => sv.toolIds.filter((t) => !have.has(t)))
@@ -126,9 +126,9 @@ describe('발주처 팩 누수', () => {
    * 안 맞으면 '기대는 영역에 못 찾는 문서가 있다'는 판정이 조용히 빈 값이 되고,
    * 화면은 '빈틈 없음'이라고 말한다 — 틀린 안심을 준다.
    */
-  it('색인 항목과 운영 실적이 그 팩의 지식 영역을 가리킨다', () => {
+  it('색인 항목과 운영 실적이 그 팩의 지식 영역을 가리킨다', async () => {
     for (const id of PACKED_DOMAIN_IDS) {
-      const pack = packOf(id)
+      const pack = await loadPack(id)
       if (!pack) throw new Error(`${id} 팩이 없다`)
       const have = new Set(pack.knowledgeAreas.map((a) => a.id))
       expect(
@@ -143,9 +143,9 @@ describe('발주처 팩 누수', () => {
   })
 
   /* 운영 실적도 도입한 것만 있어야 한다 — 안 산 에이전트가 돌 리 없다 */
-  it('운영 실적은 도입한 에이전트만 다룬다', () => {
+  it('운영 실적은 도입한 에이전트만 다룬다', async () => {
     for (const id of PACKED_DOMAIN_IDS) {
-      const pack = packOf(id)
+      const pack = await loadPack(id)
       if (!pack) throw new Error(`${id} 팩이 없다`)
       const extra = pack.agentOps.map((o) => o.agentId).filter((x) => !pack.agents.includes(x))
       expect(extra, `${id}: 도입 전인데 실적이 있다`).toEqual([])
@@ -159,9 +159,9 @@ describe('발주처 팩 누수', () => {
    * 버튼이 된다. 부르는 문서·조회 소스가 그 팩에 없어도 마찬가지다 —
    * 릴레이가 중간에 실패하고, 사용자는 눌러 봐야 안다.
    */
-  it('릴레이는 소개와 실행 설정이 함께 있고 그 팩의 것을 부른다', () => {
+  it('릴레이는 소개와 실행 설정이 함께 있고 그 팩의 것을 부른다', async () => {
     for (const id of PACKED_DOMAIN_IDS) {
-      const pack = packOf(id)
+      const pack = await loadPack(id)
       if (!pack) throw new Error(`${id} 팩이 없다`)
       expect(Boolean(pack.scenario), `${id}: 소개와 실행 설정이 짝이 아니다`).toBe(
         Boolean(pack.relay),
@@ -192,9 +192,9 @@ describe('발주처 팩 누수', () => {
   })
 
   /* 표시만 있고 내용이 없으면 화면이 빈칸을 그린다 */
-  it('팩마다 자기 말이 실제로 들어 있다', () => {
+  it('팩마다 자기 말이 실제로 들어 있다', async () => {
     for (const id of PACKED_DOMAIN_IDS) {
-      const text = textOf(id)
+      const text = await textOf(id)
       const own = MARKERS[id] ?? []
       expect(own.length, `${id}의 판정 기준이 없다`).toBeGreaterThan(0)
       const found = own.filter((w) => text.includes(w))

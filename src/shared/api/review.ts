@@ -24,7 +24,7 @@ export async function createReview(
     return { ok: false, error: '대조할 규정을 1개 이상 선택하세요.' }
   }
 
-  const pack = currentPack()
+  const pack = await currentPack()
   if (!pack) return { ok: false, error: '이 발주처의 업무 데이터가 아직 없습니다.' }
 
   /* 선택한 규정 묶음의 위반만 모은다 — 규정 선택이 결과를 실제로 바꿔야

@@ -19,7 +19,7 @@ export async function runQuery(
   await wait(opts.delayMs ?? 1500)
   // TODO(api-미확정): POST /queries 로 교체. 제거 조건 = Text-to-SQL 엔진·응답 형식 확정.
   if (!req.question.trim()) return { ok: false, error: '조회할 내용을 입력하세요.' }
-  const pack = currentPack()
+  const pack = await currentPack()
   if (!pack) return { ok: false, error: '이 발주처의 업무 데이터가 아직 없습니다.' }
   const base = pack.queryResults[req.source]
   if (!base) return { ok: false, error: `지원하지 않는 데이터 소스입니다: ${req.source}` }

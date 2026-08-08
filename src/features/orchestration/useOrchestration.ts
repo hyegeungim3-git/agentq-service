@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { lowConfidenceLines } from '@entities/ocr/model'
 import { countByStatus } from '@entities/mapping/model'
 import { EMPTY_REPORT_INPUTS } from '@entities/report/model'
@@ -8,6 +8,7 @@ import { runMapping } from '@shared/api/mapping'
 import { runQuery } from '@shared/api/dataquery'
 import { createReport } from '@shared/api/report'
 import { currentPack } from '@shared/api/pack'
+import type { DomainPackData } from '@fixtures/packs'
 
 export type OrchestrationOptions = { delayMs?: number | undefined }
 
@@ -39,7 +40,23 @@ const fail = (message: string): StepOutcome => ({
 export function useOrchestration(opts: OrchestrationOptions = {}) {
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
   const [outcomes, setOutcomes] = useState<StepOutcome[]>([])
-  const relay = currentPack()?.relay ?? null
+  /**
+   * 릴레이 정의는 팩에서 온다. 팩은 **고를 때 받으므로** 여기서도 기다려야 한다.
+   *
+   * `undefined`(아직 모름)와 `null`(이 발주처엔 릴레이가 없음)을 **갈라 둔다.**
+   * 하나로 합치면 받는 동안 화면이 '릴레이가 아직 없습니다'라고 말한다 —
+   * 없는 것과 아직 모르는 것을 같게 표시하는 것이 이 저장소가 계속 막아 온 거짓이다.
+   */
+  const [relay, setRelay] = useState<DomainPackData['relay'] | null | undefined>(undefined)
+  useEffect(() => {
+    let alive = true
+    void currentPack().then((pack) => {
+      if (alive) setRelay(pack?.relay ?? null)
+    })
+    return () => {
+      alive = false
+    }
+  }, [])
 
   const delayMs = opts.delayMs
 
@@ -174,5 +191,13 @@ export function useOrchestration(opts: OrchestrationOptions = {}) {
     setOutcomes([])
   }, [])
 
-  return { scenario: relay?.scenario ?? null, phase, outcomes, run, reset }
+  return {
+    scenario: relay?.scenario ?? null,
+    /** 아직 받는 중인가 — '없음'과 구분해서 화면이 다른 말을 하게 */
+    loading: relay === undefined,
+    phase,
+    outcomes,
+    run,
+    reset,
+  }
 }

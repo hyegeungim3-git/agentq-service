@@ -32,7 +32,7 @@ export async function searchKnowledge(
   if (req.baseIds.length === 0) {
     return { ok: false, error: '검색할 지식베이스를 하나 이상 선택해 주세요.' }
   }
-  const pack = currentPack()
+  const pack = await currentPack()
   if (!pack) return { ok: false, error: '이 발주처의 업무 데이터가 아직 없습니다.' }
   await wait(opts.delayMs ?? 1700)
   /* 검색어·검색 방식·범위·보안등급·결과 수가 전부 결과를 바꾼다.

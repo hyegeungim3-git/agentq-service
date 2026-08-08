@@ -207,8 +207,10 @@ test.describe('전수 세기 @a11y', () => {
       /* `liveMetric`은 팩의 **필수 항목**이다(`DomainPackData`). 그러니 안 보이면
          건너뛸 일이 아니라 결함이다 — '없으면 넘어간다'로 두면 카드가 통째로 사라져도
          초록불이 된다 */
+      /* 카드는 업무 데이터(팩)가 도착한 뒤에 뜬다 — 고를 때 받기 때문이다.
+         기다리지 않고 세면 첫 발주처만 잡힌다 */
       const speed = page.locator('label').filter({ hasText: '60×' })
-      if ((await speed.count()) === 0) continue
+      await expect(speed).toBeVisible({ timeout: 10_000 })
       withMetric += 1
 
       const alert = page.getByRole('alert').filter({ hasText: /관리 기준/ })
@@ -416,4 +418,35 @@ test('관리자 섹션은 그 섹션을 열 때 받는다', async ({ page }) => 
   await nav.getByRole('button', { name: '사용자 관리' }).first().click()
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   expect(got, '섹션을 옮겼는데 그 코드를 안 받았다').toContain('ops')
+})
+
+/**
+ * **한 발주처를 골랐는데 다른 발주처 데이터까지 받는가.**
+ *
+ * 이 제품의 핵심은 발주처를 갈아 끼우는 것이다. 그런데 넷의 업무 데이터가 첫 화면에
+ * 통째로 실려 있었다(gzip 90KB, 첫 화면의 46%). 크기 문제이기 전에 **테넌시 문제**다 —
+ * 공공기관 담당자의 브라우저에 병원 데이터가 통째로 내려가 있었다는 뜻이다.
+ *
+ * 그래서 크기가 아니라 **무엇을 받았는지**를 본다.
+ */
+test('고른 발주처의 업무 데이터만 받는다', async ({ page }) => {
+  const packs: string[] = []
+  page.on('request', (r) => {
+    const m = /\/(manufacturing|public|civic|medical)[.-]/.exec(new URL(r.url()).pathname)
+    if (m?.[1]) packs.push(m[1])
+  })
+
+  await page.goto('./')
+  await expect(page.getByRole('button', { name: /한빛정밀/ })).toBeVisible()
+  expect(packs, '분야를 고르기도 전에 업무 데이터를 받고 있다').toEqual([])
+
+  await page.getByRole('button', { name: /한빛정밀/ }).click()
+  await expect(page.getByRole('textbox').first()).toBeVisible()
+  await expect(page.locator('label').filter({ hasText: '60×' })).toBeVisible({ timeout: 10_000 })
+
+  expect(packs, '고른 발주처의 데이터를 안 받았다면 첫 청크에 이미 있던 것이다').toContain(
+    'manufacturing',
+  )
+  const others = packs.filter((p) => p !== 'manufacturing')
+  expect(others, '고르지 않은 발주처의 업무 데이터까지 받았다').toEqual([])
 })

@@ -43,7 +43,7 @@ function boundaryFunctionCount(): number {
   let count = 0
   for (const f of readdirSync(dir)) {
     if (!f.endsWith('.ts') || f.includes('.test.')) continue
-    count += (readFileSync(join(dir, f), 'utf8').match(/^export function /gm) ?? []).length
+    count += (readFileSync(join(dir, f), 'utf8').match(/^export (?:async )?function /gm) ?? []).length
   }
   return count
 }

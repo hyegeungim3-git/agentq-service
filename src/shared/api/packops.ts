@@ -2,7 +2,7 @@ import type { Deployment, DomainPack, ToolEntry } from '@entities/packops/model'
 import type { AgentId } from '@entities/agent/model'
 import { DEPLOYMENTS } from '@fixtures/packops'
 import { DOMAIN_FIXTURES } from '@fixtures/domains'
-import { packStatuses, type DomainPackData } from '@fixtures/packs'
+import { loadPackStatuses, type DomainPackData } from '@fixtures/packs'
 import type { ApiResult } from './domains'
 import { withPack, withPackOf } from './pack'
 
@@ -13,11 +13,11 @@ import { withPack, withPackOf } from './pack'
  * 여기서 '준비됨'인데 포털에서 못 고르면 어느 쪽이 맞는지 알 수 없다.
  */
 
-export function fetchPacks(): Promise<ApiResult<DomainPack[]>> {
+export async function fetchPacks(): Promise<ApiResult<DomainPack[]>> {
   /* 팩 현황도 레지스트리에서 뽑는다 — 노출 현황과 같은 근거여야 한다.
      예전에는 여기에 표를 따로 뒀고, 네 번째 발주처를 열자 갈라졌다. */
   // TODO(api-미확정): GET /packs 로 교체. 제거 조건 = 백엔드가 제안서를 확정.
-  const byId = new Map(packStatuses().map((p) => [p.domainId, p]))
+  const byId = new Map((await loadPackStatuses()).map((p) => [p.domainId, p]))
   const data: DomainPack[] = DOMAIN_FIXTURES.map((d) => {
     const pack = byId.get(d.id)
     return {
@@ -28,7 +28,7 @@ export function fetchPacks(): Promise<ApiResult<DomainPack[]>> {
       usable: pack !== undefined,
     }
   })
-  return Promise.resolve({ ok: true, data })
+  return { ok: true, data }
 }
 
 export function createPack(orgName: string): Promise<ApiResult<never>> {

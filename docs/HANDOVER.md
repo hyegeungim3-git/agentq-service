@@ -47,7 +47,7 @@ npm run dev                           # http://localhost:5173
 | `src/App.tsx` | 화면 전환(라우터 없음 — `View` 타입이 곧 라우트 정의) |
 | `src/AdminApp.tsx` · `src/admin/sections/*` | 관리자 셸과 5개 구역. **새 관리자 화면은 섹션 파일에** |
 | `src/AgentApp.tsx` | 에이전트 13종 라우팅. **새 에이전트 화면은 여기에** |
-| `src/shared/api/*.ts` | **데이터 경계 함수 102개.** 서버를 붙일 때 만지는 유일한 자리 |
+| `src/shared/api/*.ts` | **데이터 경계 함수 116개.** 서버를 붙일 때 만지는 유일한 자리 |
 | `src/fixtures/` | 예시 데이터. 발주처별 팩(`packs/`)이 테넌시의 핵심 |
 | `src/entities/*/model.ts` | 도메인 타입과 순수 판정 함수. **API 명세의 정본** |
 | `src/widgets/` · `src/features/` | 화면 조각과 업무 훅 |
@@ -58,7 +58,7 @@ npm run dev                           # http://localhost:5173
 
 ## 설계 판단 — 왜 이 구조인가
 
-전부 `docs/DECISIONS.md`에 D-001~D-012로 근거가 있다. 이어받을 때 알아야 할 것 넷:
+전부 `docs/DECISIONS.md`에 D-001~D-013으로 근거가 있다. 이어받을 때 알아야 할 것 넷:
 
 **1. 화면은 데이터를 직접 읽지 않는다.** `shared/api`를 통과한다. 지금은 fixture를
 돌려주고, 서버가 정해지면 **그 안에서만** 바뀐다. 화면은 한 줄도 안 고쳐도 된다.
@@ -69,6 +69,8 @@ npm run dev                           # http://localhost:5173
 
 **3. 발주처는 데이터로 갈아 끼운다.** 화면을 복사하지 않는다. 새 발주처는
 `src/fixtures/packs/`에 팩 하나를 추가하면 13종 에이전트와 관리자가 그 데이터로 돈다.
+팩은 **고를 때 받는다**(D-013) — 정적 import로 되돌리면 넷이 첫 화면에 실린다.
+그건 크기 문제이기 전에 테넌시 문제다.
 
 **4. 코드는 사용자가 고르는 경계로 나눈다.** 관리자·에이전트·관리자 섹션이 각각
 따로 내려받는다(D-012). **새 화면을 `App.tsx`에 직접 import하면 첫 화면 용량이
@@ -79,7 +81,7 @@ npm run dev                           # http://localhost:5173
 ## 데이터 및 API
 
 - **모든 데이터는 `src/fixtures/`.** 서버 없음
-- 교체 지점: `src/shared/api/` 경계 함수 **102개**, `TODO(api-미확정)` 표시 **110개**
+- 교체 지점: `src/shared/api/` 경계 함수 **116개**, `TODO(api-미확정)` 표시 **110개**
 - 계약 제안서: `docs/API-PROPOSAL.md` — **프론트 제안이고 백엔드 확정 전이다.**
   확정된 것처럼 쓰지 말 것
 - 기계가 읽는 명세: `docs/api/openapi.yaml`(생성물). **손으로 고치지 말 것** —
@@ -111,7 +113,7 @@ npm run dev                           # http://localhost:5173
 | `npm run test` | 541 통과 |
 | `npm run e2e:app` | 278 통과 (데스크톱 1440 · 모바일 375) |
 | `npm run e2e:a11y` | 58 통과 |
-| `npm run budget` | 첫 화면 196KB gzip / 상한 200KB |
+| `npm run budget` | 첫 화면 106KB gzip / 상한 200KB |
 | `npm run build` | 통과 |
 
 확인한 화면 크기: **375 · 1440**, 라이트·다크 양쪽.
@@ -127,8 +129,7 @@ npm run dev                           # http://localhost:5173
 
 | # | 무엇 | 왜 안 했나 |
 |---|---|---|
-| 1 | 백엔드 연결 | 계약 미확정. 경계 102곳은 준비돼 있다 |
-| 2 | 첫 화면의 발주처 팩 90KB | 4곳 데이터가 전부 첫 화면에 온다. `fetchDomains()`가 포털 목록을 그리려 팩을 읽어서, **목록용 요약과 본문을 가르는 일이 먼저** |
+| 1 | 백엔드 연결 | 계약 미확정. 경계 116곳은 준비돼 있다 |
 | 3 | 화면 5곳이 fixture 직접 읽음 | id→이름 조회라 위험은 낮다. `scripts/boundary.test.ts`의 `DEBT` 목록이 정본 |
 | 4 | 사람의 낭독기 청취 | 자동으로 못 하는 유일한 검증 |
 | 5 | 인증·권한·테넌시 | **프론트가 정할 수 없다.** 백엔드 확정 사항 |
@@ -167,6 +168,7 @@ npm run dev                           # http://localhost:5173
 | `e2e/naming.spec.ts` | 메뉴 이름과 화면 제목이 갈라지는 것(다섯 번 갈라졌다) |
 | `e2e/a11y-census.spec.ts` | 한 화면만 고치고 '전부 고쳤다'고 하는 것 |
 | `npm run budget` | 첫 화면 용량이 되돌아가는 것 |
+| `e2e/a11y-census.spec.ts` 팩 검사 | 고르지 않은 발주처의 업무 데이터가 내려가는 것 |
 
 ### 검사를 새로 쓸 때
 

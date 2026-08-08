@@ -222,27 +222,48 @@ export type DomainPackData = {
   }
 }
 
-/* 팩은 자기 모듈에서 자기 것만 만든다 — 서로를 참조하지 않는다 */
-import { CIVIC_PACK } from './packs/civic'
-import { MANUFACTURING_PACK } from './packs/manufacturing'
-import { MEDICAL_PACK } from './packs/medical'
-import { PUBLIC_PACK } from './packs/public'
+/**
+ * 팩은 자기 모듈에서 자기 것만 만든다 — 서로를 참조하지 않는다.
+ *
+ * ⚠️ **정적 import를 되돌리지 말 것.** 예전에는 넷을 그냥 `import`했는데,
+ * `shared/api/*`가 전부 이 파일을 거치므로 **발주처 넷의 업무 데이터가 첫 화면에
+ * 통째로 실렸다**(실측 gzip 90KB, 첫 화면의 46%). 한 번에 한 발주처만 쓰는데 넷을
+ * 다 받는 것은 이 저장소가 세 번 고친 것과 같은 낭비다.
+ *
+ * 고를 때 받게 하려면 **동적 import**여야 한다. 바꿀 수 있었던 이유는
+ * `withPack`/`withPackOf`가 처음부터 `Promise`를 돌려주게 돼 있었기 때문이다 —
+ * 경계 함수 102곳과 호출부는 한 줄도 안 바뀌었다.
+ */
+type PackLoader = () => Promise<DomainPackData>
 
-const PACKS: Record<string, DomainPackData> = {
-  manufacturing: MANUFACTURING_PACK,
-  public: PUBLIC_PACK,
-  civic: CIVIC_PACK,
-  medical: MEDICAL_PACK,
+const PACK_LOADERS: Record<string, PackLoader> = {
+  manufacturing: () => import('./packs/manufacturing').then((m) => m.MANUFACTURING_PACK),
+  public: () => import('./packs/public').then((m) => m.PUBLIC_PACK),
+  civic: () => import('./packs/civic').then((m) => m.CIVIC_PACK),
+  medical: () => import('./packs/medical').then((m) => m.MEDICAL_PACK),
 }
+
+/**
+ * 한 번 받은 팩은 들고 있는다 — 같은 발주처 안에서 화면을 옮길 때마다 다시 받으면
+ * 느려지고, 네트워크가 끊기면 이미 보던 화면이 빈다.
+ */
+const loaded = new Map<string, DomainPackData>()
 
 /** 이 발주처의 업무 데이터. 없으면 null — 부르는 쪽이 그 사실을 말해야 한다 */
-export function packOf(domainId: string | null): DomainPackData | null {
+export async function loadPack(domainId: string | null): Promise<DomainPackData | null> {
   if (domainId === null) return null
-  return PACKS[domainId] ?? null
+  const cached = loaded.get(domainId)
+  if (cached) return cached
+  const load = PACK_LOADERS[domainId]
+  if (!load) return null
+  const pack = await load()
+  loaded.set(domainId, pack)
+  return pack
 }
 
-/** 업무 데이터가 갖춰진 발주처 id 목록 — 포털의 선택 가능 여부와 같은 근거다 */
-export const PACKED_DOMAIN_IDS: string[] = Object.keys(PACKS)
+/** 업무 데이터가 갖춰진 발주처 id 목록 — 포털의 선택 가능 여부와 같은 근거다.
+ *  **키만 읽으므로 팩 데이터를 받지 않는다** — 이 목록 때문에 넷이 딸려 오면 안 된다 */
+export const PACKED_DOMAIN_IDS: string[] = Object.keys(PACK_LOADERS)
 
 /**
  * 관리자 화면이 쓰는 팩 현황 — **여기서 뽑는다.**
@@ -250,6 +271,9 @@ export const PACKED_DOMAIN_IDS: string[] = Object.keys(PACKS)
  * 예전에는 관리자 쪽에 따로 표를 두고 있었다. 네 번째 발주처를 열자
  * 포털은 넷이 열렸는데 관리자는 '업무 데이터 없음'이라고 말하는 상태가 됐다.
  * 같은 사실을 두 곳에 두면 반드시 갈라진다 — 그래서 파생으로 바꿨다.
+ *
+ * 이 화면 하나만은 넷을 다 받는다. 넷을 비교해 보여 주는 것이 이 화면의 일이라
+ * 피할 수 없고, 관리자 안에서만 일어난다.
  */
 export type PackStatus = {
   domainId: string
@@ -258,19 +282,27 @@ export type PackStatus = {
   agentCount: number
 }
 
-export function packStatuses(): PackStatus[] {
-  return Object.entries(PACKS).map(([domainId, pack]) => ({
-    domainId,
-    /* 실제로 채워진 것만 센다. 팩에 값이 있으면 채워진 것이다 */
-    filled: [
-      pack.documents.length > 0 ? 'documents' : '',
-      pack.summaries && Object.keys(pack.summaries).length > 0 ? 'agentContent' : '',
-      pack.scenario ? 'scenarios' : '',
-      pack.mapIntel.sites.length > 0 ? 'mapIntel' : '',
-      pack.signals.length > 0 ? 'signals' : '',
-      pack.workspaces.length > 0 ? 'branding' : '',
-    ].filter(Boolean),
-    usable: true,
-    agentCount: pack.agents.length,
-  }))
+export async function loadPackStatuses(): Promise<PackStatus[]> {
+  const entries = await Promise.all(
+    Object.keys(PACK_LOADERS).map(async (domainId) => {
+      const pack = await loadPack(domainId)
+      return { domainId, pack }
+    }),
+  )
+  return entries
+    .filter((e): e is { domainId: string; pack: DomainPackData } => e.pack !== null)
+    .map(({ domainId, pack }) => ({
+      domainId,
+      /* 실제로 채워진 것만 센다. 팩에 값이 있으면 채워진 것이다 */
+      filled: [
+        pack.documents.length > 0 ? 'documents' : '',
+        pack.summaries && Object.keys(pack.summaries).length > 0 ? 'agentContent' : '',
+        pack.scenario ? 'scenarios' : '',
+        pack.mapIntel.sites.length > 0 ? 'mapIntel' : '',
+        pack.signals.length > 0 ? 'signals' : '',
+        pack.workspaces.length > 0 ? 'branding' : '',
+      ].filter(Boolean),
+      usable: true,
+      agentCount: pack.agents.length,
+    }))
 }

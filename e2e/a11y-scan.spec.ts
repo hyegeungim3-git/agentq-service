@@ -168,8 +168,26 @@ test('접근성 훑기 @a11y', async ({ page }) => {
     content: '*,*::before,*::after{transition:none !important;animation:none !important}',
   })
 
+  /**
+   * 화면이 **다 그려진 뒤에** 훑는다.
+   *
+   * 업무 데이터(팩)를 발주처를 고를 때 받게 바꾼 뒤로, 조작 요소가 한 박자 늦게
+   * 늘어난다. 한 번만 재면 덜 그려진 화면을 훑고 '결함 0건'이 나온다 —
+   * 그래서 기대 개수에 닿을 때까지 기다렸다가 잰다. 끝내 못 닿으면 그대로 적는다.
+   */
   const scan = async (where: string, least: number) => {
-    const { findings, seen } = await audit(page, where)
+    let seen = 0
+    let findings: Finding[] = []
+    for (let tries = 0; tries < 50; tries += 1) {
+      const r = await audit(page, where)
+      findings = r.findings
+      seen = r.seen
+      /* 다 그려졌고 결함도 없으면 끝. 업무 데이터를 발주처를 고를 때 받게 되면서
+         **잠깐 이름이 빈 요소**가 생기는데, 그 순간을 잡으면 없는 결함이 나온다.
+         끝까지 남는 결함은 진짜이므로 예산을 다 쓰고 그대로 보고한다 */
+      if (seen >= least && findings.length === 0) break
+      await page.waitForTimeout(200)
+    }
     all.push(...findings)
     if (seen < least) thin.push(`${where}: 조작 요소 ${seen}개 — 화면이 덜 그려진 채로 훑었다`)
   }

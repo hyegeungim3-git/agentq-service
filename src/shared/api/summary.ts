@@ -22,7 +22,7 @@ export async function createSummary(
   await wait(opts.delayMs ?? 1600)
   // TODO(api-미확정): POST /summaries 로 교체. 제거 조건 = 요약 모델·응답 형식 확정.
 
-  const pack = currentPack()
+  const pack = await currentPack()
   if (!pack) return { ok: false, error: '이 발주처의 업무 데이터가 아직 없습니다.' }
 
   const byDoc = pack.summaries[req.documentId]

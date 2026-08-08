@@ -12,7 +12,7 @@ export async function analyzeData(
 ): Promise<ApiResult<AnalysisResult>> {
   await wait(opts.delayMs ?? 2000)
   // TODO(api-미확정): POST /analyses 로 교체. 제거 조건 = 분석 엔진·응답 형식 확정.
-  const pack = currentPack()
+  const pack = await currentPack()
   if (!pack) return { ok: false, error: '이 발주처의 업무 데이터가 아직 없습니다.' }
   const byKind = pack.analyses[req.datasetId]
   if (!byKind) return { ok: false, error: `분석 결과가 없는 데이터입니다: ${req.datasetId}` }

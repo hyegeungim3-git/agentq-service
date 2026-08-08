@@ -14,7 +14,7 @@ export async function runMapping(
   opts: MappingApiOptions = {},
 ): Promise<ApiResult<MappingResult>> {
   /* 발주처의 대장이 없으면 못 푼다 — 다른 발주처 대장으로 대신 풀지 않는다 */
-  const pack = currentPack()
+  const pack = await currentPack()
   if (!pack) {
     return { ok: false, error: '이 발주처의 업무 데이터가 아직 없습니다. 다른 발주처를 선택하십시오.' }
   }

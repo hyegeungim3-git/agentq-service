@@ -1,4 +1,4 @@
-import { packOf, type DomainPackData } from '@fixtures/packs'
+import { loadPack, type DomainPackData } from '@fixtures/packs'
 import { activeDomain } from './tenant'
 import type { ApiResult } from './domains'
 
@@ -9,15 +9,15 @@ import type { ApiResult } from './domains'
  * 이전 데모의 사고가 정확히 그 지점이었다 — 공공을 골라도 제조 문서가 떴다.
  * 서버가 붙으면 이 함수는 사라지고, 같은 판정을 서버가 404로 한다.
  */
-export function withPack<T>(read: (pack: DomainPackData) => T): Promise<ApiResult<T>> {
-  const pack = packOf(activeDomain())
+export async function withPack<T>(read: (pack: DomainPackData) => T): Promise<ApiResult<T>> {
+  const pack = await loadPack(activeDomain())
   if (!pack) {
-    return Promise.resolve({
+    return {
       ok: false,
       error: '이 발주처의 업무 데이터가 아직 없습니다. 다른 발주처를 선택하십시오.',
-    })
+    }
   }
-  return Promise.resolve({ ok: true, data: read(pack) })
+  return { ok: true, data: read(pack) }
 }
 
 /**
@@ -28,23 +28,28 @@ export function withPack<T>(read: (pack: DomainPackData) => T): Promise<ApiResul
  * 제안서 §3-2의 헤더 방식으로 보면, 사용자 포털은 셸이 헤더를 달고 관리자는
  * 고른 발주처를 헤더에 담는 것이다 — 헤더가 사라지는 게 아니라 주체가 바뀐다.
  */
-export function withPackOf<T>(
+export async function withPackOf<T>(
   domainId: string | null,
   read: (pack: DomainPackData) => T,
 ): Promise<ApiResult<T>> {
-  const pack = packOf(domainId)
+  const pack = await loadPack(domainId)
   if (!pack) {
-    return Promise.resolve({
+    return {
       ok: false,
       error: '이 발주처의 업무 데이터가 아직 없습니다. 다른 발주처를 선택하십시오.',
-    })
+    }
   }
-  return Promise.resolve({ ok: true, data: read(pack) })
+  return { ok: true, data: read(pack) }
 }
 
-/** 팩을 바로 꺼내야 하는 곳(동기 시뮬레이션)용. 없으면 null */
-export function currentPack(): DomainPackData | null {
-  return packOf(activeDomain())
+/**
+ * 지금 발주처의 팩. 없으면 null.
+ *
+ * 팩을 **고를 때 받으므로** 이 함수도 비동기다(첫 화면에서 넷을 다 받지 않으려는 것).
+ * 이미 받은 발주처는 캐시에서 즉시 돌아온다.
+ */
+export function currentPack(): Promise<DomainPackData | null> {
+  return loadPack(activeDomain())
 }
 
 /**
