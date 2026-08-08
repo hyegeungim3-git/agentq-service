@@ -280,6 +280,10 @@ export default function App() {
       onDeleteConversation={conv.remove}
       onClearConversations={conv.clearAll}
       conversationsPersisted={conv.persisted}
+      activeAgentId={view.tab === 'agents' ? view.agentId : null}
+      onAgent={(id) =>
+        setView({ name: 'shell', domainId: domain.id, tab: 'agents', agentId: id, scenario: false })
+      }
       unreadNotices={unread.length}
       signals={signals}
       onOpenSignal={openSignal}

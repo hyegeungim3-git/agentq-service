@@ -1,4 +1,5 @@
-import { ChevronRight, UserCheck, Workflow } from 'lucide-react'
+import { useState } from 'react'
+import { ChevronRight, Search, UserCheck, Workflow } from 'lucide-react'
 import { AGENTS, type AgentDefinition, type AgentId } from '@entities/agent/model'
 import {
   CAPABILITY_LABEL,
@@ -41,6 +42,7 @@ export function HubPage({
   onBack?: (() => void) | undefined
   agents?: AgentDefinition[]
 }) {
+  const [query, setQuery] = useState('')
   const total = agents.length
   const ready = agents.filter((a) => a.status === 'ready').length
   const defs = useRemote(() => fetchAgentDefs(domain.id), [domain.id])
@@ -49,6 +51,16 @@ export function HubPage({
   const adopted = useRemote(fetchAdoptedAgents, [domain.id])
   const adoptedIds = adopted.kind === 'ready' ? adopted.data.agents : null
   const scenario = adopted.kind === 'ready' ? adopted.data.scenario : null
+  const adoptedCount = adoptedIds?.length ?? null
+  /* 이름·설명 어느 쪽이 걸려도 찾힌다 — 사용자는 '번역'을 이름으로만 기억하지 않는다 */
+  const q = query.trim().toLowerCase()
+  const shown =
+    q === ''
+      ? agents
+      : agents.filter(
+          (a) => a.name.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q),
+        )
+
   const flowOf = (id: AgentId): AgentFlow | null =>
     defs.kind === 'ready' ? (defs.data.find((d) => d.agentId === id) ?? null) : null
 
@@ -72,12 +84,47 @@ export function HubPage({
             </span>
             <h1 className="text-xl font-black text-slate-900">{domain.orgName}</h1>
           </div>
-          <p className="mt-1 text-sm text-slate-600">
-            업무에 맞는 에이전트를 선택하세요.{' '}
-            <span className="text-slate-400">
-              (이식 {ready}/{total}종)
+          <p className="mt-1 text-sm text-slate-600">업무에 맞는 에이전트를 선택하세요.</p>
+
+          {/* 원본처럼 **한눈에 세 수**를 둔다(D-014) — 몇 개가 있고, 몇 개가 도는지.
+              지어낸 수가 아니라 카탈로그와 팩에서 센 값이다 */}
+          <dl className="mt-4 flex flex-wrap gap-6">
+            <div>
+              <dd className="text-2xl font-black text-slate-900">{total}</dd>
+              <dt className="text-[11px] text-slate-500">에이전트</dt>
+            </div>
+            <div>
+              <dd className="text-2xl font-black text-emerald-700">{ready}</dd>
+              <dt className="text-[11px] text-slate-500">가동 중</dt>
+            </div>
+            <div>
+              <dd className="text-2xl font-black text-slate-900">{adoptedCount ?? '—'}</dd>
+              <dt className="text-[11px] text-slate-500">이 발주처 도입</dt>
+            </div>
+          </dl>
+
+          {/* 13종을 눈으로 훑는 대신 이름으로 좁힌다 — 고르는 것이 결과를 바꾼다 */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <label htmlFor="agent-q" className="sr-only">
+              에이전트 검색
+            </label>
+            <div className="relative min-w-56 flex-1">
+              <Search
+                className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
+                aria-hidden="true"
+              />
+              <input
+                id="agent-q"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="에이전트 검색…"
+                className="min-h-11 w-full rounded-lg border border-slate-200 bg-white pr-3 pl-9 text-sm outline-none focus:border-slate-400"
+              />
+            </div>
+            <span className="text-[11px] text-slate-500">
+              {shown.length}종 표시
             </span>
-          </p>
+          </div>
         </header>
 
         {/* 한 에이전트로 끝나지 않는 업무는 릴레이로 묶는다 */}
@@ -104,7 +151,7 @@ export function HubPage({
         )}
 
         <ul className="grid gap-3 sm:grid-cols-2">
-          {agents.map((a) => {
+          {shown.map((a) => {
             /* 두 가지 이유로 못 쓴다 — 아직 안 만든 화면과, 이 발주처가 아직 안 도입한 것.
                뭉뚱그리면 '없는 기능'과 '아직 안 산 기능'을 구분할 수 없다 */
             const built = a.status === 'ready'

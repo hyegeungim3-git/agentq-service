@@ -4,7 +4,7 @@ import { openTab, enterDomain } from './shell'
 async function openAgent(page: import('@playwright/test').Page, name: RegExp) {
   await enterDomain(page)
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name }).click()
+  await page.getByRole('main').getByRole('button', { name }).click()
 }
 
 test.describe('파일 업로드', () => {

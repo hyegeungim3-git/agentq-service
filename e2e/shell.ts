@@ -48,7 +48,9 @@ export async function enterDomain(page: Page, org = '한빛정밀') {
 export async function openAgent(page: Page, name: RegExp) {
   await enterDomain(page)
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name }).click()
+  /* 에이전트 이름은 이제 **사이드바 목록과 허브 카드 양쪽**에 있다(D-014).
+     허브 카드가 처음 여는 사람의 동선이라 본문 쪽을 누른다 */
+  await page.getByRole('main').getByRole('button', { name }).click()
 }
 
 /* ─── 관리자 메뉴 전수 순회 ────────────────────────────────────────────────

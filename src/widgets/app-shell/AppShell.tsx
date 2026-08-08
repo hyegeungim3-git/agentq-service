@@ -12,8 +12,10 @@ import {
   ArrowRightLeft,
   ClipboardCheck,
   Layers,
+  LayoutGrid,
 } from 'lucide-react'
 import type { Domain } from '@entities/domain/model'
+import { AGENTS, type AgentId } from '@entities/agent/model'
 import { sectorLabel } from '@entities/domain/model'
 import { BrandLock } from '@shared/ui/Brand'
 import { SkipToMain } from '@shared/ui/SkipLink'
@@ -68,6 +70,11 @@ export type ShellProps = {
   /** 저장이 막힌 환경이면 그렇다고 말해야 한다 */
   conversationsPersisted: boolean
 
+  /** 지금 열려 있는 에이전트. 허브면 null */
+  activeAgentId: AgentId | null
+  /** 에이전트로 이동. null이면 허브로 */
+  onAgent: (id: AgentId | null) => void
+
   unreadNotices: number
   signals: WorkSignal[]
   onOpenSignal: (link: SignalLink) => void
@@ -91,6 +98,8 @@ export function AppShell({
   onDeleteConversation,
   onClearConversations,
   conversationsPersisted,
+  activeAgentId,
+  onAgent,
   unreadNotices,
   signals,
   onOpenSignal,
@@ -168,6 +177,67 @@ export function AppShell({
           </p>
         )}
       </div>
+
+      {/* 에이전트 탭에서는 **에이전트 목록**이 이 자리에 온다(원본 배치, D-014).
+          허브로 돌아가 카드를 찾는 대신 옆에서 바로 옮겨 다닌다 —
+          하루에 여러 에이전트를 오가는 것이 이 제품의 실제 동선이다 */}
+      {tab === 'agents' && (
+        <div lang="ko" className="border-b border-slate-200 p-2">
+          <p className="px-2 pb-1 text-[11px] font-bold tracking-wide text-slate-400">AI 에이전트</p>
+          <ul>
+            <li>
+              <button
+                type="button"
+                onClick={() => {
+                  onAgent(null)
+                  close()
+                }}
+                aria-current={activeAgentId === null ? 'true' : undefined}
+                /* 허브 카드에도 같은 이름이 있다. 이름이 겹치면 **음성으로 골라 누를 수
+                   없다** — 보이는 글자를 그대로 담고 뒤에 자리를 덧붙여 갈라 둔다
+                   (WCAG 2.5.3은 보이는 글자가 이름 안에 있으면 된다) */
+                aria-label="전체 허브 목록에서 열기"
+                className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] ${
+                  activeAgentId === null
+                    ? 'bg-brand-soft font-bold text-slate-900'
+                    : 'text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <LayoutGrid
+                  className={`size-4 shrink-0 ${activeAgentId === null ? 'text-brand' : 'text-slate-400'}`}
+                  aria-hidden="true"
+                />
+                전체 허브
+              </button>
+            </li>
+            {AGENTS.map((a) => {
+              const on = activeAgentId === a.id
+              return (
+                <li key={a.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onAgent(a.id)
+                      close()
+                    }}
+                    aria-current={on ? 'true' : undefined}
+                    aria-label={`${a.name} 목록에서 열기`}
+                    className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] ${
+                      on ? 'bg-brand-soft font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span
+                      className={`size-1.5 shrink-0 rounded-full ${on ? 'bg-brand' : 'bg-slate-300'}`}
+                      aria-hidden="true"
+                    />
+                    <span className="min-w-0 truncate">{a.name}</span>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
 
       {/* 업무 탭 — 세로 목록이 아니라 한 덩어리 스위처다. 셋이 나란히 있어야
           '지금 어느 쪽에 있는지'와 '옆에 무엇이 있는지'가 함께 보인다 */}

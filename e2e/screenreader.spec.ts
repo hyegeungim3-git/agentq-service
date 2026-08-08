@@ -71,7 +71,7 @@ test('같은 이름의 조작 요소가 겹치지 않는다 @a11y', async ({ pag
   await page.goto('./')
   await enterPicked(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
-  await expect(page.getByRole('button', { name: '문서 요약', exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true })).toBeVisible()
 
   const nodes = await tree(page)
   const buttons = nodes.filter((n) => n.role === 'button' && n.name.trim())
@@ -90,7 +90,7 @@ test('결과가 나오면 낭독기에 알린다 @a11y', async ({ page }) => {
   await page.goto('./')
   await enterPicked(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '문서 요약', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true }).click()
 
   /* 실행 전에는 진행 상태를 알리는 자리가 없다 */
   const liveBefore = await page.locator('[aria-live], [role=status], [role=alert]').count()
@@ -196,7 +196,7 @@ test('사이드바로 화면을 바꿔도 포커스가 본문으로 간다 @a11y
   await expect(page.getByRole('textbox').first()).toBeVisible()
 
   await openTab(page, /^에이전트/)
-  await expect(page.getByRole('button', { name: '문서 요약', exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true })).toBeVisible()
 
   await expect
     .poll(

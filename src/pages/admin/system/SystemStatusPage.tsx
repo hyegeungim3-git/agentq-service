@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Gauge } from '@widgets/admin-shell/Gauge'
 import { POD_WINDOWS, type PodInfo, type PodWindow } from '@entities/infra/model'
 import { fetchCluster, fetchNodes, fetchPods } from '@shared/api/infra'
 import { useRemote } from '@features/remote/useRemote'
@@ -15,15 +16,6 @@ import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
  */
 
 const pct = (r: number): string => `${(r * 100).toFixed(1)}%`
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <p className="text-[11px] font-bold text-slate-500">{label}</p>
-      <p className="mt-1 text-xl font-black tabular-nums text-slate-900">{value}</p>
-    </div>
-  )
-}
 
 function PodRows({ pods }: { pods: PodInfo[] }) {
   return (
@@ -98,10 +90,16 @@ export function SystemStatusPage() {
         )}
         {cluster.kind === 'ready' && (
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Metric label="CPU 사용률" value={pct(cluster.data.cpuRatio)} />
-            <Metric label="메모리 사용률" value={pct(cluster.data.memoryRatio)} />
-            <Metric label="GPU 평균 소비 전력" value={`${cluster.data.gpuPowerWatt.toFixed(1)}W`} />
-            <Metric label="파일시스템 사용률" value={pct(cluster.data.filesystemRatio)} />
+            {/* 숫자만 있으면 5.3%와 58.4%가 같은 무게로 보인다 — 채운 만큼을 함께
+                보여 준다(원본 배치, D-014). 숫자와 라벨은 그대로 남는다 */}
+            <Gauge label="CPU 사용률" value={Number((cluster.data.cpuRatio * 100).toFixed(1))} unit="%" />
+            <Gauge label="메모리 사용률" value={Number((cluster.data.memoryRatio * 100).toFixed(1))} unit="%" />
+            <Gauge label="GPU 평균 소비 전력" value={Number(cluster.data.gpuPowerWatt.toFixed(1))} unit="W" />
+            <Gauge
+              label="파일시스템 사용률"
+              value={Number((cluster.data.filesystemRatio * 100).toFixed(1))}
+              unit="%"
+            />
           </div>
         )}
       </section>

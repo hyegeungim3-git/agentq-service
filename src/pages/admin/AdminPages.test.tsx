@@ -19,7 +19,8 @@ describe('시스템 현황', () => {
   it('값보다 먼저 예시 값임을 말한다', async () => {
     render(<SystemStatusPage />)
     expect(screen.getAllByText(/서버 미연결 — 예시 값/).length).toBeGreaterThan(0)
-    expect(await screen.findByText('5.3%')).toBeInTheDocument()
+    /* 게이지가 되면서 숫자와 단위가 나뉜다 — 게이지 이름으로 값을 확인한다 */
+    expect(await screen.findByRole('img', { name: 'CPU 사용률 5.3%' })).toBeInTheDocument()
   })
 
   it('노드 표를 보여 준다', async () => {

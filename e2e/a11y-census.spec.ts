@@ -45,7 +45,7 @@ const AGENTS = [
 const openHub = async (page: Page) => {
   await enterDomain(page)
   await openTab(page, /^에이전트/)
-  await expect(page.getByRole('button', { name: '문서 요약', exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true })).toBeVisible()
 }
 
 test.describe('전수 세기 @a11y', () => {

@@ -67,7 +67,7 @@ test('규칙 엔진이 아는 위반이 없다 — 사용자 포털 @a11y', asyn
   all.push(...(await scan(page, '대화')))
 
   await openTab(page, /^에이전트/)
-  await expect(page.getByRole('button', { name: '문서 요약', exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true })).toBeVisible()
   all.push(...(await scan(page, '허브')))
 
   for (const agent of ['문서 요약', '기준정보 표준화', '문서 번역', '데이터 분석', '안전관리계획 수립']) {

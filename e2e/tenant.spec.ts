@@ -27,12 +27,12 @@ const bodyText = (page: import('@playwright/test').Page) =>
 test('발주처를 바꾸면 문서 목록이 바뀐다', async ({ page }) => {
   await enter(page, '한빛정밀')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '문서 요약', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true }).click()
   await expect(page.getByText('프레스_작업표준서_SOP-PR-011.pdf')).toBeVisible()
 
   await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '문서 요약', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true }).click()
   await expect(page.getByText('표준지공시지가_조사지침_2026.pdf')).toBeVisible()
   await expect(page.getByText('프레스_작업표준서_SOP-PR-011.pdf')).toHaveCount(0)
 })
@@ -75,8 +75,8 @@ test('제조 포털에 공공의 말이 한 글자도 없다', async ({ page }) 
 test('도입한 에이전트는 모두 열려 있다', async ({ page }) => {
   await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
-  await expect(page.getByRole('button', { name: '문서 요약', exact: true })).toBeEnabled()
-  await expect(page.getByRole('button', { name: '기준정보 표준화', exact: true })).toBeEnabled()
+  await expect(page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true })).toBeEnabled()
+  await expect(page.getByRole('main').getByRole('button', { name: '기준정보 표준화', exact: true })).toBeEnabled()
   await expect(page.getByText('도입 전')).toHaveCount(0)
 })
 
@@ -97,7 +97,7 @@ test('발주처 색이 실제로 바뀐다', async ({ page }) => {
 test('공공에서 문서 요약이 공공 문서로 돈다', async ({ page }) => {
   await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '문서 요약', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true }).click()
   await page.getByRole('button', { name: '요약 생성' }).click()
   const result = page.getByRole('region', { name: /요약 결과/ })
   await expect(result).toBeVisible({ timeout: 10_000 })
@@ -108,7 +108,7 @@ test('공공에서 문서 요약이 공공 문서로 돈다', async ({ page }) =
 test('공공 사전 검토는 공공 규정 묶음을 대조한다', async ({ page }) => {
   await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '문서 사전 검토', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '문서 사전 검토', exact: true }).click()
   // 묶음 이름도 발주처가 정한다 — '품질경영매뉴얼'은 제조 전용이었다
   await expect(page.getByText('표준지 조사지침')).toBeVisible()
   await expect(page.getByText('품질경영매뉴얼')).toHaveCount(0)
@@ -124,7 +124,7 @@ test('공공 사전 검토는 공공 규정 묶음을 대조한다', async ({ pa
 test('공공 데이터 조회는 공공 소스를 쓴다', async ({ page }) => {
   await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '데이터 조회', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '데이터 조회', exact: true }).click()
   await expect(page.getByRole('radio', { name: '이의신청 대장' })).toBeVisible()
   await expect(page.getByText('설비 대장')).toHaveCount(0)
 
@@ -138,8 +138,8 @@ test('공공 데이터 조회는 공공 소스를 쓴다', async ({ page }) => {
 test('공공 문서 인식은 공공 서식을 읽는다', async ({ page }) => {
   await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '문서 인식(OCR)', exact: true }).click()
-  await page.getByRole('button', { name: '문서 인식' }).click()
+  await page.getByRole('main').getByRole('button', { name: '문서 인식(OCR)', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '문서 인식', exact: true }).click()
   const result = page.getByRole('region', { name: /인식 결과/ })
   await expect(result).toBeVisible({ timeout: 10_000 })
   await expect(result).toContainText('표준지공시지가 이의신청서')
@@ -150,14 +150,14 @@ test('공공 문서 인식은 공공 서식을 읽는다', async ({ page }) => {
 test('기준정보 표준화가 발주처마다 다른 것을 푼다', async ({ page }) => {
   await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '기준정보 표준화', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '기준정보 표준화', exact: true }).click()
   await expect(page.getByRole('radio', { name: /단일 주소/ })).toBeVisible()
   await expect(page.getByRole('radio', { name: /태그·코드 매핑/ })).toHaveCount(0)
 
   /* 병원은 주소가 아니라 청구 항목 코드를 푼다 */
   await enter(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '기준정보 표준화', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '기준정보 표준화', exact: true }).click()
   await expect(page.getByRole('radio', { name: /태그·코드 매핑/ })).toBeVisible()
   await expect(page.getByRole('radio', { name: /단일 주소/ })).toHaveCount(0)
 })
@@ -165,7 +165,7 @@ test('기준정보 표준화가 발주처마다 다른 것을 푼다', async ({ 
 test('공공 보고서·회의록이 공공 내용으로 나온다', async ({ page }) => {
   await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '표준 보고서 작성', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '표준 보고서 작성', exact: true }).click()
   await page.getByRole('button', { name: '보고서 생성' }).click()
   const report = page.getByRole('region', { name: /보고/ })
   await expect(report).toBeVisible({ timeout: 10_000 })
@@ -173,8 +173,8 @@ test('공공 보고서·회의록이 공공 내용으로 나온다', async ({ pa
   await expect(report).not.toContainText('HBP-생산기술')
 
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '회의록 작성', exact: true }).click()
-  await page.getByRole('button', { name: '회의록 작성' }).click()
+  await page.getByRole('main').getByRole('button', { name: '회의록 작성', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '회의록 작성' }).click()
   const minutes = page.getByRole('region', { name: /심의회/ })
   await expect(minutes).toBeVisible({ timeout: 10_000 })
   await expect(minutes).toContainText('윤서경')
@@ -211,7 +211,7 @@ test('세 발주처가 서로 다른 색·문서·에이전트를 쓴다', async
       color,
     )
     await openTab(page, /^에이전트/)
-    await page.getByRole('button', { name: '문서 요약', exact: true }).click()
+    await page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true }).click()
     await expect(page.getByText(doc)).toBeVisible()
   }
 })
@@ -231,7 +231,7 @@ test('의료 포털에 앞선 세 발주처의 말이 없다', async ({ page }) 
 test('의료 에이전트가 의료 결과를 낸다', async ({ page }) => {
   await enter(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '문서 사전 검토', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '문서 사전 검토', exact: true }).click()
   await expect(page.getByText('청구 심사지침')).toBeVisible()
   await page.getByRole('button', { name: '사전 검토 시작' }).click()
   const result = page.getByRole('region', { name: /검토 결과/ })
@@ -243,7 +243,7 @@ test('의료 에이전트가 의료 결과를 낸다', async ({ page }) => {
 test('행정 에이전트가 행정 결과를 낸다', async ({ page }) => {
   await enter(page, '한성시청')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '문서 사전 검토', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '문서 사전 검토', exact: true }).click()
   await expect(page.getByText('민원사무 처리지침')).toBeVisible()
   await page.getByRole('button', { name: '사전 검토 시작' }).click()
   const result = page.getByRole('region', { name: /검토 결과/ })
@@ -331,7 +331,7 @@ test('답변 근거의 지식 영역이 발주처마다 다르다', async ({ pag
 test('번역이 발주처 문서와 용어집으로 나온다', async ({ page }) => {
   await enter(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '문서 번역', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '문서 번역', exact: true }).click()
   await page.getByRole('button', { name: '번역 실행' }).click()
 
   const result = page.getByRole('region', { name: /번역 결과/ })

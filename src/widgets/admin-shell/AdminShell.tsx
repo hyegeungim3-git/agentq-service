@@ -1,5 +1,5 @@
 import { useCallback, useState, type ReactNode } from 'react'
-import { Menu, User } from 'lucide-react'
+import { LayoutGrid, Menu, User } from 'lucide-react'
 import {
   ADMIN_SECTIONS,
   childrenOf,
@@ -235,8 +235,29 @@ export function AdminShell({
             <Menu className="size-5" aria-hidden="true" />
           </button>
           <Crumb menuId={menuId} />
-          {/* 나가는 길은 사이드바 아래에 한 곳만 둔다 —
-              같은 동작을 두 곳에 두면 어느 쪽이 진짜인지 헷갈리고, 하나만 고치게 된다 */}
+
+          {/* 원본처럼 오른쪽에 **나가는 길과 지금 누구인지**를 둔다(D-014).
+              사이드바 아래에도 같은 길이 있지만, 관리자는 화면이 길어 아래까지
+              내려가야 나갈 수 있었다 — 위에서도 닿게 한다 */}
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onUserPortal}
+              className="hidden min-h-11 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 sm:inline-flex"
+            >
+              <LayoutGrid className="size-3.5" aria-hidden="true" />
+              사용자 포털
+            </button>
+            <span className="flex items-center gap-2 border-l border-slate-200 pl-2">
+              <span className="flex size-8 items-center justify-center rounded-full bg-slate-900 text-[11px] font-black text-white">
+                {admin.name.slice(0, 1)}
+              </span>
+              <span className="hidden text-xs sm:block">
+                <span className="block font-bold text-slate-800">{admin.name}</span>
+                <span className="block text-slate-500">{admin.org}</span>
+              </span>
+            </span>
+          </div>
         </div>
         {children}
       </div>

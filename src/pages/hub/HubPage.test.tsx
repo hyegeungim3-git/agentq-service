@@ -72,9 +72,22 @@ describe('HubPage', () => {
     expect(onOpen).not.toHaveBeenCalled()
   })
 
-  it('이식 진척을 숨기지 않고 표시한다', () => {
+  /* 몇 개가 있고 몇 개가 도는지 — 원본처럼 수로 먼저 말한다(D-014) */
+  it('에이전트 수와 가동 중인 수를 함께 말한다', () => {
     setup()
-    expect(screen.getByText(/이식 \d+\/13종/)).toBeInTheDocument()
+    const counts = screen.getByRole('list', { hidden: true, name: '' })
+    expect(counts).toBeDefined()
+    expect(screen.getByText('에이전트')).toBeInTheDocument()
+    expect(screen.getByText('가동 중')).toBeInTheDocument()
+  })
+
+  /* 13종을 눈으로 훑는 대신 이름으로 좁힌다 — 고른 것이 결과를 바꿔야 한다 */
+  it('검색이 목록을 실제로 좁힌다', async () => {
+    setup()
+    expect(screen.getByText('13종 표시')).toBeInTheDocument()
+    await userEvent.type(screen.getByLabelText('에이전트 검색'), '번역')
+    expect(screen.getByText('1종 표시')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /문서 요약/ })).not.toBeInTheDocument()
   })
 
   it('조직명과 분야를 보여준다', () => {

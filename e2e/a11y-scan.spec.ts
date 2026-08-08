@@ -208,7 +208,7 @@ test('접근성 훑기 @a11y', async ({ page }) => {
   await scan('대화', 8)
 
   await openTab(page, /^에이전트/)
-  await expect(page.getByRole('button', { name: '문서 요약', exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true })).toBeVisible()
   await scan('허브', 12)
 
   for (const agent of ['문서 요약', '기준정보 표준화', '문서 번역', '데이터 분석']) {

@@ -4,7 +4,7 @@ import { openTab, enterDomain } from './shell'
 async function openAgent(page: import('@playwright/test').Page, name: RegExp) {
   await enterDomain(page)
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name }).click()
+  await page.getByRole('main').getByRole('button', { name }).click()
 }
 
 test.describe('신규 에이전트 3종', () => {
@@ -17,14 +17,14 @@ test.describe('신규 에이전트 3종', () => {
 
   test('회의록 — 미정 항목 건수를 알린다', async ({ page }) => {
     await openAgent(page, /회의록 작성/)
-    await page.getByRole('button', { name: '회의록 작성' }).click()
+    await page.getByRole('main').getByRole('button', { name: '회의록 작성' }).click()
     await expect(page.getByText(/정해지지 않은 항목이 2건/)).toBeVisible({ timeout: 10_000 })
   })
 
   test('내규 조회 — 근거를 못 찾으면 지어내지 않는다', async ({ page }) => {
     await openAgent(page, /내규·규정 조회/)
     await page.getByLabel(/무엇이 궁금하신가요/).fill('사내 동호회 지원금')
-    await page.getByRole('button', { name: '규정 조회' }).click()
+    await page.getByRole('main').getByRole('button', { name: '규정 조회' }).click()
     await expect(page.getByText(/근거 조항을 찾지 못했습니다/)).toBeVisible({ timeout: 10_000 })
   })
 

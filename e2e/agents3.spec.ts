@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test'
 import { openTab, enterDomain } from './shell'
-import { AGENTS, READY_AGENTS } from '../src/entities/agent/model'
+import { READY_AGENTS } from '../src/entities/agent/model'
 
 async function openAgent(page: import('@playwright/test').Page, name: RegExp) {
   await enterDomain(page)
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name }).click()
+  await page.getByRole('main').getByRole('button', { name }).click()
 }
 
 test.describe('기준정보 표준화 · 챗봇', () => {
@@ -42,7 +42,9 @@ test.describe('기준정보 표준화 · 챗봇', () => {
   test('13종이 모두 열린다', async ({ page }) => {
     await enterDomain(page)
     await openTab(page, /^에이전트/)
-    await expect(page.getByText(`(이식 ${READY_AGENTS.length}/${AGENTS.length}종)`)).toBeVisible()
+    const main = page.getByRole('main')
+    await expect(main.getByText(String(READY_AGENTS.length), { exact: true }).first()).toBeVisible()
+    await expect(main.getByText('13종 표시')).toBeVisible()
     // 비활성 버튼이 하나도 없어야 한다
     await expect(page.getByRole('button', { disabled: true })).toHaveCount(0)
   })

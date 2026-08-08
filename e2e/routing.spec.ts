@@ -23,7 +23,7 @@ test('발주처 안에서 새로고침하면 그 자리에 남는다', async ({ 
 test('에이전트 안쪽까지 주소에 남는다', async ({ page }) => {
   await enterDomain(page)
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name: '문서 요약', exact: true }).click()
+  await page.getByRole('main').getByRole('button', { name: '문서 요약', exact: true }).click()
   await expect(page).toHaveURL(/#\/d\/manufacturing\/agents\/summary/)
 
   await page.reload()

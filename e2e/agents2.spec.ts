@@ -5,7 +5,7 @@ import { AGENTS, READY_AGENTS } from '../src/entities/agent/model'
 async function openAgent(page: import('@playwright/test').Page, name: RegExp) {
   await enterDomain(page)
   await openTab(page, /^에이전트/)
-  await page.getByRole('button', { name }).click()
+  await page.getByRole('main').getByRole('button', { name }).click()
 }
 
 test.describe('신규 에이전트 3종 (2차)', () => {
@@ -33,7 +33,7 @@ test.describe('신규 에이전트 3종 (2차)', () => {
 
   test('OCR — 못 읽은 줄과 마스킹 기록을 함께 보여준다', async ({ page }) => {
     await openAgent(page, /문서 인식/)
-    await page.getByRole('button', { name: '문서 인식' }).click()
+    await page.getByRole('main').getByRole('button', { name: '문서 인식', exact: true }).click()
     await expect(page.getByRole('region', { name: '인식 결과' })).toContainText('미만인 줄이 2개', {
       timeout: 10_000,
     })
@@ -54,6 +54,10 @@ test.describe('신규 에이전트 3종 (2차)', () => {
   test('허브 진척이 카탈로그와 일치한다', async ({ page }) => {
     await enterDomain(page)
     await openTab(page, /^에이전트/)
-    await expect(page.getByText(`(이식 ${READY_AGENTS.length}/${AGENTS.length}종)`)).toBeVisible()
+    /* 진척은 이제 수 세 개로 말한다(D-014) — 전체와 가동 중이 카탈로그와 같아야 한다 */
+    const main = page.getByRole('main')
+    await expect(main.getByText(String(AGENTS.length), { exact: true }).first()).toBeVisible()
+    await expect(main.getByText(String(READY_AGENTS.length), { exact: true }).first()).toBeVisible()
+    await expect(main.getByText('가동 중')).toBeVisible()
   })
 })
