@@ -162,13 +162,16 @@ const PORTAL: Record<string, Disposition> = {
     note: '내려받기(글자 파일)와 인쇄는 만들었다. 공문서 서식(PDF·HWP)은 서버가 만들어야 한다',
   },
 
-  /* ── 미이관 ── */
+  /* ── 모달을 화면 안으로 (미이관은 이제 없다) ── */
   'components/SelfCheckModal.jsx': { kind: '합침', to: undefined, note: '결과 옆 내보내기 전 확인으로 — 미리 적어 둔 결과가 아니라 문서를 보고 계산한다' },
   'components/ApprovalModal.jsx': { kind: '합침', to: undefined, note: '모달 대신 결과 옆에 — 고쳐야 할 것이 남으면 올릴 수 없다고 그 자리에서 말한다' },
   'components/ShiftHandoverModal.jsx': { kind: '합침', to: undefined, note: '모달 대신 셸의 현장 화면으로 — 교대 시간에 모달을 띄우면 뒤가 안 보인다' },
   'components/WorkOrderModal.jsx': { kind: '합침', to: undefined, note: '모달 대신 셸의 현장 화면으로 — 이력을 함께 보려면 자리가 필요하다' },
   'components/ScanModal.jsx': { kind: '옮김', note: '카메라·목록·직접 입력 셋을 함께 — 카메라만 두면 못 쓰는 기기가 생긴다' },
-  'components/modals/AgentBuilderModal.jsx': { kind: '미이관', note: 'P7 — 무엇을 거쳐 답했는지 사용자가 보는 화면' },
+  'components/modals/AgentBuilderModal.jsx': {
+    kind: '옮김',
+    note: '모달 대신 에이전트 화면 안 접이식 처리 단계로 — 결과를 보는 자리에서 무엇을 거쳤는지 편다. 진행률은 흉내 내지 않는다',
+  },
   'voiceInput.js': { kind: '옮김', note: '받아쓴 문장은 입력창에만 채운다. 음성이 밖으로 나갈 수 있다는 사실을 화면이 말한다' },
   'shiftHandover.js': { kind: '옮김' },
   'workOrders.js': { kind: '옮김' },

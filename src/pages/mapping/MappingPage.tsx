@@ -19,6 +19,7 @@ import {
 import { useMapping, type MappingOptions } from "@features/mapping/useMapping";
 import { formatCount } from "@shared/lib/format";
 import { AgentPageHeader } from "@widgets/agent-shell/AgentShell";
+import { AgentFlowTrail } from "@widgets/agent-flow/AgentFlowTrail";
 import { Play } from "lucide-react";
 
 const STATUS_STYLE: Record<MappingStatus, string> = {
@@ -190,6 +191,8 @@ export function MappingPage({
                 )}
             </>
           )}
+
+          <AgentFlowTrail agentId="address" />
         </div>
       </div>
     </main>

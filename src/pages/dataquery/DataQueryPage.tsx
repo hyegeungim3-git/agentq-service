@@ -1,6 +1,7 @@
 import type { QueryResult } from '@entities/dataquery/model'
 import { useDataQuery, type DataQueryOptions } from '@features/dataquery/useDataQuery'
 import { AgentPageHeader, ResultSection } from '@widgets/agent-shell/AgentShell'
+import { AgentFlowTrail } from '@widgets/agent-flow/AgentFlowTrail'
 import { Play } from 'lucide-react'
 
 /**
@@ -110,6 +111,8 @@ export function DataQueryPage({
               }
             />
           )}
+
+          <AgentFlowTrail agentId="dbquery" />
         </div>
       </div>
     </main>

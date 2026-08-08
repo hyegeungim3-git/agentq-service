@@ -1,6 +1,7 @@
 import { REGULATION_CATEGORIES, categoryLabel, isStale } from '@entities/regulation/model'
 import { useRegulation, type RegulationOptions } from '@features/regulation/useRegulation'
 import { AgentPageHeader, ResultSection } from '@widgets/agent-shell/AgentShell'
+import { AgentFlowTrail } from '@widgets/agent-flow/AgentFlowTrail'
 import { Play } from 'lucide-react'
 
 /**
@@ -148,6 +149,8 @@ export function RegulationPage({
 
             </ResultSection>
           )}
+
+          <AgentFlowTrail agentId="internalreg" />
         </div>
       </div>
     </main>

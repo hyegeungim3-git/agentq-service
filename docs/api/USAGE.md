@@ -25,7 +25,7 @@
 | `GET /apps/instances` | `fetchAppInstances` | `src/pages/admin/appinst/AppInstancePage.tsx` |
 | `PATCH /apps/instances/{id}` | `setInstanceLive` | `src/pages/admin/appinst/AppInstancePage.tsx` |
 | `GET /knowledge/pipeline-runs` | `fetchPipelineRuns` | `src/pages/admin/appinst/PipelinePage.tsx` |
-| `GET /agents/definitions` | `fetchAgentDefs` | `src/pages/admin/agentdef/FlowBuilderPage.tsx`<br>`src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/hub/HubPage.tsx` |
+| `GET /agents/definitions` | `fetchAgentDefs` | `src/pages/admin/agentdef/FlowBuilderPage.tsx`<br>`src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/hub/HubPage.tsx`<br>`src/widgets/agent-flow/AgentFlowTrail.tsx` |
 | `GET /agents/adopted` | `fetchAdoptedAgents` | `src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/hub/HubPage.tsx` |
 | `PUT /agents/definitions/{id}` | `saveAgentDef` | `src/pages/admin/agentdef/FlowBuilderPage.tsx` |
 | `GET /workflows` | `fetchWorkflows` | `src/pages/admin/agentdef/WorkflowPage.tsx` |
@@ -135,7 +135,7 @@
 | `GET /apps/domains` | `fetchDomainExposure` | `src/pages/admin/agentops/AppSurfacePage.tsx` |
 | `GET /packs` | `fetchPacks` | `src/pages/admin/packops/PackStudioPage.tsx` |
 | `POST /packs` | `createPack` | `src/pages/admin/packops/PackStudioPage.tsx` |
-| `GET /tools` | `fetchTools` | `src/pages/admin/agentdef/FlowBuilderPage.tsx`<br>`src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/admin/packops/ToolDeployPage.tsx`<br>`src/widgets/chat-panel/ChatSidePanel.tsx` |
+| `GET /tools` | `fetchTools` | `src/pages/admin/agentdef/FlowBuilderPage.tsx`<br>`src/pages/admin/agentdef/ScenarioBuilderPage.tsx`<br>`src/pages/admin/packops/ToolDeployPage.tsx`<br>`src/widgets/agent-flow/AgentFlowTrail.tsx`<br>`src/widgets/chat-panel/ChatSidePanel.tsx` |
 | `GET /deployments` | `fetchDeployments` | `src/pages/admin/packops/ToolDeployPage.tsx` |
 | `POST /deployments:promote` | `promote` | `src/pages/admin/packops/ToolDeployPage.tsx` |
 | `GET /datasets` | `fetchDatasets` | `src/pages/admin/mlops/DatasetPage.tsx`<br>`src/pages/admin/mlops/EvaluationPage.tsx`<br>`src/pages/admin/mlops/RegistryPage.tsx`<br>`src/pages/admin/mlops/TrainingPage.tsx` |

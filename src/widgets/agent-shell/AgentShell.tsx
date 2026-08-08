@@ -5,6 +5,7 @@ import { formatSize } from '@entities/document/model'
 import { acceptAttr } from '@entities/upload/model'
 import type { AgentId } from '@entities/agent/model'
 import { AGENT_ICONS, FALLBACK_AGENT_ICON } from '@shared/ui/agentIcons'
+import { AgentFlowTrail } from '@widgets/agent-flow/AgentFlowTrail'
 import type { AgentInput, RunPhase, UploadSlot } from '@features/agent-run/useAgentRun'
 
 /**
@@ -231,6 +232,10 @@ export function AgentShell<R>({
                 </button>
               </div>
             )}
+
+            {/* 이 결과가 무엇을 거쳐 나왔는지 — 결과를 받는 사람에게도 보인다.
+                접어 두는 이유는 평소에 필요한 정보가 아니어서지, 숨기려는 것이 아니다 */}
+            {agentId && <AgentFlowTrail agentId={agentId} />}
 
             {phase.kind === 'done' && result(phase.result)}
           </div>

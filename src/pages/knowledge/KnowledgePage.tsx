@@ -13,6 +13,7 @@ import {
 } from '@entities/knowledge/model'
 import { useKnowledge, type KnowledgeOptions } from '@features/knowledge/useKnowledge'
 import { AgentPageHeader, ResultSection } from '@widgets/agent-shell/AgentShell'
+import { AgentFlowTrail } from '@widgets/agent-flow/AgentFlowTrail'
 import { Play } from 'lucide-react'
 
 export function KnowledgePage({
@@ -229,6 +230,10 @@ export function KnowledgePage({
             {k.phase.kind === 'done' && <SearchResultView result={k.phase.result} baseName={baseName} referenceSpec={k.referenceSpec} />}
           </div>
         )}
+
+        <div className="mt-5">
+          <AgentFlowTrail agentId="knowledge" />
+        </div>
       </div>
     </main>
   )
