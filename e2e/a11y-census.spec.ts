@@ -1,6 +1,15 @@
 import { test, expect, type Page } from '@playwright/test'
 import { adminNav, enterDomain, openTab, walkAdminScreens } from './shell'
 
+/** 첫 화면이 두 단계가 됐다(D-014) — 스위처로 고르고 카드로 들어간다 */
+async function enterPicked(page: import('@playwright/test').Page, org: string) {
+  await page
+    .getByRole('navigation', { name: '발주처 선택' })
+    .getByRole('button', { name: org, exact: true })
+    .click()
+  await page.getByRole('button', { name: /사용자 포털 입장/ }).click()
+}
+
 /**
  * **전수를 센다.** 한 화면에서 되는 것을 보고 '전부 된다'고 적지 않기 위해서다.
  *
@@ -124,12 +133,16 @@ test.describe('전수 세기 @a11y', () => {
 
     for (const org of orgs) {
       await page.goto('./')
-      const card = page.getByRole('button', { name: new RegExp(org) })
-      if ((await card.count()) === 0 || (await card.isDisabled())) {
+      /* 첫 화면이 두 단계가 됐다(D-014) — 스위처로 고르고 카드로 들어간다 */
+      const pill = page
+        .getByRole('navigation', { name: '발주처 선택' })
+        .getByRole('button', { name: org, exact: true })
+      if ((await pill.count()) === 0 || (await pill.isDisabled())) {
         missed.push(org)
         continue
       }
-      await card.click()
+      await pill.click()
+      await page.getByRole('button', { name: /사용자 포털 입장/ }).click()
       await expect(page.getByRole('textbox').first()).toBeVisible()
       await expect(page).toHaveTitle(new RegExp(org))
       titles.push(await page.title())
@@ -201,7 +214,7 @@ test.describe('전수 세기 @a11y', () => {
 
     for (const org of orgs) {
       await page.goto('./')
-      await page.getByRole('button', { name: new RegExp(org) }).click()
+      await enterPicked(page, org)
       await expect(page.getByRole('textbox').first()).toBeVisible()
 
       /* `liveMetric`은 팩의 **필수 항목**이다(`DomainPackData`). 그러니 안 보이면
@@ -440,7 +453,7 @@ test('고른 발주처의 업무 데이터만 받는다', async ({ page }) => {
   await expect(page.getByRole('button', { name: /한빛정밀/ })).toBeVisible()
   expect(packs, '분야를 고르기도 전에 업무 데이터를 받고 있다').toEqual([])
 
-  await page.getByRole('button', { name: /한빛정밀/ }).click()
+  await page.getByRole('button', { name: /사용자 포털 입장/ }).click()
   await expect(page.getByRole('textbox').first()).toBeVisible()
   await expect(page.locator('label').filter({ hasText: '60×' })).toBeVisible({ timeout: 10_000 })
 

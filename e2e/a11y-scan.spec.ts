@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
-import { openTab, adminNav } from './shell'
+import { openTab, adminNav, enterDomain } from './shell'
+
 
 /**
  * 접근성 훑기.
@@ -193,10 +194,16 @@ test('접근성 훑기 @a11y', async ({ page }) => {
   }
 
   /* 발주처 목록이 오기 전에 훑으면 버튼 하나짜리 화면을 보게 된다 */
-  await expect(page.getByRole('button', { name: /새빛대학교병원/ })).toBeVisible()
+  await expect(
+    page.getByRole('navigation', { name: '발주처 선택' }).getByRole('button', { name: '새빛대학교병원', exact: true }),
+  ).toBeVisible()
   await scan('포털', 5)
 
-  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await page
+    .getByRole('navigation', { name: '발주처 선택' })
+    .getByRole('button', { name: '새빛대학교병원', exact: true })
+    .click()
+  await page.getByRole('button', { name: /사용자 포털 입장/ }).click()
   await expect(page.getByRole('textbox').first()).toBeVisible()
   await scan('대화', 8)
 
@@ -248,6 +255,9 @@ test('접근성 훑기 @a11y', async ({ page }) => {
 
 test('키보드만으로 대화까지 간다 @a11y', async ({ page }) => {
   await page.goto('./')
+  /* 첫 화면은 발주처 목록을 받은 뒤에 그려진다 — 기다리지 않고 Tab을 누르면
+     정지점이 아직 없어서 훑은 것이 0이 된다(빈 결과가 통과로 보이는 자리) */
+  await expect(page.getByRole('navigation', { name: '발주처 선택' })).toBeVisible()
   const trail: string[] = []
   for (let i = 0; i < 12; i += 1) {
     await page.keyboard.press('Tab')
@@ -281,10 +291,16 @@ test('다크 스킨도 대비를 지킨다 @a11y', async ({ page }) => {
   await page.addStyleTag({
     content: '*,*::before,*::after{transition:none !important;animation:none !important}',
   })
-  await expect(page.getByRole('button', { name: /새빛대학교병원/ })).toBeVisible()
+  await expect(
+    page.getByRole('navigation', { name: '발주처 선택' }).getByRole('button', { name: '새빛대학교병원', exact: true }),
+  ).toBeVisible()
 
   const { findings: portal } = await audit(page, '포털(다크)')
-  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await page
+    .getByRole('navigation', { name: '발주처 선택' })
+    .getByRole('button', { name: '새빛대학교병원', exact: true })
+    .click()
+  await page.getByRole('button', { name: /사용자 포털 입장/ }).click()
   await expect(page.getByRole('textbox').first()).toBeVisible()
   const { findings: chat } = await audit(page, '대화(다크)')
 
@@ -297,9 +313,7 @@ test('다크 스킨도 대비를 지킨다 @a11y', async ({ page }) => {
 test('모바일 터치 타깃이 44px 이상이다 @a11y', async ({ page, viewport }) => {
   /* 좁은 화면에서만 본다 — 넓은 화면의 조밀한 도구 모음까지 44px을 강요하지 않는다 */
   if ((viewport?.width ?? 0) > 500) return
-  await page.goto('./')
-  await expect(page.getByRole('button', { name: /새빛대학교병원/ })).toBeVisible()
-  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await enterDomain(page, '새빛대학교병원')
   await expect(page.getByRole('textbox').first()).toBeVisible()
 
   const small = await page.evaluate(() =>

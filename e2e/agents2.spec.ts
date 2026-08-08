@@ -1,10 +1,9 @@
 import { test, expect } from '@playwright/test'
-import { openTab } from './shell'
+import { openTab, enterDomain } from './shell'
 import { AGENTS, READY_AGENTS } from '../src/entities/agent/model'
 
 async function openAgent(page: import('@playwright/test').Page, name: RegExp) {
-  await page.goto('./')
-  await page.getByRole('button', { name: /한빛정밀/ }).click()
+  await enterDomain(page)
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name }).click()
 }
@@ -53,8 +52,7 @@ test.describe('신규 에이전트 3종 (2차)', () => {
   /* 숫자를 하드코딩하면 에이전트를 추가할 때마다 테스트를 고쳐야 한다.
      카탈로그에서 계산해 '화면과 카탈로그가 일치하는가'를 본다. */
   test('허브 진척이 카탈로그와 일치한다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await openTab(page, /^에이전트/)
     await expect(page.getByText(`(이식 ${READY_AGENTS.length}/${AGENTS.length}종)`)).toBeVisible()
   })

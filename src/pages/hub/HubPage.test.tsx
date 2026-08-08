@@ -7,8 +7,12 @@ import { noHumanCheck } from '@entities/agentdef/model'
 import { AGENT_DEFS } from '@fixtures/agentdef'
 import * as agentdefApi from '@shared/api/agentdef'
 import type { Domain } from '@entities/domain/model'
+import { DOMAIN_FIXTURES } from '@fixtures/domains'
 
+/* 화면이 안 쓰는 칸까지 손으로 채우면 스키마가 바뀔 때마다 검사가 깨진다 —
+   fixture의 진짜 발주처를 그대로 쓴다 */
 const domain: Domain = {
+  ...(DOMAIN_FIXTURES.find((d) => d.id === 'manufacturing') as Domain),
   id: 'manufacturing',
   orgName: '한빛정밀',
   orgShort: 'HBP',

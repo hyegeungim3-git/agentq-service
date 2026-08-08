@@ -5,21 +5,21 @@ test.describe('포털 · 셸', () => {
   /* 분야를 고르면 셸이 열리고 '일반' 탭(챗봇)이 먼저 보인다 */
   test('분야를 고르면 셸이 열리고 돌아올 수 있다', async ({ page }) => {
     await page.goto('./')
-    await expect(page.getByRole('heading', { name: 'AgentQ' })).toBeVisible()
+    /* 첫 화면 제목은 고른 발주처의 플랫폼 이름이다(D-014) */
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('한빛정밀')
 
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /사용자 포털 입장/ }).click()
     await expect(page.getByRole('heading', { name: '업무 챗봇' })).toBeVisible()
 
     const nav = await openSidebar(page)
     await expect(nav).toContainText('한빛정밀')
     await nav.getByRole('button', { name: '분야 선택으로' }).click()
-    await expect(page.getByRole('heading', { name: 'AgentQ' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('한빛정밀')
   })
 
   /* 탭이 실제로 화면을 바꾼다 */
   test('탭을 옮기면 본문이 바뀐다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
 
     await openTab(page, /^에이전트/)
     await expect(page.getByRole('heading', { name: '한빛정밀' })).toBeVisible()
@@ -40,8 +40,7 @@ test.describe('포털 · 셸', () => {
   })
 
   test('가로 스크롤이 없다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await expect(page.getByRole('heading', { name: '업무 챗봇' })).toBeVisible()
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -59,8 +58,7 @@ test.describe('포털 · 셸', () => {
 test.describe('셸 — 최근 대화', () => {
   /* 목록이 실제로 대화를 오갈 수 있어야 한다 */
   test('질문하면 목록에 남고, 새 대화로 갈랐다가 되돌아올 수 있다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
 
     await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
     await expect(page.getByText(/타수 50만 타/)).toBeVisible({ timeout: 10_000 })
@@ -81,8 +79,7 @@ test.describe('셸 — 최근 대화', () => {
 test.describe('셸 — 워크스페이스·공지·가이드', () => {
   /* 워크스페이스가 대화를 실제로 나누지 않으면 이름표에 불과하다 */
   test('워크스페이스를 바꾸면 대화 목록이 갈린다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
 
     await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
     await expect(page.getByText(/타수 50만 타/)).toBeVisible({ timeout: 10_000 })
@@ -101,20 +98,18 @@ test.describe('셸 — 워크스페이스·공지·가이드', () => {
 
   /* 새로고침해도 남아야 '저장'이라고 말할 수 있다 */
   test('대화가 새로고침 뒤에도 남는다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await page.getByRole('button', { name: /출장 여비 기준 알려줘/ }).click()
     await expect(page.getByText(/일 60,000원/)).toBeVisible({ timeout: 10_000 })
 
     await page.reload()
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await page.getByRole('button', { name: /사용자 포털 입장/ }).click()
     const nav = await openSidebar(page)
     await expect(nav).toContainText('출장 여비 기준 알려줘')
   })
 
   test('공지와 사용 가이드가 실제 내용을 보여준다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
 
     await openTab(page, /^공지사항/)
     await expect(page.getByRole('heading', { name: '공지사항' })).toBeVisible()
@@ -127,8 +122,7 @@ test.describe('셸 — 워크스페이스·공지·가이드', () => {
 test.describe('셸 — 알림·브리핑', () => {
   /* 눌러도 아무 데도 못 가면 읽음 처리 버튼일 뿐이다 */
   test('브리핑에서 릴레이로, 알림에서 에이전트로 이어진다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
 
     // 빈 화면 브리핑
     await expect(page.getByRole('region', { name: '오늘의 업무 브리핑' })).toContainText(
@@ -149,8 +143,7 @@ test.describe('셸 — 알림·브리핑', () => {
 test.describe('셸 — 라이브 지표·판단 근거·피드백', () => {
   /* 계기판처럼 보이는데 지어낸 숫자면 그게 제일 위험하다 */
   test('라이브 지표는 예시 값임을 먼저 말하고 배속이 동작한다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
 
     const card = page.getByRole('region', { name: 'PRS-C03 진동 RMS' })
     await expect(card).toContainText('서버 미연결 — 예시 값')
@@ -163,8 +156,7 @@ test.describe('셸 — 라이브 지표·판단 근거·피드백', () => {
   })
 
   test('판단 근거와 피드백이 답변에 붙는다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
     await expect(page.getByText(/타수 50만 타/)).toBeVisible({ timeout: 10_000 })
 
@@ -178,8 +170,7 @@ test.describe('셸 — 라이브 지표·판단 근거·피드백', () => {
   })
 
   test('사업장별 지표는 도식임을 밝히고 값 없는 곳을 지우지 않는다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await page.getByRole('button', { name: /사업장별 가동률 보여줘/ }).click()
 
     await expect(page.getByText('배치 도식 — 실제 지리 좌표 아님')).toBeVisible({ timeout: 10_000 })

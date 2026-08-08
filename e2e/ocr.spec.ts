@@ -1,9 +1,8 @@
 import { test, expect } from '@playwright/test'
-import { openTab } from './shell'
+import { openTab, enterDomain } from './shell'
 
 async function openOcr(page: import('@playwright/test').Page) {
-  await page.goto('./')
-  await page.getByRole('button', { name: /한빛정밀/ }).click()
+  await enterDomain(page)
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: /문서 인식/ }).click()
 }
@@ -11,8 +10,7 @@ async function openOcr(page: import('@playwright/test').Page) {
 test.describe('표준 보고서 설정', () => {
   /* 입력 칸이 결과에 안 들어가면 그건 장식이다 */
   test('직접 입력한 내용이 보고서에 들어가고 확인 필요에서 빠진다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await openTab(page, /^에이전트/)
     await page.getByRole('button', { name: /표준 보고서 작성/ }).click()
 
@@ -67,8 +65,7 @@ test.describe('문서 인식 설정', () => {
 
 test.describe('기준정보 표준화 — 주소 처리', () => {
   async function openMapping(page: import('@playwright/test').Page) {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await openTab(page, /^에이전트/)
     await page.getByRole('button', { name: /기준정보 표준화/ }).click()
   }
@@ -98,8 +95,7 @@ test.describe('기준정보 표준화 — 주소 처리', () => {
 test.describe('회의록 — 자료·참석자·안건', () => {
   /* 논의되지 않은 안건과 명단 밖 발언자를 드러내는 것이 회의록의 실무 가치다 */
   test('안건 논의 여부와 자료 근거가 결과에 반영된다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await openTab(page, /^에이전트/)
     await page.getByRole('button', { name: /회의록 작성/ }).click()
 
@@ -115,8 +111,7 @@ test.describe('회의록 — 자료·참석자·안건', () => {
 
 test.describe('챗봇 — FAQ·출처 원문', () => {
   test('범주로 거르고, 목록에서 바로 물어보고, 출처 원문을 펼친다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await openTab(page, /^에이전트/)
     await page.getByRole('button', { name: /업무 챗봇/ }).click()
 
@@ -137,8 +132,7 @@ test.describe('챗봇 — FAQ·출처 원문', () => {
 
   /* 목록에 있어도 근거가 없으면 없다고 말한다 */
   test('FAQ에 있어도 근거가 없으면 지어내지 않는다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await openTab(page, /^에이전트/)
     await page.getByRole('button', { name: /업무 챗봇/ }).click()
     await page.getByRole('button', { name: /기밀 기술자료는 어떻게 처리하나요/ }).click()
@@ -150,8 +144,7 @@ test.describe('챗봇 — FAQ·출처 원문', () => {
 
 test.describe('번역 — 방향·직접 입력·요약', () => {
   async function openTranslate(page: import('@playwright/test').Page) {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await openTab(page, /^에이전트/)
     await page.getByRole('button', { name: /문서 번역/ }).click()
   }
@@ -183,8 +176,7 @@ test.describe('번역 — 방향·직접 입력·요약', () => {
 test.describe('복합 업무 오케스트레이션', () => {
   /* 끝까지 갔다고 다 된 게 아니다 */
   test('릴레이가 완주하고 사람 확인 지점을 합계로 먼저 말한다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await openTab(page, /^에이전트/)
     await page.getByRole('button', { name: /수입검사 성적서 접수 처리/ }).click()
 

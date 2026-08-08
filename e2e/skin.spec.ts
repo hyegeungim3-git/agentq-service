@@ -20,8 +20,7 @@ const BRAND = {
 }
 
 test('발주처를 고르면 그 발주처 색이 화면에 실제로 칠해진다', async ({ page }) => {
-  await page.goto('./')
-  await page.getByRole('button', { name: /한빛정밀/ }).click()
+  await enterDomain(page)
 
   const nav = await openSidebar(page)
   const tab = nav.getByRole('button', { name: /^일반/ }).first()
@@ -30,17 +29,19 @@ test('발주처를 고르면 그 발주처 색이 화면에 실제로 칠해진�
 
 test('포털 카드는 발주처마다 다른 색을 쓴다', async ({ page }) => {
   await page.goto('./')
-  const chip = (org: string) =>
-    page.getByRole('button', { name: new RegExp(org) }).locator('span').first()
+  const nav = page.getByRole('navigation', { name: '발주처 선택' })
+  /* 사용자 포털 카드 위쪽 띠가 그 발주처의 색이다 — 고른 곳에 따라 바뀐다 */
+  const band = () => page.getByRole('button', { name: /사용자 포털 입장/ }).locator('span').first()
 
-  // 첫 span은 브랜드 색 띠 — 발주처마다 달라야 한다
-  await expect(chip('한빛정밀')).toHaveCSS('background-color', BRAND.한빛정밀)
-  await expect(chip('한국부동산원')).toHaveCSS('background-color', BRAND.한국부동산원)
+  await nav.getByRole('button', { name: '한빛정밀', exact: true }).click()
+  await expect(band()).toHaveCSS('background-color', BRAND.한빛정밀)
+
+  await nav.getByRole('button', { name: '한국부동산원', exact: true }).click()
+  await expect(band()).toHaveCSS('background-color', BRAND.한국부동산원)
 })
 
 test('로고와 근거 패널이 자리를 지킨다', async ({ page }) => {
-  await page.goto('./')
-  await page.getByRole('button', { name: /한빛정밀/ }).click()
+  await enterDomain(page)
 
   const nav = await openSidebar(page)
   await expect(nav.getByText('OCUBE')).toBeVisible()

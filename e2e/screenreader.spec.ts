@@ -1,6 +1,15 @@
 import { test, expect } from '@playwright/test'
 import { enterDomain, openSidebar, openTab } from './shell'
 
+/** 첫 화면이 두 단계가 됐다(D-014) — 스위처로 고르고 카드로 들어간다 */
+async function enterPicked(page: import('@playwright/test').Page, org: string) {
+  await page
+    .getByRole('navigation', { name: '발주처 선택' })
+    .getByRole('button', { name: org, exact: true })
+    .click()
+  await page.getByRole('button', { name: /사용자 포털 입장/ }).click()
+}
+
 /**
  * 화면 낭독기가 **실제로 받는 것**을 본다.
  *
@@ -35,7 +44,7 @@ const tree = async (page: import('@playwright/test').Page): Promise<Node[]> => {
 
 test('낭독기가 화면 구조를 훑을 수 있다 @a11y', async ({ page }) => {
   await page.goto('./')
-  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await enterPicked(page, '새빛대학교병원')
   await expect(page.getByRole('textbox').first()).toBeVisible()
 
   const nodes = await tree(page)
@@ -60,7 +69,7 @@ test('낭독기가 화면 구조를 훑을 수 있다 @a11y', async ({ page }) =
 
 test('같은 이름의 조작 요소가 겹치지 않는다 @a11y', async ({ page }) => {
   await page.goto('./')
-  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await enterPicked(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
   await expect(page.getByRole('button', { name: '문서 요약', exact: true })).toBeVisible()
 
@@ -79,7 +88,7 @@ test('같은 이름의 조작 요소가 겹치지 않는다 @a11y', async ({ pag
 
 test('결과가 나오면 낭독기에 알린다 @a11y', async ({ page }) => {
   await page.goto('./')
-  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await enterPicked(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '문서 요약', exact: true }).click()
 
@@ -116,10 +125,12 @@ test('결과가 나오면 낭독기에 알린다 @a11y', async ({ page }) => {
  */
 test('화면이 바뀌면 제목·알림·포커스가 함께 움직인다 @a11y', async ({ page }) => {
   await page.goto('./')
-  await expect(page.getByRole('button', { name: /새빛대학교병원/ })).toBeVisible()
+  await expect(
+    page.getByRole('navigation', { name: '발주처 선택' }).getByRole('button', { name: '새빛대학교병원', exact: true }),
+  ).toBeVisible()
   const portalTitle = await page.title()
 
-  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await enterPicked(page, '새빛대학교병원')
   await expect(page.getByRole('textbox').first()).toBeVisible()
 
   /* ① 창 제목이 바뀌고 어느 발주처인지 들어 있다 */
@@ -167,8 +178,7 @@ test('화면이 바뀌면 제목·알림·포커스가 함께 움직인다 @a11y
   expect(after.tabindex, 'tabindex="-1"이 없으면 제목은 포커스를 받을 수 없다').toBe('-1')
 
   /* 발주처가 다르면 제목도 다르다 — 소리로 구분되는지가 핵심이다 */
-  await page.goto('./')
-  await page.getByRole('button', { name: /한빛정밀/ }).click()
+  await enterDomain(page)
   await expect(page.getByRole('textbox').first()).toBeVisible()
   expect(await page.title()).toContain('한빛정밀')
 })
@@ -182,7 +192,7 @@ test('화면이 바뀌면 제목·알림·포커스가 함께 움직인다 @a11y
  */
 test('사이드바로 화면을 바꿔도 포커스가 본문으로 간다 @a11y', async ({ page }) => {
   await page.goto('./')
-  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await enterPicked(page, '새빛대학교병원')
   await expect(page.getByRole('textbox').first()).toBeVisible()
 
   await openTab(page, /^에이전트/)
@@ -208,7 +218,7 @@ test('사이드바로 화면을 바꿔도 포커스가 본문으로 간다 @a11y
  */
 test('챗봇 답변이 도착한 것을 말한다 @a11y', async ({ page }) => {
   await page.goto('./')
-  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await enterPicked(page, '새빛대학교병원')
   const status = page.locator('p[role="status"]').first()
 
   /* 자리는 물어보기 전에도 있어야 한다 — 그때 만들면 첫 변화를 놓친다 */
@@ -223,7 +233,7 @@ test('챗봇 답변이 도착한 것을 말한다 @a11y', async ({ page }) => {
 /* 릴레이가 끝났다는 것과 남은 확인 지점을 말하는가 */
 test('릴레이가 끝난 것을 말한다 @a11y', async ({ page }) => {
   await page.goto('./')
-  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await enterPicked(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: /청구 보류 건 회신 처리/ }).click()
   await page.getByRole('button', { name: '릴레이 실행' }).click()
@@ -275,7 +285,7 @@ for (const where of ['portal', 'admin'] as const) {
   test(`첫 Tab에서 본문으로 건너뛸 수 있다 — ${where} @a11y`, async ({ page }) => {
     await page.goto('./')
     if (where === 'portal') {
-      await page.getByRole('button', { name: /한빛정밀/ }).click()
+      await page.getByRole('button', { name: /사용자 포털 입장/ }).click()
       await expect(page.getByRole('textbox').first()).toBeVisible()
     } else {
       await page.getByRole('button', { name: /관리자 시스템/ }).click()

@@ -4554,14 +4554,35 @@ components:
           description: 포털 화면의 한 줄 소개
         status:
           $ref: "#/components/schemas/DomainStatus"
+        statusNote:
+          type: string
+          description: |-
+            첫 화면 상태 칩 — 이 조직에서 이 플랫폼이 어떤 조건으로 도는가.
+            
+            ⚠️ **이 값은 서버가 확인한 상태가 아니다.** 원본 데모의 문구를 그대로 쓴다(D-014). 서버가 붙으면 실제 가동 상태로 바뀐다.
+        features:
+          type: array
+          items:
+            type: string
+          description: 사용자 포털 카드에 적는 이 조직의 대표 업무 4가지
+        footer:
+          type: array
+          items:
+            type: string
+          minItems: 2
+          maxItems: 2
+          description: 첫 화면 맨 아래 두 줄 — 사업 맥락과 데이터 취급
       required:
         - brandColor
         - docPrefix
+        - features
+        - footer
         - id
         - orgName
         - orgShort
         - sector
         - status
+        - statusNote
         - tagline
         - user
     DomainExposure:

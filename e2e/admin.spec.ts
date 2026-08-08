@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test'
 /* 메뉴 여는 절차는 `shell.ts` 한 곳에 있다. 여기 복사본을 두었더니, 관리자 코드를
    따로 내려받게 되면서 '도착할 때까지 기다리기'가 필요해졌을 때 이 파일만 깨졌다 */
-import { adminNav, openTab } from './shell'
+import { adminNav, openTab, enterDomain } from './shell'
 
 async function enterAdmin(page: Page) {
   await page.goto('./')
@@ -17,7 +17,8 @@ test.describe('관리자 셸', () => {
     await enterAdmin(page)
     const nav = await adminNav(page)
     await nav.getByRole('button', { name: '포털 선택으로' }).click()
-    await expect(page.getByRole('heading', { name: 'AgentQ' })).toBeVisible()
+    /* 첫 화면 제목은 고른 발주처의 플랫폼 이름이다(D-014) */
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('AI 플랫폼')
   })
 
   /* 감추면 '이 제품에는 사용자 관리가 없다'로 읽힌다.
@@ -204,8 +205,7 @@ test.describe('관리자 셸', () => {
 
   /* 포털에서 누른 피드백이 관리자 화면으로 이어진다 */
   test('AI 품질 관리 — 포털 피드백이 집계되고 한계를 밝힌다', async ({ page }) => {
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await page.getByRole('button', { name: /금형 교체 주기가 어떻게 되나요/ }).click()
     await expect(page.getByText(/타수 50만 타/)).toBeVisible({ timeout: 10_000 })
     await page.getByRole('button', { name: '도움이 안 됐어요' }).click()
@@ -309,8 +309,7 @@ test.describe('관리자 셸', () => {
   /* 관리자가 따로 목록을 갖고 있으면 '여기서 고쳤는데 포털에 안 나오는' 상태가 생긴다 */
   test('콘텐츠 관리가 사용자 포털과 같은 공지를 보여 준다', async ({ page }) => {
     // 먼저 포털에서 공지 제목을 확인한다
-    await page.goto('./')
-    await page.getByRole('button', { name: /한빛정밀/ }).click()
+    await enterDomain(page)
     await openTab(page, /^공지사항/)
     const portalTitle = await page
       .getByRole('main')
@@ -428,8 +427,10 @@ test.describe('관리자 셸', () => {
      두 숫자를 손으로 맞춰야 했다. 지금은 **두 화면이 같은 말을 하는지**만 본다 */
   test('애플리케이션의 발주처 노출이 포털과 같은 기준이다', async ({ page }) => {
     await page.goto('./')
+    /* 첫 화면에서 고를 수 있는 발주처는 위쪽 스위처에 있다(D-014) */
     const openInPortal = await page
-      .getByRole('button', { name: /생성형 AI 플랫폼/ })
+      .getByRole('navigation', { name: '발주처 선택' })
+      .getByRole('button')
       .evaluateAll((els) => els.filter((e) => !(e as HTMLButtonElement).disabled).length)
 
     await page.getByRole('button', { name: /관리자 시스템/ }).click()
@@ -450,8 +451,10 @@ test.describe('관리자 셸', () => {
      여기서는 **팩 수가 포털과 맞는지**를 본다 — 두 화면이 갈라지지 않게. */
   test('도메인 팩 스튜디오가 포털과 같은 팩 수를 말한다', async ({ page }) => {
     await page.goto('./')
+    /* 첫 화면에서 고를 수 있는 발주처는 위쪽 스위처에 있다(D-014) */
     const openInPortal = await page
-      .getByRole('button', { name: /생성형 AI 플랫폼/ })
+      .getByRole('navigation', { name: '발주처 선택' })
+      .getByRole('button')
       .evaluateAll((els) => els.filter((e) => !(e as HTMLButtonElement).disabled).length)
 
     await page.getByRole('button', { name: /관리자 시스템/ }).click()

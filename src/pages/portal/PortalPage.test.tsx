@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { PortalPage } from './PortalPage'
 import * as api from '@shared/api/domains'
@@ -17,18 +17,31 @@ describe('PortalPage', () => {
     expect(screen.getByRole('status')).toBeInTheDocument()
   })
 
-  it('목록을 받으면 분야 라벨과 조직명을 함께 보여준다', async () => {
+  /* 발주처는 위쪽 스위처에서 고르고, 들어가는 것은 카드로 한다(D-014) */
+  it('스위처에 발주처가 모두 나오고 고른 곳의 소개가 뜬다', async () => {
     render(<PortalPage onSelect={() => {}} onAdmin={() => {}} />)
-    expect(await screen.findByText('한빛정밀')).toBeInTheDocument()
-    expect(screen.getByText('제조')).toBeInTheDocument()
-    expect(screen.getByText('한국부동산원')).toBeInTheDocument()
+    const nav = await screen.findByRole('navigation', { name: '발주처 선택' })
+    for (const d of DOMAIN_FIXTURES) {
+      expect(within(nav).getByRole('button', { name: d.orgName })).toBeInTheDocument()
+    }
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('한빛정밀')
   })
 
-  it('선택하면 도메인 id를 넘긴다', async () => {
+  it('발주처를 바꾸면 제목·소개·기능 목록이 함께 바뀐다', async () => {
+    render(<PortalPage onSelect={() => {}} onAdmin={() => {}} />)
+    const nav = await screen.findByRole('navigation', { name: '발주처 선택' })
+    await userEvent.click(within(nav).getByRole('button', { name: '한국부동산원' }))
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('한국부동산원')
+    expect(screen.getByText(/표준지공시지가 조사지침/)).toBeInTheDocument()
+  })
+
+  it('사용자 포털로 들어가면 고른 발주처 id를 넘긴다', async () => {
     const onSelect = vi.fn()
     render(<PortalPage onSelect={onSelect} onAdmin={() => {}} />)
-    await userEvent.click(await screen.findByRole('button', { name: /한빛정밀/ }))
-    expect(onSelect).toHaveBeenCalledWith('manufacturing')
+    const nav = await screen.findByRole('navigation', { name: '발주처 선택' })
+    await userEvent.click(within(nav).getByRole('button', { name: '한성시청' }))
+    await userEvent.click(screen.getByRole('button', { name: /사용자 포털 입장/ }))
+    expect(onSelect).toHaveBeenCalledWith('civic')
   })
 
   /* 업무 데이터가 없는 발주처를 열면 다른 발주처의 문서·수치가 그대로 보인다.
@@ -47,16 +60,17 @@ describe('PortalPage', () => {
   it('업무 데이터가 준비되지 않은 발주처는 선택할 수 없다', async () => {
     withPlanned()
     render(<PortalPage onSelect={() => {}} onAdmin={() => {}} />)
-    const btn = await screen.findByRole('button', { name: /준비중기관/ })
+    const btn = await screen.findByRole('button', { name: '준비중기관' })
     expect(btn).toBeDisabled()
-    expect(btn).toHaveTextContent('업무 데이터 준비 중')
   })
 
   it('준비되지 않은 발주처는 눌러도 열리지 않는다', async () => {
     withPlanned()
     const onSelect = vi.fn()
     render(<PortalPage onSelect={onSelect} onAdmin={() => {}} />)
-    await userEvent.click(await screen.findByRole('button', { name: /준비중기관/ }))
+    await userEvent.click(await screen.findByRole('button', { name: '준비중기관' }))
+    /* 눌려도 스위처가 안 바뀌므로 들어가는 곳은 그대로다 */
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('한빛정밀')
     expect(onSelect).not.toHaveBeenCalled()
   })
 
@@ -69,8 +83,9 @@ describe('PortalPage', () => {
   /* 반대편 — 지금은 전부 열려 있어야 한다 */
   it('팩이 있는 발주처는 모두 고를 수 있다', async () => {
     render(<PortalPage onSelect={() => {}} onAdmin={() => {}} />)
+    const nav = await screen.findByRole('navigation', { name: '발주처 선택' })
     for (const d of DOMAIN_FIXTURES.filter((x) => x.status === 'ready')) {
-      expect(await screen.findByRole('button', { name: new RegExp(d.orgName) })).toBeEnabled()
+      expect(within(nav).getByRole('button', { name: d.orgName })).toBeEnabled()
     }
   })
 

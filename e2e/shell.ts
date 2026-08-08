@@ -31,10 +31,17 @@ export async function openTab(page: Page, name: RegExp) {
   await nav.getByRole('button', { name }).click()
 }
 
-/** 포털에서 제조 분야로 들어간다 */
-export async function enterDomain(page: Page) {
+/**
+ * 포털에서 발주처 안으로 들어간다.
+ *
+ * 첫 화면은 두 단계다(D-014) — 위쪽 스위처에서 **발주처를 고르고**, 카드에서
+ * **역할을 고른다**. 한 번에 되던 것이 두 번이 됐으므로 여기 한 곳에서만 안다.
+ */
+export async function enterDomain(page: Page, org = '한빛정밀') {
   await page.goto('./')
-  await page.getByRole('button', { name: /한빛정밀/ }).click()
+  const nav = page.getByRole('navigation', { name: '발주처 선택' })
+  await nav.getByRole('button', { name: org, exact: true }).click()
+  await page.getByRole('button', { name: /사용자 포털 입장/ }).click()
 }
 
 /** 분야 선택 → 에이전트 탭 → 해당 에이전트 */

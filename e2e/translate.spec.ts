@@ -1,9 +1,8 @@
 import { test, expect } from '@playwright/test'
-import { openTab } from './shell'
+import { openTab, enterDomain } from './shell'
 
 async function openTranslate(page: import('@playwright/test').Page) {
-  await page.goto('./')
-  await page.getByRole('button', { name: /한빛정밀/ }).click()
+  await enterDomain(page)
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: /문서 번역/ }).click()
   await expect(page.getByRole('heading', { name: '문서 번역 에이전트' })).toBeVisible()

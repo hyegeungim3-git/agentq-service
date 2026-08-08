@@ -42,6 +42,17 @@ export type DomainSummary = {
   /** 포털 화면의 한 줄 소개 */
   tagline: string
   status: DomainStatus
+  /**
+   * 첫 화면 상태 칩 — 이 조직에서 이 플랫폼이 어떤 조건으로 도는가.
+   *
+   * ⚠️ **이 값은 서버가 확인한 상태가 아니다.** 원본 데모의 문구를 그대로 쓴다(D-014).
+   * 서버가 붙으면 실제 가동 상태로 바뀐다.
+   */
+  statusNote: string
+  /** 사용자 포털 카드에 적는 이 조직의 대표 업무 4가지 */
+  features: string[]
+  /** 첫 화면 맨 아래 두 줄 — 사업 맥락과 데이터 취급 */
+  footer: [string, string]
 }
 
 export type DomainUser = {
@@ -68,4 +79,17 @@ const SECTOR_LABEL: Record<SectorCode, string> = {
 export function sectorLabel(sector: SectorCode): string {
   return SECTOR_LABEL[sector]
 }
+
+/**
+ * 관리자 카드에 적는 것.
+ *
+ * 발주처별로 두지 않는다 — 관리자는 **플랫폼 전체**를 다루므로 어느 발주처를
+ * 골라도 같은 일을 한다. 발주처마다 다르게 적으면 그 자체가 거짓말이 된다.
+ */
+export const ADMIN_FEATURES: string[] = [
+  '대시보드 (시스템·GPU·서비스 현황)',
+  '모델 학습·배포·서빙 파이프라인 관리',
+  '에이전트 태스크플로우 빌더 & 워크플로우',
+  '사용자 관리 · 승인 · 이용 통계 · 접근 로그',
+]
 

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { openSidebar, openTab } from './shell'
+import { enterDomain, openSidebar, openTab } from './shell'
 
 /**
  * 발주처를 갈아끼우면 **내용이 실제로 바뀌는가.**
@@ -18,21 +18,19 @@ const HANBIT = ['프레스', '금형', 'PRS-C03']
    네 번째 발주처를 넣자 오탐이 났다 — 마커는 그 발주처에서만 쓰는 좁은 말로 고른다 */
 const REB = ['표준지', '공시지가', '괴리율']
 
-const enter = async (page: import('@playwright/test').Page, org: RegExp) => {
-  await page.goto('./')
-  await page.getByRole('button', { name: org }).click()
-}
+/* 첫 화면이 두 단계가 됐다(D-014) — 순회는 `shell.ts`가 안다 */
+const enter = (page: import('@playwright/test').Page, org: string) => enterDomain(page, org)
 
 const bodyText = (page: import('@playwright/test').Page) =>
   page.evaluate(() => document.body.innerText)
 
 test('발주처를 바꾸면 문서 목록이 바뀐다', async ({ page }) => {
-  await enter(page, /한빛정밀/)
+  await enter(page, '한빛정밀')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '문서 요약', exact: true }).click()
   await expect(page.getByText('프레스_작업표준서_SOP-PR-011.pdf')).toBeVisible()
 
-  await enter(page, /한국부동산원/)
+  await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '문서 요약', exact: true }).click()
   await expect(page.getByText('표준지공시지가_조사지침_2026.pdf')).toBeVisible()
@@ -40,7 +38,7 @@ test('발주처를 바꾸면 문서 목록이 바뀐다', async ({ page }) => {
 })
 
 test('공공 포털에 제조의 말이 한 글자도 없다', async ({ page }) => {
-  await enter(page, /한국부동산원/)
+  await enter(page, '한국부동산원')
   await expect(page.getByRole('heading', { name: '업무 챗봇' })).toBeVisible()
   await page.waitForTimeout(800)
 
@@ -55,7 +53,7 @@ test('공공 포털에 제조의 말이 한 글자도 없다', async ({ page }) 
 })
 
 test('제조 포털에 공공의 말이 한 글자도 없다', async ({ page }) => {
-  await enter(page, /한빛정밀/)
+  await enter(page, '한빛정밀')
   await expect(page.getByRole('heading', { name: '업무 챗봇' })).toBeVisible()
   await page.waitForTimeout(800)
 
@@ -75,7 +73,7 @@ test('제조 포털에 공공의 말이 한 글자도 없다', async ({ page }) 
  * 여기서는 지금 사실을 본다: 고를 수 있는 것이 실제로 다 열려 있는가.
  */
 test('도입한 에이전트는 모두 열려 있다', async ({ page }) => {
-  await enter(page, /한국부동산원/)
+  await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
   await expect(page.getByRole('button', { name: '문서 요약', exact: true })).toBeEnabled()
   await expect(page.getByRole('button', { name: '기준정보 표준화', exact: true })).toBeEnabled()
@@ -83,7 +81,7 @@ test('도입한 에이전트는 모두 열려 있다', async ({ page }) => {
 })
 
 test('발주처 색이 실제로 바뀐다', async ({ page }) => {
-  await enter(page, /한국부동산원/)
+  await enter(page, '한국부동산원')
   const nav = await openSidebar(page)
   await expect(nav.getByRole('button', { name: /^일반/ }).first()).toHaveCSS(
     'background-color',
@@ -97,7 +95,7 @@ test('발주처 색이 실제로 바뀐다', async ({ page }) => {
  * 목록만 바뀌고 결과가 제조 것이면 갈아끼운 게 아니다 — 옵션·결과까지 본다.
  */
 test('공공에서 문서 요약이 공공 문서로 돈다', async ({ page }) => {
-  await enter(page, /한국부동산원/)
+  await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '문서 요약', exact: true }).click()
   await page.getByRole('button', { name: '요약 생성' }).click()
@@ -108,7 +106,7 @@ test('공공에서 문서 요약이 공공 문서로 돈다', async ({ page }) =
 })
 
 test('공공 사전 검토는 공공 규정 묶음을 대조한다', async ({ page }) => {
-  await enter(page, /한국부동산원/)
+  await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '문서 사전 검토', exact: true }).click()
   // 묶음 이름도 발주처가 정한다 — '품질경영매뉴얼'은 제조 전용이었다
@@ -124,7 +122,7 @@ test('공공 사전 검토는 공공 규정 묶음을 대조한다', async ({ pa
 })
 
 test('공공 데이터 조회는 공공 소스를 쓴다', async ({ page }) => {
-  await enter(page, /한국부동산원/)
+  await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '데이터 조회', exact: true }).click()
   await expect(page.getByRole('radio', { name: '이의신청 대장' })).toBeVisible()
@@ -138,7 +136,7 @@ test('공공 데이터 조회는 공공 소스를 쓴다', async ({ page }) => {
 })
 
 test('공공 문서 인식은 공공 서식을 읽는다', async ({ page }) => {
-  await enter(page, /한국부동산원/)
+  await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '문서 인식(OCR)', exact: true }).click()
   await page.getByRole('button', { name: '문서 인식' }).click()
@@ -150,14 +148,14 @@ test('공공 문서 인식은 공공 서식을 읽는다', async ({ page }) => {
 
 /* 안 쓰는 처리 유형은 라디오에 두지 않는다 — 고를 수 있는데 아무 일도 안 하는 칸이 된다 */
 test('기준정보 표준화가 발주처마다 다른 것을 푼다', async ({ page }) => {
-  await enter(page, /한국부동산원/)
+  await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '기준정보 표준화', exact: true }).click()
   await expect(page.getByRole('radio', { name: /단일 주소/ })).toBeVisible()
   await expect(page.getByRole('radio', { name: /태그·코드 매핑/ })).toHaveCount(0)
 
   /* 병원은 주소가 아니라 청구 항목 코드를 푼다 */
-  await enter(page, /새빛대학교병원/)
+  await enter(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '기준정보 표준화', exact: true }).click()
   await expect(page.getByRole('radio', { name: /태그·코드 매핑/ })).toBeVisible()
@@ -165,7 +163,7 @@ test('기준정보 표준화가 발주처마다 다른 것을 푼다', async ({ 
 })
 
 test('공공 보고서·회의록이 공공 내용으로 나온다', async ({ page }) => {
-  await enter(page, /한국부동산원/)
+  await enter(page, '한국부동산원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '표준 보고서 작성', exact: true }).click()
   await page.getByRole('button', { name: '보고서 생성' }).click()
@@ -186,7 +184,7 @@ test('공공 보고서·회의록이 공공 내용으로 나온다', async ({ pa
 /* 세 번째 발주처 — 팩 구조가 실제로 반복 가능한지 본다 */
 
 test('행정 포털에 앞선 두 발주처의 말이 없다', async ({ page }) => {
-  await enter(page, /한성시청/)
+  await enter(page, '한성시청')
   await expect(page.getByRole('heading', { name: '업무 챗봇' })).toBeVisible()
   await page.waitForTimeout(800)
   const body = await bodyText(page)
@@ -199,11 +197,11 @@ test('행정 포털에 앞선 두 발주처의 말이 없다', async ({ page }) 
 })
 
 test('세 발주처가 서로 다른 색·문서·에이전트를 쓴다', async ({ page }) => {
-  const cases: [RegExp, string, string][] = [
-    [/한빛정밀/, 'rgb(15, 118, 110)', '프레스_작업표준서_SOP-PR-011.pdf'],
-    [/한국부동산원/, 'rgb(0, 48, 135)', '표준지공시지가_조사지침_2026.pdf'],
-    [/한성시청/, 'rgb(22, 101, 52)', '민원사무_처리지침_2026.pdf'],
-    [/새빛대학교병원/, 'rgb(124, 58, 237)', '진료비청구_심사지침_2026.pdf'],
+  const cases: [string, string, string][] = [
+    ['한빛정밀', 'rgb(15, 118, 110)', '프레스_작업표준서_SOP-PR-011.pdf'],
+    ['한국부동산원', 'rgb(0, 48, 135)', '표준지공시지가_조사지침_2026.pdf'],
+    ['한성시청', 'rgb(22, 101, 52)', '민원사무_처리지침_2026.pdf'],
+    ['새빛대학교병원', 'rgb(124, 58, 237)', '진료비청구_심사지침_2026.pdf'],
   ]
   for (const [org, color, doc] of cases) {
     await enter(page, org)
@@ -219,7 +217,7 @@ test('세 발주처가 서로 다른 색·문서·에이전트를 쓴다', async
 })
 
 test('의료 포털에 앞선 세 발주처의 말이 없다', async ({ page }) => {
-  await enter(page, /새빛대학교병원/)
+  await enter(page, '새빛대학교병원')
   await expect(page.getByRole('heading', { name: '업무 챗봇' })).toBeVisible()
   await page.waitForTimeout(800)
   const body = await bodyText(page)
@@ -231,7 +229,7 @@ test('의료 포털에 앞선 세 발주처의 말이 없다', async ({ page }) 
 })
 
 test('의료 에이전트가 의료 결과를 낸다', async ({ page }) => {
-  await enter(page, /새빛대학교병원/)
+  await enter(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '문서 사전 검토', exact: true }).click()
   await expect(page.getByText('청구 심사지침')).toBeVisible()
@@ -243,7 +241,7 @@ test('의료 에이전트가 의료 결과를 낸다', async ({ page }) => {
 })
 
 test('행정 에이전트가 행정 결과를 낸다', async ({ page }) => {
-  await enter(page, /한성시청/)
+  await enter(page, '한성시청')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '문서 사전 검토', exact: true }).click()
   await expect(page.getByText('민원사무 처리지침')).toBeVisible()
@@ -262,11 +260,11 @@ test('행정 에이전트가 행정 결과를 낸다', async ({ page }) => {
  * `설비 상태 조회`가 떠 있었다. 정의가 코어에 하나뿐이었기 때문이다.
  */
 test('허브 카드의 단계가 발주처마다 다르다', async ({ page }) => {
-  await enter(page, /한빛정밀/)
+  await enter(page, '한빛정밀')
   await openTab(page, /^에이전트/)
   await expect(page.getByText('MES 조회').first()).toBeVisible()
 
-  await enter(page, /새빛대학교병원/)
+  await enter(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
   await expect(page.getByText('점검·운영 자료 조회').first()).toBeVisible()
   for (const word of ['MES 조회', '센서 이력 결합', '설비 상태 조회']) {
@@ -289,11 +287,11 @@ const openTools = async (page: import('@playwright/test').Page) => {
 }
 
 test('연동 도구 패널이 발주처마다 다르다', async ({ page }) => {
-  await enter(page, /한빛정밀/)
+  await enter(page, '한빛정밀')
   await openTools(page)
   await expect(page.getByText('MES 조회')).toBeVisible()
 
-  await enter(page, /새빛대학교병원/)
+  await enter(page, '새빛대학교병원')
   await openTools(page)
   await expect(page.getByText('청구 자료 조회')).toBeVisible()
   await expect(page.getByText('MES 조회')).toHaveCount(0)
@@ -317,11 +315,11 @@ test('답변 근거의 지식 영역이 발주처마다 다르다', async ({ pag
   /* 좁은 화면에서는 패널이 오버레이라 화면 전체가 아니라 패널을 본다 */
   const panel = page.getByRole('complementary', { name: '답변 근거' })
 
-  await enter(page, /한빛정밀/)
+  await enter(page, '한빛정밀')
   await openAreas()
   await expect(panel).toContainText('설비 대장·정비 이력')
 
-  await enter(page, /새빛대학교병원/)
+  await enter(page, '새빛대학교병원')
   await openAreas()
   await expect(panel).toContainText('심사지침·급여 기준')
   for (const word of ['설비 대장·정비 이력', '작업표준·공정 문서', '협력사 공유 문서']) {
@@ -331,7 +329,7 @@ test('답변 근거의 지식 영역이 발주처마다 다르다', async ({ pag
 
 /* 번역은 목표 언어를 바꾸면 결과가 바뀌어야 하고, 문서도 발주처 것이어야 한다 */
 test('번역이 발주처 문서와 용어집으로 나온다', async ({ page }) => {
-  await enter(page, /새빛대학교병원/)
+  await enter(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: '문서 번역', exact: true }).click()
   await page.getByRole('button', { name: '번역 실행' }).click()
@@ -352,7 +350,7 @@ test('번역이 발주처 문서와 용어집으로 나온다', async ({ page })
  * 그리지 못했다. 병원은 2단계가 아예 다르다 — 주소가 아니라 청구 항목 코드다.
  */
 test('릴레이가 발주처마다 자기 이야기로 완주한다', async ({ page }) => {
-  await enter(page, /새빛대학교병원/)
+  await enter(page, '새빛대학교병원')
   await openTab(page, /^에이전트/)
   await page.getByRole('button', { name: /청구 보류 건 회신 처리/ }).click()
 

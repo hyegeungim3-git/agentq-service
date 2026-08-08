@@ -2,6 +2,15 @@ import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import { openTab, adminNav } from './shell'
 
+/** 첫 화면이 두 단계가 됐다(D-014) — 스위처로 고르고 카드로 들어간다 */
+async function enterPicked(page: import('@playwright/test').Page, org: string) {
+  await page
+    .getByRole('navigation', { name: '발주처 선택' })
+    .getByRole('button', { name: org, exact: true })
+    .click()
+  await page.getByRole('button', { name: /사용자 포털 입장/ }).click()
+}
+
 /**
  * 규칙 엔진(axe) 검사.
  *
@@ -48,10 +57,12 @@ test('규칙 엔진이 아는 위반이 없다 — 사용자 포털 @a11y', asyn
   const all: Violation[] = []
 
   await page.goto('./')
-  await expect(page.getByRole('button', { name: /새빛대학교병원/ })).toBeVisible()
+  await expect(
+    page.getByRole('navigation', { name: '발주처 선택' }).getByRole('button', { name: '새빛대학교병원', exact: true }),
+  ).toBeVisible()
   all.push(...(await scan(page, '포털')))
 
-  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await enterPicked(page, '새빛대학교병원')
   await expect(page.getByRole('textbox').first()).toBeVisible()
   all.push(...(await scan(page, '대화')))
 
@@ -116,10 +127,12 @@ test('규칙 엔진이 아는 위반이 없다 — 관리자 @a11y', async ({ pa
 test('다크 스킨도 규칙 엔진을 통과한다 @a11y', async ({ page }) => {
   await page.goto('./')
   await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'))
-  await expect(page.getByRole('button', { name: /새빛대학교병원/ })).toBeVisible()
+  await expect(
+    page.getByRole('navigation', { name: '발주처 선택' }).getByRole('button', { name: '새빛대학교병원', exact: true }),
+  ).toBeVisible()
   const portal = await scan(page, '포털(다크)')
 
-  await page.getByRole('button', { name: /새빛대학교병원/ }).click()
+  await enterPicked(page, '새빛대학교병원')
   await expect(page.getByRole('textbox').first()).toBeVisible()
   const chat = await scan(page, '대화(다크)')
 
