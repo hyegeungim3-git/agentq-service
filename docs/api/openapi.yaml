@@ -2129,6 +2129,72 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiError"
+  /safety/duties:
+    get:
+      operationId: fetchSafetyDuties
+      summary: "**증빙 갱신 시각과 조직이 정한 갱신 주기를 함께** — 이행 여부만 오면 화면은 한 번 초록색이 된 항목을 영원히 초록색으로 그린다"
+      description: → `SafetyDuty[]` (`entities/safetyact/model.ts`). **증빙 갱신 시각(`evidenceAt`)과 조직이 정한 갱신 주기(`cycleDays`)를 함께** — 이행 여부만 오면 화면은 한 번 초록색이 된 항목을 영원히 초록색으로 그린다
+      tags:
+        - safety
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SafetyDuty"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /safety/risk-assessments:
+    get:
+      operationId: fetchRiskAssessments
+      summary: 찾은 위험요인 수와 **조치가 끝난 수를 따로** — 평가를 한 것과 위험이 없어진 것은 다르다
+      description: → `RiskAssessment[]`. 찾은 위험요인 수와 **조치가 끝난 수를 따로** — 평가를 한 것과 위험이 없어진 것은 다르다
+      tags:
+        - safety
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RiskAssessment"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /safety/trainings:
+    get:
+      operationId: fetchSafetyTrainings
+      summary: 이수율이 아니라 **대상 인원과 이수 인원** — 비율만 오면 남은 사람 수를 말할 수 없다
+      description: → `SafetyTraining[]`. 이수율이 아니라 **대상 인원과 이수 인원** — 비율만 오면 남은 사람 수를 말할 수 없다
+      tags:
+        - safety
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SafetyTraining"
+        default:
+          description: 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
   /knowledge/areas:
     get:
       operationId: fetchAreas
@@ -3910,6 +3976,24 @@ components:
         - oversight
         - record
       description: 제34조 5개 책무
+    DutyStatus:
+      type: string
+      enum:
+        - met
+        - attention
+        - unmet
+      description: |-
+        중대재해처벌법 대응 (관리자 화면).
+        
+        ⚠️ `entities/safety`와 **다른 것**이다. 저기는 사용자 포털의 안전관리계획 수립 에이전트가 쓰는 위험요인·대책 모델이고, 여기는 관리자의 법 이행 기록이다. 이름이 비슷해 덮어쓸 뻔했다 — 실제로 한 번 덮었다(2026-08-08).
+        
+        ⚠️ **이 화면도 법적 판단을 내리지 않는다.** 의무를 이행했는지는 사업주·경영책임자가 판단하고 필요하면 노동관서에 확인한다. 화면은 그 판단과 **증빙이 어디 있는지**를 기록할 뿐이다. AI 기본법 대응과 같은 규율이다.
+        
+        이 화면의 핵심은 이행률 숫자가 아니다. **증빙이 살아 있는가**다. 한 번 '이행'으로 적어 두면 그 표시는 영원히 이행으로 남는다 — 반기 평가를 안 해도, 수급업체 평가를 건너뛰어도 표에는 초록색이 그대로다. 그래서 기준 시점을 받아 **증빙이 낡은 것**을 따로 센다.
+        
+        낡음 판정은 **호마다 다른 주기**로 한다. 경영방침 공표는 연 1회, 책임자 평가는 반기 1회, 위험성평가는 상시다. 한 숫자로 다 재면 연 1회짜리가 7개월 만에 빨간색이 되고, 그러면 아무도 그 경고를 안 본다.
+        
+        자동 축적과 수기를 나누는 이유도 같다. 위험성평가·의견 청취처럼 플랫폼이 돌면서 쌓이는 것은 안 낡는다. 수기 증빙은 **아무도 안 올리면 조용히 낡는다.**
     EvalResult:
       type: object
       properties:
@@ -5903,6 +5987,74 @@ components:
         - accurate
         - needsFix
         - hallucination
+    RiskAssessment:
+      type: object
+      properties:
+        id:
+          type: string
+        task:
+          type: string
+        docNo:
+          type: string
+        assessedOn:
+          type: string
+        by:
+          type: string
+        risks:
+          type: number
+          description: 찾은 위험요인 수
+        actionsDone:
+          type: number
+          description: 그중 조치가 끝난 수
+      required:
+        - id
+        - task
+        - docNo
+        - assessedOn
+        - by
+        - risks
+        - actionsDone
+      additionalProperties: false
+    SafetyDuty:
+      type: object
+      properties:
+        id:
+          type: string
+        clause:
+          type: string
+          description: 시행령 제4조 각 호
+        name:
+          type: string
+        status:
+          $ref: "#/components/schemas/DutyStatus"
+        evidence:
+          type: string
+          description: 무엇으로 이행을 보이는가
+        evidenceAt:
+          type: string
+          description: 그 증빙이 마지막으로 갱신된 날
+        owner:
+          type: string
+        cycleDays:
+          type: number
+          description: |-
+            이 증빙을 며칠마다 갱신하기로 했는가.
+            
+            ⚠️ **법이 정한 주기가 아니라 조직이 정한 주기다.** 화면이 법정 주기를 아는 척하면 그 숫자를 근거로 감사에 답하게 된다. 서버가 붙으면 조직 규정에서 온다.
+        auto:
+          type: boolean
+          description: 플랫폼이 돌면서 자동으로 쌓이는 증빙인가
+      required:
+        - id
+        - clause
+        - name
+        - status
+        - evidence
+        - evidenceAt
+        - owner
+        - cycleDays
+        - auto
+      additionalProperties: false
     SafetyPlan:
       type: object
       properties:
@@ -5939,6 +6091,29 @@ components:
       required:
         - documentId
         - crewSize
+      additionalProperties: false
+    SafetyTraining:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        target:
+          type: string
+        done:
+          type: number
+        total:
+          type: number
+        heldOn:
+          type: string
+      required:
+        - id
+        - name
+        - target
+        - done
+        - total
+        - heldOn
       additionalProperties: false
     SatisfactionSurvey:
       type: object

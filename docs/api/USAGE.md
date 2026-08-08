@@ -63,7 +63,7 @@
 | `GET /users` | `fetchUsers` | `src/pages/admin/users/QuotaPage.tsx`<br>`src/pages/admin/users/UserListPage.tsx` |
 | `PATCH /users/{id}` | `updateUserState` | `src/pages/admin/users/UserListPage.tsx` |
 | `GET /approvals` | `fetchApprovals` | `src/pages/admin/users/ApprovalPage.tsx` |
-| `GET /meta/as-of` | `fetchAsOf` | `src/pages/admin/users/ApprovalPage.tsx`<br>`src/pages/admin/users/BlockRulePage.tsx` |
+| `GET /meta/as-of` | `fetchAsOf` | `src/pages/admin/compliance/SafetyActPage.tsx`<br>`src/pages/admin/users/ApprovalPage.tsx`<br>`src/pages/admin/users/BlockRulePage.tsx` |
 | `POST /approvals/{id}:decide` | `decideApproval` | `src/pages/admin/users/ApprovalPage.tsx` |
 | `GET /audit/access` | `fetchAccessLogs` | `src/pages/admin/users/AccessLogPage.tsx` |
 | `GET /audit/coverage` | `fetchLogGaps` | `src/pages/admin/users/AccessLogPage.tsx` |
@@ -98,6 +98,9 @@
 | `GET /compliance/systems` | `fetchAiSystems` | `src/pages/admin/compliance/AiActPage.tsx` |
 | `GET /compliance/labeling` | `fetchLabelRules` | `src/pages/admin/compliance/AiActPage.tsx` |
 | `GET /compliance/assessments` | `fetchAssessments` | `src/pages/admin/compliance/AiActPage.tsx` |
+| `GET /safety/duties` | `fetchSafetyDuties` | `src/pages/admin/compliance/SafetyActPage.tsx` |
+| `GET /safety/risk-assessments` | `fetchRiskAssessments` | `src/pages/admin/compliance/SafetyActPage.tsx` |
+| `GET /safety/trainings` | `fetchSafetyTrainings` | `src/pages/admin/compliance/SafetyActPage.tsx` |
 | `GET /knowledge/areas` | `fetchAreas` | `src/pages/admin/agentops/AgentOpsPage.tsx`<br>`src/pages/admin/datainfra/IngestPage.tsx`<br>`src/pages/admin/datainfra/VectorDbPage.tsx`<br>`src/pages/admin/knowledge/KnowledgeBasePage.tsx`<br>`src/widgets/chat-panel/ChatSidePanel.tsx` |
 | `GET /knowledge/index` | `fetchIndexEntries` | `src/pages/admin/knowledge/KnowledgeBasePage.tsx` |
 | `GET /knowledge/rag-config` | `fetchRagConfig` | `src/pages/admin/knowledge/KnowledgeBasePage.tsx` |

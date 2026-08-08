@@ -76,7 +76,7 @@ const PLAN: Record<string, Disposition> = {
   'guardrail.log': { kind: '옮김', to: 'guardrail' },
   'security.arch': { kind: '미이관', note: 'P6 — 망 경계를 넘는 흐름과 통제' },
   aiact: { kind: '옮김', to: 'aiact' },
-  safetyact: { kind: '미이관', note: 'P6 — 중대재해처벌법 시행령 제4조 의무별 이행·증빙' },
+  safetyact: { kind: '옮김', to: 'safetyact' },
   repro: { kind: '미이관', note: 'P6 — 과거 답변을 그때 구성으로 재현' },
   packstudio: { kind: '옮김', to: 'packstudio' },
   'deploy.tools.mcp': { kind: '합침', to: 'deploy', note: '도구 등록과 배포를 한 화면에서 봐야 무엇이 안 나갔는지 보인다' },

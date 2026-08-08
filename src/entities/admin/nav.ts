@@ -15,8 +15,9 @@
 
 export type AdminSection = '대시보드' | '인프라 · 개발' | 'AI 서비스' | '지식 · RAG' | '운영 · 관리'
 
-/* P5 = 전체 재검수(2026-08-03)에서 뒤늦게 찾은 하위 메뉴들 — SCOPE-PLAN §6 */
-export type AdminPhase = 'P1' | 'P2' | 'P3' | 'P4' | 'P5'
+/* P5 = 전체 재검수(2026-08-03)에서 뒤늦게 찾은 하위 메뉴들 — SCOPE-PLAN §6
+   P6 = 이전 데모 전수 대조(2026-08-08)에서 나온 미이관 — PARITY-AUDIT.md */
+export type AdminPhase = 'P1' | 'P2' | 'P3' | 'P4' | 'P5' | 'P6'
 
 export type AdminMenu = {
   id: string
@@ -93,6 +94,7 @@ export const ADMIN_MENUS: AdminMenu[] = [
 
   { id: 'guardrail', label: '가드레일', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '규칙에 걸린 실제 기록 — 규칙 설정은 신뢰성 관리' },
   { id: 'aiact', label: 'AI 기본법 대응', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '고영향 AI 관리·생성물 표시·영향평가' },
+  { id: 'safetyact', label: '중대재해처벌법 대응', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P6', summary: '시행령 제4조 9개 호의 이행 상태와 증빙' },
   { id: 'packstudio', label: '도메인 팩 스튜디오', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '발주처별 업무 데이터 — 채워져야 포털에서 고를 수 있다' },
   { id: 'deploy', label: '도구 · 배포', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '에이전트가 부르는 도구와 떠 있는 버전' },
   { id: 'agents', label: '에이전트', section: 'AI 서비스', parentId: null, status: 'ready', phase: 'P3', summary: '에이전트 운영·정의·시나리오' },

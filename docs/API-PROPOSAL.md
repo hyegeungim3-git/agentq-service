@@ -154,6 +154,9 @@ HTTP에 그 봉투를 강요하지 않는다. 변환은 `shared/api` 안에서 �
 | `GET /compliance/systems` | `fetchAiSystems` | → `AiSystem[]`. 판정에는 근거(`reason`)와 운영 여부(`inService`)를 함께 |
 | `GET /compliance/labeling` | `fetchLabelRules` | → `LabelRule[]` |
 | `GET /compliance/assessments` | `fetchAssessments` | → `Assessment[]`. 안 끝난 것은 무엇이 남았는지(`remaining`) |
+| `GET /safety/duties` | `fetchSafetyDuties` | → `SafetyDuty[]` (`entities/safetyact/model.ts`). **증빙 갱신 시각(`evidenceAt`)과 조직이 정한 갱신 주기(`cycleDays`)를 함께** — 이행 여부만 오면 화면은 한 번 초록색이 된 항목을 영원히 초록색으로 그린다 |
+| `GET /safety/risk-assessments` | `fetchRiskAssessments` | → `RiskAssessment[]`. 찾은 위험요인 수와 **조치가 끝난 수를 따로** — 평가를 한 것과 위험이 없어진 것은 다르다 |
+| `GET /safety/trainings` | `fetchSafetyTrainings` | → `SafetyTraining[]`. 이수율이 아니라 **대상 인원과 이수 인원** — 비율만 오면 남은 사람 수를 말할 수 없다 |
 | `GET /knowledge/areas` | `fetchAreas` | → `KnowledgeArea[]` (`entities/knowledgebase/model.ts`). **등록 수와 검색 가능 수를 따로** — 하나만 오면 '못 찾는 문서'를 그릴 수 없다 |
 | `GET /knowledge/index?area=` | `fetchIndexEntries` | → `IndexEntry[]`. 색인 안 된 문서는 사유(`reason`) 필수 |
 | `GET /knowledge/rag-config` | `fetchRagConfig` | → `RagConfig`. 재색인 진행률(`reindexedRatio`)을 함께 |
