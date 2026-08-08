@@ -30,8 +30,11 @@ test.describe('데이터 조회·분석', () => {
     await openAgent(page, /데이터 분석/)
     await page.getByRole('button', { name: '분석 실행' }).click()
     await expect(page.getByRole('table', { name: '추이 분석 데이터' })).toBeVisible({ timeout: 10_000 })
-    // 지연 로딩된 차트가 실제로 그려졌는지 — SVG 존재로 판정
-    await expect(page.locator('svg.recharts-surface').first()).toBeVisible({ timeout: 10_000 })
+    /* 지연 로딩된 차트가 실제로 그려졌는지. 차트는 aria-hidden이라 역할로는 못 찾고,
+       라이브러리 클래스명에 기대면 그리는 방법을 바꿀 때마다 깨진다 —
+       **그림 자체**(figure 안의 꺾은선)가 있는지로 판정한다 */
+    const plot = page.locator('figure[aria-hidden="true"] polyline')
+    await expect(plot.first()).toBeAttached({ timeout: 10_000 })
   })
 
   test('분석 — 부분 결론임을 알린다', async ({ page }) => {
