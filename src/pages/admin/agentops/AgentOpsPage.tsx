@@ -7,6 +7,7 @@ import { fetchAreas } from '@shared/api/knowledgebase'
 import { fetchDomains } from '@shared/api/domains'
 import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 에이전트 운영.
@@ -131,8 +132,7 @@ export function AgentOpsPage() {
                 </div>
               )}
 
-              <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                <table className="w-full min-w-[52rem] text-left text-xs">
+              <AdminTable label="에이전트 운영 현황" minW="min-w-[52rem]" wrap="mt-4">
                   <thead className="bg-slate-50 text-[11px] text-slate-500">
                     <tr>
                       <th scope="col" className="px-3 py-2">에이전트</th>
@@ -145,6 +145,9 @@ export function AgentOpsPage() {
                     </tr>
                   </thead>
                   <tbody>
+                    {ops.data.length === 0 && (
+                      <EmptyRow cols={6}>운영 중인 에이전트가 없습니다.</EmptyRow>
+                    )}
                     {/* 실패율이 높은 순 — 이름순으로 두면 문제를 찾아 훑어야 한다 */}
                     {byFailure(ops.data).map((o) => {
                       const def = AGENTS.find((a) => a.id === o.agentId)
@@ -193,8 +196,7 @@ export function AgentOpsPage() {
                       )
                     })}
                   </tbody>
-                </table>
-              </div>
+                </AdminTable>
 
               <p className="mt-4 max-w-3xl text-xs text-slate-500">
                 에이전트가 무엇을 하도록 정해 놓았는지(단계·능력·사람 확인 지점)는{' '}

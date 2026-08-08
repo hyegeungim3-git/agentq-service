@@ -9,6 +9,7 @@ import {
 } from '@entities/user/model'
 import { fetchUsers, updateUserState, type UserFilter } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 사용자 목록.
@@ -118,8 +119,7 @@ export function UserListPage() {
       {state.kind === 'ready' && state.data.length > 0 && (
         <>
           <p className="mt-4 text-xs text-slate-600">{state.data.length}명</p>
-          <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-            <table className="w-full min-w-[46rem] text-left text-xs">
+          <AdminTable label="사용자 목록" minW="min-w-[46rem]">
               <thead className="bg-slate-50 text-[11px] text-slate-500">
                 <tr>
                   <th scope="col" className="px-3 py-2">이름</th>
@@ -132,6 +132,9 @@ export function UserListPage() {
                 </tr>
               </thead>
               <tbody>
+            {state.data.length === 0 && (
+              <EmptyRow cols={7}>표시할 사용자 목록이(가) 없습니다.</EmptyRow>
+            )}
                 {state.data.map((u) => (
                   <tr key={u.id} className="border-t border-slate-100">
                     <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{u.name}</th>
@@ -159,8 +162,7 @@ export function UserListPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+            </AdminTable>
         </>
       )}
 

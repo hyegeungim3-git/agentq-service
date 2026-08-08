@@ -8,6 +8,7 @@ import { fetchCollections } from '@shared/api/datainfra'
 import { fetchAreas } from '@shared/api/knowledgebase'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 벡터 DB.
@@ -112,8 +113,7 @@ export function VectorDbPage() {
                 </div>
               </dl>
 
-              <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                <table className="w-full min-w-[50rem] text-left text-xs">
+              <AdminTable label="벡터 컬렉션" minW="min-w-[50rem]" wrap="mt-4">
                   <thead className="bg-slate-50 text-[11px] text-slate-500">
                     <tr>
                       <th scope="col" className="px-3 py-2">컬렉션</th>
@@ -126,6 +126,9 @@ export function VectorDbPage() {
                     </tr>
                   </thead>
                   <tbody>
+            {state.data.length === 0 && (
+              <EmptyRow cols={7}>표시할 벡터 컬렉션이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+            )}
                     {state.data.map((c) => (
                       <tr key={c.id} className="border-t border-slate-100">
                         <th scope="row" className="px-3 py-2 font-mono text-[11px] font-bold text-slate-800 text-left">
@@ -170,8 +173,7 @@ export function VectorDbPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
-              </div>
+                </AdminTable>
             </>
           )
         })()}

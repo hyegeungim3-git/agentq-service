@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { fetchAccessLogs, fetchLogGaps, type LogFilter } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 접근 로그.
@@ -70,8 +71,7 @@ export function AccessLogPage() {
                   <span className="ml-1 font-bold text-rose-700">· 거부 {denied.length}건</span>
                 )}
               </p>
-              <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                <table className="w-full min-w-[48rem] text-left text-xs">
+              <AdminTable label="접근 로그" minW="min-w-[48rem]">
                   <thead className="bg-slate-50 text-[11px] text-slate-500">
                     <tr>
                       <th scope="col" className="px-3 py-2">시각</th>
@@ -83,6 +83,9 @@ export function AccessLogPage() {
                     </tr>
                   </thead>
                   <tbody>
+                    {denied.length + ok.length === 0 && (
+                      <EmptyRow cols={6}>이 조건에 맞는 접근 기록이 없습니다.</EmptyRow>
+                    )}
                     {/* 거부를 위로 — 막힌 시도가 정상 접근 사이에 묻히면 안 된다 */}
                     {[...denied, ...ok].map((l) => (
                       <tr key={l.id} className="border-t border-slate-100">
@@ -113,8 +116,7 @@ export function AccessLogPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
-              </div>
+                </AdminTable>
             </>
           )
         })()}

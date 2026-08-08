@@ -6,6 +6,7 @@ import {
 import { fetchBenchmarkRuns, fetchBenchmarks } from '@shared/api/datainfra'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 평가 지표 (벤치마크).
@@ -89,8 +90,7 @@ export function BenchmarkPage() {
             <h2 id="runs" className="text-sm font-black text-slate-900">
               평가 실행 기록
             </h2>
-            <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-              <table className="w-full min-w-[48rem] text-left text-xs">
+            <AdminTable label="모델 평가 실행 결과" minW="min-w-[48rem]">
                 <thead className="bg-slate-50 text-[11px] text-slate-500">
                   <tr>
                     <th scope="col" className="px-3 py-2">실행</th>
@@ -103,6 +103,9 @@ export function BenchmarkPage() {
                   </tr>
                 </thead>
                 <tbody>
+            {runs.data.length === 0 && (
+              <EmptyRow cols={7}>표시할 모델 평가 실행 결과이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+            )}
                   {runs.data.map((r) => {
                     const b = benchmarks.data.find((x) => x.id === r.benchmarkId)
                     return (
@@ -144,8 +147,7 @@ export function BenchmarkPage() {
                     )
                   })}
                 </tbody>
-              </table>
-            </div>
+              </AdminTable>
           </section>
 
           <p className="mt-4 max-w-3xl text-xs text-slate-500">

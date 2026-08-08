@@ -1,6 +1,7 @@
 import { OUTCOME_LABEL, disputed, passedThrough, type BlockOutcome } from '@entities/compliance/model'
 import { fetchGuardrailHits } from '@shared/api/compliance'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 가드레일 — 실제로 무엇이 걸렸는지.
@@ -85,8 +86,7 @@ export function GuardrailPage() {
                 </p>
               )}
 
-              <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                <table className="w-full min-w-[48rem] text-left text-xs">
+              <AdminTable label="가드레일 차단 이력" minW="min-w-[48rem]" wrap="mt-4">
                   <thead className="bg-slate-50 text-[11px] text-slate-500">
                     <tr>
                       <th scope="col" className="px-3 py-2">시각</th>
@@ -98,6 +98,9 @@ export function GuardrailPage() {
                     </tr>
                   </thead>
                   <tbody>
+                    {passed.length + stopped.length === 0 && (
+                      <EmptyRow cols={6}>가드레일이 걸러 낸 것이 없습니다.</EmptyRow>
+                    )}
                     {/* 경고만 한 것을 위로 — 놓치면 안 되는 쪽이다 */}
                     {[...passed, ...stopped].map((h) => (
                       <tr key={h.id} className={`border-t border-slate-100 ${h.outcome === 'warned' ? 'bg-amber-50' : ''}`}>
@@ -122,8 +125,7 @@ export function GuardrailPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
-              </div>
+                </AdminTable>
 
               <p className="mt-4 max-w-3xl text-xs text-slate-500">
                 걸린 내용의 원문은 남기지 않습니다. 개인정보를 가리려고 만든 규칙의 이력에 그

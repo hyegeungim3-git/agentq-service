@@ -9,6 +9,7 @@ import {
 } from '@entities/augment/model'
 import { fetchCacheEntries, fetchRoutes, fetchStrategies, reloadCacheEntry } from '@shared/api/augment'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 지식 증강 전략.
@@ -186,13 +187,7 @@ export function AugmentPage() {
       {cache.kind === 'ready' && (
         <>
           <h2 className="mt-5 text-sm font-black text-slate-900">캐시에 올려 둔 문서</h2>
-          <div
-            className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white"
-            role="region"
-            aria-label="표 — 가로로 스크롤됩니다"
-            tabIndex={0}
-          >
-            <table className="w-full min-w-[46rem] text-left text-xs">
+          <AdminTable label="캐시에 올려 둔 문서" minW="min-w-[46rem]">
               <thead className="bg-slate-50 text-[11px] text-slate-500">
                 <tr>
                   <th scope="col" className="px-3 py-2">문서</th>
@@ -204,6 +199,9 @@ export function AugmentPage() {
                 </tr>
               </thead>
               <tbody>
+            {cache.data.length === 0 && (
+              <EmptyRow cols={6}>표시할 캐시에 올려 둔 문서이(가) 없습니다.</EmptyRow>
+            )}
                 {cache.data.map((c) => {
                   const stale = c.loadedRev !== c.currentRev
                   return (
@@ -223,8 +221,7 @@ export function AugmentPage() {
                   )
                 })}
               </tbody>
-            </table>
-          </div>
+            </AdminTable>
         </>
       )}
     </main>

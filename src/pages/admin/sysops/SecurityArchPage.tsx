@@ -11,6 +11,7 @@ import {
 import { fetchBoundaryRules, fetchDataFlows, fetchExternalAccess } from '@shared/api/secarch'
 import { fetchAsOf } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 보안 아키텍처.
@@ -93,13 +94,7 @@ export function SecurityArchPage() {
           })()}
 
           <h2 className="mt-5 text-sm font-black text-slate-900">데이터 흐름</h2>
-          <div
-            className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white"
-            role="region"
-            aria-label="표 — 가로로 스크롤됩니다"
-            tabIndex={0}
-          >
-            <table className="w-full min-w-[52rem] text-left text-xs">
+          <AdminTable label="데이터 흐름" minW="min-w-[52rem]">
               <thead className="bg-slate-50 text-[11px] text-slate-500">
                 <tr>
                   <th scope="col" className="px-3 py-2">흐름</th>
@@ -111,6 +106,9 @@ export function SecurityArchPage() {
                 </tr>
               </thead>
               <tbody>
+            {flows.data.length === 0 && (
+              <EmptyRow cols={6}>표시할 데이터 흐름이(가) 없습니다.</EmptyRow>
+            )}
                 {flows.data.map((f) => (
                   <tr key={f.id} className="border-t border-slate-100">
                     <th scope="row" className="px-3 py-2 text-left font-bold text-slate-900">
@@ -134,21 +132,14 @@ export function SecurityArchPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+            </AdminTable>
 
           <h2 className="mt-5 text-sm font-black text-slate-900">등급별 경계 정책</h2>
           <p className="mt-1 max-w-3xl text-xs text-slate-600">
             <b>이 표는 정책이지 실제 통제가 아닙니다.</b> '차단'이라고 적혀 있다는 것은 그렇게
             막기로 정했다는 뜻이며, 지금 실제로 막고 있는지는 게이트웨이가 답해야 합니다.
           </p>
-          <div
-            className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white"
-            role="region"
-            aria-label="표 — 가로로 스크롤됩니다"
-            tabIndex={0}
-          >
-            <table className="w-full min-w-[40rem] text-left text-xs">
+          <AdminTable label="등급별 경계 정책" minW="min-w-[40rem]">
               <thead className="bg-slate-50 text-[11px] text-slate-500">
                 <tr>
                   <th scope="col" className="px-3 py-2">등급</th>
@@ -159,6 +150,9 @@ export function SecurityArchPage() {
                 </tr>
               </thead>
               <tbody>
+            {rules.data.length === 0 && (
+              <EmptyRow cols={5}>표시할 등급별 경계 정책이(가) 없습니다.</EmptyRow>
+            )}
                 {rules.data.map((r) => (
                   <tr key={r.grade} className="border-t border-slate-100">
                     <th scope="row" className="px-3 py-2 text-left font-bold text-slate-900">
@@ -175,8 +169,7 @@ export function SecurityArchPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+            </AdminTable>
         </>
       )}
 
@@ -200,13 +193,7 @@ export function SecurityArchPage() {
                     {noMfa.map((a) => a.org).join(' · ')}. 비밀번호 하나가 뚫리면 그대로 들어옵니다.
                   </p>
                 )}
-                <div
-                  className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white"
-                  role="region"
-                  aria-label="표 — 가로로 스크롤됩니다"
-                  tabIndex={0}
-                >
-                  <table className="w-full min-w-[44rem] text-left text-xs">
+                <AdminTable label="외부 조직 접근 권한" minW="min-w-[44rem]">
                     <thead className="bg-slate-50 text-[11px] text-slate-500">
                       <tr>
                         <th scope="col" className="px-3 py-2">조직</th>
@@ -218,6 +205,9 @@ export function SecurityArchPage() {
                       </tr>
                     </thead>
                     <tbody>
+            {access.data.length === 0 && (
+              <EmptyRow cols={6}>표시할 외부 조직 접근 권한이(가) 없습니다.</EmptyRow>
+            )}
                       {access.data.map((a) => {
                         const over = a.expiresOn < asOf.data
                         return (
@@ -245,8 +235,7 @@ export function SecurityArchPage() {
                         )
                       })}
                     </tbody>
-                  </table>
-                </div>
+                  </AdminTable>
               </>
             )
           })()}

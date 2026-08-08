@@ -7,6 +7,7 @@ import {
 } from '@entities/analytics/model'
 import { fetchUsageEntries } from '@shared/api/analytics'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 이용 이력.
@@ -102,8 +103,7 @@ export function UsageHistoryPage() {
                 </div>
               </dl>
 
-              <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                <table className="w-full min-w-[44rem] text-left text-xs">
+              <AdminTable label="이용 이력" minW="min-w-[44rem]" wrap="mt-4">
                   <thead className="bg-slate-50 text-[11px] text-slate-500">
                     <tr>
                       <th scope="col" className="px-3 py-2">시각</th>
@@ -115,6 +115,9 @@ export function UsageHistoryPage() {
                     </tr>
                   </thead>
                   <tbody>
+                    {state.data.length === 0 && (
+                      <EmptyRow cols={6}>이 조건에 맞는 이용 이력이 없습니다. 기간이나 업무를 바꿔 보십시오.</EmptyRow>
+                    )}
                     {[...reported, ...state.data.filter((e) => !e.reported)].map((e) => (
                       <tr key={e.id} className="border-t border-slate-100">
                         <th scope="row" className="px-3 py-2 tabular-nums text-slate-600 text-left">{e.at}</th>
@@ -148,8 +151,7 @@ export function UsageHistoryPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
-              </div>
+                </AdminTable>
             </>
           )
         })()}

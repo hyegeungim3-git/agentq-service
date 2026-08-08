@@ -12,6 +12,7 @@ import { fetchMcpServers } from '@shared/api/evidence'
 import { fetchDomains } from '@shared/api/domains'
 import { useRemote } from '@features/remote/useRemote'
 import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 도구 · 배포.
@@ -267,8 +268,7 @@ export function ToolDeployPage() {
                   </div>
                 )}
 
-                <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                  <table className="w-full min-w-[40rem] text-left text-xs">
+                <AdminTable label="배포 이력" minW="min-w-[40rem]" wrap="mt-4">
                     <thead className="bg-slate-50 text-[11px] text-slate-500">
                       <tr>
                         <th scope="col" className="px-3 py-2">대상</th>
@@ -279,6 +279,9 @@ export function ToolDeployPage() {
                       </tr>
                     </thead>
                     <tbody>
+            {deployments.data.length === 0 && (
+              <EmptyRow cols={5}>표시할 배포 이력이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+            )}
                       {deployments.data.map((d) => (
                         <tr key={d.id} className="border-t border-slate-100">
                           <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{d.target}</th>
@@ -301,8 +304,7 @@ export function ToolDeployPage() {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
-                </div>
+                  </AdminTable>
               </>
             )
           })()}

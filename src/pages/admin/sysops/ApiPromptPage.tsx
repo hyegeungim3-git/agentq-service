@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { API_STATE_LABEL, type ApiState } from '@entities/sysops/model'
 import { fetchApis, fetchPrompts, reissueApiKey } from '@shared/api/sysops'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * API · 프롬프트 관리.
@@ -79,8 +80,7 @@ export function ApiPromptPage() {
             화면은 캡처되고 공유됩니다. 키를 잃어버렸으면 재발급하십시오 — 쓰던 키는 그때 죽습니다.
           </p>
 
-          <div className="mt-3 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-            <table className="w-full min-w-[48rem] text-left text-xs">
+          <AdminTable label="API 목록" minW="min-w-[48rem]" wrap="mt-3">
               <thead className="bg-slate-50 text-[11px] text-slate-500">
                 <tr>
                   <th scope="col" className="px-3 py-2">API</th>
@@ -92,6 +92,9 @@ export function ApiPromptPage() {
                 </tr>
               </thead>
               <tbody>
+            {apis.data.length === 0 && (
+              <EmptyRow cols={6}>표시할 API 목록이(가) 없습니다.</EmptyRow>
+            )}
                 {apis.data.map((a) => (
                   <tr key={a.id} className="border-t border-slate-100">
                     <th scope="row" className="px-3 py-2 text-left">
@@ -122,8 +125,7 @@ export function ApiPromptPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+            </AdminTable>
         </section>
       )}
 

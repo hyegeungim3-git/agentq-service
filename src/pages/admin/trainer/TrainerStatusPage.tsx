@@ -9,6 +9,7 @@ import {
 import { fetchTrainerReport } from '@shared/api/infra'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 트레이너 현황 — 학습 작업 집계.
@@ -144,8 +145,7 @@ export function TrainerStatusPage() {
                 <h2 id="jobs" className="text-sm font-black text-slate-900">
                   학습 작업 {r.jobs.length}건
                 </h2>
-                <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                  <table className="w-full min-w-[38rem] text-left text-xs">
+                <AdminTable label="학습 작업 현황" minW="min-w-[38rem]">
                     <thead className="bg-slate-50 text-[11px] text-slate-500">
                       <tr>
                         <th scope="col" className="px-3 py-2">작업</th>
@@ -156,6 +156,9 @@ export function TrainerStatusPage() {
                       </tr>
                     </thead>
                     <tbody>
+            {r.jobs.length === 0 && (
+              <EmptyRow cols={5}>표시할 학습 작업 현황이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+            )}
                       {r.jobs.map((j) => (
                         <tr key={j.id} className="border-t border-slate-100">
                           <th scope="row" className="px-3 py-2 font-mono text-[11px] font-bold text-slate-800 text-left">{j.id}</th>
@@ -178,8 +181,7 @@ export function TrainerStatusPage() {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
-                </div>
+                  </AdminTable>
               </section>
             </>
           )

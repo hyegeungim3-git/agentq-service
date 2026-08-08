@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { averageGain } from '@entities/llmops/model'
 import { fetchConfidencePolicy, fetchGuardrails, fetchPipelines, toggleGuardrail } from '@shared/api/llmops'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 신뢰성 관리.
@@ -113,8 +114,7 @@ export function ReliabilityPage() {
                   </p>
                 )}
 
-                <div className="mt-3 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                  <table className="w-full min-w-[48rem] text-left text-xs">
+                <AdminTable label="Re-rank 설정" minW="min-w-[48rem]" wrap="mt-3">
                     <thead className="bg-slate-50 text-[11px] text-slate-500">
                       <tr>
                         <th scope="col" className="px-3 py-2">대상</th>
@@ -126,6 +126,9 @@ export function ReliabilityPage() {
                       </tr>
                     </thead>
                     <tbody>
+            {pipelines.data.length === 0 && (
+              <EmptyRow cols={6}>표시할 Re-rank 설정이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+            )}
                       {pipelines.data.map((p) => (
                         <tr key={p.id} className="border-t border-slate-100">
                           <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{p.agentLabel}</th>
@@ -157,8 +160,7 @@ export function ReliabilityPage() {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
-                </div>
+                  </AdminTable>
               </>
             )
           })()}

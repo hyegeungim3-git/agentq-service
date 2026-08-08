@@ -67,6 +67,9 @@ describe('접근성 전수 — 자리를 세어 본다', () => {
         const row = f.src.slice(j, close < 0 ? f.src.length : close)
         j = close < 0 ? f.src.length : close + 5
         if (!row.includes('<td')) continue
+        /* 한 칸이 표 전체를 가로지르는 줄은 값이 아니라 **말**이다('아직 없습니다').
+           붙일 행 머리글이 없고, 붙이면 오히려 값이 든 줄처럼 읽힌다 */
+        if (row.includes('colSpan=')) continue
         rows += 1
         /* 칸을 반복해 그리는 표는 자리를 봐서 첫 칸만 머리글로 만든다
            (`ci === 0 ? <th scope="row"` 꼴) — 그래서 순서가 아니라 존재로 본다 */
@@ -90,6 +93,11 @@ describe('접근성 전수 — 자리를 세어 본다', () => {
     let stops = 0
 
     for (const f of FILES) {
+      /* 관리자 표 28개는 `AdminTable` 안으로 들어갔다. 그 부품이 역할·이름·표 이름을
+         **한 곳에서** 붙이므로 부르는 쪽은 이름만 준다. 정지점 수는 그 호출을 센다 —
+         안 세면 아래 하한선이 '검사가 아무것도 안 봤다'를 못 잡는다 */
+      stops += (f.src.match(/<AdminTable label="/g) ?? []).length
+
       let i = 0
       while ((i = f.src.indexOf('overflow-x-auto', i)) >= 0) {
         /* 이 클래스를 들고 있는 여는 태그 하나를 떼어 낸다 */

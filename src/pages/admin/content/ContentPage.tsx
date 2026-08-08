@@ -3,6 +3,7 @@ import { noticeLevelLabel } from '@entities/notice/model'
 import { faqCategoryLabel } from '@entities/chat/model'
 import { fetchManagedFaq, fetchManagedNotices, saveNotice } from '@shared/api/oplog'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 콘텐츠 관리 — 공지사항·Q&A·설문.
@@ -75,8 +76,7 @@ export function ContentPage() {
           <p className="text-xs text-slate-600">
             {notices.data.length}건 · 사용자 포털 사이드바의 <b>공지사항</b>에 그대로 나옵니다
           </p>
-          <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-            <table className="w-full min-w-[38rem] text-left text-xs">
+          <AdminTable label="공지사항 목록" minW="min-w-[38rem]">
               <thead className="bg-slate-50 text-[11px] text-slate-500">
                 <tr>
                   <th scope="col" className="px-3 py-2">등급</th>
@@ -85,6 +85,9 @@ export function ContentPage() {
                 </tr>
               </thead>
               <tbody>
+            {notices.data.length === 0 && (
+              <EmptyRow cols={3}>표시할 공지사항 목록이(가) 없습니다.</EmptyRow>
+            )}
                 {notices.data.map((n) => (
                   <tr key={n.id} className="border-t border-slate-100">
                     <th scope="row" className="px-3 py-2 text-left">
@@ -103,8 +106,7 @@ export function ContentPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+            </AdminTable>
 
           <form onSubmit={submit} className="mt-4 max-w-xl rounded-xl border border-slate-200 bg-white p-4">
             <label htmlFor="notice-title" className="block text-[11px] font-bold text-slate-500">

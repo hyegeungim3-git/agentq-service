@@ -2,6 +2,7 @@ import { MODEL_STAGE_LABEL, unevaluated, untraceable } from '@entities/mlops/mod
 import { fetchEvalResults, fetchModelVersions, fetchDatasets } from '@shared/api/mlops'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 모델 레지스트리.
@@ -72,8 +73,7 @@ export function RegistryPage() {
                 </p>
               )}
 
-              <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                <table className="w-full min-w-[48rem] text-left text-xs">
+              <AdminTable label="등록된 모델" minW="min-w-[48rem]" wrap="mt-4">
                   <thead className="bg-slate-50 text-[11px] text-slate-500">
                     <tr>
                       <th scope="col" className="px-3 py-2">모델</th>
@@ -85,6 +85,9 @@ export function RegistryPage() {
                     </tr>
                   </thead>
                   <tbody>
+                    {models.data.length === 0 && (
+                      <EmptyRow cols={6}>등록된 모델이 없습니다.</EmptyRow>
+                    )}
                     {[...lost, ...models.data.filter((m) => !lost.includes(m))].map((m) => (
                       <tr
                         key={m.id}
@@ -118,8 +121,7 @@ export function RegistryPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
-              </div>
+                </AdminTable>
             </>
           )
         })()}

@@ -1,6 +1,7 @@
 import { isOverQuota, quotaRatio } from '@entities/user/model'
 import { fetchUsers } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 할당량.
@@ -45,8 +46,7 @@ export function QuotaPage() {
                 {countedAt && <p className="text-xs text-slate-400">집계 기준 {countedAt}</p>}
               </div>
 
-              <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                <table className="w-full min-w-[42rem] text-left text-xs">
+              <AdminTable label="사용자별 할당량" minW="min-w-[42rem]">
                   <thead className="bg-slate-50 text-[11px] text-slate-500">
                     <tr>
                       <th scope="col" className="px-3 py-2">이름</th>
@@ -58,6 +58,9 @@ export function QuotaPage() {
                     </tr>
                   </thead>
                   <tbody>
+                    {over.length + rest.length === 0 && (
+                      <EmptyRow cols={6}>할당량을 둔 사용자가 없습니다.</EmptyRow>
+                    )}
                     {[...over, ...rest].map((u) => {
                       const ratio = quotaRatio(u)
                       const excess = u.quota.limit === null ? 0 : u.quota.used - u.quota.limit
@@ -94,8 +97,7 @@ export function QuotaPage() {
                       )
                     })}
                   </tbody>
-                </table>
-              </div>
+                </AdminTable>
 
               {over.length > 0 && (
                 <p className="mt-3 max-w-3xl rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800">

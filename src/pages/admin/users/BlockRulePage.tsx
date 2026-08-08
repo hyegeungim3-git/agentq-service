@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { isActiveRule, type BlockRule } from '@entities/user/model'
 import { createBlockRule, fetchBlockRules, fetchAsOf } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 접근권한·차단.
@@ -101,8 +102,7 @@ export function BlockRulePage() {
                 )}
               </p>
 
-              <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                <table className="w-full min-w-[46rem] text-left text-xs">
+              <AdminTable label="차단 규칙" minW="min-w-[46rem]">
                   <thead className="bg-slate-50 text-[11px] text-slate-500">
                     <tr>
                       <th scope="col" className="px-3 py-2">종류</th>
@@ -114,6 +114,9 @@ export function BlockRulePage() {
                     </tr>
                   </thead>
                   <tbody>
+            {active.length === 0 && (
+              <EmptyRow cols={6}>표시할 차단 규칙이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+            )}
                     {active.map((r) => (
                       <Row key={r.id} rule={r} active />
                     ))}
@@ -121,8 +124,7 @@ export function BlockRulePage() {
                       <Row key={r.id} rule={r} active={false} />
                     ))}
                   </tbody>
-                </table>
-              </div>
+                </AdminTable>
 
               {expired.length > 0 && (
                 <div className="mt-3 max-w-3xl rounded-xl border border-amber-200 bg-amber-50 p-3">

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { OPLOG_KINDS, OPLOG_KIND_LABEL, type OpLogKind } from '@entities/oplog/model'
 import { exportLogsCsv, fetchOpLogs } from '@shared/api/oplog'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 통합 로그 관리.
@@ -88,8 +89,7 @@ export function IntegratedLogPage() {
       {state.kind === 'ready' && (
         <>
           <p className="mt-4 text-xs text-slate-600">{state.data.length}건</p>
-          <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-            <table className="w-full min-w-[46rem] text-left text-xs">
+          <AdminTable label="통합 로그" minW="min-w-[46rem]">
               <thead className="bg-slate-50 text-[11px] text-slate-500">
                 <tr>
                   <th scope="col" className="px-3 py-2">일시</th>
@@ -100,6 +100,9 @@ export function IntegratedLogPage() {
                 </tr>
               </thead>
               <tbody>
+            {state.data.length === 0 && (
+              <EmptyRow cols={5}>표시할 통합 로그이(가) 없습니다.</EmptyRow>
+            )}
                 {state.data.map((e) => (
                   <tr key={e.id} className={`border-t border-slate-100 ${e.sensitive ? 'bg-amber-50' : ''}`}>
                     <th scope="row" className="px-3 py-2 tabular-nums text-slate-600 text-left">{e.at}</th>
@@ -123,8 +126,7 @@ export function IntegratedLogPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+            </AdminTable>
         </>
       )}
     </main>

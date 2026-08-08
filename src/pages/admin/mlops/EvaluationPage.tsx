@@ -2,6 +2,7 @@ import { untrusted } from '@entities/mlops/model'
 import { fetchEvalResults, fetchDatasets } from '@shared/api/mlops'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 모델 평가.
@@ -75,8 +76,7 @@ export function EvaluationPage() {
                 <h2 id="ranked" className="text-sm font-black text-slate-900">
                   믿을 수 있는 결과 {ranked.length}건
                 </h2>
-                <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                  <table className="w-full min-w-[44rem] text-left text-xs">
+                <AdminTable label="모델 평가 순위" minW="min-w-[44rem]">
                     <thead className="bg-slate-50 text-[11px] text-slate-500">
                       <tr>
                         <th scope="col" className="px-3 py-2">순위</th>
@@ -88,6 +88,9 @@ export function EvaluationPage() {
                       </tr>
                     </thead>
                     <tbody>
+            {ranked.length === 0 && (
+              <EmptyRow cols={6}>표시할 모델 평가 순위이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+            )}
                       {ranked.map((e, i) => (
                         <tr key={e.id} className="border-t border-slate-100">
                           <th scope="row" className="px-3 py-2 tabular-nums font-bold text-slate-500 text-left">{i + 1}</th>
@@ -106,8 +109,7 @@ export function EvaluationPage() {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
-                </div>
+                  </AdminTable>
               </section>
 
               <p className="mt-4 max-w-3xl text-xs text-slate-500">

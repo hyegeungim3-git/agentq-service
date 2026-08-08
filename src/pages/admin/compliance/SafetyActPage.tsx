@@ -15,6 +15,7 @@ import {
 import { fetchRiskAssessments, fetchSafetyDuties, fetchSafetyTrainings } from '@shared/api/safetyact'
 import { fetchAsOf } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 중대재해처벌법 대응.
@@ -158,13 +159,7 @@ export function SafetyActPage() {
       </div>
 
       {tab === 'duty' && duties.kind === 'ready' && asOf.kind === 'ready' && (
-            <div
-              className="mt-3 overflow-x-auto rounded-xl border border-slate-200 bg-white"
-              role="region"
-              aria-label="표 — 가로로 스크롤됩니다"
-              tabIndex={0}
-            >
-              <table className="w-full min-w-[52rem] text-left text-xs">
+            <AdminTable label="중대재해처벌법 의무 이행 현황" minW="min-w-[52rem]" wrap="mt-3">
                 <thead className="bg-slate-50 text-[11px] text-slate-500">
                   <tr>
                     <th scope="col" className="px-3 py-2">호</th>
@@ -177,6 +172,9 @@ export function SafetyActPage() {
                   </tr>
                 </thead>
                 <tbody>
+            {duties.data.length === 0 && (
+              <EmptyRow cols={7}>표시할 중대재해처벌법 의무 이행 현황이(가) 없습니다.</EmptyRow>
+            )}
                   {duties.data.map((d) => {
                     const age = daysBetween(d.evidenceAt, asOf.data)
                     const old = d.status === 'met' && age > cycleOf(d)
@@ -209,8 +207,7 @@ export function SafetyActPage() {
                     )
                   })}
                 </tbody>
-              </table>
-        </div>
+              </AdminTable>
       )}
 
       {tab === 'risk' && risks.kind === 'ready' && (

@@ -4,6 +4,7 @@ import { POD_WINDOWS, type PodInfo, type PodWindow } from '@entities/infra/model
 import { fetchCluster, fetchNodes, fetchPods } from '@shared/api/infra'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 시스템 현황 — 클러스터 자원과 노드·파드.
@@ -109,8 +110,7 @@ export function SystemStatusPage() {
           노드 정보
         </h2>
         {nodes.kind === 'ready' && (
-          <div className="mt-3 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-            <table className="w-full min-w-[40rem] text-left text-xs">
+          <AdminTable label="노드 정보" minW="min-w-[40rem]" wrap="mt-3">
               <thead className="bg-slate-50 text-[11px] text-slate-500">
                 <tr>
                   <th scope="col" className="px-3 py-2">노드</th>
@@ -122,6 +122,9 @@ export function SystemStatusPage() {
                 </tr>
               </thead>
               <tbody>
+            {nodes.data.length === 0 && (
+              <EmptyRow cols={6}>표시할 노드 정보이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+            )}
                 {nodes.data.map((n) => (
                   <tr key={n.name} className="border-t border-slate-100">
                     <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{n.name}</th>
@@ -133,8 +136,7 @@ export function SystemStatusPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+            </AdminTable>
         )}
       </section>
 
@@ -181,8 +183,7 @@ export function SystemStatusPage() {
                 <span className="ml-1 text-slate-400">· 실패·재시작 없음</span>
               )}
             </p>
-            <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-              <table className="w-full min-w-[44rem] text-left text-xs">
+            <AdminTable label="파드 정보" minW="min-w-[44rem]">
                 <thead className="bg-slate-50 text-[11px] text-slate-500">
                   <tr>
                     <th scope="col" className="px-3 py-2">파드</th>
@@ -196,8 +197,7 @@ export function SystemStatusPage() {
                 <tbody>
                   <PodRows pods={pods.data} />
                 </tbody>
-              </table>
-            </div>
+              </AdminTable>
           </>
         )}
       </section>

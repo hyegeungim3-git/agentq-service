@@ -3,6 +3,7 @@ import { IDLE_LIMIT_DAYS, idleHolding } from '@entities/mlops/model'
 import { fetchWorkspaces, releaseWorkspace } from '@shared/api/mlops'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * 개발 환경.
@@ -94,8 +95,7 @@ export function DevEnvPage() {
                 </div>
               </dl>
 
-              <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                <table className="w-full min-w-[42rem] text-left text-xs">
+              <AdminTable label="작업 공간 사용 현황" minW="min-w-[42rem]" wrap="mt-4">
                   <thead className="bg-slate-50 text-[11px] text-slate-500">
                     <tr>
                       <th scope="col" className="px-3 py-2">사용자</th>
@@ -107,6 +107,9 @@ export function DevEnvPage() {
                     </tr>
                   </thead>
                   <tbody>
+                    {idle.length + rest.length === 0 && (
+                      <EmptyRow cols={6}>열려 있는 작업 공간이 없습니다.</EmptyRow>
+                    )}
                     {[...idle, ...rest].map((w) => (
                       <tr
                         key={w.id}
@@ -145,8 +148,7 @@ export function DevEnvPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
-              </div>
+                </AdminTable>
             </>
           )
         })()}

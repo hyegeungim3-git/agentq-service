@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { HR_CHANGE_LABEL, failedChanges, riskyPending } from '@entities/sysops/model'
 import { fetchHrSync, runHrSync } from '@shared/api/sysops'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
 
 /**
  * HR 연계·그룹 관리.
@@ -111,8 +112,7 @@ export function HrSyncPage() {
                 마지막 동기화 {s.lastSyncAt} · 다음 예정 {s.nextSyncAt}
               </p>
 
-              <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white" role="region" aria-label="표 — 가로로 스크롤됩니다" tabIndex={0}>
-                <table className="w-full min-w-[44rem] text-left text-xs">
+              <AdminTable label="인사 변동 처리 내역" minW="min-w-[44rem]" wrap="mt-4">
                   <thead className="bg-slate-50 text-[11px] text-slate-500">
                     <tr>
                       <th scope="col" className="px-3 py-2">이름</th>
@@ -123,6 +123,9 @@ export function HrSyncPage() {
                     </tr>
                   </thead>
                   <tbody>
+                    {failed.length + done.length === 0 && (
+                      <EmptyRow cols={5}>이 구간에 처리한 인사 변동이 없습니다.</EmptyRow>
+                    )}
                     {[...failed, ...done].map((c) => (
                       <tr key={c.id} className={`border-t border-slate-100 ${c.failedReason ? 'bg-rose-50' : ''}`}>
                         <th scope="row" className="px-3 py-2 font-bold text-slate-800 text-left">{c.name}</th>
@@ -139,8 +142,7 @@ export function HrSyncPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
-              </div>
+                </AdminTable>
 
               <p className="mt-4 max-w-3xl text-xs text-slate-500">
                 매일 01:00에 자동 동기화됩니다. 신규 입사는 계정을 만들어 승인 대기로 보내고,
