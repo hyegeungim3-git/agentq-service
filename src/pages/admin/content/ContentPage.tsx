@@ -86,7 +86,7 @@ export function ContentPage() {
               </thead>
               <tbody>
             {notices.data.length === 0 && (
-              <EmptyRow cols={3}>표시할 공지사항 목록이(가) 없습니다.</EmptyRow>
+              <EmptyRow cols={3}>등록된 공지사항이 없습니다.</EmptyRow>
             )}
                 {notices.data.map((n) => (
                   <tr key={n.id} className="border-t border-slate-100">

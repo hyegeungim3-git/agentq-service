@@ -115,7 +115,7 @@ export function BlockRulePage() {
                   </thead>
                   <tbody>
             {active.length === 0 && (
-              <EmptyRow cols={6}>표시할 차단 규칙이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+              <EmptyRow cols={6}>등록된 차단 규칙이 없습니다.</EmptyRow>
             )}
                     {active.map((r) => (
                       <Row key={r.id} rule={r} active />

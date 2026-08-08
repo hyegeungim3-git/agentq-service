@@ -89,7 +89,7 @@ export function EvaluationPage() {
                     </thead>
                     <tbody>
             {ranked.length === 0 && (
-              <EmptyRow cols={6}>표시할 모델 평가 순위이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+              <EmptyRow cols={6}>평가한 모델이 없습니다.</EmptyRow>
             )}
                       {ranked.map((e, i) => (
                         <tr key={e.id} className="border-t border-slate-100">

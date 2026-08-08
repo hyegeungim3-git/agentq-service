@@ -127,7 +127,7 @@ export function ReliabilityPage() {
                     </thead>
                     <tbody>
             {pipelines.data.length === 0 && (
-              <EmptyRow cols={6}>표시할 Re-rank 설정이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+              <EmptyRow cols={6}>재정렬을 켜 둔 대상이 없습니다.</EmptyRow>
             )}
                       {pipelines.data.map((p) => (
                         <tr key={p.id} className="border-t border-slate-100">

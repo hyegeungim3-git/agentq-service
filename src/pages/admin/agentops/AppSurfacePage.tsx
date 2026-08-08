@@ -98,7 +98,7 @@ export function AppSurfacePage() {
               </thead>
               <tbody>
             {domains.data.length === 0 && (
-              <EmptyRow cols={4}>표시할 발주처별 노출 현황이(가) 없습니다.</EmptyRow>
+              <EmptyRow cols={4}>아직 어느 발주처에도 열지 않았습니다.</EmptyRow>
             )}
                 {domains.data.map((d) => (
                   <tr key={d.domainId} className="border-t border-slate-100">

@@ -127,7 +127,7 @@ export function VectorDbPage() {
                   </thead>
                   <tbody>
             {state.data.length === 0 && (
-              <EmptyRow cols={7}>표시할 벡터 컬렉션이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+              <EmptyRow cols={7}>만들어 둔 컬렉션이 없습니다.</EmptyRow>
             )}
                     {state.data.map((c) => (
                       <tr key={c.id} className="border-t border-slate-100">

@@ -123,7 +123,7 @@ export function SystemStatusPage() {
               </thead>
               <tbody>
             {nodes.data.length === 0 && (
-              <EmptyRow cols={6}>표시할 노드 정보이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+              <EmptyRow cols={6}>클러스터에 노드가 없습니다.</EmptyRow>
             )}
                 {nodes.data.map((n) => (
                   <tr key={n.name} className="border-t border-slate-100">

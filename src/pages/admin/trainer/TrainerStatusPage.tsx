@@ -157,7 +157,7 @@ export function TrainerStatusPage() {
                     </thead>
                     <tbody>
             {r.jobs.length === 0 && (
-              <EmptyRow cols={5}>표시할 학습 작업 현황이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+              <EmptyRow cols={5}>이 구간에 학습 작업이 없습니다. 기간을 넓혀 보십시오.</EmptyRow>
             )}
                       {r.jobs.map((j) => (
                         <tr key={j.id} className="border-t border-slate-100">

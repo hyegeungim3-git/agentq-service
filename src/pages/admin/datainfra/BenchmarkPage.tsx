@@ -104,7 +104,7 @@ export function BenchmarkPage() {
                 </thead>
                 <tbody>
             {runs.data.length === 0 && (
-              <EmptyRow cols={7}>표시할 모델 평가 실행 결과이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+              <EmptyRow cols={7}>평가를 실행한 적이 없습니다.</EmptyRow>
             )}
                   {runs.data.map((r) => {
                     const b = benchmarks.data.find((x) => x.id === r.benchmarkId)

@@ -93,7 +93,7 @@ export function ApiPromptPage() {
               </thead>
               <tbody>
             {apis.data.length === 0 && (
-              <EmptyRow cols={6}>표시할 API 목록이(가) 없습니다.</EmptyRow>
+              <EmptyRow cols={6}>등록된 API가 없습니다.</EmptyRow>
             )}
                 {apis.data.map((a) => (
                   <tr key={a.id} className="border-t border-slate-100">

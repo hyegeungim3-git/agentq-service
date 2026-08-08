@@ -133,7 +133,7 @@ export function UserListPage() {
               </thead>
               <tbody>
             {state.data.length === 0 && (
-              <EmptyRow cols={7}>표시할 사용자 목록이(가) 없습니다.</EmptyRow>
+              <EmptyRow cols={7}>이 조건에 맞는 사용자가 없습니다.</EmptyRow>
             )}
                 {state.data.map((u) => (
                   <tr key={u.id} className="border-t border-slate-100">

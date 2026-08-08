@@ -101,7 +101,7 @@ export function IntegratedLogPage() {
               </thead>
               <tbody>
             {state.data.length === 0 && (
-              <EmptyRow cols={5}>표시할 통합 로그이(가) 없습니다.</EmptyRow>
+              <EmptyRow cols={5}>이 조건에 맞는 로그가 없습니다.</EmptyRow>
             )}
                 {state.data.map((e) => (
                   <tr key={e.id} className={`border-t border-slate-100 ${e.sensitive ? 'bg-amber-50' : ''}`}>

@@ -107,7 +107,7 @@ export function SecurityArchPage() {
               </thead>
               <tbody>
             {flows.data.length === 0 && (
-              <EmptyRow cols={6}>표시할 데이터 흐름이(가) 없습니다.</EmptyRow>
+              <EmptyRow cols={6}>기록된 데이터 흐름이 없습니다.</EmptyRow>
             )}
                 {flows.data.map((f) => (
                   <tr key={f.id} className="border-t border-slate-100">
@@ -151,7 +151,7 @@ export function SecurityArchPage() {
               </thead>
               <tbody>
             {rules.data.length === 0 && (
-              <EmptyRow cols={5}>표시할 등급별 경계 정책이(가) 없습니다.</EmptyRow>
+              <EmptyRow cols={5}>정해 둔 경계 정책이 없습니다.</EmptyRow>
             )}
                 {rules.data.map((r) => (
                   <tr key={r.grade} className="border-t border-slate-100">
@@ -206,7 +206,7 @@ export function SecurityArchPage() {
                     </thead>
                     <tbody>
             {access.data.length === 0 && (
-              <EmptyRow cols={6}>표시할 외부 조직 접근 권한이(가) 없습니다.</EmptyRow>
+              <EmptyRow cols={6}>외부 조직에 준 접근 권한이 없습니다.</EmptyRow>
             )}
                       {access.data.map((a) => {
                         const over = a.expiresOn < asOf.data

@@ -280,7 +280,7 @@ export function ToolDeployPage() {
                     </thead>
                     <tbody>
             {deployments.data.length === 0 && (
-              <EmptyRow cols={5}>표시할 배포 이력이(가) 없습니다. 조건을 바꾸면 다시 나올 수 있습니다.</EmptyRow>
+              <EmptyRow cols={5}>배포한 적이 없습니다.</EmptyRow>
             )}
                       {deployments.data.map((d) => (
                         <tr key={d.id} className="border-t border-slate-100">

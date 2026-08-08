@@ -173,7 +173,7 @@ export function SafetyActPage() {
                 </thead>
                 <tbody>
             {duties.data.length === 0 && (
-              <EmptyRow cols={7}>표시할 중대재해처벌법 의무 이행 현황이(가) 없습니다.</EmptyRow>
+              <EmptyRow cols={7}>점검할 의무 항목이 없습니다.</EmptyRow>
             )}
                   {duties.data.map((d) => {
                     const age = daysBetween(d.evidenceAt, asOf.data)

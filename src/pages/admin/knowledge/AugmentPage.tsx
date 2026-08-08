@@ -200,7 +200,7 @@ export function AugmentPage() {
               </thead>
               <tbody>
             {cache.data.length === 0 && (
-              <EmptyRow cols={6}>표시할 캐시에 올려 둔 문서이(가) 없습니다.</EmptyRow>
+              <EmptyRow cols={6}>캐시에 올려 둔 문서가 없습니다.</EmptyRow>
             )}
                 {cache.data.map((c) => {
                   const stale = c.loadedRev !== c.currentRev
