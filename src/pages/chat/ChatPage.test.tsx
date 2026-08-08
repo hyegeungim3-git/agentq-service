@@ -331,4 +331,26 @@ describe('ChatPage', () => {
     })
   })
 
+  describe('지식참조 토글', () => {
+    /* 눌러도 아무 일 없는 토글을 두지 않는다 — 끄면 실제로 달라져야 한다 */
+    it('끄고 보내면 서버가 필요하다고 말하고 보내지 않는다', async () => {
+      setup()
+      await userEvent.click(screen.getByRole('button', { name: /지식참조/ }))
+      await userEvent.type(screen.getByLabelText('질문 입력'), '금형 교체 주기')
+      await userEvent.click(screen.getByRole('button', { name: '전송' }))
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(/서버의 모델이 직접 답해야/)
+      expect(within(screen.getByRole('list', { name: '대화' })).queryAllByRole('listitem')).toHaveLength(0)
+    })
+
+    it('다시 켜면 평소대로 답한다', async () => {
+      setup()
+      const toggle = screen.getByRole('button', { name: /지식참조/ })
+      await userEvent.click(toggle)
+      await userEvent.click(toggle)
+      await ask('금형 교체 주기 알려줘')
+      expect(await screen.findByText(/타수 50만 타/)).toBeInTheDocument()
+    })
+  })
+
 })

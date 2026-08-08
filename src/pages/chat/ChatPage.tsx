@@ -45,6 +45,8 @@ const SUGGEST_ICON: Record<FaqCategory, typeof Activity> = {
 import { useVoice } from '@features/voice/useVoice'
 import { ScanDialog } from '@widgets/scan/ScanDialog'
 import { DOCUMENT_UPLOAD, validateUpload } from '@entities/upload/model'
+import { fetchModels } from '@shared/api/llmops'
+import { useRemote } from '@features/remote/useRemote'
 import { uploadDocument } from '@shared/api/documents'
 
 export function ChatPage({
@@ -72,6 +74,17 @@ export function ChatPage({
   const fileRef = useRef<HTMLInputElement>(null)
   const [attachError, setAttachError] = useState<string | null>(null)
   const [scanOpen, setScanOpen] = useState(false)
+  /**
+   * 사내 문서를 근거로 찾을 것인가.
+   *
+   * 켜 두는 것이 기본이다. 끄면 **서버의 모델이 직접** 답해야 하는데, 그건 서버가
+   * 있어야 한다 — 끈 채로 보내면 그 사실을 말한다. 눌러도 아무 일 없는 토글을
+   * 두지 않으려면, 끄는 것이 실제로 무언가를 바꿔야 한다.
+   */
+  const [grounded, setGrounded] = useState(true)
+  const models = useRemote(fetchModels, [])
+  /* 지금 답하는 모델 — 고르는 것은 서버 몫이라 **보여 주기만** 한다 */
+  const activeModel = models.kind === 'ready' ? models.data.find((m) => m.state === 'running') : undefined
   /* 받아쓴 문장은 **입력창에 채운다.** 바로 보내면 소음 속 오인식이 그대로 질의가 된다 */
   const voice = useVoice(c.setInput)
   const [panelOpen, setPanelOpen] = useState(false)
@@ -83,6 +96,18 @@ export function ChatPage({
    * 사용자는 그 문서를 근거로 답할 거라고 믿는다(D-009와 같은 처리).
    * 검사는 서버가 붙어도 그대로 남는다 — 큰 파일을 다 올린 뒤에 거절당하지 않게.
    */
+  /* 근거 검색을 끈 채로 보내면 서버가 필요하다 — 성공한 척하지 않는다 */
+  const submit = () => {
+    if (!grounded) {
+      setAttachError(
+        '근거 검색을 끄면 서버의 모델이 직접 답해야 합니다. 서버가 연결되지 않아 보내지 못했습니다.',
+      )
+      return
+    }
+    setAttachError(null)
+    void c.send()
+  }
+
   const attach = async (files: FileList | null) => {
     const file = files?.[0]
     if (fileRef.current) fileRef.current.value = ''
@@ -369,7 +394,7 @@ export function ChatPage({
               // Enter로 전송, Shift+Enter는 줄바꿈 — 안내한 대로 실제로 동작해야 한다
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault()
-                void c.send()
+                submit()
               }
             }}
             rows={2}
@@ -420,11 +445,36 @@ export function ChatPage({
             <Paperclip className="size-4" aria-hidden="true" />
             <span className="sr-only">파일 첨부</span>
           </label>
+            {/* 원본의 '지식참조' 토글 — 끄면 무엇이 달라지는지가 실제로 달라진다 */}
+            <button
+              type="button"
+              onClick={() => setGrounded(!grounded)}
+              aria-pressed={grounded}
+              className={`min-h-11 rounded-lg border px-2.5 text-[11px] font-bold ${
+                grounded
+                  ? 'border-brand-soft bg-brand-soft text-slate-800'
+                  : 'border-slate-200 text-slate-500'
+              }`}
+            >
+              지식참조 {grounded ? '켜짐' : '꺼짐'}
+            </button>
+
+            {/* 지금 답하는 모델. 고르는 것은 서버 몫이라 **표시만** 한다 —
+                누르면 바뀌는 것처럼 보이는 드롭다운을 두지 않는다(§3-9) */}
+            {activeModel && (
+              <span
+                title="답변 모델 교체는 서버가 정합니다"
+                className="hidden min-h-11 items-center rounded-lg border border-slate-200 px-2.5 text-[11px] font-bold text-slate-600 sm:inline-flex"
+              >
+                {activeModel.name}
+              </span>
+            )}
+
             {/* 원본과 같이 **원형 보내기** — 글자 버튼보다 손이 먼저 간다.
                 이름은 남긴다(아이콘만 있으면 낭독기가 읽을 것이 없다) */}
             <button
               type="button"
-              onClick={() => void c.send()}
+              onClick={submit}
               disabled={!c.canSend}
               aria-label="전송"
               className="bg-brand text-brand-fg ml-auto flex size-11 items-center justify-center rounded-full hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"

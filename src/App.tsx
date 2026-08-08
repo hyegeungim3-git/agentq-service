@@ -16,6 +16,7 @@ import type { LiveMetric } from '@entities/metric/model'
 import type { SignalLink, WorkSignal } from '@entities/signal/model'
 import { readJson, writeJson } from '@shared/lib/storage'
 import { AppShell } from '@widgets/app-shell/AppShell'
+import { NoticeBanner } from '@widgets/notice-banner/NoticeBanner'
 import { shellTabLabel, type ShellTab } from '@widgets/app-shell/tabs'
 import { Loadable } from '@shared/ui/Loadable'
 import { PortalPage } from '@pages/portal/PortalPage'
@@ -249,6 +250,9 @@ export default function App() {
     )
   }
 
+  /* 배지와 배너가 같은 목록을 본다 — 두 곳에서 따로 세면 어긋난다 */
+  const unread = unreadNotices(notices, readIds)
+
   const backToAgents = () => setView(shell(domain.id, 'agents'))
 
   /* 알림·브리핑에서 처리할 화면으로 잇는다 — 이을 곳이 없으면 아무 것도 하지 않는다 */
@@ -276,11 +280,20 @@ export default function App() {
       onDeleteConversation={conv.remove}
       onClearConversations={conv.clearAll}
       conversationsPersisted={conv.persisted}
-      unreadNotices={unreadNotices(notices, readIds).length}
+      unreadNotices={unread.length}
       signals={signals}
       onOpenSignal={openSignal}
       onExit={() => setView({ name: 'portal' })}
       uiLang={prefs.prefs.uiLang}
+      banner={
+        view.tab !== 'notices' && unread.length > 0 ? (
+          <NoticeBanner
+            notices={unread}
+            onRead={markRead}
+            onOpen={() => setView(shell(domain.id, 'notices'))}
+          />
+        ) : null
+      }
     >
       {view.tab === 'general' && (
         <ChatPage store={conv.store} signals={signals} onOpenSignal={openSignal} metrics={metrics} />

@@ -69,7 +69,7 @@
 | `GET /audit/coverage` | `fetchLogGaps` | `src/pages/admin/users/AccessLogPage.tsx` |
 | `GET /access-rules` | `fetchBlockRules` | `src/pages/admin/users/BlockRulePage.tsx` |
 | `POST /access-rules` | `createBlockRule` | `src/pages/admin/users/BlockRulePage.tsx` |
-| `GET /llm/models` | `fetchModels` | `src/pages/admin/llmops/ModelPage.tsx` |
+| `GET /llm/models` | `fetchModels` | `src/pages/admin/llmops/ModelPage.tsx`<br>`src/pages/chat/ChatPage.tsx` |
 | `PATCH /llm/models/{id}` | `updateModelParams` | `src/pages/admin/llmops/ModelPage.tsx` |
 | `GET /llm/rerank-pipelines` | `fetchPipelines` | `src/pages/admin/llmops/ReliabilityPage.tsx` |
 | `GET /llm/guardrails` | `fetchGuardrails` | `src/pages/admin/llmops/ReliabilityPage.tsx` |

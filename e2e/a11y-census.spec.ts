@@ -101,17 +101,26 @@ test.describe('전수 세기 @a11y', () => {
   test('허브 카드 13장 모두 사람 확인 지점을 이름 옆에서 말한다', async ({ page }) => {
     await openHub(page)
 
-    const missing = await page.evaluate(() => {
-      const out: string[] = []
-      for (const b of Array.from(document.querySelectorAll('button[aria-describedby]'))) {
-        const ids = (b.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean)
-        const text = ids
-          .map((id) => document.getElementById(id)?.textContent ?? '')
-          .join(' ')
-        if (!/사람 확인/.test(text)) out.push(b.textContent?.trim().slice(0, 20) ?? '(이름 없음)')
-      }
-      return out
-    })
+    /* 카드는 먼저 뜨고 **설명은 나중에 온다**(에이전트 정의를 따로 받는다).
+       한 번 읽고 끝내면 아직 안 온 설명을 '없다'로 읽는다 — 실제로 13장 전부가
+       빠진 것으로 나왔다. 올 때까지 다시 본다. */
+    const read = () =>
+      page.evaluate(() => {
+        const out: string[] = []
+        for (const b of Array.from(document.querySelectorAll('button[aria-describedby]'))) {
+          const ids = (b.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean)
+          const text = ids
+            .map((id) => document.getElementById(id)?.textContent ?? '')
+            .join(' ')
+          if (!/사람 확인/.test(text)) out.push(b.textContent?.trim().slice(0, 20) ?? '(이름 없음)')
+        }
+        return out
+      })
+
+    await expect
+      .poll(read, { message: '설명에 사람 확인 지점이 없는 카드 — 소리로는 그 정보가 통째로 빠진다' })
+      .toEqual([])
+    const missing = await read()
 
     const described = await page.locator('button[aria-describedby]').count()
     expect(described, '설명이 붙은 카드를 못 찾았다면 이 검사는 아무것도 보지 않았다').toBeGreaterThanOrEqual(

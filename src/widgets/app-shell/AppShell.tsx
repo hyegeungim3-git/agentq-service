@@ -49,6 +49,8 @@ const TAB_ICON: Record<ShellTab, LucideIcon> = {
 }
 
 export type ShellProps = {
+  /** 본문 위에 띄울 띠 — 지금은 공지. 없으면 안 그린다 */
+  banner?: React.ReactNode
   domain: Domain
   tab: ShellTab
   onTab: (t: ShellTab) => void
@@ -95,6 +97,7 @@ export function AppShell({
   onExit,
   uiLang,
   children,
+  banner,
 }: ShellProps) {
   const [open, setOpen] = useState(false)
   const close = useCallback(() => setOpen(false), [])
@@ -440,6 +443,8 @@ export function AppShell({
         {/* 본문은 통째로 업무 콘텐츠다 — 챗봇 답변·문서명·규정 조항·에이전트 결과가
             전부 한국어 원문이므로 여기서 한 번에 표시한다. 화면 틀이 영어인 화면
             (환경설정)은 자기 쪽에서 다시 덮어쓴다 — 가까운 lang이 이긴다 */}
+        {/* 공지는 업무 화면 위에 띄운다 — 공지 탭에만 두면 아무도 안 본다 */}
+        {banner}
         <div lang="ko" className="contents">
           {children}
         </div>
