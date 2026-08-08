@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useState, type ReactNode } from 'react'
+import { lazy, useCallback, useEffect, useState } from 'react'
 import { AGENTS, type AgentId } from '@entities/agent/model'
 import { useScreenChange, type ScreenChange } from '@features/screen-change/useScreenChange'
 import type { Domain } from '@entities/domain/model'
@@ -16,6 +16,7 @@ import type { SignalLink, WorkSignal } from '@entities/signal/model'
 import { readJson, writeJson } from '@shared/lib/storage'
 import { AppShell } from '@widgets/app-shell/AppShell'
 import { shellTabLabel, type ShellTab } from '@widgets/app-shell/tabs'
+import { Loadable } from '@shared/ui/Loadable'
 import { PortalPage } from '@pages/portal/PortalPage'
 import { HubPage } from '@pages/hub/HubPage'
 import { SecurityPage } from '@pages/security/SecurityPage'
@@ -49,28 +50,6 @@ type View =
  */
 const AdminApp = lazy(() => import('./AdminApp').then((m) => ({ default: m.AdminApp })))
 const AgentApp = lazy(() => import('./AgentApp').then((m) => ({ default: m.AgentApp })))
-
-/**
- * 코드를 받는 동안 보여 줄 것.
- *
- * 빈 화면을 두지 않는다 — 눌렀는데 아무 일도 안 일어난 것처럼 보인다.
- * 낭독기에도 말한다: 화면이 바뀌는 중이라는 것을 소리로 알 수 있어야
- * '안 눌렸나' 하고 다시 누르지 않는다.
- */
-function Loadable({ children }: { children: ReactNode }) {
-  return (
-    <Suspense
-      fallback={
-        <main role="status" aria-live="polite" className="grid min-h-dvh place-items-center">
-          <span className="sr-only">화면을 불러오는 중입니다</span>
-          <div className="h-8 w-40 animate-pulse rounded bg-slate-200" />
-        </main>
-      }
-    >
-      {children}
-    </Suspense>
-  )
-}
 
 const READ_KEY = 'agentq.readNotices.v1'
 

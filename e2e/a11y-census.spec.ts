@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
-import { enterDomain, openTab, walkAdminScreens } from './shell'
+import { adminNav, enterDomain, openTab, walkAdminScreens } from './shell'
 
 /**
  * **전수를 센다.** 한 화면에서 되는 것을 보고 '전부 된다'고 적지 않기 위해서다.
@@ -388,4 +388,32 @@ test('관리자 코드는 관리자에 들어갈 때 받는다', async ({ page }
     'AdminApp',
   )
   expect(chunks, '관리자에 들어갔을 뿐인데 에이전트 코드까지 받았다').not.toContain('AgentApp')
+})
+
+/**
+ * **관리자 안에서도 섹션을 고를 때 받는가.**
+ *
+ * 관리자를 통째로 나눠 놓아도 들어가는 순간 44화면을 다 받으면 같은 문제의 축소판이다.
+ * 시스템 현황만 보는 사람에게 MLOps·에이전트 정의까지 딸려 오면 안 된다.
+ */
+test('관리자 섹션은 그 섹션을 열 때 받는다', async ({ page }) => {
+  const got: string[] = []
+  page.on('request', (r) => {
+    const m = /\/(dashboard|ops|ai|infra|knowledge)[.-]/.exec(new URL(r.url()).pathname)
+    if (m?.[1]) got.push(m[1])
+  })
+
+  await page.goto('./')
+  await page.getByRole('button', { name: /관리자 시스템/ }).click()
+  await expect(page.getByRole('heading', { name: '시스템 현황' })).toBeVisible()
+
+  /* 첫 화면(시스템 현황)은 대시보드 섹션이다 */
+  expect(got, '들어간 섹션을 안 받았다면 이미 한 덩어리로 들어 있던 것이다').toContain('dashboard')
+  expect(got, '대시보드만 열었는데 운영·관리 섹션까지 받았다').not.toContain('ops')
+
+  /* 다른 섹션으로 옮기면 그때 받는다 */
+  const nav = await adminNav(page)
+  await nav.getByRole('button', { name: '사용자 관리' }).first().click()
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  expect(got, '섹션을 옮겼는데 그 코드를 안 받았다').toContain('ops')
 })

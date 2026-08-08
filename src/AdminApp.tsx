@@ -1,61 +1,42 @@
-/**
- * 관리자 화면 묶음 — **따로 내려받는다.**
- *
- * 44개 화면이 App과 한 덩어리에 있으면 업무 화면만 쓰는 사람도 관리자 코드를 전부
- * 받는다. 실측: 첫 청크가 1021KB(gzip 262KB)였고 관리자가 통째로 그 안에 있었다.
- * 관리자는 포털에서 따로 들어가는 곳이라 경계가 분명하다 — 여기서 끊는다.
- *
- * `App`은 이 파일을 `lazy()`로만 부른다. 그래서 여기서 import하는 것은 전부
- * 관리자 청크로 따라간다. 새 관리자 화면은 **App.tsx가 아니라 여기에** 넣어야
- * 그 경계가 유지된다.
- */
+import { lazy } from 'react'
 import { AdminShell } from '@widgets/admin-shell/AdminShell'
-import { findMenu } from '@entities/admin/nav'
-import { SystemStatusPage } from '@pages/admin/system/SystemStatusPage'
-import { ServiceStatusPage } from '@pages/admin/service/ServiceStatusPage'
-import { GpuStatusPage } from '@pages/admin/gpu/GpuStatusPage'
-import { TrainerStatusPage } from '@pages/admin/trainer/TrainerStatusPage'
+import { findMenu, type AdminSection } from '@entities/admin/nav'
 import { PlannedPage } from '@pages/admin/planned/PlannedPage'
-import { UserListPage } from '@pages/admin/users/UserListPage'
-import { ApprovalPage } from '@pages/admin/users/ApprovalPage'
-import { QuotaPage } from '@pages/admin/users/QuotaPage'
-import { AccessLogPage } from '@pages/admin/users/AccessLogPage'
-import { BlockRulePage } from '@pages/admin/users/BlockRulePage'
-import { ModelPage } from '@pages/admin/llmops/ModelPage'
-import { ReliabilityPage } from '@pages/admin/llmops/ReliabilityPage'
-import { QualityPage } from '@pages/admin/llmops/QualityPage'
-import { UsageHistoryPage } from '@pages/admin/analytics/UsageHistoryPage'
-import { SatisfactionPage } from '@pages/admin/analytics/SatisfactionPage'
-import { UsageStatsPage } from '@pages/admin/analytics/UsageStatsPage'
-import { ReportPage as AnalyticsReportPage } from '@pages/admin/analytics/ReportPage'
-import { IntegratedLogPage } from '@pages/admin/oplog/IntegratedLogPage'
-import { UsageMonitorPage } from '@pages/admin/oplog/UsageMonitorPage'
-import { ContentPage } from '@pages/admin/content/ContentPage'
-import { HrSyncPage } from '@pages/admin/sysops/HrSyncPage'
-import { ApiPromptPage } from '@pages/admin/sysops/ApiPromptPage'
-import { IntegrationPage } from '@pages/admin/sysops/IntegrationPage'
-import { AdminHomePage } from '@pages/admin/sysops/AdminHomePage'
-import { GuardrailPage } from '@pages/admin/compliance/GuardrailPage'
-import { AiActPage } from '@pages/admin/compliance/AiActPage'
-import { KnowledgeBasePage } from '@pages/admin/knowledge/KnowledgeBasePage'
-import { AgentOpsPage } from '@pages/admin/agentops/AgentOpsPage'
-import { AppSurfacePage } from '@pages/admin/agentops/AppSurfacePage'
-import { FlowBuilderPage } from '@pages/admin/agentdef/FlowBuilderPage'
-import { ScenarioBuilderPage } from '@pages/admin/agentdef/ScenarioBuilderPage'
-import { WorkflowPage } from '@pages/admin/agentdef/WorkflowPage'
-import { AppInstancePage } from '@pages/admin/appinst/AppInstancePage'
-import { PipelinePage } from '@pages/admin/appinst/PipelinePage'
-import { VectorDbPage } from '@pages/admin/datainfra/VectorDbPage'
-import { IngestPage } from '@pages/admin/datainfra/IngestPage'
-import { BenchmarkPage } from '@pages/admin/datainfra/BenchmarkPage'
-import { PackStudioPage } from '@pages/admin/packops/PackStudioPage'
-import { ToolDeployPage } from '@pages/admin/packops/ToolDeployPage'
-import { DatasetPage } from '@pages/admin/mlops/DatasetPage'
-import { DevEnvPage } from '@pages/admin/mlops/DevEnvPage'
-import { VolumePage } from '@pages/admin/mlops/VolumePage'
-import { RegistryPage } from '@pages/admin/mlops/RegistryPage'
-import { TrainingPage } from '@pages/admin/mlops/TrainingPage'
-import { EvaluationPage } from '@pages/admin/mlops/EvaluationPage'
+import { Loadable } from '@shared/ui/Loadable'
+
+/**
+ * 관리자 — **셸만 여기 있고 화면은 섹션별로 따로 받는다.**
+ *
+ * 두 단계로 나눴다.
+ *  ① 관리자 전체를 `App`에서 떼어 냈다. 업무 화면만 쓰는 사람이 관리자 44화면을
+ *    받지 않게 하려는 것이다(첫 청크 gzip 262KB → 184KB).
+ *  ② 그러고도 관리자에 들어가는 순간 58KB를 한꺼번에 받았다. 시스템 현황만 보는
+ *    사람에게 MLOps·에이전트 정의·규정 화면까지 딸려 오는 것은 같은 문제의 축소판이다.
+ *    그래서 **사이드바 섹션 단위**로 한 번 더 나눴다.
+ *
+ * 섹션을 경계로 삼은 이유: 사용자가 눈으로 보는 구분과 같고, 한 섹션 안에서
+ * 화면을 옮길 때는 이미 받은 것이라 기다림이 없다. 화면마다 나누면 44개 요청이 되고,
+ * 안 나누면 처음에 다 받는다 — 그 사이다.
+ *
+ * 새 관리자 화면은 **해당 섹션 파일**(`src/admin/sections/*.tsx`)에 넣는다.
+ * 여기에 직접 import하면 섹션 경계가 무너져 전부 한 덩어리로 돌아간다.
+ */
+
+type SectionProps = { menuId: string; onMenu: (id: string) => void }
+
+const SECTIONS: Record<AdminSection, React.LazyExoticComponent<(p: SectionProps) => React.ReactNode>> = {
+  대시보드: lazy(() =>
+    import('./admin/sections/dashboard').then((m) => ({ default: m.DashboardSection })),
+  ),
+  '인프라 · 개발': lazy(() =>
+    import('./admin/sections/infra').then((m) => ({ default: m.InfraSection })),
+  ),
+  'AI 서비스': lazy(() => import('./admin/sections/ai').then((m) => ({ default: m.AiSection }))),
+  '지식 · RAG': lazy(() =>
+    import('./admin/sections/knowledge').then((m) => ({ default: m.KnowledgeSection })),
+  ),
+  '운영 · 관리': lazy(() => import('./admin/sections/ops').then((m) => ({ default: m.OpsSection }))),
+}
 
 export type AdminAppProps = {
   menuId: string
@@ -67,6 +48,9 @@ export type AdminAppProps = {
 
 export function AdminApp({ menuId, onMenu, onExit, onUserPortal, admin }: AdminAppProps) {
   const menu = findMenu(menuId)
+  /* 메뉴를 못 찾으면 '준비 중' 화면으로 간다 — 섹션을 찍어서 엉뚱한 것을 받지 않는다 */
+  const Section = menu ? SECTIONS[menu.section] : null
+
   return (
     <AdminShell
       menuId={menuId}
@@ -75,53 +59,13 @@ export function AdminApp({ menuId, onMenu, onExit, onUserPortal, admin }: AdminA
       onUserPortal={onUserPortal}
       admin={admin}
     >
-      {menuId === 'system' && <SystemStatusPage />}
-      {menuId === 'service' && <ServiceStatusPage />}
-      {menuId === 'gpu' && <GpuStatusPage />}
-      {menuId === 'trainer' && <TrainerStatusPage />}
-      {menuId === 'users.list' && <UserListPage />}
-      {menuId === 'users.approval' && <ApprovalPage />}
-      {menuId === 'users.quota' && <QuotaPage />}
-      {menuId === 'users.log' && <AccessLogPage />}
-      {menuId === 'users.block' && <BlockRulePage />}
-      {menuId === 'llmops.models' && <ModelPage />}
-      {menuId === 'llmops.reliability' && <ReliabilityPage />}
-      {menuId === 'llmops.quality' && <QualityPage />}
-      {menuId === 'analytics.history' && <UsageHistoryPage />}
-      {menuId === 'analytics.satisfaction' && <SatisfactionPage />}
-      {menuId === 'analytics.stats' && <UsageStatsPage />}
-      {menuId === 'analytics.report' && <AnalyticsReportPage />}
-      {menuId === 'logs.integrated' && <IntegratedLogPage />}
-      {menuId === 'logs.usage' && <UsageMonitorPage />}
-      {menuId === 'content' && <ContentPage />}
-      {menuId === 'hr' && <HrSyncPage />}
-      {menuId === 'guardrail' && <GuardrailPage />}
-      {menuId === 'aiact' && <AiActPage />}
-      {menuId === 'knowledge.areas' && <KnowledgeBasePage />}
-      {menuId === 'knowledge.pipeline' && <PipelinePage />}
-      {menuId === 'agents.ops' && <AgentOpsPage />}
-      {menuId === 'agents.flow' && <FlowBuilderPage />}
-      {menuId === 'agents.scenario' && <ScenarioBuilderPage />}
-      {menuId === 'agents.workflow' && <WorkflowPage />}
-      {menuId === 'apps.surface' && <AppSurfacePage />}
-      {menuId === 'apps.instance' && <AppInstancePage />}
-      {menuId === 'packstudio' && <PackStudioPage />}
-      {menuId === 'deploy' && <ToolDeployPage />}
-      {menuId === 'data.sets' && <DatasetPage />}
-      {menuId === 'data.vector' && <VectorDbPage />}
-      {menuId === 'data.ingest' && <IngestPage />}
-      {menuId === 'devenv.workspace' && <DevEnvPage />}
-      {menuId === 'devenv.volume' && <VolumePage />}
-      {menuId === 'registry' && <RegistryPage />}
-      {menuId === 'training' && <TrainingPage />}
-      {menuId === 'evaluation.internal' && <EvaluationPage />}
-      {menuId === 'evaluation.benchmark' && <BenchmarkPage />}
-      {menuId === 'prompts' && <ApiPromptPage />}
-      {menuId === 'sysops.integration' && <IntegrationPage />}
-      {menuId === 'sysops.home' && (
-        <AdminHomePage onOpen={onMenu} />
-      )}
       {menu !== null && menu.status === 'planned' && <PlannedPage menu={menu} />}
+      {menu !== null && menu.status !== 'planned' && Section !== null && (
+        /* 셸 안이므로 `inner` — 여기서 화면 높이를 또 주면 사이드바 옆이 한 화면만큼 밀린다 */
+        <Loadable fill="inner">
+          <Section menuId={menuId} onMenu={onMenu} />
+        </Loadable>
+      )}
     </AdminShell>
   )
 }
