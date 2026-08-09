@@ -75,3 +75,18 @@ export function validateUpload(
   }
   return null
 }
+
+/**
+ * 올리는 자리 하나.
+ *
+ * 에이전트 화면과 대화 우측 패널이 같은 자리를 쓴다. 처음에는 에이전트 훅 안에만
+ * 있었는데, 대화 쪽에도 같은 것이 필요해지자 **모양을 다시 적을 뻔했다** —
+ * 그러면 한쪽만 오류를 안 지우는 식으로 갈라진다.
+ */
+export type UploadSlot = {
+  constraint: UploadConstraint
+  busy: boolean
+  error: string | null
+  select: (file: File) => void
+  clearError: () => void
+}

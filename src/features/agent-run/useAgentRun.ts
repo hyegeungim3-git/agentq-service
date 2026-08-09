@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { BusinessDocument, DocumentKind } from '@entities/document/model'
-import { validateUpload, type UploadConstraint } from '@entities/upload/model'
+import { validateUpload, type UploadConstraint, type UploadSlot } from '@entities/upload/model'
+
+export type { UploadSlot }
 import { fetchDocuments, uploadDocument } from '@shared/api/documents'
 import type { ApiResult } from '@shared/api/domains'
 
@@ -59,13 +61,7 @@ export type UseAgentRunArgs<R, I extends AgentInput> = {
 }
 
 /** 화면이 업로드 자리를 그리는 데 필요한 것 — 페이지는 이 묶음만 넘긴다. */
-export type UploadSlot = {
-  constraint: UploadConstraint
-  busy: boolean
-  error: string | null
-  select: (file: File) => void
-  clearError: () => void
-}
+
 
 /**
  * `I`는 목록 항목의 실제 타입이다. 기본값이 `BusinessDocument`라

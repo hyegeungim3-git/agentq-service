@@ -14,6 +14,15 @@ import { adminScreenLabels, walkAdminScreens } from './shell'
  * 메뉴를 전부 도는 순회 자체는 `shell.ts`에 있다 — 접근성 전수 검사도 같은 것을
  * 쓴다. 두 곳에 복사해 두면 한쪽이 조용히 덜 도는 것을 아무도 모른다.
  */
+/**
+ * 56화면을 하나씩 열어 보는 검사라 기본 30초로는 모자라다.
+ *
+ * 병렬로 돌 때만 넘치기 시작했다 — 혼자 돌리면 통과하고 전체 실행에서만 깨져서
+ * 화면이 고장 난 것처럼 보였다. **느린 것과 깨진 것은 다르다.**
+ * 도는 화면을 줄여 빠르게 만들면 그때부터는 전수가 아니다.
+ */
+test.setTimeout(120_000)
+
 test('메뉴 이름과 화면 제목이 같다', async ({ page }) => {
   await page.goto('./')
   await page.getByRole('button', { name: /관리자 시스템/ }).click()

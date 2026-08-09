@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react'
-import { useId, useRef, useState } from 'react'
-import { ChevronLeft, CloudUpload, FileText, Info, Play, Sparkles, type LucideIcon } from 'lucide-react'
+import { useId } from 'react'
+import { ChevronLeft, FileText, Info, Play, Sparkles, type LucideIcon } from 'lucide-react'
 import { formatSize } from '@entities/document/model'
-import { acceptAttr } from '@entities/upload/model'
+
 import type { AgentId } from '@entities/agent/model'
 import { AGENT_ICONS, FALLBACK_AGENT_ICON } from '@shared/ui/agentIcons'
 import { AgentFlowTrail } from '@widgets/agent-flow/AgentFlowTrail'
-import type { AgentInput, RunPhase, UploadSlot } from '@features/agent-run/useAgentRun'
+import type { AgentInput, RunPhase } from '@features/agent-run/useAgentRun'
+import type { UploadSlot } from '@entities/upload/model'
+import { UploadZone } from '@widgets/upload/UploadZone'
 import { Button } from '@shared/ui/Button'
 
 /**
@@ -230,78 +232,6 @@ export function AgentShell<R>({
         )}
       </div>
     </main>
-  )
-}
-
-/**
- * 파일 업로드 자리.
- *
- * 부모 안에서 정의하지 않는다 — 매 렌더 새 타입이 되어 리마운트되고,
- * 드래그 상태와 파일 입력이 초기화된다(AGENTS.md §6, 이전 데모에서 난 사고).
- *
- * 형식·용량 검사는 훅이 먼저 하고, 여기는 그 결과를 보여 주기만 한다.
- */
-function UploadZone({ slot }: { slot: UploadSlot }) {
-  const inputId = useId()
-  const errorId = useId()
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [over, setOver] = useState(false)
-
-  const take = (files: FileList | null) => {
-    const file = files?.[0]
-    if (file) slot.select(file)
-    // 같은 파일을 다시 고를 수 있게 비운다 — 안 그러면 두 번째 선택이 조용히 무시된다
-    if (inputRef.current) inputRef.current.value = ''
-  }
-
-  return (
-    <div className="mt-3">
-      <div
-        onDragOver={(e) => {
-          e.preventDefault()
-          setOver(true)
-        }}
-        onDragLeave={() => setOver(false)}
-        onDrop={(e) => {
-          e.preventDefault()
-          setOver(false)
-          take(e.dataTransfer.files)
-        }}
-        className={`rounded-lg border border-dashed p-5 text-center transition-colors ${
-          over ? 'border-brand bg-brand-soft' : 'border-slate-300'
-        }`}
-      >
-        <CloudUpload className="mx-auto mb-2 size-7 text-slate-400" aria-hidden="true" />
-        <input
-          ref={inputRef}
-          id={inputId}
-          type="file"
-          accept={acceptAttr(slot.constraint)}
-          disabled={slot.busy}
-          onChange={(e) => take(e.target.files)}
-          aria-describedby={slot.error ? errorId : undefined}
-          className="sr-only"
-        />
-        <label
-          htmlFor={inputId}
-          className="inline-flex min-h-11 cursor-pointer items-center rounded-lg border border-slate-300 px-4 text-sm font-bold text-slate-700 hover:bg-slate-100"
-        >
-          {slot.busy ? '올리는 중…' : '파일 선택 또는 끌어다 놓기'}
-        </label>
-        <p className="mt-2 text-xs text-slate-500">{slot.constraint.hint}</p>
-      </div>
-
-      {/* 실패를 조용히 넘기지 않는다 — 무엇이 왜 안 됐는지 말한다 */}
-      {slot.error && (
-        <p
-          id={errorId}
-          role="alert"
-          className="mt-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-bold text-rose-800"
-        >
-          {slot.error}
-        </p>
-      )}
-    </div>
   )
 }
 

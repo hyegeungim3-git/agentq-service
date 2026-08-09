@@ -12,7 +12,7 @@
 | `GET /workspaces` | `fetchWorkspaces` | `src/App.tsx` |
 | `GET /notices` | `fetchNotices` | `src/App.tsx`<br>`src/pages/notices/NoticesPage.tsx` |
 | `GET /documents` | `fetchDocuments` | `src/features/agent-run/useAgentRun.ts`<br>`src/features/meeting/useMeeting.ts`<br>`src/widgets/chat-panel/ChatSidePanel.tsx` |
-| `POST /documents` | `uploadDocument` | `src/features/agent-run/useAgentRun.ts`<br>`src/pages/chat/ChatPage.tsx` |
+| `POST /documents` | `uploadDocument` | `src/features/agent-run/useAgentRun.ts`<br>`src/pages/chat/ChatPage.tsx`<br>`src/widgets/chat-panel/ChatSidePanel.tsx` |
 | `GET /compliance/evidence` | `fetchEvidence` | `src/pages/admin/compliance/AiActPage.tsx` |
 | `GET /tools/servers` | `fetchMcpServers` | `src/pages/admin/packops/ToolDeployPage.tsx` |
 | `GET /volumes` | `fetchVolumes` | `src/pages/admin/mlops/VolumePage.tsx` |

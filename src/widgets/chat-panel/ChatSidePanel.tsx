@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { BookOpen, FileText, PlugZap, X } from 'lucide-react'
 import {
   SECURITY_LABEL,
@@ -7,8 +7,11 @@ import {
   type KnowledgeArea,
   type SecurityLevel,
 } from '@entities/knowledgebase/model'
-import { formatSize } from '@entities/document/model'
-import { fetchDocuments } from '@shared/api/documents'
+import { formatSize, type BusinessDocument } from '@entities/document/model'
+import { fetchDocuments, uploadDocument } from '@shared/api/documents'
+import { DOCUMENT_UPLOAD } from '@entities/upload/model'
+import { useUploadSlot } from '@features/upload/useUploadSlot'
+import { UploadZone } from '@widgets/upload/UploadZone'
 
 /** 등급이 무엇을 뜻하는지 — 배지 색만 보고 짐작하게 두지 않는다 */
 const SECURITY_SCOPE: Record<SecurityLevel, string> = {
@@ -200,6 +203,11 @@ const DOC_TONE: Record<SecurityLevel, string> = {
  */
 function DocumentList() {
   const state = useRemote(fetchDocuments, [])
+  /* 올린 문서는 목록 위에 얹는다. 지금은 서버가 없어 여기까지 오지 않지만,
+     붙는 날 화면을 다시 손대지 않으려면 자리가 미리 있어야 한다 */
+  const [added, setAdded] = useState<BusinessDocument[]>([])
+  const onAdded = useCallback((d: BusinessDocument) => setAdded((prev) => [d, ...prev]), [])
+  const slot = useUploadSlot(DOCUMENT_UPLOAD, uploadDocument, onAdded)
 
   if (state.kind === 'loading') {
     return (
@@ -219,7 +227,7 @@ function DocumentList() {
     )
   }
 
-  const docs = state.data
+  const docs = [...added, ...state.data]
   const notIndexed = docs.filter((d) => !d.indexed)
 
   return (
@@ -277,10 +285,12 @@ function DocumentList() {
         ))}
       </ul>
 
-      {/* 원본의 '문서 추가 업로드' 자리. 누르면 무엇이 필요한지 말한다 —
-          올린 척하면 그 문서를 근거로 답할 거라고 믿는다(D-009) */}
-      <p className="mt-3 rounded-xl border border-dashed border-slate-300 px-3 py-4 text-center text-[11px] text-slate-500">
-        문서 추가는 <b>서버가 붙어야</b> 합니다. 지금은 위 목록으로만 답합니다.
+      {/* 원본의 '문서 추가 업로드' 자리.
+          형식·용량 검사는 **실제로 돈다.** 보내는 데서 실패하면 그 문장을 그대로 보여 준다 —
+          올린 척하면 사용자는 그 문서를 근거로 답할 거라고 믿는다(D-009) */}
+      <UploadZone slot={slot} layout="mt-3" compact />
+      <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
+        올린 문서로 답하려면 색인이 필요합니다. 지금은 위 목록으로만 답합니다.
       </p>
     </div>
   )
