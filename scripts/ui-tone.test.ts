@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, relative } from 'node:path'
 
 /**
  * 화면 톤 규약 — 관리자와 사용자 포털 양쪽.
@@ -29,7 +29,10 @@ function walk(dir: string, out: File[] = []): File[] {
       continue
     }
     if (!name.endsWith('.tsx') || name.includes('.test.')) continue
-    out.push({ rel: p.replace(process.cwd() + '\\', '').replace(/\\/g, '/'), src: readFileSync(p, 'utf8') })
+    /* 경로 구분자를 손으로 떼어 내면 **윈도우에서만 맞는다.** 실제로 그랬다 —
+       CI(리눅스)에서는 rel이 절대 경로로 남아 제외 목록이 통째로 안 먹혔고,
+       손대면 안 되는 관리자 셸까지 검사 대상이 됐다. 로컬만 초록이었다 */
+    out.push({ rel: relative(process.cwd(), p).replace(/\\/g, '/'), src: readFileSync(p, 'utf8') })
   }
   return out
 }
@@ -40,6 +43,22 @@ const FILES = walk(ADMIN)
 const USER_FILES = USER_DIRS.flatMap((d) => walk(join(process.cwd(), d))).filter(
   (f) => !SKIP.some((s) => f.rel.startsWith(s)),
 )
+
+describe('검사 자체', () => {
+  /**
+   * 경로가 상대 경로인지.
+   *
+   * 이 한 줄이 틀리면 **검사가 조용히 다른 파일을 본다.** 실제로 그랬다 —
+   * 윈도우에서만 맞는 방식으로 경로를 잘라, 로컬은 초록인데 CI는 제외 목록이
+   * 안 먹혀 관리자 셸까지 잡았다. 무엇을 보는지부터 검사한다.
+   */
+  it('훑는 파일 경로가 상대 경로다', () => {
+    const bad = [...FILES, ...USER_FILES].map((f) => f.rel).filter((r) => !r.startsWith('src/'))
+    expect(bad, '경로가 플랫폼마다 다르면 제외 목록이 안 먹는다').toEqual([])
+    expect(FILES.length).toBeGreaterThan(40)
+    expect(USER_FILES.length).toBeGreaterThan(20)
+  })
+})
 
 describe('관리자 조작 부품', () => {
   /**
