@@ -1,6 +1,7 @@
-import { useId, useState } from 'react'
+import { useCallback, useId, useState } from 'react'
 import { Settings } from 'lucide-react'
 import { DENSITY_LABEL, type Density } from '@shared/lib/adminPrefs'
+import { useDismissable } from '@features/overlay/useDismissable'
 
 /**
  * 상단바 톱니 — 원본에 있던 자리.
@@ -17,10 +18,11 @@ export function AdminSettings({
 }) {
   const [open, setOpen] = useState(false)
   const panelId = useId()
+  const boxRef = useDismissable<HTMLDivElement>(open, useCallback(() => setOpen(false), []))
   const groupId = useId()
 
   return (
-    <div className="relative">
+    <div ref={boxRef} className="relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

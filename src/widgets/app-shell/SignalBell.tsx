@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useId, useState } from 'react'
 import {
   formatSignalTime,
   signalSeverityLabel,
@@ -7,6 +7,7 @@ import {
   type WorkSignal,
 } from '@entities/signal/model'
 import { Button } from '@shared/ui/Button'
+import { useDismissable } from '@features/overlay/useDismissable'
 
 const SEVERITY_STYLE: Record<SignalSeverity, string> = {
   action: 'bg-rose-100 text-rose-800',
@@ -28,25 +29,8 @@ export function SignalBell({
   onOpen: (link: SignalLink) => void
 }) {
   const [open, setOpen] = useState(false)
-  const boxRef = useRef<HTMLDivElement>(null)
+  const boxRef = useDismissable<HTMLDivElement>(open, useCallback(() => setOpen(false), []))
   const actionCount = signals.filter((s) => s.severity === 'action').length
-
-  /* 바깥을 누르거나 Esc를 누르면 닫힌다 — 열어 놓고 다른 걸 누르면 닫혀야 한다 */
-  useEffect(() => {
-    if (!open) return
-    const onDown = (e: MouseEvent) => {
-      if (!boxRef.current?.contains(e.target as Node)) setOpen(false)
-    }
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
-    }
-    document.addEventListener('mousedown', onDown)
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('mousedown', onDown)
-      document.removeEventListener('keydown', onKey)
-    }
-  }, [open])
 
   const summaryId = useId()
 

@@ -173,3 +173,24 @@ input[type='checkbox'] {
 .admin-compact :is(td, th) {
   padding-block: 0.25rem;
 }
+
+/**
+ * 키보드 포커스 표시 — 전역.
+ *
+ * 재 보니 **없었다.** 버튼에 `outline-style: none`이 걸려 있어, 탭으로 도는 사람은
+ * 지금 어디에 서 있는지 알 방법이 없었다. 화면 몇 곳에만 `focus-visible:outline-2`를
+ * 붙여 뒀는데 그것도 10곳뿐이었다. 규칙 엔진(axe)은 이걸 못 잡는다 —
+ * 포커스가 보이는지는 색을 재 봐야 안다.
+ *
+ * 고리를 두 겹으로 두른다. 흰 테두리 + 진한 테두리라 **흰 배경에서도 브랜드 색으로
+ * 채운 버튼 위에서도** 보인다. 한 겹이면 둘 중 한쪽에서 사라진다.
+ *
+ * `:where()`로 감싸 특이도를 0으로 둔다 — 화면이 따로 정한 포커스 스타일이 있으면
+ * 그쪽이 이긴다.
+ */
+:where(button, a, input, select, textarea, summary, [role='button'], [role='tab'], [tabindex]):focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px #0f172a;
+}

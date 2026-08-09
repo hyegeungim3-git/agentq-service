@@ -27,13 +27,35 @@ export function AdminTabs<T extends string>({
   layout?: string
 }) {
   return (
-    <div role="tablist" aria-label={label} className={`${layout} flex flex-wrap gap-2`}>
+    <div
+      role="tablist"
+      aria-label={label}
+      /**
+       * 탭이라고 말했으면 **탭처럼 움직여야 한다.**
+       *
+       * `role="tab"`을 들은 낭독기 사용자는 좌우 화살표로 옮겨 다닌다. 그런데
+       * 화살표를 안 받으면 아무 일도 안 일어나고, 그때부터 이 묶음은 '고장 난 탭'이다.
+       * 역할을 뗄 수도 있었지만, 실제로 탭처럼 쓰는 것이 맞으니 동작을 채운다.
+       */
+      onKeyDown={(e) => {
+        const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0
+        if (step === 0) return
+        e.preventDefault()
+        const i = items.findIndex((t) => t.id === value)
+        /* 끝에서 반대편으로 돈다 — 탭 묶음의 관례다 */
+        const next = items[(i + step + items.length) % items.length]
+        if (next) onChange(next.id)
+      }}
+      className={`${layout} flex flex-wrap gap-2`}
+    >
       {items.map((t) => (
         <button
           key={t.id}
           type="button"
           role="tab"
           aria-selected={value === t.id}
+          /* 고른 것만 탭 순서에 둔다 — 안 그러면 탭 키로 묶음 전체를 지나야 한다 */
+          tabIndex={value === t.id ? 0 : -1}
           onClick={() => onChange(t.id)}
           className={`min-h-11 rounded-full border px-4 text-sm font-bold ${
             value === t.id

@@ -49,3 +49,26 @@ test('표 밀도를 좁게 두면 표가 좁아지고 새로고침해도 남는�
   const after = (await page.getByRole('table', { name: '노드 정보' }).getByRole('cell').first().boundingBox())?.height ?? 0
   expect(after).toBeLessThan(before)
 })
+
+/**
+ * 팝오버는 **닫는 길**이 있어야 한다.
+ *
+ * 사용자 포털 알림에는 있었는데 관리자 상단바에 종·톱니를 붙이면서 빠뜨렸다.
+ * 열어 놓고 다른 걸 누르면 닫혀야 하고, Esc로도 닫혀야 한다.
+ */
+test('상단바 팝오버는 Esc와 바깥 누르기로 닫힌다', async ({ page }) => {
+  await enterAdmin(page)
+
+  const bell = page.getByRole('button', { name: /확인이 필요한 것|확인할 알림 없음/ })
+  await bell.click()
+  await expect(bell).toHaveAttribute('aria-expanded', 'true')
+  await page.keyboard.press('Escape')
+  await expect(bell).toHaveAttribute('aria-expanded', 'false')
+
+  const gear = page.getByRole('button', { name: '화면 설정' })
+  await gear.click()
+  await expect(gear).toHaveAttribute('aria-expanded', 'true')
+  /* 본문 아무 데나 누르면 닫힌다 */
+  await page.getByRole('heading', { name: '시스템 현황' }).click()
+  await expect(gear).toHaveAttribute('aria-expanded', 'false')
+})

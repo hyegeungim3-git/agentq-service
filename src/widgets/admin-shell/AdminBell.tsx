@@ -1,9 +1,10 @@
-import { useId, useState } from 'react'
+import { useCallback, useId, useState } from 'react'
 import { AlertTriangle, ArrowRight, Bell, Eye } from 'lucide-react'
 import { actionCount, buildAlerts, type AdminAlert } from '@entities/adminalert/model'
 import { fetchHrSync } from '@shared/api/sysops'
 import { fetchPods } from '@shared/api/infra'
 import { useRemote } from '@features/remote/useRemote'
+import { useDismissable } from '@features/overlay/useDismissable'
 
 /**
  * 상단바 알림 — 원본에 있던 종 모양.
@@ -43,6 +44,8 @@ function Row({ alert, onGo }: { alert: AdminAlert; onGo: () => void }) {
 export function AdminBell({ onMenu }: { onMenu: (menuId: string) => void }) {
   const [open, setOpen] = useState(false)
   const panelId = useId()
+  /* 열어 놓고 다른 걸 누르면 닫혀야 한다 — 사용자 포털 알림과 같은 규칙 */
+  const boxRef = useDismissable<HTMLDivElement>(open, useCallback(() => setOpen(false), []))
 
   /* 상단바는 어느 화면에서나 떠 있다 — 파드는 기본 구간만 본다.
      구간을 넓히면 알림이 화면마다 달라져서, 같은 종을 눌렀는데 다른 수가 나온다 */
@@ -61,7 +64,7 @@ export function AdminBell({ onMenu }: { onMenu: (menuId: string) => void }) {
   const urgent = actionCount(alerts)
 
   return (
-    <div className="relative">
+    <div ref={boxRef} className="relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

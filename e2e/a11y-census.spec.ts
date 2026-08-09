@@ -358,9 +358,19 @@ test('관리자 화면 전수 — 제목·정지점 이름·행 머리글 @a11y'
       const main = document.querySelector('main')
       if (!main) return { heading: 0, stops: 0, rows: 0 }
 
-      /* Tab이 멈추는데 이름이 없는 자리 */
+      /**
+       * Tab이 멈추는데 이름이 없는 자리.
+       *
+       * 보이는 글자가 곧 이름인 자리(버튼·링크)는 대상이 아니다. 처음에는
+       * `aria-label`만 봤더니 **글자를 가진 탭 버튼**을 이름 없는 자리로 셌다 —
+       * 탭에 화살표 키를 넣으면서 고른 탭에 `tabindex="0"`을 준 순간 드러났다.
+       * 이름이 **아예 없는 것**만 잡는다(가로 스크롤 상자 같은 `div`가 그렇다).
+       */
       const stops = Array.from(main.querySelectorAll('[tabindex="0"]')).filter(
-        (el) => !el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby'),
+        (el) =>
+          !el.getAttribute('aria-label') &&
+          !el.getAttribute('aria-labelledby') &&
+          (el.textContent ?? '').trim() === '',
       ).length
 
       /* 행 머리글이 없는 행 — 헤더 전용 행(모두 th)은 제외한다 */
