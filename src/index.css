@@ -194,3 +194,24 @@ input[type='checkbox'] {
     0 0 0 2px #fff,
     0 0 0 4px #0f172a;
 }
+
+/**
+ * 모션 줄이기 설정을 존중한다.
+ *
+ * 재 보니 `prefers-reduced-motion: reduce`를 켜도 로딩 자리의 맥박(`animate-pulse`)과
+ * 색 전환이 그대로 돌았다. 전정 기능에 문제가 있는 사람에게는 화면 곳곳에서
+ * 뛰는 회색 블록이 실제로 불편하다.
+ *
+ * 완전히 0으로 두지 않고 아주 짧게 남긴다 — 0이면 `transitionend`를 기다리는 코드가
+ * 있을 때 영영 안 온다. 지금은 그런 코드가 없지만, 나중에 생겨도 안 깨지게 둔다.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

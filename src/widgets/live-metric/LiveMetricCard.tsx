@@ -64,6 +64,11 @@ export function LiveMetricCard({ metric }: { metric: LiveMetric }) {
       </p>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
+        {/* 스스로 움직이는 것은 멈출 수 있어야 한다(WCAG 2.2.2). 움직이는 숫자 옆에서
+            글을 읽기 어려운 사람이 있고, 확대해 쓰는 사람은 값이 바뀔 때마다 초점을 잃는다 */}
+        <Button size="sm" onClick={m.togglePause}>
+          {m.paused ? '이어서 보기' : '멈춤'}
+        </Button>
         <span className="text-[11px] font-bold text-slate-500">재생 배속</span>
         {METRIC_SPEEDS.map((s: MetricSpeed) => (
           <label
@@ -76,6 +81,7 @@ export function LiveMetricCard({ metric }: { metric: LiveMetric }) {
               value={s}
               checked={m.speed === s}
               onChange={() => m.setSpeed(s)}
+              disabled={m.paused}
               className="sr-only"
             />
             {s}×
