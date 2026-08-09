@@ -13,6 +13,7 @@ import { fetchAreas, fetchIndexEntries, fetchRagConfig, runReindex } from '@shar
 import { fetchDomains } from '@shared/api/domains'
 import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminButton, AdminTabs } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 지식 관리.
@@ -83,24 +84,7 @@ export function KnowledgeBasePage() {
         </p>
       )}
 
-      <div role="tablist" aria-label="지식 관리 항목" className="mt-4 flex flex-wrap gap-2">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={`min-h-11 rounded-full border px-4 text-sm font-bold ${
-              tab === t.id
-                ? 'border-slate-900 bg-brand text-brand-fg'
-                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <AdminTabs label="지식 관리 항목" items={TABS} value={tab} onChange={setTab} />
 
       {tab === 'areas' && areas.kind === 'ready' && (
         <section className="mt-4">
@@ -183,13 +167,9 @@ export function KnowledgeBasePage() {
                           )}
                         </p>
                         <p className="mt-1 text-[11px] text-slate-400">마지막 색인 {a.lastIndexedAt}</p>
-                        <button
-                          type="button"
-                          onClick={() => reindex(a.id)}
-                          className="mt-2 min-h-11 rounded-lg border border-slate-300 px-3 text-[11px] font-bold text-slate-700 hover:bg-slate-50"
-                        >
+                        <AdminButton size="sm" layout="mt-2" onClick={() => reindex(a.id)}>
                           재색인
-                        </button>
+                        </AdminButton>
                       </li>
                     )
                   })}

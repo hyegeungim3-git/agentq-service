@@ -33,6 +33,35 @@ function walk(dir: string, out: File[] = []): File[] {
 
 const FILES = walk(ADMIN)
 
+describe('관리자 조작 부품', () => {
+  /**
+   * 버튼 39개가 클래스 20종이었다. 역할은 셋뿐인데(주요·보조·링크) 화면마다 여백과
+   * 글자 크기가 조금씩 달랐다 — 하나씩 보면 안 보이고 51화면을 이어 보면 보인다.
+   *
+   * 색이 다른 버튼(경고성 동작의 호박색 테두리)은 뜻이 있어 남겨 뒀다.
+   * 여기서 막는 것은 **같은 역할을 새 치수로 다시 그리는 것**이다.
+   */
+  it('버튼을 새 치수로 그리지 않는다', () => {
+    const bad: string[] = []
+    for (const f of FILES) {
+      for (const m of f.src.matchAll(/<button\b[\s\S]{0,700}?className="([^"]*)"/g)) {
+        const cls = m[1] ?? ''
+        if (!cls.includes('min-h-11')) continue
+        /* 뜻이 있는 색은 예외 — 그 밖에 표준 배색을 쓰면서 손으로 그린 것만 잡는다 */
+        if (/amber|rose|emerald/.test(cls)) continue
+        if (/bg-brand|border-slate-300|border-slate-200|underline/.test(cls)) bad.push(f.rel)
+      }
+    }
+    expect(bad, 'AdminButton을 쓸 것 — 같은 역할이 화면마다 다른 크기가 된다').toEqual([])
+  })
+
+  /* 탭 묶음도 같은 이유로 한 곳에서 그린다 */
+  it('탭 묶음을 손으로 그리지 않는다', () => {
+    const bad = FILES.filter((f) => f.src.includes('role="tablist"')).map((f) => f.rel)
+    expect(bad, 'AdminTabs를 쓸 것 — 이름 없는 탭 묶음이 다시 생긴다').toEqual([])
+  })
+})
+
 describe('관리자 표', () => {
   it('화면이 표를 손으로 그리지 않는다', () => {
     const raw = FILES.filter((f) => f.src.includes('<table')).map((f) => f.rel)

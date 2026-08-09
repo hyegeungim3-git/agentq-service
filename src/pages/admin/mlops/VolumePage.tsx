@@ -3,6 +3,7 @@ import { FULL_THRESHOLD, STALE_DAYS, nearlyFull, stale, usedRatio } from '@entit
 import { fetchVolumes, releaseVolume } from '@shared/api/evidence'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
+import { AdminButton } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 공유 볼륨.
@@ -151,13 +152,9 @@ export function VolumePage() {
                           </span>
                         )}
                       </p>
-                      <button
-                        type="button"
-                        onClick={() => release(v.id)}
-                        className="mt-2 min-h-11 rounded-lg border border-slate-300 px-3 text-[11px] font-bold text-slate-700 hover:bg-slate-50"
-                      >
+                      <AdminButton size="sm" layout="mt-2" onClick={() => release(v.id)}>
                         비우기
-                      </button>
+                      </AdminButton>
                     </li>
                   )
                 })}

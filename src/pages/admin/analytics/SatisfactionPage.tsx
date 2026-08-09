@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { responseRate, surveyAverage } from '@entities/analytics/model'
 import { fetchSurvey, sendSurvey } from '@shared/api/analytics'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminButton } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 이용만족도.
@@ -28,13 +29,9 @@ export function SatisfactionPage() {
     <main className="min-w-0 p-4 sm:p-6">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-lg font-black text-slate-900">이용만족도</h1>
-        <button
-          type="button"
-          onClick={send}
-          className="ml-auto min-h-11 rounded-lg border border-slate-300 px-4 text-sm font-bold text-slate-700 hover:bg-slate-50"
-        >
+        <AdminButton layout="ml-auto" onClick={send}>
           만족도 조사 발송
-        </button>
+        </AdminButton>
       </div>
 
       {failure && (

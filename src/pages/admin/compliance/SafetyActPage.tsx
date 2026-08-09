@@ -16,6 +16,7 @@ import { fetchRiskAssessments, fetchSafetyDuties, fetchSafetyTrainings } from '@
 import { fetchAsOf } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
+import { AdminTabs } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 중대재해처벌법 대응.
@@ -139,24 +140,7 @@ export function SafetyActPage() {
       )}
 
       {/* 탭은 데이터를 기다리지 않는다 — 의무 목록이 늦게 와도 다른 탭으로 갈 수 있어야 한다 */}
-      <div role="tablist" aria-label="이행 항목" className="mt-4 flex flex-wrap gap-2">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={`min-h-11 rounded-full border px-4 text-sm font-bold ${
-              tab === t.id
-                ? 'border-slate-900 bg-brand text-brand-fg'
-                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <AdminTabs label="이행 항목" items={TABS} value={tab} onChange={setTab} />
 
       {tab === 'duty' && duties.kind === 'ready' && asOf.kind === 'ready' && (
             <AdminTable label="중대재해처벌법 의무 이행 현황" minW="min-w-[52rem]" wrap="mt-3">

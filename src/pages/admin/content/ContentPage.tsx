@@ -4,6 +4,7 @@ import { faqCategoryLabel } from '@entities/chat/model'
 import { fetchManagedFaq, fetchManagedNotices, saveNotice } from '@shared/api/oplog'
 import { useRemote } from '@features/remote/useRemote'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
+import { AdminButton, AdminTabs } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 콘텐츠 관리 — 공지사항·Q&A·설문.
@@ -52,24 +53,7 @@ export function ContentPage() {
         </p>
       )}
 
-      <div role="tablist" aria-label="콘텐츠 종류" className="mt-4 flex flex-wrap gap-2">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={`min-h-11 rounded-full border px-4 text-sm font-bold ${
-              tab === t.id
-                ? 'border-slate-900 bg-brand text-brand-fg'
-                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <AdminTabs label="콘텐츠 종류" items={TABS} value={tab} onChange={setTab} />
 
       {tab === 'notice' && notices.kind === 'ready' && (
         <section className="mt-4">
@@ -120,13 +104,9 @@ export function ContentPage() {
                 placeholder="예: 4월 정기 점검 안내"
                 className="min-h-11 min-w-48 flex-1 rounded-lg border border-slate-300 px-3 text-sm"
               />
-              <button
-                type="submit"
-                disabled={title.trim() === ''}
-                className="min-h-11 rounded-lg bg-brand px-4 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-              >
+              <AdminButton tone="primary" type="submit" disabled={title.trim() === ''}>
                 등록
-              </button>
+              </AdminButton>
             </div>
           </form>
         </section>

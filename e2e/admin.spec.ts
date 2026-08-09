@@ -78,11 +78,14 @@ test.describe('관리자 셸', () => {
   test('파드 구간을 바꾸면 목록이 실제로 달라진다', async ({ page }) => {
     await enterAdmin(page)
     await expect(page.getByText(/24h 구간 7건/)).toBeVisible()
-    await expect(page.getByText('notify-relay-6d4f2')).toBeVisible()
+    /* 표 안에서 찾는다 — 같은 파드 이름이 상단바 알림에도 있다(그쪽은 접혀 있다).
+       화면 전체에서 찾으면 '어디에든 있으면 통과'가 되어 표를 안 보게 된다 */
+    const pods = page.getByRole('table', { name: '파드 정보' })
+    await expect(pods.getByText('notify-relay-6d4f2')).toBeVisible()
 
     await pickLabel(page, '1h')
     await expect(page.getByText(/1h 구간 3건/)).toBeVisible()
-    await expect(page.getByText('notify-relay-6d4f2')).toHaveCount(0)
+    await expect(pods.getByText('notify-relay-6d4f2')).toHaveCount(0)
   })
 
   /* 상태를 아는 것과 조치할 수 있는 것은 다르다 */
@@ -678,7 +681,7 @@ test.describe('관리자 셸', () => {
 
     await pickLabel(page, '리랭킹 학습')
     await expect(page.getByText(/Top-K 50 · 음성 표본 하드 네거티브 8/)).toBeVisible()
-    await expect(page.getByText('JOB-992')).toHaveCount(0)
+    await expect(page.getByRole('table', { name: '학습 작업 현황' }).getByText('JOB-992')).toHaveCount(0)
   })
 
 })

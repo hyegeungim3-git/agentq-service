@@ -8,6 +8,7 @@ import { fetchDomains } from '@shared/api/domains'
 import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
 import { useRemote } from '@features/remote/useRemote'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
+import { AdminButton } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 에이전트 운영.
@@ -184,13 +185,9 @@ export function AgentOpsPage() {
                           </td>
                           <td className="px-3 py-2 text-slate-600">{o.owner}</td>
                           <td className="px-3 py-2">
-                            <button
-                              type="button"
-                              onClick={() => toggle(o.agentId, !o.exposed)}
-                              className="min-h-11 rounded-lg border border-slate-300 px-2 text-[11px] font-bold text-slate-700 hover:bg-slate-50"
-                            >
+                            <AdminButton size="sm" onClick={() => toggle(o.agentId, !o.exposed)}>
                               {o.exposed ? '내리기' : '올리기'}
-                            </button>
+                            </AdminButton>
                           </td>
                         </tr>
                       )

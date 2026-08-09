@@ -9,6 +9,7 @@ import {
 } from '@entities/catalog/model'
 import { fetchDataAssets, fetchLineages } from '@shared/api/catalog'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminButton } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 데이터 카탈로그 · 리니지.
@@ -122,14 +123,9 @@ export function CatalogPage() {
                     이 자산이 틀리면 함께 틀리는 곳: <b>{a.consumers.join(' · ')}</b>
                   </p>
 
-                  <button
-                    type="button"
-                    onClick={() => setSelected(open ? null : a.id)}
-                    aria-expanded={open}
-                    className="mt-2 min-h-11 text-[11px] font-bold text-slate-600 underline underline-offset-2 hover:text-slate-900"
-                  >
+                  <AdminButton tone="link" size="sm" layout="mt-2" onClick={() => setSelected(open ? null : a.id)} aria-expanded={open}>
                     {open ? '계보 접기' : '계보 보기'}
-                  </button>
+                  </AdminButton>
 
                   {open && line === null && (
                     <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-900">

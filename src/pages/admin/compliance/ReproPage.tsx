@@ -9,6 +9,7 @@ import {
 } from '@entities/repro/model'
 import { fetchSnapshots, runReproduction } from '@shared/api/repro'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminButton } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 답변 재현성.
@@ -75,14 +76,9 @@ function SnapshotCard({
         </p>
       )}
 
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={open}
-        className="mt-2 min-h-11 text-[11px] font-bold text-slate-600 underline underline-offset-2 hover:text-slate-900"
-      >
+      <AdminButton tone="link" size="sm" layout="mt-2" onClick={onToggle} aria-expanded={open}>
         {open ? '구성 상세 접기' : '구성 상세 보기'}
-      </button>
+      </AdminButton>
 
       {open && (
         <div className="mt-2 border-t border-slate-100 pt-3">
@@ -128,14 +124,9 @@ function SnapshotCard({
       )}
 
       <div className="mt-3">
-        <button
-          type="button"
-          onClick={onRun}
-          disabled={running}
-          className="min-h-11 rounded-lg border border-slate-300 px-3 text-[11px] font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-        >
+        <AdminButton size="sm" onClick={onRun} disabled={running}>
           {running ? '재현 시도 중…' : '이 구성으로 재현'}
-        </button>
+        </AdminButton>
       </div>
     </li>
   )

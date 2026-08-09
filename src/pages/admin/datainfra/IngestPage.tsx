@@ -5,6 +5,7 @@ import { fetchAreas } from '@shared/api/knowledgebase'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
+import { AdminButton } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 자동 적재.
@@ -141,13 +142,9 @@ export function IngestPage() {
                         </td>
                         <td className="px-3 py-2 tabular-nums text-slate-600">{s.total}건</td>
                         <td className="px-3 py-2">
-                          <button
-                            type="button"
-                            onClick={() => run(s.id)}
-                            className="min-h-11 rounded-lg border border-slate-300 px-2 text-[11px] font-bold text-slate-700 hover:bg-slate-50"
-                          >
+                          <AdminButton size="sm" onClick={() => run(s.id)}>
                             지금 수집
-                          </button>
+                          </AdminButton>
                         </td>
                       </tr>
                     ))}

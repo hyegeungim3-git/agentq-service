@@ -14,6 +14,7 @@ import { fetchDomains } from '@shared/api/domains'
 import { fetchTools } from '@shared/api/packops'
 import { useRemote } from '@features/remote/useRemote'
 import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
+import { AdminButton } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 태스크플로우 빌더 — 에이전트가 무엇을 하도록 정해 놓았나.
@@ -206,14 +207,9 @@ export function FlowBuilderPage() {
                         )}
                       </p>
 
-                      <button
-                        type="button"
-                        onClick={() => setOpenId(open ? null : d.agentId)}
-                        aria-expanded={open}
-                        className="mt-2 min-h-11 rounded-lg border border-slate-300 px-3 text-[11px] font-bold text-slate-700 hover:bg-slate-50"
-                      >
+                      <AdminButton size="sm" layout="mt-2" onClick={() => setOpenId(open ? null : d.agentId)} aria-expanded={open}>
                         {open ? '단계 접기' : '단계 보기'}
-                      </button>
+                      </AdminButton>
 
                       {open && (
                         <ol className="mt-3 space-y-2 border-l-2 border-slate-200 pl-3">
@@ -246,13 +242,9 @@ export function FlowBuilderPage() {
                         </ol>
                       )}
 
-                      <button
-                        type="button"
-                        onClick={() => save(d.agentId)}
-                        className="mt-3 min-h-11 rounded-lg bg-brand px-3 text-[11px] font-bold text-brand-fg hover:opacity-90"
-                      >
+                      <AdminButton tone="primary" size="sm" layout="mt-3" onClick={() => save(d.agentId)}>
                         정의 저장
-                      </button>
+                      </AdminButton>
                     </li>
                   )
                 })}

@@ -11,6 +11,7 @@ import {
 import { createPack, fetchPacks } from '@shared/api/packops'
 import { withSubject } from '@shared/lib/korean'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminButton } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 도메인 팩 스튜디오.
@@ -168,13 +169,9 @@ export function PackStudioPage() {
                     placeholder="예: 한울에너지공사"
                     className="min-h-11 min-w-48 flex-1 rounded-lg border border-slate-300 px-3 text-sm"
                   />
-                  <button
-                    type="submit"
-                    disabled={name.trim() === ''}
-                    className="min-h-11 rounded-lg bg-brand px-4 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
+                  <AdminButton tone="primary" type="submit" disabled={name.trim() === ''}>
                     팩 만들기
-                  </button>
+                  </AdminButton>
                 </div>
                 <p className="mt-2 text-[11px] text-slate-500">
                   이름만으로는 팩이 되지 않습니다. 업무 문서와 조직 정보를 올려야 포털에서 고를 수

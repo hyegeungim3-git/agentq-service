@@ -57,7 +57,7 @@
 | `GET /signals` | `fetchSignals` | `src/App.tsx` |
 | `GET /infra/cluster` | `fetchCluster` | `src/pages/admin/system/SystemStatusPage.tsx` |
 | `GET /infra/nodes` | `fetchNodes` | `src/pages/admin/system/SystemStatusPage.tsx` |
-| `GET /infra/pods` | `fetchPods` | `src/pages/admin/system/SystemStatusPage.tsx` |
+| `GET /infra/pods` | `fetchPods` | `src/pages/admin/system/SystemStatusPage.tsx`<br>`src/widgets/admin-shell/AdminBell.tsx` |
 | `GET /infra/services` | `fetchServices` | `src/pages/admin/service/ServiceStatusPage.tsx` |
 | `GET /infra/gpus` | `fetchGpuNodes` | `src/pages/admin/gpu/GpuStatusPage.tsx` |
 | `GET /users` | `fetchUsers` | `src/pages/admin/users/QuotaPage.tsx`<br>`src/pages/admin/users/UserListPage.tsx` |
@@ -89,7 +89,7 @@
 | `GET /notices` | `fetchManagedNotices` | `src/pages/admin/content/ContentPage.tsx` |
 | `GET /chat/faq` | `fetchManagedFaq` | `src/pages/admin/content/ContentPage.tsx` |
 | `POST /notices` | `saveNotice` | `src/pages/admin/content/ContentPage.tsx` |
-| `GET /integrations/hr` | `fetchHrSync` | `src/pages/admin/sysops/HrSyncPage.tsx` |
+| `GET /integrations/hr` | `fetchHrSync` | `src/pages/admin/sysops/HrSyncPage.tsx`<br>`src/widgets/admin-shell/AdminBell.tsx` |
 | `POST /integrations/hr:sync` | `runHrSync` | `src/pages/admin/sysops/HrSyncPage.tsx` |
 | `GET /apis` | `fetchApis` | `src/pages/admin/sysops/ApiPromptPage.tsx` |
 | `POST /apis/{id}/keys` | `reissueApiKey` | `src/pages/admin/sysops/ApiPromptPage.tsx` |

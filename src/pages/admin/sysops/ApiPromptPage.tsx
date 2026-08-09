@@ -3,6 +3,7 @@ import { API_STATE_LABEL, type ApiState } from '@entities/sysops/model'
 import { fetchApis, fetchPrompts, reissueApiKey } from '@shared/api/sysops'
 import { useRemote } from '@features/remote/useRemote'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
+import { AdminButton, AdminTabs } from '@widgets/admin-shell/AdminControls'
 
 /**
  * API · 프롬프트 관리.
@@ -17,6 +18,11 @@ import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
  */
 
 type Tab = 'api' | 'prompt'
+
+const TABS: readonly { id: Tab; label: string }[] = [
+  { id: 'api', label: 'API 관리' },
+  { id: 'prompt', label: '프롬프트 관리' },
+]
 
 const STATE_TONE: Record<ApiState, string> = {
   active: 'bg-emerald-100 text-emerald-800',
@@ -47,29 +53,7 @@ export function ApiPromptPage() {
         </p>
       )}
 
-      <div role="tablist" aria-label="관리 대상" className="mt-4 flex flex-wrap gap-2">
-        {(
-          [
-            { id: 'api' as const, label: 'API 관리' },
-            { id: 'prompt' as const, label: '프롬프트 관리' },
-          ] as const
-        ).map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={`min-h-11 rounded-full border px-4 text-sm font-bold ${
-              tab === t.id
-                ? 'border-slate-900 bg-brand text-brand-fg'
-                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <AdminTabs label="관리 대상" items={TABS} value={tab} onChange={setTab} />
 
       {tab === 'api' && apis.kind === 'ready' && (
         <section className="mt-4">
@@ -114,13 +98,9 @@ export function ApiPromptPage() {
                       {a.callsToday.toLocaleString('ko-KR')}
                     </td>
                     <td className="px-3 py-2">
-                      <button
-                        type="button"
-                        onClick={() => reissue(a.id)}
-                        className="min-h-11 rounded-lg border border-slate-300 px-2 text-[11px] font-bold text-slate-700 hover:bg-slate-50"
-                      >
+                      <AdminButton size="sm" onClick={() => reissue(a.id)}>
                         재발급
-                      </button>
+                      </AdminButton>
                     </td>
                   </tr>
                 ))}

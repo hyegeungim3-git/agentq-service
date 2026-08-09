@@ -4,6 +4,7 @@ import { fetchWorkspaces, releaseWorkspace } from '@shared/api/mlops'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
+import { AdminButton } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 개발 환경.
@@ -136,14 +137,9 @@ export function DevEnvPage() {
                           )}
                         </td>
                         <td className="px-3 py-2">
-                          <button
-                            type="button"
-                            onClick={() => release(w.id)}
-                            disabled={w.gpuCount === 0}
-                            className="min-h-11 rounded-lg border border-slate-300 px-2 text-[11px] font-bold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-                          >
+                          <AdminButton size="sm" onClick={() => release(w.id)} disabled={w.gpuCount === 0}>
                             회수
-                          </button>
+                          </AdminButton>
                         </td>
                       </tr>
                     ))}

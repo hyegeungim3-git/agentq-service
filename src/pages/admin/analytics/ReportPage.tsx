@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { STAT_WINDOWS, STAT_WINDOW_LABEL, type StatWindow } from '@entities/analytics/model'
 import { buildReport, fetchReportSections } from '@shared/api/analytics'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminButton } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 서비스 통계 리포트.
@@ -110,14 +111,9 @@ export function ReportPage() {
               )}
 
               <div className="mt-5 flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  onClick={build}
-                  disabled={picked.size === 0}
-                  className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-                >
+                <AdminButton tone="primary" onClick={build} disabled={picked.size === 0}>
                   리포트 만들기
-                </button>
+                </AdminButton>
                 {picked.size === 0 && (
                   <p className="text-xs text-slate-500">항목을 하나 이상 고르세요.</p>
                 )}

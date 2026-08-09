@@ -13,6 +13,7 @@ import { fetchDomains } from '@shared/api/domains'
 import { useRemote } from '@features/remote/useRemote'
 import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
+import { AdminTabs } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 도구 · 배포.
@@ -30,6 +31,12 @@ import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
  */
 
 type Tab = 'tools' | 'servers' | 'deploy'
+
+const TABS: readonly { id: Tab; label: string }[] = [
+  { id: 'tools', label: '도구' },
+  { id: 'servers', label: 'MCP 서버' },
+  { id: 'deploy', label: '배포' },
+]
 
 export function ToolDeployPage() {
   const [tab, setTab] = useState<Tab>('tools')
@@ -59,30 +66,7 @@ export function ToolDeployPage() {
         </p>
       )}
 
-      <div role="tablist" aria-label="도구·배포" className="mt-4 flex flex-wrap gap-2">
-        {(
-          [
-            { id: 'tools' as const, label: '도구' },
-            { id: 'servers' as const, label: 'MCP 서버' },
-            { id: 'deploy' as const, label: '배포' },
-          ] as const
-        ).map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={`min-h-11 rounded-full border px-4 text-sm font-bold ${
-              tab === t.id
-                ? 'border-slate-900 bg-brand text-brand-fg'
-                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <AdminTabs label="도구·배포" items={TABS} value={tab} onChange={setTab} />
 
       {tab !== 'deploy' && (
         <DomainSelect

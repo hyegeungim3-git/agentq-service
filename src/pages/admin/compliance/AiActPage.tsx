@@ -20,6 +20,7 @@ import {
 } from '@entities/evidence/model'
 import { fetchEvidence } from '@shared/api/evidence'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminTabs } from '@widgets/admin-shell/AdminControls'
 
 /**
  * AI 기본법 대응.
@@ -92,24 +93,7 @@ export function AiActPage() {
         ))}
       </ul>
 
-      <div role="tablist" aria-label="이행 항목" className="mt-4 flex flex-wrap gap-2">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={`min-h-11 rounded-full border px-4 text-sm font-bold ${
-              tab === t.id
-                ? 'border-slate-900 bg-brand text-brand-fg'
-                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <AdminTabs label="이행 항목" items={TABS} value={tab} onChange={setTab} />
 
       {tab === 'systems' && systems.kind === 'ready' && (
         <section className="mt-4">

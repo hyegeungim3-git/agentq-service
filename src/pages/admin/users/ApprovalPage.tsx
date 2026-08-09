@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { APPROVAL_LABEL, waitingDays, type ApprovalRequest } from '@entities/user/model'
 import { decideApproval, fetchApprovals, fetchAsOf } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
+import { AdminButton } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 승인 관리.
@@ -44,20 +45,12 @@ function Card({
         신청 사유 · {req.reason ?? <span className="text-slate-400">적지 않음</span>}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => onDecide(req.id, true)}
-          className="min-h-11 rounded-lg bg-brand px-4 text-xs font-bold text-brand-fg hover:opacity-90"
-        >
+        <AdminButton tone="primary" size="sm" onClick={() => onDecide(req.id, true)}>
           승인
-        </button>
-        <button
-          type="button"
-          onClick={() => onDecide(req.id, false)}
-          className="min-h-11 rounded-lg border border-slate-300 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50"
-        >
+        </AdminButton>
+        <AdminButton size="sm" onClick={() => onDecide(req.id, false)}>
           반려
-        </button>
+        </AdminButton>
       </div>
     </li>
   )

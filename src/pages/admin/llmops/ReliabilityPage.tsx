@@ -3,6 +3,7 @@ import { averageGain } from '@entities/llmops/model'
 import { fetchConfidencePolicy, fetchGuardrails, fetchPipelines, toggleGuardrail } from '@shared/api/llmops'
 import { useRemote } from '@features/remote/useRemote'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
+import { AdminButton, AdminTabs } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 신뢰성 관리.
@@ -55,24 +56,7 @@ export function ReliabilityPage() {
         </p>
       )}
 
-      <div role="tablist" aria-label="신뢰성 설정" className="mt-4 flex flex-wrap gap-2">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={`min-h-11 rounded-full border px-4 text-sm font-bold ${
-              tab === t.id
-                ? 'border-slate-900 bg-brand text-brand-fg'
-                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <AdminTabs label="신뢰성 설정" items={TABS} value={tab} onChange={setTab} />
 
       {tab === 'rerank' && pipelines.kind === 'ready' && (
         <section className="mt-4">
@@ -198,13 +182,9 @@ export function ReliabilityPage() {
                   {g.enabled ? '끄면 · ' : '꺼져 있어 지금 · '}
                   {g.riskIfOff}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => toggle(g.id, !g.enabled)}
-                  className="mt-2 min-h-11 rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
-                >
+                <AdminButton size="sm" layout="mt-2" onClick={() => toggle(g.id, !g.enabled)}>
                   {g.enabled ? '끄기' : '켜기'}
-                </button>
+                </AdminButton>
               </li>
             ))}
           </ul>

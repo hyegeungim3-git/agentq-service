@@ -13,6 +13,9 @@ import { BrandLock } from '@shared/ui/Brand'
 import { SkipToMain } from '@shared/ui/SkipLink'
 import { useModalOverlay } from '@features/overlay/useModalOverlay'
 import { FALLBACK_ICON, MENU_ICONS, menuIcon } from './menuIcons'
+import { AdminBell } from './AdminBell'
+import { AdminSettings } from './AdminSettings'
+import { readDensity, writeDensity, type Density } from '@shared/lib/adminPrefs'
 
 /**
  * 관리자 셸 — 좌측 메뉴와 상단 바.
@@ -70,6 +73,12 @@ export function AdminShell({
 }: AdminShellProps) {
   const [open, setOpen] = useState(false)
   const close = useCallback(() => setOpen(false), [])
+  /* 표 밀도는 이 브라우저에 남는다 — 새로 열 때마다 다시 고르게 하지 않는다 */
+  const [density, setDensity] = useState<Density>(readDensity)
+  const pickDensity = useCallback((d: Density) => {
+    setDensity(d)
+    writeDensity(d)
+  }, [])
   /* 좁은 화면에서 메뉴는 본문을 덮는다 — 덮으면 대화상자여야 한다 */
   const panelRef = useModalOverlay(open, close)
 
@@ -207,7 +216,7 @@ export function AdminShell({
     /* 관리자는 화면 틀 언어 전환 대상이 아니다 — 메뉴 55개와 본문이 전부 한국어다.
        그런데 `<html lang>`은 사용자가 고른 화면 틀 언어를 따라가므로, English로 두고
        관리자로 들어오면 한국어가 통째로 영어 아래 놓인다. 여기서 한 번에 표시한다 */
-    <div lang="ko" className="flex min-h-dvh bg-slate-50">
+    <div lang="ko" className={`flex min-h-dvh bg-slate-50 ${density === 'compact' ? 'admin-compact' : ''}`}>
       {/* 첫 정지점 — 관리자는 메뉴 버튼 55개를 지나야 본문에 닿는다 */}
       <SkipToMain label="본문으로 건너뛰기" />
 
@@ -267,6 +276,11 @@ export function AdminShell({
               <LayoutGrid className="size-3.5" aria-hidden="true" />
               사용자 포털
             </button>
+
+            {/* 원본 상단바의 종·톱니. 아이콘만 옮기지 않았다 — 종은 실제로 세고,
+                톱니는 실제로 화면을 바꾼다. 누르면 아무 일도 없는 아이콘은 두지 않는다 */}
+            <AdminBell onMenu={onMenu} />
+            <AdminSettings density={density} onDensity={pickDensity} />
             <span className="flex items-center gap-2 border-l border-slate-200 pl-2">
               <span className="flex size-8 items-center justify-center rounded-full bg-slate-900 text-[11px] font-black text-white">
                 {admin.name.slice(0, 1)}

@@ -10,6 +10,7 @@ import {
 import { fetchUsers, updateUserState, type UserFilter } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
+import { AdminButton } from '@widgets/admin-shell/AdminControls'
 
 /**
  * 사용자 목록.
@@ -151,13 +152,9 @@ export function UserListPage() {
                       {u.lastSeenAt ?? <span className="text-slate-400">접속 이력 없음</span>}
                     </td>
                     <td className="px-3 py-2">
-                      <button
-                        type="button"
-                        onClick={() => tryChange(u.id, u.state === 'suspended' ? 'active' : 'suspended')}
-                        className="min-h-11 rounded-lg border border-slate-300 px-2 text-[11px] font-bold text-slate-700 hover:bg-slate-50"
-                      >
+                      <AdminButton size="sm" onClick={() => tryChange(u.id, u.state === 'suspended' ? 'active' : 'suspended')}>
                         {u.state === 'suspended' ? '정지 해제' : '정지'}
-                      </button>
+                      </AdminButton>
                     </td>
                   </tr>
                 ))}
