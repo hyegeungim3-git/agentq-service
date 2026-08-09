@@ -3,7 +3,8 @@ import { averageGain } from '@entities/llmops/model'
 import { fetchConfidencePolicy, fetchGuardrails, fetchPipelines, toggleGuardrail } from '@shared/api/llmops'
 import { useRemote } from '@features/remote/useRemote'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
-import { AdminButton, AdminTabs } from '@widgets/admin-shell/AdminControls'
+import { AdminTabs } from '@widgets/admin-shell/AdminControls'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 신뢰성 관리.
@@ -182,9 +183,9 @@ export function ReliabilityPage() {
                   {g.enabled ? '끄면 · ' : '꺼져 있어 지금 · '}
                   {g.riskIfOff}
                 </p>
-                <AdminButton size="sm" layout="mt-2" onClick={() => toggle(g.id, !g.enabled)}>
+                <Button size="sm" layout="mt-2" onClick={() => toggle(g.id, !g.enabled)}>
                   {g.enabled ? '끄기' : '켜기'}
-                </AdminButton>
+                </Button>
               </li>
             ))}
           </ul>

@@ -6,6 +6,7 @@ import {
   type SignalSeverity,
   type WorkSignal,
 } from '@entities/signal/model'
+import { Button } from '@shared/ui/Button'
 
 const SEVERITY_STYLE: Record<SignalSeverity, string> = {
   action: 'bg-rose-100 text-rose-800',
@@ -101,16 +102,12 @@ export function SignalBell({
                   {/* 무엇이 이 알림을 만들었는지 — 근거 없는 알림은 확인할 방법이 없다 */}
                   <p className="mt-1 text-[11px] text-slate-400">출처 · {s.source}</p>
                   {s.link ? (
-                    <button
-                      type="button"
-                      onClick={() => {
+                    <Button tone="link" size="sm" layout="mt-2" onClick={() => {
                         onOpen(s.link)
                         setOpen(false)
-                      }}
-                      className="mt-2 min-h-11 text-xs font-bold text-slate-700 underline hover:text-slate-900"
-                    >
+                      }}>
                       {s.link.label} →
-                    </button>
+                    </Button>
                   ) : (
                     <p className="mt-2 text-[11px] text-slate-400">이어질 화면이 없는 안내입니다.</p>
                   )}

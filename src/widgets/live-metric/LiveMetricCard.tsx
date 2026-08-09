@@ -1,5 +1,6 @@
 import { METRIC_SPEEDS, type LiveMetric, type MetricSpeed } from '@entities/metric/model'
 import { useLiveMetric } from '@features/metrics/useLiveMetric'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 라이브 지표 카드.
@@ -81,13 +82,9 @@ export function LiveMetricCard({ metric }: { metric: LiveMetric }) {
           </label>
         ))}
         {m.finished && (
-          <button
-            type="button"
-            onClick={m.reset}
-            className="min-h-11 text-xs font-bold text-slate-500 underline hover:text-slate-900"
-          >
+          <Button tone="link" size="sm" onClick={m.reset}>
             처음부터
-          </button>
+          </Button>
         )}
       </div>
 

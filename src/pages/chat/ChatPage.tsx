@@ -48,6 +48,7 @@ import { DOCUMENT_UPLOAD, validateUpload } from '@entities/upload/model'
 import { fetchModels } from '@shared/api/llmops'
 import { useRemote } from '@features/remote/useRemote'
 import { uploadDocument } from '@shared/api/documents'
+import { Button } from '@shared/ui/Button'
 
 export function ChatPage({
   onBack,
@@ -681,15 +682,10 @@ function SourceItem({ source }: { source: ChatSource }) {
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        className="min-h-11 text-left text-xs font-bold text-slate-600 underline decoration-slate-300 underline-offset-2 hover:text-slate-900"
-      >
+      <Button onClick={() => setOpen((v) => !v)} aria-expanded={open} tone="link" size="sm" layout="text-left">
         {source.title} · {source.locator}
         {source.revisedOn && <span className="ml-1 font-normal text-slate-400">({source.revisedOn} 개정)</span>}
-      </button>
+      </Button>
 
       {open && (
         <p className="mt-1 rounded-lg bg-slate-50 px-3 py-2 text-xs leading-relaxed text-slate-700">
@@ -711,14 +707,9 @@ function XaiPanel({ xai }: { xai: Xai }) {
 
   return (
     <div className="mt-3">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        className="min-h-11 text-[11px] font-bold text-slate-600 underline decoration-slate-300 underline-offset-2 hover:text-slate-900"
-      >
+      <Button onClick={() => setOpen((v) => !v)} aria-expanded={open} tone="link" size="sm">
         왜 이 답변인가
-      </button>
+      </Button>
 
       {open && (
         <div className="mt-1 rounded-lg bg-slate-50 p-3">

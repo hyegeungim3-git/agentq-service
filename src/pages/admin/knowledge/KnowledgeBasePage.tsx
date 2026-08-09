@@ -13,7 +13,8 @@ import { fetchAreas, fetchIndexEntries, fetchRagConfig, runReindex } from '@shar
 import { fetchDomains } from '@shared/api/domains'
 import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
 import { useRemote } from '@features/remote/useRemote'
-import { AdminButton, AdminTabs } from '@widgets/admin-shell/AdminControls'
+import { AdminTabs } from '@widgets/admin-shell/AdminControls'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 지식 관리.
@@ -167,9 +168,9 @@ export function KnowledgeBasePage() {
                           )}
                         </p>
                         <p className="mt-1 text-[11px] text-slate-400">마지막 색인 {a.lastIndexedAt}</p>
-                        <AdminButton size="sm" layout="mt-2" onClick={() => reindex(a.id)}>
+                        <Button size="sm" layout="mt-2" onClick={() => reindex(a.id)}>
                           재색인
-                        </AdminButton>
+                        </Button>
                       </li>
                     )
                   })}

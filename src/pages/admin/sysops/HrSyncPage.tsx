@@ -3,7 +3,7 @@ import { HR_CHANGE_LABEL, failedChanges, riskyPending } from '@entities/sysops/m
 import { fetchHrSync, runHrSync } from '@shared/api/sysops'
 import { useRemote } from '@features/remote/useRemote'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
-import { AdminButton } from '@widgets/admin-shell/AdminControls'
+import { Button } from '@shared/ui/Button'
 
 /**
  * HR 연계·그룹 관리.
@@ -29,9 +29,9 @@ export function HrSyncPage() {
     <main className="min-w-0 p-4 sm:p-6">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-lg font-black text-slate-900">HR 연계·그룹 관리</h1>
-        <AdminButton layout="ml-auto" onClick={sync}>
+        <Button layout="ml-auto" onClick={sync}>
           수동 동기화
-        </AdminButton>
+        </Button>
       </div>
       <p className="mt-1 text-sm text-slate-600">인사 정보가 바뀌면 계정이 따라 바뀝니다.</p>
 

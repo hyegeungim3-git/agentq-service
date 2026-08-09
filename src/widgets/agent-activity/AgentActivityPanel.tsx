@@ -1,6 +1,7 @@
 import { Activity, ArrowRight, CheckCircle2, Clock } from 'lucide-react'
 import { AGENTS, type AgentId } from '@entities/agent/model'
 import { recentlyUsed, totalRuns, type AgentActivity } from '@entities/agentusage/model'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 내 에이전트 활동 — 원본 허브 오른쪽 패널이다(D-014).
@@ -88,14 +89,10 @@ export function AgentActivityPanel({
             <li key={h.id} className="border-brand-soft bg-brand-soft rounded-xl border p-3">
               <p className="text-xs font-bold text-slate-900">{h.title}</p>
               <p className="mt-1 text-[11px] leading-relaxed text-slate-700">{h.body}</p>
-              <button
-                type="button"
-                onClick={() => onOpen(h.agentId)}
-                className="bg-brand text-brand-fg mt-2 inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-[11px] font-bold hover:opacity-90"
-              >
+              <Button onClick={() => onOpen(h.agentId)} tone="primary" size="sm" layout="mt-2">
                 {h.action}
                 <ArrowRight className="size-3.5" aria-hidden="true" />
-              </button>
+              </Button>
             </li>
           ))}
         </ul>

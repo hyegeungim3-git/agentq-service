@@ -5,6 +5,7 @@ import { ADMIN_FEATURES } from '@entities/domain/model'
 import { fetchDomains } from '@shared/api/domains'
 import { OcubeMark } from '@shared/ui/Brand'
 import { brandVars } from '@shared/lib/brand'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 첫 화면.
@@ -104,13 +105,9 @@ export function PortalPage({
           <div role="alert" className="mt-10 rounded-xl border border-rose-200 bg-rose-50 p-5">
             <p className="text-sm font-bold text-rose-800">발주처 목록을 불러오지 못했습니다</p>
             <p className="mt-1 text-sm text-rose-700">{state.message}</p>
-            <button
-              type="button"
-              onClick={() => setState({ kind: 'loading' })}
-              className="mt-3 min-h-11 rounded-lg border border-rose-300 px-3 text-sm font-bold text-rose-800 hover:bg-rose-100"
-            >
+            <Button tone="danger" layout="mt-3" onClick={() => setState({ kind: 'loading' })}>
               다시 시도
-            </button>
+            </Button>
           </div>
         )}
 

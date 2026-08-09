@@ -3,7 +3,7 @@ import { isActiveRule, type BlockRule } from '@entities/user/model'
 import { createBlockRule, fetchBlockRules, fetchAsOf } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
-import { AdminButton } from '@widgets/admin-shell/AdminControls'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 접근권한·차단.
@@ -157,9 +157,9 @@ export function BlockRulePage() {
             placeholder="예: 203.0.113.0/24"
             className="min-h-11 min-w-48 flex-1 rounded-lg border border-slate-300 px-3 text-sm"
           />
-          <AdminButton tone="primary" type="submit" disabled={value.trim() === ''}>
+          <Button tone="primary" type="submit" disabled={value.trim() === ''}>
             규칙 추가
-          </AdminButton>
+          </Button>
         </div>
       </form>
     </main>

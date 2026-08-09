@@ -3,7 +3,8 @@ import { API_STATE_LABEL, type ApiState } from '@entities/sysops/model'
 import { fetchApis, fetchPrompts, reissueApiKey } from '@shared/api/sysops'
 import { useRemote } from '@features/remote/useRemote'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
-import { AdminButton, AdminTabs } from '@widgets/admin-shell/AdminControls'
+import { AdminTabs } from '@widgets/admin-shell/AdminControls'
+import { Button } from '@shared/ui/Button'
 
 /**
  * API · 프롬프트 관리.
@@ -98,9 +99,9 @@ export function ApiPromptPage() {
                       {a.callsToday.toLocaleString('ko-KR')}
                     </td>
                     <td className="px-3 py-2">
-                      <AdminButton size="sm" onClick={() => reissue(a.id)}>
+                      <Button size="sm" onClick={() => reissue(a.id)}>
                         재발급
-                      </AdminButton>
+                      </Button>
                     </td>
                   </tr>
                 ))}

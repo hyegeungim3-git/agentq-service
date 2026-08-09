@@ -9,6 +9,7 @@ import {
 import { useOrchestration, type OrchestrationOptions } from '@features/orchestration/useOrchestration'
 import { AgentPageHeader } from '@widgets/agent-shell/AgentShell'
 import { Workflow } from 'lucide-react'
+import { Button } from '@shared/ui/Button'
 
 const STATUS_STYLE: Record<StepStatus, string> = {
   pending: 'bg-slate-100 text-slate-500',
@@ -87,22 +88,13 @@ export function OrchestrationPage({
           </section>
 
           <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => void o.run()}
-              disabled={busy}
-              className="min-h-11 rounded-lg bg-brand px-5 text-sm font-bold text-brand-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-            >
+            <Button tone="primary" onClick={() => void o.run()} disabled={busy}>
               {busy ? '진행 중…' : '릴레이 실행'}
-            </button>
+            </Button>
             {o.outcomes.length > 0 && !busy && (
-              <button
-                type="button"
-                onClick={o.reset}
-                className="min-h-11 rounded-lg border border-slate-300 px-4 text-sm font-bold text-slate-700 hover:bg-slate-100"
-              >
+              <Button onClick={o.reset}>
                 다시 설정
-              </button>
+              </Button>
             )}
           </div>
 

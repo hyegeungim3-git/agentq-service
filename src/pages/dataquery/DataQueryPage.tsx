@@ -3,6 +3,7 @@ import { useDataQuery, type DataQueryOptions } from '@features/dataquery/useData
 import { AgentPageHeader, ResultSection } from '@widgets/agent-shell/AgentShell'
 import { AgentFlowTrail } from '@widgets/agent-flow/AgentFlowTrail'
 import { Play } from 'lucide-react'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 데이터 조회는 질문 입력형이라 AgentShell을 쓰지 않는다(내규 조회와 같은 이유).
@@ -68,15 +69,10 @@ export function DataQueryPage({
             />
           </section>
 
-          <button
-            type="button"
-            onClick={() => void q.run()}
-            disabled={!q.canRun || q.phase.kind === 'running'}
-            className="bg-brand text-brand-fg flex min-h-11 items-center gap-2 rounded-lg px-5 text-sm font-bold shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-          >
+          <Button tone="primary" onClick={() => void q.run()} disabled={!q.canRun || q.phase.kind === 'running'}>
             <Play className="size-4" aria-hidden="true" />
             {q.phase.kind === 'running' ? '조회 중…' : '조회 실행'}
-          </button>
+          </Button>
 
           {/* 알림 자리는 **처음부터 있어야 한다.** 실행하는 순간 비로소 만들어지는
               라이브 리전은 낭독기가 첫 변화를 놓치는 경우가 있다. 자리는 늘 두고

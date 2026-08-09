@@ -4,7 +4,8 @@ import { faqCategoryLabel } from '@entities/chat/model'
 import { fetchManagedFaq, fetchManagedNotices, saveNotice } from '@shared/api/oplog'
 import { useRemote } from '@features/remote/useRemote'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
-import { AdminButton, AdminTabs } from '@widgets/admin-shell/AdminControls'
+import { AdminTabs } from '@widgets/admin-shell/AdminControls'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 콘텐츠 관리 — 공지사항·Q&A·설문.
@@ -104,9 +105,9 @@ export function ContentPage() {
                 placeholder="예: 4월 정기 점검 안내"
                 className="min-h-11 min-w-48 flex-1 rounded-lg border border-slate-300 px-3 text-sm"
               />
-              <AdminButton tone="primary" type="submit" disabled={title.trim() === ''}>
+              <Button tone="primary" type="submit" disabled={title.trim() === ''}>
                 등록
-              </AdminButton>
+              </Button>
             </div>
           </form>
         </section>

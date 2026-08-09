@@ -8,6 +8,7 @@ import {
 import { fetchScanTargets } from '@shared/api/scan'
 import { useRemote } from '@features/remote/useRemote'
 import { useModalOverlay } from '@features/overlay/useModalOverlay'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 코드로 찾기.
@@ -93,13 +94,9 @@ export function ScanDialog({
 
         <div className="mt-3 rounded-xl border border-slate-200 p-3">
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => void startCamera()}
-              className="min-h-11 rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
-            >
+            <Button size="sm" onClick={() => void startCamera()}>
               카메라로 찍기
-            </button>
+            </Button>
             {camera === 'live' && (
               <span role="status" className="text-[11px] font-bold text-emerald-700">
                 카메라를 켰습니다
@@ -143,13 +140,9 @@ export function ScanDialog({
               placeholder="예: PRS-C03"
               className="min-h-11 min-w-48 flex-1 rounded-lg border border-slate-300 px-3 text-sm"
             />
-            <button
-              type="submit"
-              disabled={manual.trim() === ''}
-              className="bg-brand text-brand-fg min-h-11 rounded-lg px-4 text-sm font-bold hover:opacity-90 disabled:opacity-40"
-            >
+            <Button tone="primary" type="submit" disabled={manual.trim() === ''}>
               찾기
-            </button>
+            </Button>
           </div>
         </form>
 

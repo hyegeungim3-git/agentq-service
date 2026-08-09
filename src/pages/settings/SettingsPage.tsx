@@ -1,5 +1,6 @@
 import { UI_LANGS, t, uiLangLabel, type UiLang } from '@shared/i18n/strings'
 import type { PrefsStore, Theme } from '@features/prefs/usePrefs'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 환경설정.
@@ -90,13 +91,9 @@ export function SettingsPage({ store }: { store: PrefsStore }) {
       </section>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={reset}
-          className="min-h-11 rounded-lg border border-slate-300 px-4 text-sm font-bold text-slate-700 hover:bg-slate-50"
-        >
+        <Button onClick={reset}>
           {t(lang, 'settings.reset')}
-        </button>
+        </Button>
         {/* 저장 사실과 막혔을 때를 모두 말한다 */}
         <p className={`text-xs ${persisted ? 'text-slate-500' : 'text-rose-800'}`}>
           {t(lang, persisted ? 'settings.saved' : 'settings.notSaved')}

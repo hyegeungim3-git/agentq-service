@@ -21,6 +21,7 @@ import { formatCount } from "@shared/lib/format";
 import { AgentPageHeader } from "@widgets/agent-shell/AgentShell";
 import { AgentFlowTrail } from "@widgets/agent-flow/AgentFlowTrail";
 import { Play } from "lucide-react";
+import { Button } from '@shared/ui/Button'
 
 const STATUS_STYLE: Record<MappingStatus, string> = {
   auto: "bg-emerald-100 text-emerald-800",
@@ -113,15 +114,10 @@ export function MappingPage({
                 ocrDocument={m.ocrDocument}
               />
 
-              <button
-                type="button"
-                onClick={() => void m.run()}
-                disabled={busy}
-                className="bg-brand text-brand-fg flex min-h-11 items-center gap-2 rounded-lg px-5 text-sm font-bold shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-              >
+              <Button tone="primary" onClick={() => void m.run()} disabled={busy}>
                 <Play className="size-4" aria-hidden="true" />
                 {busy ? "처리 중…" : runLabel}
-              </button>
+              </Button>
 
               {/* 자리는 처음부터 두고 내용만 채운다 — 실행 순간에 만들어지는 리전은
                   첫 변화를 놓친다. 보이는 카드는 같은 말을 두 번 읽히지 않게 내린다 */}
@@ -705,14 +701,9 @@ function TagResultView({
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={applyAuto}
-            disabled={applied.size > 0 || autoList.length === 0}
-            className="min-h-11 rounded-lg border border-slate-300 px-4 text-sm font-bold text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
-          >
+          <Button onClick={applyAuto} disabled={applied.size > 0 || autoList.length === 0}>
             자동 확정 {formatCount(result.autoConfirmable)}건 반영
-          </button>
+          </Button>
           {applied.size > 0 && (
             <p className="text-sm font-bold text-emerald-700">
               {formatCount(result.autoConfirmable)}건 반영 — 표준화{" "}

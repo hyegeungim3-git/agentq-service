@@ -27,6 +27,8 @@ import type { SignalLink, WorkSignal } from '@entities/signal/model'
 import { FIELD_TABS, INFO_TABS, SHELL_TABS, shellTabDesc, shellTabLabel, type ShellTab } from './tabs'
 import { t, type UiLang } from '@shared/i18n/strings'
 import { SignalBell } from './SignalBell'
+import { Button } from '@shared/ui/Button'
+import { groupByRecency } from '@entities/chat/recentGroups'
 
 /**
  * 사용자 포털의 셸 — 사이드바와 탭.
@@ -108,6 +110,9 @@ export function AppShell({
   children,
   banner,
 }: ShellProps) {
+  /* 렌더 중에 시계를 읽으면 순수하지 않다(lint가 잡는다). 이 화면이 열린 때를
+     한 번 잡아 쓴다 — 자정을 넘겨 켜 둔 창은 다음에 열 때 다시 묶인다 */
+  const [mountedAt] = useState(() => Date.now())
   const [open, setOpen] = useState(false)
   const close = useCallback(() => setOpen(false), [])
   const current = workspaces.find((w) => w.id === workspaceId)
@@ -278,39 +283,39 @@ export function AppShell({
           그래서 줄지 않게 하고(`shrink-0`) 최소 높이를 준다 — 모자라면 사이드바
           전체가 스크롤된다(`nav`의 `overflow-y-auto`). */}
       <div className="flex min-h-40 shrink-0 grow flex-col overflow-hidden p-2">
-        <button
-          type="button"
+        {/* 원본과 같이 **채운 버튼**이다 — 사이드바에서 제일 먼저 누르는 것이라
+            테두리만 있으면 목록에 묻힌다 */}
+        <Button
+          tone="primary"
           onClick={() => {
             onNewConversation()
             onTab('general')
             close()
           }}
-          /* 원본과 같이 **채운 버튼**이다 — 사이드바에서 제일 먼저 누르는 것이라
-             테두리만 있으면 목록에 묻힌다 */
-          className="bg-brand text-brand-fg min-h-11 rounded-lg px-3 text-sm font-bold shadow-sm hover:opacity-90"
         >
           {t(uiLang, 'nav.newChat')}
-        </button>
+        </Button>
 
         <div className="mt-4 flex items-center justify-between px-3">
           <p className="text-[11px] font-bold text-slate-500">{t(uiLang, 'nav.recent')}</p>
           {conversations.length > 0 && (
-            <button
-              type="button"
-              onClick={onClearConversations}
-              className="min-h-11 text-[11px] font-bold text-slate-400 underline hover:text-slate-700"
-            >
+            <Button onClick={onClearConversations} tone="link" size="sm">
               {t(uiLang, 'nav.clearAll')}
-            </button>
+            </Button>
           )}
         </div>
 
         {conversations.length === 0 ? (
           <p className="px-3 py-2 text-xs text-slate-400">{t(uiLang, 'nav.empty')}</p>
         ) : (
-          /* 대화 제목은 사용자가 물어본 한국어 문장 그대로다 */
-          <ul lang="ko" className="mt-1 min-h-0 flex-1 overflow-y-auto">
-            {conversations.map((c) => (
+          /* 대화 제목은 사용자가 물어본 한국어 문장 그대로다.
+             원본처럼 날짜로 묶는다 — 목록이 길어지면 제목만으로는 언제 물은 것인지 모른다 */
+          <div lang="ko" className="mt-1 min-h-0 flex-1 overflow-y-auto">
+            {groupByRecency(conversations, mountedAt).map((g) => (
+              <section key={g.label} aria-label={`${g.label} 대화`}>
+                <p className="px-3 pt-2 pb-1 text-[11px] font-bold text-slate-400">{g.label}</p>
+                <ul>
+            {g.items.map((c) => (
               <li key={c.id} className="flex items-center gap-1">
                 <button
                   type="button"
@@ -343,7 +348,10 @@ export function AppShell({
                 </button>
               </li>
             ))}
-          </ul>
+                </ul>
+              </section>
+            ))}
+          </div>
         )}
 
         {/* 저장 사실과 막혔을 때를 모두 말한다 */}
@@ -432,13 +440,9 @@ export function AppShell({
             <span className="block truncate text-xs text-slate-500">{domain.user.dept}</span>
           </span>
         </div>
-        <button
-          type="button"
-          onClick={onExit}
-          className="mt-2 min-h-11 text-xs font-bold text-slate-500 underline hover:text-slate-900"
-        >
+        <Button tone="link" size="sm" layout="mt-2" onClick={onExit}>
           {t(uiLang, 'nav.exit')}
-        </button>
+        </Button>
       </div>
     </nav>
   )

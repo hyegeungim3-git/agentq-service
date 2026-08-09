@@ -15,6 +15,7 @@ import { useKnowledge, type KnowledgeOptions } from '@features/knowledge/useKnow
 import { AgentPageHeader, ResultSection } from '@widgets/agent-shell/AgentShell'
 import { AgentFlowTrail } from '@widgets/agent-flow/AgentFlowTrail'
 import { Play } from 'lucide-react'
+import { Button } from '@shared/ui/Button'
 
 export function KnowledgePage({
   onBack,
@@ -184,23 +185,14 @@ export function KnowledgePage({
             </section>
 
             <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => void k.search()}
-                disabled={busy}
-                className="bg-brand text-brand-fg flex min-h-11 items-center gap-2 rounded-lg px-5 text-sm font-bold shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-              >
+              <Button tone="primary" onClick={() => void k.search()} disabled={busy}>
             <Play className="size-4" aria-hidden="true" />
                 {busy ? '검색 중…' : `${searchModeLabel(k.mode)} 시작`}
-              </button>
+              </Button>
               {k.phase.kind === 'done' && (
-                <button
-                  type="button"
-                  onClick={k.reset}
-                  className="min-h-11 rounded-lg border border-slate-300 px-4 text-sm font-bold text-slate-700 hover:bg-slate-100"
-                >
+                <Button onClick={k.reset}>
                   다시 설정
-                </button>
+                </Button>
               )}
             </div>
 

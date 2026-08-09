@@ -5,6 +5,7 @@ import {
   type SignalLink,
   type WorkSignal,
 } from '@entities/signal/model'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 오늘의 업무 브리핑.
@@ -72,13 +73,9 @@ export function BriefingCards({
                 </span>
                 <span className="text-slate-700">{s.title}</span>
                 {s.link && (
-                  <button
-                    type="button"
-                    onClick={() => onOpen(s.link)}
-                    className="min-h-11 text-xs font-bold text-slate-500 underline hover:text-slate-900"
-                  >
+                  <Button tone="link" size="sm" onClick={() => onOpen(s.link)}>
                     {s.link.label}
-                  </button>
+                  </Button>
                 )}
               </li>
             ))}

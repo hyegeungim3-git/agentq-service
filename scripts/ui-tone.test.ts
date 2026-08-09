@@ -3,7 +3,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 /**
- * 관리자 표 규약.
+ * 화면 톤 규약 — 관리자와 사용자 포털 양쪽.
  *
  * 관리자 화면 51개 중 25개가 표를 그린다. 표는 손으로 그리면 **빠지는 것이 늘 같다** —
  * 이름, 비었을 때의 말. 실제로 그 상태였다: 표 28개 전부 `<caption>`이 없었고,
@@ -15,6 +15,9 @@ import { join } from 'node:path'
  */
 
 const ADMIN = join(process.cwd(), 'src/pages/admin')
+/* 사용자 쪽도 같은 일이 있었다 — 버튼 80개 중 같은 역할이 서로 다른 치수였다 */
+const USER_DIRS = ['src/pages', 'src/widgets']
+const SKIP = ['src/pages/admin', 'src/widgets/admin-shell']
 
 type File = { rel: string; src: string }
 
@@ -33,6 +36,11 @@ function walk(dir: string, out: File[] = []): File[] {
 
 const FILES = walk(ADMIN)
 
+/** 관리자를 뺀 나머지 화면 */
+const USER_FILES = USER_DIRS.flatMap((d) => walk(join(process.cwd(), d))).filter(
+  (f) => !SKIP.some((s) => f.rel.startsWith(s)),
+)
+
 describe('관리자 조작 부품', () => {
   /**
    * 버튼 39개가 클래스 20종이었다. 역할은 셋뿐인데(주요·보조·링크) 화면마다 여백과
@@ -43,16 +51,19 @@ describe('관리자 조작 부품', () => {
    */
   it('버튼을 새 치수로 그리지 않는다', () => {
     const bad: string[] = []
-    for (const f of FILES) {
+    for (const f of [...FILES, ...USER_FILES]) {
       for (const m of f.src.matchAll(/<button\b[\s\S]{0,700}?className="([^"]*)"/g)) {
         const cls = m[1] ?? ''
         if (!cls.includes('min-h-11')) continue
         /* 뜻이 있는 색은 예외 — 그 밖에 표준 배색을 쓰면서 손으로 그린 것만 잡는다 */
         if (/amber|rose|emerald/.test(cls)) continue
-        if (/bg-brand|border-slate-300|border-slate-200|underline/.test(cls)) bad.push(f.rel)
+        /* 생김새 자체가 뜻인 버튼은 대상이 아니다 — 카드(`p-4`·`text-left`),
+           칩(`rounded-full`), 아이콘 원형(`size-11`)은 Button이 맡을 것이 아니다 */
+        if (/rounded-full|size-11|p-4|text-left|absolute|group/.test(cls)) continue
+        if (/bg-brand|border-slate-300|underline/.test(cls)) bad.push(f.rel)
       }
     }
-    expect(bad, 'AdminButton을 쓸 것 — 같은 역할이 화면마다 다른 크기가 된다').toEqual([])
+    expect(bad, 'shared/ui/Button을 쓸 것 — 같은 역할이 화면마다 다른 크기가 된다').toEqual([])
   })
 
   /* 탭 묶음도 같은 이유로 한 곳에서 그린다 */

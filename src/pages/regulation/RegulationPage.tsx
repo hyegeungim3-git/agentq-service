@@ -3,6 +3,7 @@ import { useRegulation, type RegulationOptions } from '@features/regulation/useR
 import { AgentPageHeader, ResultSection } from '@widgets/agent-shell/AgentShell'
 import { AgentFlowTrail } from '@widgets/agent-flow/AgentFlowTrail'
 import { Play } from 'lucide-react'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 내규 조회는 문서 선택이 아니라 질문 입력형이라 AgentShell을 쓰지 않는다.
@@ -66,15 +67,10 @@ export function RegulationPage({
             </fieldset>
           </section>
 
-          <button
-            type="button"
-            onClick={() => void r.run()}
-            disabled={!r.canRun || r.phase.kind === 'running'}
-            className="bg-brand text-brand-fg flex min-h-11 items-center gap-2 rounded-lg px-5 text-sm font-bold shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-          >
+          <Button tone="primary" onClick={() => void r.run()} disabled={!r.canRun || r.phase.kind === 'running'}>
             <Play className="size-4" aria-hidden="true" />
             {r.phase.kind === 'running' ? '조회 중…' : '규정 조회'}
-          </button>
+          </Button>
 
           {/* 자리는 처음부터 두고 내용만 채운다 — 실행 순간에 만들어지는 리전은 첫 변화를 놓친다 */}
           <p role="status" aria-live="polite" className="sr-only">

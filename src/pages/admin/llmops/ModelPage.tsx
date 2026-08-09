@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { MODEL_STATE_LABEL, type ModelEntry } from '@entities/llmops/model'
 import { fetchModels, updateModelParams } from '@shared/api/llmops'
 import { useRemote } from '@features/remote/useRemote'
-import { AdminButton } from '@widgets/admin-shell/AdminControls'
+import { Button } from '@shared/ui/Button'
 
 /**
  * LLM 설정.
@@ -98,9 +98,9 @@ function Detail({
             className="min-w-48 flex-1"
           />
           <output className="w-10 text-sm font-black tabular-nums text-slate-900">{temp.toFixed(1)}</output>
-          <AdminButton tone="primary" size="sm" disabled={!changed} onClick={() => onSave(model.id, temp)}>
+          <Button tone="primary" size="sm" disabled={!changed} onClick={() => onSave(model.id, temp)}>
             저장
-          </AdminButton>
+          </Button>
         </div>
         <p className="mt-1 text-[11px] text-slate-500">
           온도를 올리면 표현이 다양해지고 같은 질문에 매번 다른 답이 나옵니다. 규정·수치를 다루는

@@ -14,6 +14,7 @@ import { ROLE_LABEL, isComplete, missingRoles } from '@entities/approval/model'
 import { fetchApprovalLine, submitApproval } from '@shared/api/approval'
 import { useRemote } from '@features/remote/useRemote'
 import { useExport } from '@features/export/useExport'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 만든 문서를 **점검하고 · 가져가고 · 올린다.**
@@ -85,28 +86,15 @@ export function DocActions({ doc }: { doc: OutgoingDoc }) {
       </ul>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={() => exporter.download(documentAsText(doc, checks), fileNameOf(doc))}
-          className="min-h-11 rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
-        >
+        <Button size="sm" onClick={() => exporter.download(documentAsText(doc, checks), fileNameOf(doc))}>
           내려받기
-        </button>
-        <button
-          type="button"
-          onClick={exporter.print}
-          className="min-h-11 rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
-        >
+        </Button>
+        <Button size="sm" onClick={exporter.print}>
           인쇄
-        </button>
-        <button
-          type="button"
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-          className="min-h-11 rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
-        >
+        </Button>
+        <Button size="sm" onClick={() => setOpen(!open)} aria-expanded={open}>
           결재선 {open ? '접기' : '보기'}
-        </button>
+        </Button>
       </div>
 
       {/* 내려받기·인쇄가 막히면 사용자는 받은 줄 알고 파일을 찾는다 */}
@@ -152,14 +140,9 @@ export function DocActions({ doc }: { doc: OutgoingDoc }) {
 
       <div className="mt-4 border-t border-slate-100 pt-3">
         {ready ? (
-          <button
-            type="button"
-            onClick={submit}
-            disabled={sent && failure === null}
-            className="bg-brand text-brand-fg min-h-11 rounded-lg px-4 text-sm font-bold hover:opacity-90 disabled:opacity-50"
-          >
+          <Button tone="primary" onClick={submit} disabled={sent && failure === null}>
             결재 상신
-          </button>
+          </Button>
         ) : (
           /* 눌러 놓고 서버가 거절하게 두지 않는다 — 무엇을 고쳐야 하는지 여기서 말한다 */
           <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">

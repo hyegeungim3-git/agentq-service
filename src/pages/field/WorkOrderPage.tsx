@@ -11,6 +11,7 @@ import {
 import { advanceWorkOrder, fetchWorkOrders } from '@shared/api/field'
 import { fetchAsOf } from '@shared/api/users'
 import { useRemote } from '@features/remote/useRemote'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 작업지시 추적.
@@ -141,13 +142,9 @@ export function WorkOrderPage() {
                   </ol>
 
                   {to !== null && action !== null && (
-                    <button
-                      type="button"
-                      onClick={() => advance(o.id, to)}
-                      className="mt-2 min-h-11 rounded-lg border border-slate-300 px-3 text-[11px] font-bold text-slate-700 hover:bg-slate-50"
-                    >
+                    <Button onClick={() => advance(o.id, to)} size="sm" layout="mt-2">
                       {action}
-                    </button>
+                    </Button>
                   )}
                 </li>
               )

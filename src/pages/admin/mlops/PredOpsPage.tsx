@@ -13,7 +13,7 @@ import {
 import { fetchDriftItems, fetchPredModels, fetchRetrainRuns, promoteChallenger } from '@shared/api/predops'
 import { useRemote } from '@features/remote/useRemote'
 import { ExampleBadge } from '@widgets/admin-shell/ExampleBadge'
-import { AdminButton } from '@widgets/admin-shell/AdminControls'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 예측 모델 운영.
@@ -210,9 +210,9 @@ export function PredOpsPage() {
                   </p>
                   <p className="mt-1 text-[11px] text-slate-500">{r.note}</p>
                   {r.promotedOn === null && better && (
-                    <AdminButton size="sm" layout="mt-2" onClick={() => promote(r.id)}>
+                    <Button size="sm" layout="mt-2" onClick={() => promote(r.id)}>
                       이 모델로 교체
-                    </AdminButton>
+                    </Button>
                   )}
                 </li>
               )

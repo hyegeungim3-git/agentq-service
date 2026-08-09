@@ -20,6 +20,14 @@ export type Conversation = {
   /** 첫 질문에서 만든다. 아직 질문이 없으면 null */
   title: string | null
   messages: ChatMessage[]
+  /**
+   * 처음 물어본 때(에폭 밀리초).
+   *
+   * 원본처럼 '오늘 / 어제 / 이전'으로 묶으려면 시각이 있어야 한다. 예전에 저장해 둔
+   * 대화에는 이 값이 없다 — 지우지 않고 '이전'으로 본다. 있던 대화를 없애는 것보다
+   * 덜 정확한 자리에 두는 편이 낫다.
+   */
+  at?: number
 }
 
 const KEY = 'agentq.conversations.v1'
@@ -137,7 +145,7 @@ export function useConversations(workspaceId: string) {
         const newId = `conv-${workspaceId}-${seq.current}`
         const messages = update([])
         commit(
-          (prev) => [{ id: newId, workspaceId, title: titleOf(messages), messages }, ...prev],
+          (prev) => [{ id: newId, workspaceId, title: titleOf(messages), messages, at: Date.now() }, ...prev],
           [workspaceId, newId],
         )
         return

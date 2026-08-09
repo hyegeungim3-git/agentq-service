@@ -7,6 +7,7 @@ import type { AgentId } from '@entities/agent/model'
 import { AGENT_ICONS, FALLBACK_AGENT_ICON } from '@shared/ui/agentIcons'
 import { AgentFlowTrail } from '@widgets/agent-flow/AgentFlowTrail'
 import type { AgentInput, RunPhase, UploadSlot } from '@features/agent-run/useAgentRun'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 문서 입력형 에이전트의 공통 화면 골격.
@@ -179,23 +180,14 @@ export function AgentShell<R>({
             )}
 
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={onRun}
-                disabled={busy || !documentId || !canRun}
-                className="bg-brand text-brand-fg flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg px-5 text-sm font-bold shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
-              >
+              <Button tone="primary" layout="flex-1 sm:flex-none" onClick={onRun} disabled={busy || !documentId || !canRun}>
                 <Play className="size-4" aria-hidden="true" />
                 {busy ? runningLabel : runLabel}
-              </button>
+              </Button>
               {phase.kind === 'done' && (
-                <button
-                  type="button"
-                  onClick={onReset}
-                  className="min-h-11 rounded-lg border border-slate-300 px-4 text-sm font-bold text-slate-700 hover:bg-slate-100"
-                >
+                <Button onClick={onReset}>
                   다시 설정
-                </button>
+                </Button>
               )}
             </div>
 
@@ -223,13 +215,9 @@ export function AgentShell<R>({
               <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-5">
                 <p className="text-sm font-bold text-rose-800">실행에 실패했습니다</p>
                 <p className="mt-1 text-sm text-rose-700">{phase.message}</p>
-                <button
-                  type="button"
-                  onClick={onRun}
-                  className="mt-3 min-h-11 rounded-lg border border-rose-300 px-3 text-sm font-bold text-rose-800 hover:bg-rose-100"
-                >
+                <Button tone="danger" layout="mt-3" onClick={onRun}>
                   다시 시도
-                </button>
+                </Button>
               </div>
             )}
 

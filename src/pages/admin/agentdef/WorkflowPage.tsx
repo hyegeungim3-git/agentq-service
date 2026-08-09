@@ -10,7 +10,7 @@ import {
 } from '@entities/workflow/model'
 import { fetchWorkflows, setWorkflowEnabled } from '@shared/api/workflow'
 import { useRemote } from '@features/remote/useRemote'
-import { AdminButton } from '@widgets/admin-shell/AdminControls'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 워크플로우.
@@ -201,9 +201,9 @@ export function WorkflowPage() {
                         </p>
                       )}
 
-                      <AdminButton size="sm" layout="mt-3" onClick={() => toggle(w.id, !w.enabled)}>
+                      <Button size="sm" layout="mt-3" onClick={() => toggle(w.id, !w.enabled)}>
                         {w.enabled ? '끄기' : '켜기'}
-                      </AdminButton>
+                      </Button>
                     </li>
                   )
                 })}

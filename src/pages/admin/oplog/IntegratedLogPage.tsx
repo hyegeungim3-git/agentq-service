@@ -3,7 +3,8 @@ import { OPLOG_KINDS, OPLOG_KIND_LABEL, type OpLogKind } from '@entities/oplog/m
 import { exportLogsCsv, fetchOpLogs } from '@shared/api/oplog'
 import { useRemote } from '@features/remote/useRemote'
 import { AdminTable, EmptyRow } from '@widgets/admin-shell/AdminTable'
-import { AdminButton, AdminTabs } from '@widgets/admin-shell/AdminControls'
+import { AdminTabs } from '@widgets/admin-shell/AdminControls'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 통합 로그 관리.
@@ -39,9 +40,9 @@ export function IntegratedLogPage() {
     <main className="min-w-0 p-4 sm:p-6">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-lg font-black text-slate-900">통합 로그 관리</h1>
-        <AdminButton layout="ml-auto" onClick={csv}>
+        <Button layout="ml-auto" onClick={csv}>
           CSV 내보내기
-        </AdminButton>
+        </Button>
       </div>
       <p className="mt-1 text-sm text-slate-600">추출·접속·작업·질의 기록을 한자리에서 봅니다.</p>
 

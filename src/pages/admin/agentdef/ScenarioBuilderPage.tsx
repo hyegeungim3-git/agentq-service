@@ -12,7 +12,7 @@ import { fetchTools } from '@shared/api/packops'
 import { useRemote } from '@features/remote/useRemote'
 import { DomainSelect } from '@widgets/admin-shell/DomainSelect'
 import { withSubject } from '@shared/lib/korean'
-import { AdminButton } from '@widgets/admin-shell/AdminControls'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 시나리오 빌더 — 여러 에이전트를 잇는 복합 업무.
@@ -194,9 +194,9 @@ export function ScenarioBuilderPage() {
                       })}
                     </ol>
 
-                    <AdminButton tone="primary" size="sm" layout="mt-3" onClick={() => save(s.id)}>
+                    <Button tone="primary" size="sm" layout="mt-3" onClick={() => save(s.id)}>
                       시나리오 저장
-                    </AdminButton>
+                    </Button>
                   </li>
                 ))}
               </ul>

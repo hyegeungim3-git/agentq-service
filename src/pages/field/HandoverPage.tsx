@@ -7,6 +7,7 @@ import {
 } from '@entities/field/model'
 import { confirmHandover, fetchReceivedHandover, fetchShifts } from '@shared/api/field'
 import { useRemote } from '@features/remote/useRemote'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 교대 인수인계.
@@ -130,14 +131,9 @@ export function HandoverPage() {
                   })}
                 </ul>
 
-                <button
-                  type="button"
-                  onClick={confirm}
-                  disabled={checked.length === 0}
-                  className="bg-brand text-brand-fg mt-4 min-h-11 rounded-lg px-4 text-sm font-bold hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-                >
+                <Button tone="primary" layout="mt-4" onClick={confirm} disabled={checked.length === 0}>
                   확인 {checked.length}건 저장
-                </button>
+                </Button>
                 <p className="mt-2 max-w-3xl text-[11px] text-slate-500">
                   확인은 <b>다음 조가 볼 수 있어야</b> 의미가 있습니다. 서버에 남지 않으면 이 화면에서만
                   확인한 것이 됩니다.

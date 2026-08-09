@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { APP_KINDS, APP_KIND_LABEL, down, unused, type AppKind } from '@entities/appinst/model'
 import { fetchAppInstances, setInstanceLive } from '@shared/api/appinst'
 import { useRemote } from '@features/remote/useRemote'
-import { AdminButton } from '@widgets/admin-shell/AdminControls'
+import { Button } from '@shared/ui/Button'
 
 /**
  * 앱 인스턴스.
@@ -157,9 +157,9 @@ export function AppInstancePage() {
                       </p>
                     )}
 
-                    <AdminButton size="sm" layout="mt-2" onClick={() => toggle(a.id, !a.live)}>
+                    <Button size="sm" layout="mt-2" onClick={() => toggle(a.id, !a.live)}>
                       {a.live ? '내리기' : '올리기'}
-                    </AdminButton>
+                    </Button>
                   </li>
                 ))}
               </ul>

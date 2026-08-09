@@ -11,6 +11,7 @@ import {
 } from '@entities/translation/model'
 import { useTranslate, type TranslateOptions } from '@features/translate/useTranslate'
 import { AgentShell, ResultSection } from '@widgets/agent-shell/AgentShell'
+import { Button } from '@shared/ui/Button'
 
 export function TranslatePage({ onBack, apiOptions }: { onBack?: () => void; apiOptions?: TranslateOptions }) {
   const t = useTranslate(apiOptions ?? {})
@@ -123,13 +124,9 @@ export function TranslatePage({ onBack, apiOptions }: { onBack?: () => void; api
                   onChange={(e) => t.setText(e.target.value)}
                   className="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm focus-visible:outline-2 focus-visible:outline-slate-900"
                 />
-                <button
-                  type="button"
-                  onClick={t.loadSample}
-                  className="mt-1 min-h-11 text-xs font-bold text-slate-500 underline hover:text-slate-900"
-                >
+                <Button tone="link" size="sm" layout="mt-1" onClick={t.loadSample}>
                   예시 원문 넣기
-                </button>
+                </Button>
               </div>
             )}
           </fieldset>
